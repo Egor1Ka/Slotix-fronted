@@ -28,7 +28,7 @@ Use this project as a **reference template** when building new frontend projects
 | Toasts     | `sonner`                                          | 2       |
 | Charts     | `recharts`                                        | 2.15    |
 | Themes     | `next-themes` (dark mode via `.dark` class)       | 0.4     |
-| Formatting | Prettier + `prettier-plugin-tailwindcss`           | 3       |
+| Formatting | Prettier + `prettier-plugin-tailwindcss`          | 3       |
 
 ## Project Structure
 
@@ -87,12 +87,12 @@ app/
 
 `@/*` maps to the project root. Additional explicit aliases for key directories:
 
-| Alias             | Path             | Purpose                      |
-| ----------------- | ---------------- | ---------------------------- |
-| `@/*`             | `./*`            | Project root (catch-all)     |
-| `@/types/*`       | `./types/*`      | Shared TypeScript types      |
-| `@/services/*`    | `./services/*`   | API services, data fetching  |
-| `@/constants/*`   | `./constants/*`  | App-wide constants           |
+| Alias           | Path            | Purpose                     |
+| --------------- | --------------- | --------------------------- |
+| `@/*`           | `./*`           | Project root (catch-all)    |
+| `@/types/*`     | `./types/*`     | Shared TypeScript types     |
+| `@/services/*`  | `./services/*`  | API services, data fetching |
+| `@/constants/*` | `./constants/*` | App-wide constants          |
 
 ```tsx
 import { Button } from '@/components/ui/button'
@@ -407,10 +407,12 @@ The `standalone` output mode bundles everything into a self-contained `server.js
 Pipeline in `.github/workflows/ci.yml` triggers on push/PR to `main`:
 
 **lint** job:
+
 1. Install dependencies (`npm ci`)
 2. Run ESLint (`npm run lint`)
 3. Check Prettier formatting (`npx prettier --check .`)
 
 **build** job (depends on lint):
+
 1. Install dependencies
 2. Run production build (`npm run build`)

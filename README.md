@@ -24,24 +24,24 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Scripts
 
-| Command              | Description                     |
-| -------------------- | ------------------------------- |
-| `npm run dev`        | Start dev server                |
-| `npm run build`      | Production build                |
-| `npm run start`      | Serve production build          |
-| `npm run lint`       | Run ESLint                      |
-| `npm run format`     | Format files with Prettier      |
-| `npm run format:check` | Check formatting              |
+| Command                | Description                |
+| ---------------------- | -------------------------- |
+| `npm run dev`          | Start dev server           |
+| `npm run build`        | Production build           |
+| `npm run start`        | Serve production build     |
+| `npm run lint`         | Run ESLint                 |
+| `npm run format`       | Format files with Prettier |
+| `npm run format:check` | Check formatting           |
 
 ## Pages
 
-| Route         | Description                              |
-| ------------- | ---------------------------------------- |
-| `/`           | Home — navigation to all pages           |
+| Route         | Description                                |
+| ------------- | ------------------------------------------ |
+| `/`           | Home — navigation to all pages             |
 | `/demo`       | Style overview with interactive components |
-| `/login`      | Login page with form and image           |
-| `/signup`     | Signup page with form and image          |
-| `/shadcndemo` | Full shadcn/ui components showcase       |
+| `/login`      | Login page with form and image             |
+| `/signup`     | Signup page with form and image            |
+| `/shadcndemo` | Full shadcn/ui components showcase         |
 
 ## Project Structure
 
