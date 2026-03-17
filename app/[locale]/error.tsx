@@ -32,7 +32,11 @@ export default function Error({
 					<Button variant="outline" onClick={reset}>
 						{t('tryAgain')}
 					</Button>
-					<Button variant="outline" nativeButton={false} render={<Link href="/" />}>
+					<Button
+						variant="outline"
+						nativeButton={false}
+						render={<Link href="/" />}
+					>
 						{t('goHome')}
 					</Button>
 				</div>
