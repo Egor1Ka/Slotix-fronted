@@ -56,5 +56,13 @@
 	"demo": {
 		"title": "shadcn/ui Demo",
 		"description": "All shadcn/ui components in one place."
+	},
+	"errors": {
+		"title": "Something went wrong",
+		"description": "An unexpected error occurred. Please try again.",
+		"tryAgain": "Try again",
+		"goHome": "Go to homepage",
+		"notFoundTitle": "Page not found",
+		"notFoundDescription": "The page you're looking for doesn't exist or has been moved."
 	}
 }

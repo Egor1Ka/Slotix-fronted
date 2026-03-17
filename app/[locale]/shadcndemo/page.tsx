@@ -128,12 +128,8 @@ export default function ShadcnDemoPage() {
 			<div className="container mx-auto max-w-4xl space-y-12 p-8 pb-20">
 				<div className="flex items-center justify-between">
 					<div className="space-y-2">
-						<h1 className="text-4xl font-bold tracking-tight">
-							{t('title')}
-						</h1>
-						<p className="text-muted-foreground">
-							{t('description')}
-						</p>
+						<h1 className="text-4xl font-bold tracking-tight">{t('title')}</h1>
+						<p className="text-muted-foreground">{t('description')}</p>
 					</div>
 					<Button variant="outline" size="icon" onClick={() => setDark(!dark)}>
 						{dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}

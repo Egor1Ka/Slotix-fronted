@@ -46,9 +46,7 @@ export function SignupForm({
 							<Field>
 								<Field className="grid grid-cols-2 gap-4">
 									<Field>
-										<FieldLabel htmlFor="password">
-											{t('password')}
-										</FieldLabel>
+										<FieldLabel htmlFor="password">{t('password')}</FieldLabel>
 										<Input id="password" type="password" required />
 									</Field>
 									<Field>
@@ -58,9 +56,7 @@ export function SignupForm({
 										<Input id="confirm-password" type="password" required />
 									</Field>
 								</Field>
-								<FieldDescription>
-									{t('passwordDescription')}
-								</FieldDescription>
+								<FieldDescription>{t('passwordDescription')}</FieldDescription>
 							</Field>
 							<Field>
 								<Button type="submit" className="w-full">

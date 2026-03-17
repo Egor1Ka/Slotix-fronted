@@ -33,9 +33,7 @@ export default async function Home() {
 			<main className="flex w-full max-w-lg flex-col gap-8 px-6 py-16">
 				<div className="flex flex-col gap-2">
 					<div className="flex items-center justify-between">
-						<h1 className="text-3xl font-bold tracking-tight">
-							{t('title')}
-						</h1>
+						<h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
 						<LanguageSwitcher />
 					</div>
 					<p className="text-muted-foreground">{t('description')}</p>
