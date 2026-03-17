@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Toaster } from '@/components/ui/sonner'
@@ -114,6 +115,7 @@ const sections = [
 ]
 
 export default function ShadcnDemoPage() {
+	const t = useTranslations('demo')
 	const [dark, setDark] = useState(false)
 
 	useEffect(() => {
@@ -127,10 +129,10 @@ export default function ShadcnDemoPage() {
 				<div className="flex items-center justify-between">
 					<div className="space-y-2">
 						<h1 className="text-4xl font-bold tracking-tight">
-							shadcn/ui Demo
+							{t('title')}
 						</h1>
 						<p className="text-muted-foreground">
-							Все компоненты shadcn/ui в одном месте.
+							{t('description')}
 						</p>
 					</div>
 					<Button variant="outline" size="icon" onClick={() => setDark(!dark)}>

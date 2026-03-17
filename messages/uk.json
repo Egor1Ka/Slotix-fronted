@@ -1,0 +1,60 @@
+{
+	"metadata": {
+		"title": "Frontend Template",
+		"description": "Next.js frontend шаблон"
+	},
+	"home": {
+		"title": "Frontend Template",
+		"description": "Оберіть сторінку для переходу.",
+		"demo": "Демо",
+		"demoDescription": "Огляд стилів з інтерактивними компонентами",
+		"login": "Вхід",
+		"loginDescription": "Сторінка входу з формою",
+		"signup": "Реєстрація",
+		"signupDescription": "Сторінка реєстрації з формою",
+		"shadcnDemo": "shadcn/ui Демо",
+		"shadcnDemoDescription": "Усі компоненти shadcn/ui в одному місці"
+	},
+	"login": {
+		"title": "З поверненням",
+		"description": "Увійдіть до свого акаунту",
+		"email": "Email",
+		"password": "Пароль",
+		"forgotPassword": "Забули пароль?",
+		"submit": "Увійти",
+		"separator": "Або увійдіть через",
+		"appleLogin": "Увійти через Apple",
+		"googleLogin": "Увійти через Google",
+		"metaLogin": "Увійти через Meta",
+		"noAccount": "Немає акаунту?",
+		"signupLink": "Зареєструватися",
+		"terms": "Натискаючи «Увійти», ви погоджуєтесь з",
+		"termsOfService": "Умовами використання",
+		"and": "та",
+		"privacyPolicy": "Політикою конфіденційності"
+	},
+	"signup": {
+		"title": "Створити акаунт",
+		"description": "Введіть дані для реєстрації",
+		"email": "Email",
+		"emailDescription": "Ми не передаємо ваш email третім особам.",
+		"password": "Пароль",
+		"confirmPassword": "Підтвердіть",
+		"passwordDescription": "Мінімум 8 символів.",
+		"submit": "Зареєструватися",
+		"separator": "Або зареєструйтесь через",
+		"appleLogin": "Увійти через Apple",
+		"googleLogin": "Увійти через Google",
+		"metaLogin": "Увійти через Meta",
+		"hasAccount": "Вже є акаунт?",
+		"loginLink": "Увійти",
+		"terms": "Натискаючи «Зареєструватися», ви погоджуєтесь з",
+		"termsOfService": "Умовами використання",
+		"and": "та",
+		"privacyPolicy": "Політикою конфіденційності"
+	},
+	"demo": {
+		"title": "shadcn/ui Демо",
+		"description": "Усі компоненти shadcn/ui в одному місці."
+	}
+}

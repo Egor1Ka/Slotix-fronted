@@ -1,0 +1,60 @@
+{
+	"metadata": {
+		"title": "Frontend Template",
+		"description": "Next.js frontend template"
+	},
+	"home": {
+		"title": "Frontend Template",
+		"description": "Select a page to navigate to.",
+		"demo": "Demo",
+		"demoDescription": "Style overview with interactive components",
+		"login": "Login",
+		"loginDescription": "Login page with form and image",
+		"signup": "Sign Up",
+		"signupDescription": "Signup page with form and image",
+		"shadcnDemo": "shadcn/ui Demo",
+		"shadcnDemoDescription": "All shadcn/ui components showcase"
+	},
+	"login": {
+		"title": "Welcome back",
+		"description": "Sign in to your account",
+		"email": "Email",
+		"password": "Password",
+		"forgotPassword": "Forgot password?",
+		"submit": "Sign in",
+		"separator": "Or sign in with",
+		"appleLogin": "Sign in with Apple",
+		"googleLogin": "Sign in with Google",
+		"metaLogin": "Sign in with Meta",
+		"noAccount": "Don't have an account?",
+		"signupLink": "Sign up",
+		"terms": "By clicking \"Sign in\", you agree to the",
+		"termsOfService": "Terms of Service",
+		"and": "and",
+		"privacyPolicy": "Privacy Policy"
+	},
+	"signup": {
+		"title": "Create an account",
+		"description": "Enter your details to sign up",
+		"email": "Email",
+		"emailDescription": "We won't share your email with third parties.",
+		"password": "Password",
+		"confirmPassword": "Confirm",
+		"passwordDescription": "Minimum 8 characters.",
+		"submit": "Sign up",
+		"separator": "Or sign up with",
+		"appleLogin": "Sign in with Apple",
+		"googleLogin": "Sign in with Google",
+		"metaLogin": "Sign in with Meta",
+		"hasAccount": "Already have an account?",
+		"loginLink": "Sign in",
+		"terms": "By clicking \"Sign up\", you agree to the",
+		"termsOfService": "Terms of Service",
+		"and": "and",
+		"privacyPolicy": "Privacy Policy"
+	},
+	"demo": {
+		"title": "shadcn/ui Demo",
+		"description": "All shadcn/ui components in one place."
+	}
+}
