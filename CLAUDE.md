@@ -9,23 +9,26 @@ Use this project as a **reference template** when building new frontend projects
 - `npm run build` — production build
 - `npm run start` — serve production build
 - `npm run lint` — run ESLint (flat config, ESLint 9)
+- `npm run format` — format all files with Prettier
+- `npm run format:check` — check formatting without modifying files
 
 ## Tech Stack
 
-| Layer        | Technology                                  | Version |
-| ------------ | ------------------------------------------- | ------- |
-| Framework    | Next.js (App Router)                        | 16      |
-| UI Library   | React                                       | 19      |
-| Language     | TypeScript (strict mode)                    | 5       |
-| Styling      | Tailwind CSS via PostCSS (`@tailwindcss/postcss`) | 4       |
-| Components   | shadcn/ui (style: `base-nova`)              | 4       |
-| Primitives   | `@base-ui/react` (headless)                 | 1.3     |
-| Icons        | `lucide-react`                              | 0.577   |
-| Forms        | `react-hook-form` + `@hookform/resolvers`   | 7.71    |
-| Validation   | `zod`                                       | 4       |
-| Toasts       | `sonner`                                    | 2       |
-| Charts       | `recharts`                                  | 2.15    |
-| Themes       | `next-themes` (dark mode via `.dark` class) | 0.4     |
+| Layer      | Technology                                        | Version |
+| ---------- | ------------------------------------------------- | ------- |
+| Framework  | Next.js (App Router)                              | 16      |
+| UI Library | React                                             | 19      |
+| Language   | TypeScript (strict mode)                          | 5       |
+| Styling    | Tailwind CSS via PostCSS (`@tailwindcss/postcss`) | 4       |
+| Components | shadcn/ui (style: `base-nova`)                    | 4       |
+| Primitives | `@base-ui/react` (headless)                       | 1.3     |
+| Icons      | `lucide-react`                                    | 0.577   |
+| Forms      | `react-hook-form` + `@hookform/resolvers`         | 7.71    |
+| Validation | `zod`                                             | 4       |
+| Toasts     | `sonner`                                          | 2       |
+| Charts     | `recharts`                                        | 2.15    |
+| Themes     | `next-themes` (dark mode via `.dark` class)       | 0.4     |
+| Formatting | Prettier + `prettier-plugin-tailwindcss`           | 3       |
 
 ## Project Structure
 
@@ -48,11 +51,19 @@ Use this project as a **reference template** when building new frontend projects
 │
 ├── public/                     # Static assets (SVGs, favicon)
 │
+├── types/                      # Shared TypeScript types
+├── services/                   # API services and data fetching
+├── constants/                  # App-wide constants
+│
 ├── components.json             # shadcn/ui configuration
-├── tsconfig.json               # TypeScript config (path alias @/*)
+├── tsconfig.json               # TypeScript config (path aliases)
 ├── postcss.config.mjs          # PostCSS with @tailwindcss/postcss
 ├── eslint.config.mjs           # ESLint 9 flat config
-└── next.config.ts              # Next.js config (minimal)
+├── .prettierrc                 # Prettier configuration
+├── Dockerfile                  # Multi-stage production Docker build
+├── docker-compose.yml          # Docker Compose for local/production
+├── .github/workflows/ci.yml   # GitHub Actions CI (lint + build)
+└── next.config.ts              # Next.js config (standalone output)
 ```
 
 ## Architecture Details
@@ -74,12 +85,22 @@ app/
 
 ### Path Alias
 
-`@/*` maps to the project root. Always use it for imports:
+`@/*` maps to the project root. Additional explicit aliases for key directories:
+
+| Alias             | Path             | Purpose                      |
+| ----------------- | ---------------- | ---------------------------- |
+| `@/*`             | `./*`            | Project root (catch-all)     |
+| `@/types/*`       | `./types/*`      | Shared TypeScript types      |
+| `@/services/*`    | `./services/*`   | API services, data fetching  |
+| `@/constants/*`   | `./constants/*`  | App-wide constants           |
 
 ```tsx
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
-import { useIsMobile } from "@/hooks/use-mobile"
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+import { useIsMobile } from '@/hooks/use-mobile'
+import type { User } from '@/types/user'
+import { fetchUsers } from '@/services/users'
+import { API_URL } from '@/constants/config'
 ```
 
 ### Styling System
@@ -87,6 +108,7 @@ import { useIsMobile } from "@/hooks/use-mobile"
 **Tailwind CSS 4** with CSS custom properties for theming. All theme tokens are defined in `app/globals.css` using oklch color space.
 
 Key CSS variables (available in both light and dark themes):
+
 - `--background`, `--foreground` — page background/text
 - `--primary`, `--primary-foreground` — primary action color
 - `--secondary`, `--secondary-foreground` — secondary color
@@ -103,7 +125,7 @@ Dark mode is toggled by adding `.dark` class to a parent element. The variant is
 
 ### Fonts
 
-Geist Sans (`--font-geist-sans`) and Geist Mono (`--font-geist-mono`) loaded via `next/font/google` in the root layout. Applied as CSS variables on `<body>`.
+Inter (`--font-inter`) loaded via `next/font/google` in the root layout with `latin` and `cyrillic` subsets. Applied as a CSS variable on `<body>`.
 
 ## Component Patterns
 
@@ -121,17 +143,17 @@ All 54 UI components follow these conventions:
 Example pattern:
 
 ```tsx
-import * as React from "react"
-import { cn } from "@/lib/utils"
+import * as React from 'react'
+import { cn } from '@/lib/utils'
 
-function ComponentName({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="component-name"
-      className={cn("tailwind-classes-here", className)}
-      {...props}
-    />
-  )
+function ComponentName({ className, ...props }: React.ComponentProps<'div'>) {
+	return (
+		<div
+			data-slot="component-name"
+			className={cn('tailwind-classes-here', className)}
+			{...props}
+		/>
+	)
 }
 
 export { ComponentName }
@@ -142,40 +164,40 @@ export { ComponentName }
 Components with multiple visual variants use `class-variance-authority`:
 
 ```tsx
-import { cva, type VariantProps } from "class-variance-authority"
+import { cva, type VariantProps } from 'class-variance-authority'
 
-const buttonVariants = cva("base-classes", {
-  variants: {
-    variant: {
-      default: "...",
-      outline: "...",
-      ghost: "...",
-    },
-    size: {
-      default: "...",
-      sm: "...",
-      lg: "...",
-    },
-  },
-  defaultVariants: {
-    variant: "default",
-    size: "default",
-  },
+const buttonVariants = cva('base-classes', {
+	variants: {
+		variant: {
+			default: '...',
+			outline: '...',
+			ghost: '...',
+		},
+		size: {
+			default: '...',
+			sm: '...',
+			lg: '...',
+		},
+	},
+	defaultVariants: {
+		variant: 'default',
+		size: 'default',
+	},
 })
 
 function Button({
-  className,
-  variant = "default",
-  size = "default",
-  ...props
+	className,
+	variant = 'default',
+	size = 'default',
+	...props
 }: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
-  return (
-    <ButtonPrimitive
-      data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
-      {...props}
-    />
-  )
+	return (
+		<ButtonPrimitive
+			data-slot="button"
+			className={cn(buttonVariants({ variant, size, className }))}
+			{...props}
+		/>
+	)
 }
 
 export { Button, buttonVariants }
@@ -186,9 +208,9 @@ export { Button, buttonVariants }
 Many components wrap `@base-ui/react` primitives for built-in accessibility:
 
 ```tsx
-import { Button as ButtonPrimitive } from "@base-ui/react/button"
-import { Input as InputPrimitive } from "@base-ui/react/input"
-import { Checkbox as CheckboxPrimitive } from "@base-ui/react/checkbox"
+import { Button as ButtonPrimitive } from '@base-ui/react/button'
+import { Input as InputPrimitive } from '@base-ui/react/input'
+import { Checkbox as CheckboxPrimitive } from '@base-ui/react/checkbox'
 ```
 
 This gives components proper ARIA attributes, keyboard navigation, and focus management out of the box.
@@ -222,65 +244,74 @@ Complex UI elements use the compound component pattern with separate sub-compone
 Forms use `react-hook-form` + `zod` for type-safe validation:
 
 ```tsx
-"use client"
+'use client'
 
-import { useForm, Controller } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { toast } from "sonner"
+import { useForm, Controller } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { toast } from 'sonner'
 
 // 1. Define schema
 const schema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.email("Invalid email"),
-  role: z.string().min(1, "Select a role"),
+	name: z.string().min(2, 'Name must be at least 2 characters'),
+	email: z.email('Invalid email'),
+	role: z.string().min(1, 'Select a role'),
 })
 
 type FormData = z.infer<typeof schema>
 
 // 2. Setup form
-const { register, handleSubmit, control, formState: { errors }, reset } = useForm<FormData>({
-  resolver: zodResolver(schema),
+const {
+	register,
+	handleSubmit,
+	control,
+	formState: { errors },
+	reset,
+} = useForm<FormData>({
+	resolver: zodResolver(schema),
 })
 
 // 3. Handle submit
 const onSubmit = (data: FormData) => {
-  toast.success("Success!", { description: `Welcome, ${data.name}` })
-  reset()
+	toast.success('Success!', { description: `Welcome, ${data.name}` })
+	reset()
 }
 
 // 4. Render with Field components
-<form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-  {/* Simple inputs — use register() */}
-  <Field data-invalid={!!errors.name || undefined}>
-    <FieldLabel htmlFor="name">Name</FieldLabel>
-    <Input id="name" {...register("name")} />
-    <FieldError errors={[errors.name]} />
-  </Field>
+;<form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+	{/* Simple inputs — use register() */}
+	<Field data-invalid={!!errors.name || undefined}>
+		<FieldLabel htmlFor="name">Name</FieldLabel>
+		<Input id="name" {...register('name')} />
+		<FieldError errors={[errors.name]} />
+	</Field>
 
-  {/* Custom components (Select, Switch, Checkbox) — use Controller */}
-  <Field data-invalid={!!errors.role || undefined}>
-    <FieldLabel>Role</FieldLabel>
-    <Controller
-      control={control}
-      name="role"
-      render={({ field }) => (
-        <Select value={field.value} onValueChange={field.onChange}>
-          <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="dev">Developer</SelectItem>
-          </SelectContent>
-        </Select>
-      )}
-    />
-    <FieldError errors={[errors.role]} />
-  </Field>
+	{/* Custom components (Select, Switch, Checkbox) — use Controller */}
+	<Field data-invalid={!!errors.role || undefined}>
+		<FieldLabel>Role</FieldLabel>
+		<Controller
+			control={control}
+			name="role"
+			render={({ field }) => (
+				<Select value={field.value} onValueChange={field.onChange}>
+					<SelectTrigger>
+						<SelectValue placeholder="Select" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="dev">Developer</SelectItem>
+					</SelectContent>
+				</Select>
+			)}
+		/>
+		<FieldError errors={[errors.role]} />
+	</Field>
 
-  <Button type="submit">Submit</Button>
+	<Button type="submit">Submit</Button>
 </form>
 ```
 
 Key rules:
+
 - Use `register()` for native inputs (Input, Textarea, NativeSelect)
 - Use `Controller` for custom components (Select, Switch, Checkbox, RadioGroup)
 - Set `data-invalid={!!errors.field || undefined}` on Field to trigger error styling
@@ -311,6 +342,7 @@ Components will be placed in `components/ui/` and follow the `base-nova` style w
 ## Client vs Server Components
 
 By default, components in `app/` are **React Server Components**. Add `"use client"` directive at the top of files that need:
+
 - React hooks (`useState`, `useEffect`, `useForm`, etc.)
 - Event handlers (`onClick`, `onSubmit`, etc.)
 - Browser APIs (`window`, `document`, etc.)
@@ -323,16 +355,62 @@ UI components in `components/ui/` that use `@base-ui/react` primitives or intera
 Located in `lib/utils.ts`. Always use it for className composition:
 
 ```tsx
-import { cn } from "@/lib/utils"
+import { cn } from '@/lib/utils'
 
 // Merges classes and resolves Tailwind conflicts
-cn("px-4 py-2", "px-6")           // → "px-6 py-2"
-cn("text-red-500", className)      // → allows overrides from props
-cn(condition && "hidden")          // → conditional classes
+cn('px-4 py-2', 'px-6') // → "px-6 py-2"
+cn('text-red-500', className) // → allows overrides from props
+cn(condition && 'hidden') // → conditional classes
 ```
 
-## ESLint Configuration
+## Code Quality
+
+### ESLint
 
 ESLint 9 flat config in `eslint.config.mjs`:
-- Extends `next/core-web-vitals` and `next/typescript`
+
+- Extends `next/core-web-vitals`, `next/typescript`, and `eslint-config-prettier`
+- `eslint-config-prettier` disables formatting rules that conflict with Prettier
 - Ignores `.next/`, `out/`, `build/`, `next-env.d.ts`
+
+### Prettier
+
+Config in `.prettierrc`:
+
+- Tabs for indentation, no semicolons, single quotes
+- `prettier-plugin-tailwindcss` auto-sorts Tailwind classes
+- Ignored paths in `.prettierignore`
+
+Run `npm run format` to format all files. CI checks formatting with `npm run format:check`.
+
+## Docker
+
+Multi-stage Dockerfile optimized for production:
+
+1. **deps** — installs `node_modules` with `npm ci`
+2. **builder** — runs `npm run build` (requires `output: "standalone"` in `next.config.ts`)
+3. **runner** — minimal image with only standalone output, runs as non-root user
+
+```bash
+# Build and run with Docker Compose
+docker compose up --build
+
+# Or build manually
+docker build -t frontend-template .
+docker run -p 3000:3000 frontend-template
+```
+
+The `standalone` output mode bundles everything into a self-contained `server.js` — no `node_modules` needed in the final image.
+
+## CI/CD (GitHub Actions)
+
+Pipeline in `.github/workflows/ci.yml` triggers on push/PR to `main`:
+
+**lint** job:
+1. Install dependencies (`npm ci`)
+2. Run ESLint (`npm run lint`)
+3. Check Prettier formatting (`npx prettier --check .`)
+
+**build** job (depends on lint):
+1. Install dependencies
+2. Run production build (`npm run build`)

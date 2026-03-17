@@ -1,0 +1,14 @@
+.git
+.next
+node_modules
+out
+build
+coverage
+.env*
+.DS_Store
+*.md
+.vscode
+.idea
+.serena
+.claude
+.agents

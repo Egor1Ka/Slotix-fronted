@@ -6,7 +6,7 @@ import {
 	CardContent,
 	CardDescription,
 	CardHeader,
-	CardTitle
+	CardTitle,
 } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -14,7 +14,7 @@ import {
 	FieldContent,
 	FieldDescription,
 	FieldError,
-	FieldLabel
+	FieldLabel,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -25,7 +25,7 @@ import {
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
-	SelectValue
+	SelectValue,
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Toaster } from '@/components/ui/sonner'
@@ -43,7 +43,7 @@ const registrationSchema = z.object({
 		.string()
 		.min(8, 'Пароль должен содержать минимум 8 символов')
 		.regex(/\d/, 'Пароль должен содержать хотя бы одну цифру')
-		.regex(/[!@#$%^&*]/, 'Пароль должен содержать хотя бы один спецсимвол')
+		.regex(/[!@#$%^&*]/, 'Пароль должен содержать хотя бы один спецсимвол'),
 })
 
 type RegistrationData = z.infer<typeof registrationSchema>
@@ -52,7 +52,7 @@ const profileSchema = z.object({
 	name: z.string().min(1, 'Имя обязательно'),
 	bio: z.string().max(200, 'Максимум 200 символов').optional(),
 	role: z.string().min(1, 'Выберите роль'),
-	isPublic: z.boolean()
+	isPublic: z.boolean(),
 })
 
 type ProfileData = z.infer<typeof profileSchema>
@@ -60,12 +60,12 @@ type ProfileData = z.infer<typeof profileSchema>
 const feedbackSchema = z.object({
 	topic: z.string().min(1, 'Выберите тему'),
 	rating: z.enum(['good', 'average', 'bad'], {
-		message: 'Выберите оценку'
+		message: 'Выберите оценку',
 	}),
 	comment: z
 		.string()
 		.min(10, 'Комментарий должен содержать минимум 10 символов'),
-	consent: z.literal(true, 'Необходимо согласие на обработку данных')
+	consent: z.literal(true, 'Необходимо согласие на обработку данных'),
 })
 
 type FeedbackData = z.infer<typeof feedbackSchema>
@@ -75,14 +75,14 @@ function RegistrationForm() {
 		register,
 		handleSubmit,
 		formState: { errors },
-		reset
+		reset,
 	} = useForm<RegistrationData>({
-		resolver: zodResolver(registrationSchema)
+		resolver: zodResolver(registrationSchema),
 	})
 
 	const onSubmit = (data: RegistrationData) => {
 		toast.success('Регистрация успешна!', {
-			description: `Добро пожаловать, ${data.name}!`
+			description: `Добро пожаловать, ${data.name}!`,
 		})
 		reset()
 	}
@@ -96,10 +96,7 @@ function RegistrationForm() {
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
-				<form
-					className="space-y-6"
-					onSubmit={handleSubmit(onSubmit)}
-				>
+				<form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
 					<Field data-invalid={!!errors.name || undefined}>
 						<FieldLabel htmlFor="reg-name">Имя</FieldLabel>
 						<FieldDescription>Укажите ваше полное имя</FieldDescription>
@@ -151,18 +148,18 @@ function ProfileForm() {
 		register,
 		handleSubmit,
 		control,
-		formState: { errors }
+		formState: { errors },
 	} = useForm<ProfileData>({
 		resolver: zodResolver(profileSchema),
 		defaultValues: {
 			isPublic: false,
-			role: ''
-		}
+			role: '',
+		},
 	})
 
 	const onSubmit = (data: ProfileData) => {
 		toast.success('Профиль обновлён!', {
-			description: `Роль: ${data.role}`
+			description: `Роль: ${data.role}`,
 		})
 	}
 
@@ -173,10 +170,7 @@ function ProfileForm() {
 				<CardDescription>Обновите информацию вашего профиля</CardDescription>
 			</CardHeader>
 			<CardContent>
-				<form
-					className="space-y-6"
-					onSubmit={handleSubmit(onSubmit)}
-				>
+				<form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
 					<Field data-invalid={!!errors.name || undefined}>
 						<FieldLabel htmlFor="profile-name">Имя</FieldLabel>
 						<Input
@@ -205,10 +199,7 @@ function ProfileForm() {
 							control={control}
 							name="role"
 							render={({ field }) => (
-								<Select
-									value={field.value}
-									onValueChange={field.onChange}
-								>
+								<Select value={field.value} onValueChange={field.onChange}>
 									<SelectTrigger className="w-full">
 										<SelectValue placeholder="Выберите роль" />
 									</SelectTrigger>
@@ -259,19 +250,19 @@ function FeedbackForm() {
 		handleSubmit,
 		control,
 		formState: { errors },
-		reset
+		reset,
 	} = useForm<FeedbackData>({
 		resolver: zodResolver(feedbackSchema),
 		defaultValues: {
 			topic: '',
 			comment: '',
-			consent: undefined
-		}
+			consent: undefined,
+		},
 	})
 
 	const onSubmit = (data: FeedbackData) => {
 		toast.success('Отзыв отправлен!', {
-			description: `Тема: ${data.topic}, оценка: ${data.rating}`
+			description: `Тема: ${data.topic}, оценка: ${data.rating}`,
 		})
 		reset()
 	}
@@ -285,10 +276,7 @@ function FeedbackForm() {
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
-				<form
-					className="space-y-6"
-					onSubmit={handleSubmit(onSubmit)}
-				>
+				<form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
 					<Field data-invalid={!!errors.topic || undefined}>
 						<FieldLabel htmlFor="feedback-topic">Тема</FieldLabel>
 						<NativeSelect
@@ -314,29 +302,17 @@ function FeedbackForm() {
 							control={control}
 							name="rating"
 							render={({ field }) => (
-								<RadioGroup
-									value={field.value}
-									onValueChange={field.onChange}
-								>
+								<RadioGroup value={field.value} onValueChange={field.onChange}>
 									<Field orientation="horizontal">
-										<RadioGroupItem
-											value="good"
-											id="rating-good"
-										/>
+										<RadioGroupItem value="good" id="rating-good" />
 										<Label htmlFor="rating-good">Отлично</Label>
 									</Field>
 									<Field orientation="horizontal">
-										<RadioGroupItem
-											value="average"
-											id="rating-average"
-										/>
+										<RadioGroupItem value="average" id="rating-average" />
 										<Label htmlFor="rating-average">Нормально</Label>
 									</Field>
 									<Field orientation="horizontal">
-										<RadioGroupItem
-											value="bad"
-											id="rating-bad"
-										/>
+										<RadioGroupItem value="bad" id="rating-bad" />
 										<Label htmlFor="rating-bad">Плохо</Label>
 									</Field>
 								</RadioGroup>
