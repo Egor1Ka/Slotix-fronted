@@ -8,23 +8,26 @@ async function Header() {
 	return (
 		<header
 			data-slot="landing-header"
-			className="border-border/40 bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur"
+			className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60"
 		>
 			<div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-				<Link href="/" className="text-xl font-bold tracking-tight">
+				<Link
+					href="/"
+					className="font-display text-xl font-semibold italic tracking-tight"
+				>
 					{t('nav.logo')}
 				</Link>
 
-				<nav className="hidden items-center gap-6 md:flex">
+				<nav className="hidden items-center gap-8 md:flex">
 					<Link
 						href="#features"
-						className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
+						className="font-mono text-xs uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground"
 					>
 						{t('nav.features')}
 					</Link>
 					<Link
 						href="#pricing"
-						className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
+						className="font-mono text-xs uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground"
 					>
 						{t('nav.pricing')}
 					</Link>
@@ -34,13 +37,13 @@ async function Header() {
 					<LanguageSwitcher />
 					<Link
 						href="/login"
-						className="hover:bg-muted hover:text-foreground inline-flex h-7 items-center justify-center rounded-lg px-2.5 text-sm font-medium transition-all"
+						className="inline-flex h-8 items-center justify-center rounded-lg px-3 text-sm font-medium text-muted-foreground transition-all hover:text-foreground"
 					>
 						{t('nav.login')}
 					</Link>
 					<Link
 						href="/signup"
-						className="bg-primary text-primary-foreground inline-flex h-7 items-center justify-center rounded-lg px-2.5 text-sm font-medium transition-all hover:opacity-90"
+						className="inline-flex h-8 items-center justify-center rounded-lg bg-foreground px-4 text-sm font-medium text-background transition-all hover:opacity-90"
 					>
 						{t('nav.signup')}
 					</Link>

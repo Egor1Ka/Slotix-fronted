@@ -1,9 +1,13 @@
 import { cn } from '@/lib/utils'
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, Cormorant } from 'next/font/google'
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
+const inter = Inter({ subsets: ['latin', 'cyrillic'], variable: '--font-sans' })
+const cormorant = Cormorant({
+	subsets: ['latin', 'cyrillic'],
+	variable: '--font-display',
+})
 
 export const metadata: Metadata = {
 	title: 'Frontend Template',
@@ -16,7 +20,10 @@ export default function RootLayout({
 	children: React.ReactNode
 }>) {
 	return (
-		<html className={cn('font-sans', inter.variable)} suppressHydrationWarning>
+		<html
+			className={cn('font-sans', inter.variable, cormorant.variable)}
+			suppressHydrationWarning
+		>
 			<body className="antialiased">{children}</body>
 		</html>
 	)

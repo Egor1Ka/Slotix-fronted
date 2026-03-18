@@ -12,6 +12,7 @@
 			"signup": "Get started"
 		},
 		"hero": {
+			"badge": "Production-ready template",
 			"title": "Build your next project faster",
 			"subtitle": "A production-ready frontend template with everything you need to ship modern web applications.",
 			"cta": "Get started"
@@ -49,6 +50,7 @@
 		"pricing": {
 			"title": "Simple pricing",
 			"subtitle": "Choose the plan that fits your needs.",
+			"popular": "Popular",
 			"plans": {
 				"free": {
 					"name": "Free",
