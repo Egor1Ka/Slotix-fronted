@@ -626,6 +626,150 @@ Translations are in `i18n/messages/{en,uk}.json` under the `errors` key.
 
 `global-error.tsx` renders its own `<html>` and `<body>` tags with inline styles because root layout may be broken. All other error pages use the normal layout and theme.
 
+## API Error Handling
+
+### Backend Response Format
+
+All backend error responses follow this shape:
+
+```json
+{
+	"statusCode": 400,
+	"status": "validationError",
+	"data": { "email": { "error": "email - must be a valid email" } }
+}
+```
+
+Known `status` strings: `success`, `badRequest`, `validationError`, `nothingToUpdate`, `unauthorized`, `notFound`, `serverError`, `featureLocked`, `planRequired`, `userDeleted`.
+
+### ApiError Class
+
+`ApiError` (`services/api/api-error.ts`) is the unified error type for all API failures. It preserves backward-compatible properties (`status`, `message`, `data`) and adds typed accessors:
+
+| Property / Getter     | Type                             | Description                                                         |
+| --------------------- | -------------------------------- | ------------------------------------------------------------------- |
+| `status`              | `number`                         | HTTP status code (0 = network, 408 = timeout)                       |
+| `message`             | `string`                         | HTTP statusText or custom message                                   |
+| `data`                | `unknown`                        | Raw parsed response body                                            |
+| `body`                | `ApiErrorResponseBody \| null`   | Parsed backend response (cached)                                    |
+| `statusMessage`       | `string \| null`                 | Backend `status` string (e.g., `"validationError"`)                 |
+| `appStatusCode`       | `number \| null`                 | Backend `statusCode`                                                |
+| `fieldErrors`         | `Record<string, string> \| null` | Normalized field errors `{ field: message }`                        |
+| `isValidationError`   | `boolean`                        | `true` when `status === 400 && statusMessage === "validationError"` |
+| `displayMessage`      | `string`                         | `defaultErrorMessage ?? message ?? fallback`                        |
+| `silent`              | `boolean \| undefined`           | When `true`, global toast interceptor skips                         |
+| `defaultErrorMessage` | `string \| undefined`            | From `EndpointConfig.defaultErrorMessage`                           |
+| `requestConfig`       | `RequestConfig \| undefined`     | Original request config (for retry support)                         |
+| `globalInterceptors`  | `Interceptors \| undefined`      | Global interceptors (for retry support)                             |
+
+### Error Classification
+
+| HTTP Code | Backend Status                  | Error Type       | Handling                          |
+| --------- | ------------------------------- | ---------------- | --------------------------------- |
+| 0         | —                               | Network error    | Auto-toast                        |
+| 408       | —                               | Timeout          | Auto-toast                        |
+| 400       | `validationError`               | Field validation | `setServerErrors()` → form fields |
+| 400       | `badRequest`, `nothingToUpdate` | Bad request      | Auto-toast                        |
+| 401       | `unauthorized`                  | Authentication   | Refresh token → retry → redirect  |
+| 403       | `featureLocked`, `planRequired` | Authorization    | Auto-toast                        |
+| 404       | `notFound`                      | Not found        | Auto-toast                        |
+| 500       | `serverError`                   | Server error     | Auto-toast                        |
+
+### Interceptors
+
+Two built-in interceptors in `services/api/interceptors/`:
+
+**`createToastInterceptor()`** — auto-shows `toast.error()` via sonner. Exclusions:
+
+- `error.status === 401` (handled by auth redirect)
+- `error.isValidationError` (handled by form field errors)
+- `error.silent === true` (opt-out per-call)
+
+Toast text priority: `defaultErrorMessage` → `message` → generic fallback.
+
+**`createAuthRefreshInterceptor(refreshUrl, loginPath)`** — handles 401:
+
+1. Attempts `POST refreshUrl` via raw `fetch`
+2. On success → retries the original request with fresh token
+3. On failure → redirects to `loginPath`
+4. Concurrent 401s share a single refresh attempt
+5. `_isRetry` flag prevents infinite retry loops
+
+Both interceptors are **client-only** (`'use client'`). Do not wire them into server-side API instances.
+
+### OnError Recovery
+
+`OnError` interceptors can return a value to recover from errors (used by auth-refresh for retry):
+
+```ts
+type OnError = (error: ApiError) => void | unknown | Promise<void | unknown>
+```
+
+If an interceptor returns a non-`undefined` value, `request()` uses it as the successful result instead of throwing. Existing `void`-returning interceptors are unaffected.
+
+### Wiring Interceptors
+
+```ts
+import {
+	createApiMethods,
+	createAuthRefreshInterceptor,
+	createToastInterceptor,
+} from '@/services'
+import userApiConfig from '@/services/configs/user.config'
+
+export const userApi = createApiMethods(userApiConfig, {
+	interceptors: {
+		onError: [
+			createAuthRefreshInterceptor('/api/auth/refresh', '/login'),
+			createToastInterceptor(),
+		],
+	},
+})
+```
+
+### Form Validation Integration
+
+`setServerErrors()` (`services/api/set-server-errors.ts`) bridges `ApiError` → react-hook-form:
+
+```tsx
+import { setServerErrors } from '@/services'
+
+const onSubmit = async (data: FormData) => {
+	try {
+		await userApi.create({ body: data })
+		toast.success('Created!')
+	} catch (err) {
+		if (!setServerErrors(err, setError)) {
+			// Not a validation error — toast already shown by interceptor
+		}
+	}
+}
+```
+
+`setServerErrors(error, setError)` returns `true` if field errors were set, `false` otherwise.
+
+### Silent Mode
+
+Disable auto-toast for a specific call:
+
+```ts
+await userApi.me({ silent: true })
+```
+
+### defaultErrorMessage
+
+Define in endpoint config — used as toast text when the endpoint fails:
+
+```ts
+const config = {
+	getAll: endpoint<void, User[]>({
+		url: () => `/api/users`,
+		method: getData,
+		defaultErrorMessage: 'Failed to load users',
+	}),
+}
+```
+
 ## Client vs Server Components
 
 By default, components in `app/` are **React Server Components**. Add `"use client"` directive at the top of files that need:

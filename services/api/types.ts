@@ -13,6 +13,9 @@ interface RequestConfig {
 	headers?: Record<string, string>
 	timeout?: number
 	interceptors?: Interceptors
+	silent?: boolean
+	defaultErrorMessage?: string
+	_isRetry?: boolean
 }
 
 type BeforeRequest = (
@@ -24,7 +27,7 @@ type AfterResponse = (
 	config: RequestConfig,
 ) => unknown | Promise<unknown>
 
-type OnError = (error: ApiError) => void | Promise<void>
+type OnError = (error: ApiError) => void | unknown | Promise<void | unknown>
 
 interface Interceptors {
 	beforeRequest?: BeforeRequest[]
@@ -38,6 +41,13 @@ interface MethodParams {
 	headers?: Record<string, string>
 	timeout?: number
 	interceptors?: Interceptors
+	silent?: boolean
+}
+
+interface ApiErrorResponseBody {
+	statusCode: number
+	status: string
+	data?: unknown
 }
 
 interface MethodParamsWithBody<T> extends MethodParams {
@@ -93,6 +103,7 @@ export type {
 	MethodFunctionWithBody,
 	EndpointConfig,
 	MappedApiMethods,
+	ApiErrorResponseBody,
 }
 
 export { endpoint }

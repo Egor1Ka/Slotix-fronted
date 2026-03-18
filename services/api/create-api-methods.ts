@@ -30,7 +30,9 @@ function createApiMethods<
 					...params,
 					headers: mergedHeaders,
 					queryParams: mergedQuery,
-				} as MethodParamsWithBody<unknown> & { url: UrlFunction },
+					defaultErrorMessage: ep.defaultErrorMessage,
+					silent: params.silent,
+				} as unknown as MethodParamsWithBody<unknown> & { url: UrlFunction },
 				options?.interceptors,
 			)
 		}

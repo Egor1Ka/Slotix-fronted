@@ -1,5 +1,5 @@
 import { ApiError } from './api-error'
-import type { Interceptors, RequestConfig } from './types'
+import type { Interceptors, OnError, RequestConfig } from './types'
 
 const DEFAULT_TIMEOUT = 30_000
 
@@ -56,6 +56,17 @@ function mergeInterceptors(
 	}
 }
 
+async function runOnErrorInterceptors<T>(
+	handlers: OnError[],
+	error: ApiError,
+): Promise<T | undefined> {
+	for (const fn of handlers) {
+		const result = await fn(error)
+		if (result !== undefined) return result as T
+	}
+	return undefined
+}
+
 async function request<T>(
 	config: RequestConfig,
 	globalInterceptors?: Interceptors,
@@ -82,6 +93,13 @@ async function request<T>(
 		finalConfig.timeout ?? DEFAULT_TIMEOUT,
 	)
 
+	const errorOpts = {
+		defaultErrorMessage: finalConfig.defaultErrorMessage,
+		silent: finalConfig.silent,
+		requestConfig: finalConfig,
+		globalInterceptors,
+	}
+
 	try {
 		const response = await fetch(url, {
 			method: finalConfig.method ?? 'GET',
@@ -93,7 +111,7 @@ async function request<T>(
 		const data = await parseResponse(response)
 
 		if (!response.ok) {
-			throw new ApiError(response.status, response.statusText, data)
+			throw new ApiError(response.status, response.statusText, data, errorOpts)
 		}
 
 		let result: unknown = data
@@ -104,24 +122,35 @@ async function request<T>(
 		return result as T
 	} catch (error) {
 		if (error instanceof ApiError) {
-			for (const fn of interceptors.onError ?? []) {
-				await fn(error)
-			}
+			const recovery = await runOnErrorInterceptors<T>(
+				interceptors.onError ?? [],
+				error,
+			)
+			if (recovery !== undefined) return recovery
 			throw error
 		}
 
 		if (error instanceof Error && error.name === 'AbortError') {
-			const timeoutError = new ApiError(408, 'Request timeout')
-			for (const fn of interceptors.onError ?? []) {
-				await fn(timeoutError)
-			}
+			const timeoutError = new ApiError(
+				408,
+				'Request timeout',
+				undefined,
+				errorOpts,
+			)
+			const recovery = await runOnErrorInterceptors<T>(
+				interceptors.onError ?? [],
+				timeoutError,
+			)
+			if (recovery !== undefined) return recovery
 			throw timeoutError
 		}
 
-		const networkError = new ApiError(0, 'Network error', error)
-		for (const fn of interceptors.onError ?? []) {
-			await fn(networkError)
-		}
+		const networkError = new ApiError(0, 'Network error', error, errorOpts)
+		const recovery = await runOnErrorInterceptors<T>(
+			interceptors.onError ?? [],
+			networkError,
+		)
+		if (recovery !== undefined) return recovery
 		throw networkError
 	} finally {
 		clearTimeout(timeoutId)
