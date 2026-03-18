@@ -8,3 +8,4 @@ next-env.d.ts
 package-lock.json
 .agents
 .claude
+newrelic_agent.log

@@ -37,6 +37,10 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# New Relic
+newrelic_agent.log
 
 # vercel
 .vercel

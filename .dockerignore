@@ -15,3 +15,4 @@ coverage
 .agents
 .playwright-mcp
 .mcp.json
+newrelic_agent.log

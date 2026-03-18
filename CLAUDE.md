@@ -872,6 +872,74 @@ docker run -p 3000:3000 frontend-template
 
 The `standalone` output mode bundles everything into a self-contained `server.js` — no `node_modules` needed in the final image.
 
+## Monitoring (New Relic)
+
+Optional New Relic integration for APM, Browser monitoring, Error tracking, and Logs. Architecturally isolated in `lib/monitoring/`.
+
+### How it works
+
+- `instrumentation.ts` (root) — thin proxy, calls `initMonitoring()` from `lib/monitoring/`
+- `lib/monitoring/index.ts` — checks `NEXT_RUNTIME` + `NEW_RELIC_LICENSE_KEY`, dynamically imports `newrelic` agent
+- If env vars are not set, monitoring is completely disabled (zero overhead, zero console output)
+- Edge Runtime safe — `initMonitoring()` skips when `NEXT_RUNTIME !== 'nodejs'`
+
+### Setup
+
+1. Create a New Relic account at [newrelic.com](https://newrelic.com)
+2. Copy your license key from Account Settings > API keys
+3. Add to `.env.local`:
+
+```
+NEW_RELIC_LICENSE_KEY=your_license_key_here
+NEW_RELIC_APP_NAME=your_app_name
+```
+
+4. Restart the dev server — APM data will appear in New Relic dashboard within minutes
+
+### Browser Monitoring (opt-in)
+
+Browser monitoring requires adding the `NewRelicBrowserScript` component to a layout:
+
+```tsx
+import { NewRelicBrowserScript } from '@/lib/monitoring/new-relic-browser-script'
+
+// Add inside <body> in layout.tsx:
+;<NewRelicBrowserScript />
+```
+
+The component fetches the browser agent script from an API route (`/api/newrelic-browser-agent`) and injects it client-side. If NR is not active, nothing is rendered.
+
+### Production Recommendation
+
+For maximum APM instrumentation coverage in production, preload the NR agent before all other modules:
+
+```dockerfile
+CMD ["node", "-r", "newrelic", "server.js"]
+```
+
+This ensures NR can monkey-patch core Node.js modules (`http`, `https`, `fetch`) before they are first imported. The `instrumentation.ts` approach loads NR slightly later, which is sufficient for most use cases but may miss some outgoing HTTP call tracing.
+
+### Environment Variables
+
+| Variable                                           | Required | Default | Description                                      |
+| -------------------------------------------------- | -------- | ------- | ------------------------------------------------ |
+| `NEW_RELIC_LICENSE_KEY`                            | Yes      | —       | NR license key                                   |
+| `NEW_RELIC_APP_NAME`                               | Yes      | —       | App name in NR dashboard                         |
+| `NEW_RELIC_NO_CONFIG_FILE`                         | No       | —       | Set to `true` to suppress missing config warning |
+| `NEW_RELIC_LOG_LEVEL`                              | No       | `info`  | Agent log level                                  |
+| `NEW_RELIC_DISTRIBUTED_TRACING_ENABLED`            | No       | `true`  | Distributed tracing                              |
+| `NEW_RELIC_APPLICATION_LOGGING_FORWARDING_ENABLED` | No       | `true`  | Log forwarding to NR                             |
+
+### Architecture
+
+```
+instrumentation.ts (root, thin proxy)
+  └── lib/monitoring/
+        ├── index.ts (init logic, NEXT_RUNTIME guard)
+        └── new-relic-browser-script.tsx (opt-in browser agent component)
+              └── /api/newrelic-browser-agent (API route for browser timing header)
+```
+
 ## CI/CD (GitHub Actions)
 
 Pipeline in `.github/workflows/ci.yml` triggers on push/PR to `main`:

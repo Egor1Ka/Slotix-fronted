@@ -7,4 +7,7 @@ services:
       - '3000:3000'
     environment:
       - NODE_ENV=production
+      # New Relic (uncomment to enable)
+      # - NEW_RELIC_LICENSE_KEY=your_license_key
+      # - NEW_RELIC_APP_NAME=your_app_name
     restart: unless-stopped

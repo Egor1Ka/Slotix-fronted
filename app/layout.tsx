@@ -1,3 +1,4 @@
+import { NewRelicBrowserScript } from '@/lib/monitoring/new-relic-browser-script'
 import { cn } from '@/lib/utils'
 import type { Metadata } from 'next'
 import { Inter, Cormorant } from 'next/font/google'
@@ -24,7 +25,10 @@ export default function RootLayout({
 			className={cn('font-sans', inter.variable, cormorant.variable)}
 			suppressHydrationWarning
 		>
-			<body className="antialiased">{children}</body>
+			<body className="antialiased">
+				{children}
+				<NewRelicBrowserScript />
+			</body>
 		</html>
 	)
 }

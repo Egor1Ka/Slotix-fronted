@@ -26,4 +26,9 @@ USER nextjs
 EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
+# New Relic (optional, set via docker-compose or orchestrator)
+# ENV NEW_RELIC_LICENSE_KEY=
+# ENV NEW_RELIC_APP_NAME=
+# For maximum APM coverage, use NODE_OPTIONS to preload the agent:
+# CMD ["node", "-r", "newrelic", "server.js"]
 CMD ["node", "server.js"]
