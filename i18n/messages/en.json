@@ -3,17 +3,100 @@
 		"title": "Frontend Template",
 		"description": "Next.js frontend template"
 	},
-	"home": {
-		"title": "Frontend Template",
-		"description": "Select a page to navigate to.",
-		"demo": "Demo",
-		"demoDescription": "Style overview with interactive components",
-		"login": "Login",
-		"loginDescription": "Login page with form and image",
-		"signup": "Sign Up",
-		"signupDescription": "Signup page with form and image",
-		"shadcnDemo": "shadcn/ui Demo",
-		"shadcnDemoDescription": "All shadcn/ui components showcase"
+	"landing": {
+		"nav": {
+			"logo": "Template",
+			"features": "Features",
+			"pricing": "Pricing",
+			"login": "Sign in",
+			"signup": "Get started"
+		},
+		"hero": {
+			"title": "Build your next project faster",
+			"subtitle": "A production-ready frontend template with everything you need to ship modern web applications.",
+			"cta": "Get started"
+		},
+		"features": {
+			"title": "Everything you need",
+			"subtitle": "Built with modern tools and best practices out of the box.",
+			"items": {
+				"performance": {
+					"title": "Blazing Fast",
+					"description": "Optimized for speed with Next.js App Router and React Server Components."
+				},
+				"secure": {
+					"title": "Secure by Default",
+					"description": "Built-in authentication layout and route protection patterns."
+				},
+				"responsive": {
+					"title": "Fully Responsive",
+					"description": "Looks great on any device with Tailwind CSS responsive utilities."
+				},
+				"i18n": {
+					"title": "Internationalized",
+					"description": "Multi-language support with next-intl, ready for global audiences."
+				},
+				"components": {
+					"title": "54+ Components",
+					"description": "Complete shadcn/ui component library with examples for every component."
+				},
+				"dx": {
+					"title": "Great DX",
+					"description": "TypeScript, ESLint, Prettier, and CI/CD configured out of the box."
+				}
+			}
+		},
+		"pricing": {
+			"title": "Simple pricing",
+			"subtitle": "Choose the plan that fits your needs.",
+			"plans": {
+				"free": {
+					"name": "Free",
+					"price": "$0",
+					"period": "/month",
+					"description": "Perfect for side projects",
+					"features": [
+						"Up to 3 projects",
+						"Basic components",
+						"Community support"
+					]
+				},
+				"pro": {
+					"name": "Pro",
+					"price": "$19",
+					"period": "/month",
+					"description": "For professional developers",
+					"features": [
+						"Unlimited projects",
+						"All components",
+						"Priority support",
+						"Custom themes"
+					]
+				},
+				"enterprise": {
+					"name": "Enterprise",
+					"price": "Custom",
+					"period": "",
+					"description": "For large teams",
+					"features": [
+						"Everything in Pro",
+						"SSO & SAML",
+						"Dedicated support",
+						"SLA guarantee"
+					]
+				}
+			}
+		},
+		"cta": {
+			"title": "Ready to get started?",
+			"subtitle": "Start building your application today with our production-ready template.",
+			"button": "Start for free"
+		},
+		"footer": {
+			"copyright": "© 2026 Template. All rights reserved.",
+			"demo": "Demo",
+			"components": "Components"
+		}
 	},
 	"login": {
 		"title": "Welcome back",

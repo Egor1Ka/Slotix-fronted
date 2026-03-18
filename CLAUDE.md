@@ -225,6 +225,8 @@ import { Checkbox as CheckboxPrimitive } from '@base-ui/react/checkbox'
 
 This gives components proper ARIA attributes, keyboard navigation, and focus management out of the box.
 
+> **Important:** This is NOT Radix UI — there is no `asChild` prop. For link-buttons use `buttonVariants()` + `className` on `<Link>` in Client Components, or Tailwind classes directly in Server Components (since `buttonVariants` is exported from a `'use client'` file and cannot be called on the server).
+
 ### Compound Components
 
 Complex UI elements use the compound component pattern with separate sub-components:
@@ -355,8 +357,15 @@ Endpoints are declared as config objects in `services/configs/`. Use `endpoint<T
 import { getData, postData } from '@/services/api/methods'
 import { endpoint } from '@/services/api/types'
 
-interface User { id: string; email: string; name: string }
-interface CreateUserBody { email: string; name: string }
+interface User {
+	id: string
+	email: string
+	name: string
+}
+interface CreateUserBody {
+	email: string
+	name: string
+}
 
 const userApiConfig = {
 	me: endpoint<void, User>({
@@ -380,6 +389,7 @@ export default userApiConfig
 ```
 
 Rules:
+
 - `endpoint<void, T>` + `getData`/`deleteData` — no body accepted
 - `endpoint<TBody, T>` + `postData`/`putData`/`patchData` — body required
 - `url` receives `pathParams` and returns the full path
@@ -397,6 +407,7 @@ export const userApi = createApiMethods(userApiConfig)
 ```
 
 Generated methods are fully typed:
+
 - `userApi.me()` → `Promise<User>`
 - `userApi.getById({ pathParams: { id: '1' } })` → `Promise<User>`
 - `userApi.create({ body: { email, name } })` → `Promise<User>`
@@ -427,6 +438,7 @@ export const userApi = createApiMethods(userApiConfig, {
 ```
 
 Three interceptor types:
+
 - `BeforeRequest` — modify config before fetch (auth headers, logging)
 - `AfterResponse` — transform response data
 - `OnError` — handle errors (redirect, log, mutate error). After all `onError` run, the error is re-thrown
@@ -442,9 +454,9 @@ try {
 	const user = await userApi.me()
 } catch (err) {
 	if (err instanceof ApiError) {
-		err.status  // HTTP status (0 = network, 408 = timeout)
+		err.status // HTTP status (0 = network, 408 = timeout)
 		err.message // Status text or custom message
-		err.data    // Parsed response body (validation errors, etc.)
+		err.data // Parsed response body (validation errors, etc.)
 	}
 }
 ```
@@ -462,18 +474,19 @@ await userApi.me({ timeout: 5000 })
 ### Base URL
 
 `url` functions return paths that may be relative or absolute:
+
 - **Client Components** — relative URLs work with Next.js rewrites
 - **Server Components** — use absolute URLs (`${process.env.API_URL}/path`) for server-to-server calls
 
 ### Available Methods
 
-| Function | HTTP Method | Body |
-|---|---|---|
-| `getData` | GET | No |
-| `postData` | POST | Required |
-| `putData` | PUT | Required |
-| `patchData` | PATCH | Required |
-| `deleteData` | DELETE | No |
+| Function     | HTTP Method | Body     |
+| ------------ | ----------- | -------- |
+| `getData`    | GET         | No       |
+| `postData`   | POST        | Required |
+| `putData`    | PUT         | Required |
+| `patchData`  | PATCH       | Required |
+| `deleteData` | DELETE      | No       |
 
 If DELETE needs a body, use `request()` directly.
 
@@ -485,16 +498,31 @@ Step-by-step workflow for connecting a new backend API:
 
 ```ts
 // services/configs/post.types.ts
-interface Post { id: string; title: string; body: string }
-interface CreatePostBody { title: string; body: string }
-interface UpdatePostBody { title?: string; body?: string }
+interface Post {
+	id: string
+	title: string
+	body: string
+}
+interface CreatePostBody {
+	title: string
+	body: string
+}
+interface UpdatePostBody {
+	title?: string
+	body?: string
+}
 ```
 
 **2. Create config** — declare endpoints in `services/configs/<name>.config.ts`:
 
 ```ts
 // services/configs/post.config.ts
-import { getData, postData, patchData, deleteData } from '@/services/api/methods'
+import {
+	getData,
+	postData,
+	patchData,
+	deleteData,
+} from '@/services/api/methods'
 import { endpoint } from '@/services/api/types'
 import type { Post, CreatePostBody, UpdatePostBody } from './post.types'
 
@@ -532,7 +560,7 @@ import { createApiMethods } from './api/create-api-methods'
 import postApiConfig from './configs/post.config'
 
 export const postApi = createApiMethods(postApiConfig, {
-	interceptors: { beforeRequest: [withAuth] },  // if auth needed
+	interceptors: { beforeRequest: [withAuth] }, // if auth needed
 })
 ```
 
@@ -548,7 +576,7 @@ export default async function PostsPage() {
 }
 
 // Client Component
-'use client'
+;('use client')
 import { postApi } from '@/services'
 import { ApiError } from '@/services'
 
@@ -587,12 +615,12 @@ Components will be placed in `components/ui/` and follow the `base-nova` style w
 
 Three levels of error handling are in place:
 
-| File | Scope | i18n | Styling |
-|---|---|---|---|
-| `app/global-error.tsx` | Root layout crashes | Hardcoded EN | Inline styles (no Tailwind) |
-| `app/[locale]/error.tsx` | All pages inside `[locale]` | `useTranslations('errors')` | Tailwind + theme variables |
-| `app/not-found.tsx` | Unmatched routes (404) | `getTranslations('errors')` | Tailwind + theme variables |
-| `app/[locale]/not-found.tsx` | `notFound()` calls inside `[locale]` | `useTranslations('errors')` | Tailwind + theme variables |
+| File                         | Scope                                | i18n                        | Styling                     |
+| ---------------------------- | ------------------------------------ | --------------------------- | --------------------------- |
+| `app/global-error.tsx`       | Root layout crashes                  | Hardcoded EN                | Inline styles (no Tailwind) |
+| `app/[locale]/error.tsx`     | All pages inside `[locale]`          | `useTranslations('errors')` | Tailwind + theme variables  |
+| `app/not-found.tsx`          | Unmatched routes (404)               | `getTranslations('errors')` | Tailwind + theme variables  |
+| `app/[locale]/not-found.tsx` | `notFound()` calls inside `[locale]` | `useTranslations('errors')` | Tailwind + theme variables  |
 
 Translations are in `i18n/messages/{en,uk}.json` under the `errors` key.
 

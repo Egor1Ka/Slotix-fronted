@@ -9,7 +9,6 @@ import {
 	ComboboxItem,
 	ComboboxGroup,
 	ComboboxLabel,
-	ComboboxEmpty,
 	ComboboxSeparator,
 	ComboboxChips,
 	ComboboxChip,

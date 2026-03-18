@@ -3,17 +3,100 @@
 		"title": "Frontend Template",
 		"description": "Next.js frontend шаблон"
 	},
-	"home": {
-		"title": "Frontend Template",
-		"description": "Оберіть сторінку для переходу.",
-		"demo": "Демо",
-		"demoDescription": "Огляд стилів з інтерактивними компонентами",
-		"login": "Вхід",
-		"loginDescription": "Сторінка входу з формою",
-		"signup": "Реєстрація",
-		"signupDescription": "Сторінка реєстрації з формою",
-		"shadcnDemo": "shadcn/ui Демо",
-		"shadcnDemoDescription": "Усі компоненти shadcn/ui в одному місці"
+	"landing": {
+		"nav": {
+			"logo": "Template",
+			"features": "Можливості",
+			"pricing": "Ціни",
+			"login": "Увійти",
+			"signup": "Почати"
+		},
+		"hero": {
+			"title": "Створюйте проєкти швидше",
+			"subtitle": "Готовий до продакшену frontend-шаблон з усім необхідним для сучасних веб-застосунків.",
+			"cta": "Почати"
+		},
+		"features": {
+			"title": "Все, що потрібно",
+			"subtitle": "Побудовано з сучасними інструментами та найкращими практиками.",
+			"items": {
+				"performance": {
+					"title": "Блискавична швидкість",
+					"description": "Оптимізовано для швидкості з Next.js App Router та React Server Components."
+				},
+				"secure": {
+					"title": "Безпека за замовчуванням",
+					"description": "Вбудований layout автентифікації та патерни захисту маршрутів."
+				},
+				"responsive": {
+					"title": "Повністю адаптивний",
+					"description": "Чудово виглядає на будь-якому пристрої з Tailwind CSS."
+				},
+				"i18n": {
+					"title": "Інтернаціоналізований",
+					"description": "Підтримка багатьох мов з next-intl для глобальної аудиторії."
+				},
+				"components": {
+					"title": "54+ компоненти",
+					"description": "Повна бібліотека компонентів shadcn/ui з прикладами."
+				},
+				"dx": {
+					"title": "Зручна розробка",
+					"description": "TypeScript, ESLint, Prettier та CI/CD налаштовані з коробки."
+				}
+			}
+		},
+		"pricing": {
+			"title": "Прості ціни",
+			"subtitle": "Оберіть план, що підходить вам.",
+			"plans": {
+				"free": {
+					"name": "Безкоштовно",
+					"price": "$0",
+					"period": "/місяць",
+					"description": "Для особистих проєктів",
+					"features": [
+						"До 3 проєктів",
+						"Базові компоненти",
+						"Підтримка спільноти"
+					]
+				},
+				"pro": {
+					"name": "Pro",
+					"price": "$19",
+					"period": "/місяць",
+					"description": "Для професійних розробників",
+					"features": [
+						"Необмежені проєкти",
+						"Усі компоненти",
+						"Пріоритетна підтримка",
+						"Кастомні теми"
+					]
+				},
+				"enterprise": {
+					"name": "Enterprise",
+					"price": "Індивідуально",
+					"period": "",
+					"description": "Для великих команд",
+					"features": [
+						"Все з Pro",
+						"SSO та SAML",
+						"Виділена підтримка",
+						"Гарантія SLA"
+					]
+				}
+			}
+		},
+		"cta": {
+			"title": "Готові почати?",
+			"subtitle": "Почніть створювати свій застосунок з нашим готовим шаблоном.",
+			"button": "Почати безкоштовно"
+		},
+		"footer": {
+			"copyright": "© 2026 Template. Усі права захищені.",
+			"demo": "Демо",
+			"components": "Компоненти"
+		}
 	},
 	"login": {
 		"title": "З поверненням",

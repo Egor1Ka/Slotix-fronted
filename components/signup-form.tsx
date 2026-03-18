@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -96,7 +97,7 @@ export function SignupForm({
 								</Button>
 							</Field>
 							<FieldDescription className="text-center">
-								{t('hasAccount')} <a href="/login">{t('loginLink')}</a>
+								{t('hasAccount')} <Link href="/login">{t('loginLink')}</Link>
 							</FieldDescription>
 						</FieldGroup>
 					</form>
