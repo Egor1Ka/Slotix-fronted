@@ -685,7 +685,9 @@ Two built-in interceptors in `services/api/interceptors/`:
 - `error.isValidationError` (handled by form field errors)
 - `error.silent === true` (opt-out per-call)
 
-Toast text priority: `defaultErrorMessage` → `message` → generic fallback.
+Toast text priority: `defaultErrorMessage` → i18n resolved message → `message` fallback.
+
+Accepts optional `getErrorMessage` callback for i18n integration. Use `getStatusI18nKey(error.status)` to map HTTP codes to translation keys (`errors.api.*`).
 
 **`createAuthRefreshInterceptor(refreshUrl, loginPath)`** — handles 401:
 
@@ -714,6 +716,7 @@ import {
 	createApiMethods,
 	createAuthRefreshInterceptor,
 	createToastInterceptor,
+	getStatusI18nKey,
 } from '@/services'
 import userApiConfig from '@/services/configs/user.config'
 
@@ -726,6 +729,42 @@ export const userApi = createApiMethods(userApiConfig, {
 	},
 })
 ```
+
+With i18n (inside a React component or hook where `useTranslations` is available):
+
+```ts
+const t = useTranslations('errors')
+
+const userApi = createApiMethods(userApiConfig, {
+	interceptors: {
+		onError: [
+			createAuthRefreshInterceptor('/api/auth/refresh', '/login'),
+			createToastInterceptor({
+				getErrorMessage: (error) => t(`api.${getStatusI18nKey(error.status)}`),
+			}),
+		],
+	},
+})
+```
+
+### i18n Error Keys
+
+Translation keys under `errors.api.*` in `i18n/messages/{en,uk}.json`:
+
+| Key                  | HTTP Code | EN                     |
+| -------------------- | --------- | ---------------------- |
+| `network`            | 0         | No internet connection |
+| `timeout`            | 408       | Request timed out      |
+| `badRequest`         | 400, 422  | Invalid request        |
+| `forbidden`          | 403       | No permission          |
+| `notFound`           | 404       | Resource not found     |
+| `conflict`           | 409       | Action conflicts       |
+| `tooManyRequests`    | 429       | Too many requests      |
+| `serverError`        | 500       | Server error           |
+| `serviceUnavailable` | 503       | Service unavailable    |
+| `unknown`            | other     | Unexpected error       |
+
+`getStatusI18nKey(status)` maps HTTP codes to these keys.
 
 ### Form Validation Integration
 

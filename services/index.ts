@@ -10,7 +10,11 @@ export {
 export { createApiMethods } from './api/create-api-methods'
 export { endpoint } from './api/types'
 export { createAuthRefreshInterceptor } from './api/interceptors/with-auth-refresh'
-export { createToastInterceptor } from './api/interceptors/with-toast'
+export {
+	createToastInterceptor,
+	getStatusI18nKey,
+	STATUS_TO_I18N_KEY,
+} from './api/interceptors/with-toast'
 export { setServerErrors } from './api/set-server-errors'
 export type {
 	UrlFunction,
