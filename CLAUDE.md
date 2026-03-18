@@ -51,8 +51,18 @@ Use this project as a **reference template** when building new frontend projects
 │
 ├── public/                     # Static assets (SVGs, favicon)
 │
+├── services/
+│   ├── api/
+│   │   ├── api-error.ts        # ApiError class
+│   │   ├── types.ts            # All API types + endpoint() helper
+│   │   ├── request.ts          # Core request(), parseResponse, buildUrl
+│   │   ├── methods.ts          # getData, postData, putData, patchData, deleteData
+│   │   └── create-api-methods.ts # Typed mapper: config → API methods
+│   ├── configs/                # Project-specific endpoint configs
+│   │   └── example.config.ts   # Example config (reference)
+│   └── index.ts                # Public API re-exports
+│
 ├── types/                      # Shared TypeScript types
-├── services/                   # API services and data fetching
 ├── constants/                  # App-wide constants
 │
 ├── components.json             # shadcn/ui configuration
@@ -318,6 +328,240 @@ Key rules:
 - Pass `errors={[errors.field]}` to FieldError for automatic error display
 - Horizontal fields (Switch, Checkbox): use `<Field orientation="horizontal">`
 
+## API Layer
+
+Config-driven, type-safe API layer in `services/`. Works in both Server Components and Client Components.
+
+### Architecture
+
+```
+Caller → createApiMethods(config) → method wrapper (getData/postData/...) → request()
+                                                                              │
+                                              beforeRequest interceptors ─────┤
+                                              buildUrl (path + query params)  │
+                                              fetch + AbortController timeout │
+                                              parseResponse (json/text/null)  │
+                                              afterResponse interceptors ─────┤
+                                              onError interceptors (on fail) ─┘
+```
+
+All errors are **thrown** as `ApiError` (never returned as values). Unhandled errors bubble up to `error.tsx`.
+
+### Defining Endpoints
+
+Endpoints are declared as config objects in `services/configs/`. Use `endpoint<TRequest, TResponse>()` to preserve generic types for inference:
+
+```ts
+import { getData, postData } from '@/services/api/methods'
+import { endpoint } from '@/services/api/types'
+
+interface User { id: string; email: string; name: string }
+interface CreateUserBody { email: string; name: string }
+
+const userApiConfig = {
+	me: endpoint<void, User>({
+		url: () => `/api/users/me`,
+		method: getData,
+		defaultErrorMessage: 'Failed to fetch profile',
+	}),
+
+	getById: endpoint<void, User>({
+		url: ({ id }) => `/api/users/${id}`,
+		method: getData,
+	}),
+
+	create: endpoint<CreateUserBody, User>({
+		url: () => `/api/users`,
+		method: postData,
+	}),
+}
+
+export default userApiConfig
+```
+
+Rules:
+- `endpoint<void, T>` + `getData`/`deleteData` — no body accepted
+- `endpoint<TBody, T>` + `postData`/`putData`/`patchData` — body required
+- `url` receives `pathParams` and returns the full path
+- `defaultHeaders`, `defaultQuery`, `defaultErrorMessage` are optional defaults
+
+### Creating API Methods
+
+`createApiMethods()` maps config into typed functions:
+
+```ts
+import { createApiMethods } from '@/services/api/create-api-methods'
+import userApiConfig from '@/services/configs/user.config'
+
+export const userApi = createApiMethods(userApiConfig)
+```
+
+Generated methods are fully typed:
+- `userApi.me()` → `Promise<User>`
+- `userApi.getById({ pathParams: { id: '1' } })` → `Promise<User>`
+- `userApi.create({ body: { email, name } })` → `Promise<User>`
+- `userApi.create()` → TypeScript error (body required)
+
+### Interceptors
+
+Middleware pattern for auth, logging, error handling. Applied globally or per-call:
+
+```ts
+import type { BeforeRequest, OnError } from '@/services/api/types'
+
+const withAuth: BeforeRequest = async (config) => ({
+	...config,
+	headers: { ...config.headers, Authorization: `Bearer ${await getToken()}` },
+})
+
+const handle401: OnError = (error) => {
+	if (error.status === 401) redirect('/login')
+}
+
+export const userApi = createApiMethods(userApiConfig, {
+	interceptors: {
+		beforeRequest: [withAuth],
+		onError: [handle401],
+	},
+})
+```
+
+Three interceptor types:
+- `BeforeRequest` — modify config before fetch (auth headers, logging)
+- `AfterResponse` — transform response data
+- `OnError` — handle errors (redirect, log, mutate error). After all `onError` run, the error is re-thrown
+
+Execution order: global interceptors first, then per-call. Per-call interceptors can be passed in method params.
+
+### Error Handling
+
+```ts
+import { ApiError } from '@/services'
+
+try {
+	const user = await userApi.me()
+} catch (err) {
+	if (err instanceof ApiError) {
+		err.status  // HTTP status (0 = network, 408 = timeout)
+		err.message // Status text or custom message
+		err.data    // Parsed response body (validation errors, etc.)
+	}
+}
+```
+
+All `ApiError` properties are mutable for transformation in `onError` interceptors.
+
+### Timeout
+
+Built-in via `AbortController`. Default: 30 seconds. Override per-endpoint or per-call:
+
+```ts
+await userApi.me({ timeout: 5000 })
+```
+
+### Base URL
+
+`url` functions return paths that may be relative or absolute:
+- **Client Components** — relative URLs work with Next.js rewrites
+- **Server Components** — use absolute URLs (`${process.env.API_URL}/path`) for server-to-server calls
+
+### Available Methods
+
+| Function | HTTP Method | Body |
+|---|---|---|
+| `getData` | GET | No |
+| `postData` | POST | Required |
+| `putData` | PUT | Required |
+| `patchData` | PATCH | Required |
+| `deleteData` | DELETE | No |
+
+If DELETE needs a body, use `request()` directly.
+
+### Adding a New API
+
+Step-by-step workflow for connecting a new backend API:
+
+**1. Create types** — define request/response interfaces in `services/configs/<name>.types.ts`:
+
+```ts
+// services/configs/post.types.ts
+interface Post { id: string; title: string; body: string }
+interface CreatePostBody { title: string; body: string }
+interface UpdatePostBody { title?: string; body?: string }
+```
+
+**2. Create config** — declare endpoints in `services/configs/<name>.config.ts`:
+
+```ts
+// services/configs/post.config.ts
+import { getData, postData, patchData, deleteData } from '@/services/api/methods'
+import { endpoint } from '@/services/api/types'
+import type { Post, CreatePostBody, UpdatePostBody } from './post.types'
+
+const postApiConfig = {
+	getAll: endpoint<void, Post[]>({
+		url: () => `/api/posts`,
+		method: getData,
+	}),
+	getById: endpoint<void, Post>({
+		url: ({ id }) => `/api/posts/${id}`,
+		method: getData,
+	}),
+	create: endpoint<CreatePostBody, Post>({
+		url: () => `/api/posts`,
+		method: postData,
+	}),
+	update: endpoint<UpdatePostBody, Post>({
+		url: ({ id }) => `/api/posts/${id}`,
+		method: patchData,
+	}),
+	remove: endpoint<void, null>({
+		url: ({ id }) => `/api/posts/${id}`,
+		method: deleteData,
+	}),
+}
+
+export default postApiConfig
+```
+
+**3. Wire up** — create methods and export in `services/index.ts`:
+
+```ts
+// Add to services/index.ts
+import { createApiMethods } from './api/create-api-methods'
+import postApiConfig from './configs/post.config'
+
+export const postApi = createApiMethods(postApiConfig, {
+	interceptors: { beforeRequest: [withAuth] },  // if auth needed
+})
+```
+
+**4. Use in components:**
+
+```tsx
+// Server Component
+import { postApi } from '@/services'
+
+export default async function PostsPage() {
+	const posts = await postApi.getAll()
+	return <PostList posts={posts} />
+}
+
+// Client Component
+'use client'
+import { postApi } from '@/services'
+import { ApiError } from '@/services'
+
+async function handleCreate(data: CreatePostBody) {
+	try {
+		const post = await postApi.create({ body: data })
+		toast.success('Post created')
+	} catch (err) {
+		if (err instanceof ApiError) toast.error(err.message)
+	}
+}
+```
+
 ## Adding New shadcn Components
 
 Use the shadcn CLI. The config is in `components.json`:
@@ -338,6 +582,21 @@ Components will be placed in `components/ui/` and follow the `base-nova` style w
 **Actions:** Button, ButtonGroup, DropdownMenu, ContextMenu, Command, Popover
 **Media:** Carousel, Chart
 **Overlay:** Collapsible, Accordion
+
+## Error Handling Pages
+
+Three levels of error handling are in place:
+
+| File | Scope | i18n | Styling |
+|---|---|---|---|
+| `app/global-error.tsx` | Root layout crashes | Hardcoded EN | Inline styles (no Tailwind) |
+| `app/[locale]/error.tsx` | All pages inside `[locale]` | `useTranslations('errors')` | Tailwind + theme variables |
+| `app/not-found.tsx` | Unmatched routes (404) | `getTranslations('errors')` | Tailwind + theme variables |
+| `app/[locale]/not-found.tsx` | `notFound()` calls inside `[locale]` | `useTranslations('errors')` | Tailwind + theme variables |
+
+Translations are in `i18n/messages/{en,uk}.json` under the `errors` key.
+
+`global-error.tsx` renders its own `<html>` and `<body>` tags with inline styles because root layout may be broken. All other error pages use the normal layout and theme.
 
 ## Client vs Server Components
 
