@@ -9,6 +9,9 @@ coverage
 *.md
 .vscode
 .idea
+.omc
 .serena
 .claude
 .agents
+.playwright-mcp
+.mcp.json

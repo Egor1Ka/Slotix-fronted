@@ -4,6 +4,35 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@layer base {
+	a,
+	button,
+	[role='button'],
+	[type='button'],
+	[type='submit'],
+	[type='reset'],
+	select,
+	summary,
+	[tabindex]:not([tabindex='-1']),
+	[data-slot$='-trigger'],
+	[data-slot$='-link'],
+	[data-slot$='-item'],
+	[data-slot$='-close'],
+	[data-slot$='-action'],
+	[data-slot$='-cancel'],
+	[data-slot$='-sub-trigger'] {
+		cursor: pointer;
+	}
+
+	[data-slot$='-thumb'] {
+		cursor: grab;
+
+		&:active {
+			cursor: grabbing;
+		}
+	}
+}
+
 @theme inline {
 	--color-background: var(--background);
 	--color-foreground: var(--foreground);
