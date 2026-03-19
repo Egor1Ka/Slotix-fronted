@@ -101,10 +101,19 @@ async function request<T>(
 	}
 
 	try {
+		const defaultHeaders: Record<string, string> = {}
+		if (finalConfig.body && !(finalConfig.body instanceof FormData)) {
+			defaultHeaders['Content-Type'] = 'application/json'
+		}
+
 		const response = await fetch(url, {
 			method: finalConfig.method ?? 'GET',
-			headers: finalConfig.headers,
-			body: finalConfig.body ? JSON.stringify(finalConfig.body) : undefined,
+			headers: { ...defaultHeaders, ...finalConfig.headers },
+			body: finalConfig.body
+				? finalConfig.body instanceof FormData
+					? finalConfig.body
+					: JSON.stringify(finalConfig.body)
+				: undefined,
 			signal: controller.signal,
 		})
 

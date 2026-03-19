@@ -29,3 +29,28 @@ export type {
 	MappedApiMethods,
 	ApiErrorResponseBody,
 } from './api/types'
+import { createApiMethods } from './api/create-api-methods'
+import { createAuthRefreshInterceptor } from './api/interceptors/with-auth-refresh'
+import { createToastInterceptor } from './api/interceptors/with-toast'
+import authApiConfig from './configs/auth.config'
+import userApiConfig from './configs/user.config'
+import billingApiConfig from './configs/billing.config'
+
+const defaultInterceptors = {
+	interceptors: {
+		onError: [
+			createAuthRefreshInterceptor('/api/auth/refresh', '/login'),
+			createToastInterceptor(),
+		],
+	},
+}
+
+export const authApi = createApiMethods(authApiConfig)
+export const userApi = createApiMethods(userApiConfig, defaultInterceptors)
+export const billingApi = createApiMethods(billingApiConfig, defaultInterceptors)
+export type { User, UpdateUserBody } from './configs/user.config'
+export type {
+	Plan,
+	BillingSubscription,
+	BillingPayment,
+} from './configs/billing.config'

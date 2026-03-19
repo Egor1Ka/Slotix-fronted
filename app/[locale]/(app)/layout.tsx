@@ -1,6 +1,4 @@
-// TODO: Replace with real auth check (e.g., getSession() from your auth provider)
-// const session = await getSession()
-// if (!session) redirect('/login')
+import { AppHeader } from '@/components/app-header'
 
 export default function AppLayout({
 	children,
@@ -8,8 +6,8 @@ export default function AppLayout({
 	children: React.ReactNode
 }>) {
 	return (
-		<div className="flex min-h-svh">
-			{/* TODO: Add sidebar navigation here */}
+		<div className="flex min-h-svh flex-col">
+			<AppHeader />
 			<main className="flex-1">{children}</main>
 		</div>
 	)

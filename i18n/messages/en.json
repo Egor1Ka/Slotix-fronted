@@ -59,32 +59,31 @@
 					"description": "Perfect for side projects",
 					"features": [
 						"Up to 3 projects",
-						"Basic components",
+						"Dashboard access",
 						"Community support"
+					]
+				},
+				"starter": {
+					"name": "Starter",
+					"price": "$9",
+					"period": "/month",
+					"description": "For growing projects",
+					"features": [
+						"Up to 20 projects",
+						"Export data",
+						"Email support"
 					]
 				},
 				"pro": {
 					"name": "Pro",
-					"price": "$19",
+					"price": "$29",
 					"period": "/month",
-					"description": "For professional developers",
+					"description": "For professionals",
 					"features": [
 						"Unlimited projects",
-						"All components",
+						"API access",
 						"Priority support",
-						"Custom themes"
-					]
-				},
-				"enterprise": {
-					"name": "Enterprise",
-					"price": "Custom",
-					"period": "",
-					"description": "For large teams",
-					"features": [
-						"Everything in Pro",
-						"SSO & SAML",
-						"Dedicated support",
-						"SLA guarantee"
+						"Export data"
 					]
 				}
 			}

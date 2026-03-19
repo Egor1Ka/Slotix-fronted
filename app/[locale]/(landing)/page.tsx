@@ -31,7 +31,7 @@ const featureLayout = [
 
 export default async function LandingPage() {
 	const t = await getTranslations('landing')
-	const planKeys = ['free', 'pro', 'enterprise'] as const
+	const planKeys = ['free', 'starter', 'pro'] as const
 
 	return (
 		<div className="flex flex-col">
