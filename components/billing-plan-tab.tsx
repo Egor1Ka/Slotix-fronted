@@ -41,7 +41,7 @@ const PLAN_DETAILS = {
 			'Export data',
 			'Email support',
 		],
-		productId: 'prod_4gn11BCxdyx0jtpYnNsur0',
+		productId: 'prod_4tHvpNEWtUFrf8LaGBqyh8',
 	},
 	pro: {
 		name: 'Pro',
@@ -54,7 +54,7 @@ const PLAN_DETAILS = {
 			'API access',
 			'Priority support',
 		],
-		productId: 'prod_pro_monthly',
+		productId: 'prod_TkVdhx4EhreepQ0TwmrrL',
 	},
 } as const
 

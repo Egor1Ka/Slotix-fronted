@@ -11,8 +11,8 @@ interface Plan {
 interface BillingSubscription {
 	id: string
 	userId: string
-	creemSubscriptionId: string
-	creemCustomerId: string
+	providerSubscriptionId: string
+	providerCustomerId: string
 	productId: string
 	planKey: string
 	status: string
@@ -26,8 +26,8 @@ interface BillingSubscription {
 interface BillingPayment {
 	id: string
 	userId: string | null
-	creemSubscriptionId: string
-	creemEventId: string
+	providerSubscriptionId: string
+	providerEventId: string
 	productId: string
 	type: 'subscription' | 'one_time'
 	eventType: string

@@ -9,7 +9,12 @@ import {
 	TableCell,
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/ui/empty'
+import {
+	Empty,
+	EmptyHeader,
+	EmptyTitle,
+	EmptyDescription,
+} from '@/components/ui/empty'
 import type { BillingPayment } from '@/services'
 
 interface BillingHistoryTabProps {
@@ -51,7 +56,7 @@ export function BillingHistoryTab({ payments }: BillingHistoryTabProps) {
 							</TableCell>
 							<TableCell>
 								{(payment.amount / 100).toFixed(2)}{' '}
-								{payment.currency.toUpperCase()}
+								{/* {payment.currency.toUpperCase()} */}
 							</TableCell>
 							<TableCell>
 								<Badge variant="outline" className="capitalize">
