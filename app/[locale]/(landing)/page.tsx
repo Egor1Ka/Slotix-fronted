@@ -31,7 +31,7 @@ const featureLayout = [
 
 export default async function LandingPage() {
 	const t = await getTranslations('landing')
-	const planKeys = ['free', 'starter', 'pro'] as const
+	const planKeys = ['free', 'pro'] as const
 
 	return (
 		<div className="flex flex-col">
@@ -165,7 +165,7 @@ export default async function LandingPage() {
 						</p>
 					</div>
 
-					<div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-3">
+					<div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-2">
 						{planKeys.map((key) => {
 							const features: string[] = t.raw(`pricing.plans.${key}.features`)
 							const isPro = key === 'pro'

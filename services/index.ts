@@ -53,4 +53,5 @@ export type {
 	Plan,
 	BillingSubscription,
 	BillingPayment,
+	BillingOrder,
 } from './configs/billing.config'

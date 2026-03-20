@@ -21,7 +21,18 @@ import { Check } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-const PLAN_HIERARCHY = ['free', 'starter', 'pro']
+// ── Подписочные планы ───────────────────────────────────────────────────────
+// UI-конфиг для подписочных планов.
+// "productId" — ID продукта из дашборда платёжки (Creem, Stripe и т.д.).
+//               Для бесплатного плана — null (чекаут не нужен).
+//
+// Чтобы добавить новый подписочный план:
+//   1. Создай recurring-продукт в дашборде платёжки
+//   2. Добавь ключ плана в PLAN_HIERARCHY (порядок: слабый → сильный)
+//   3. Добавь запись ниже с ID продукта из платёжки
+//   4. На бэкенде тоже добавь: SUBSCRIPTION_PRODUCTS + PLANS в constants/billing.js
+
+const PLAN_HIERARCHY = ['free', 'pro']
 
 const PLAN_DETAILS = {
 	free: {
@@ -29,19 +40,7 @@ const PLAN_DETAILS = {
 		price: '$0',
 		period: '/month',
 		features: ['Up to 3 projects', 'Dashboard access', 'Community support'],
-		productId: null,
-	},
-	starter: {
-		name: 'Starter',
-		price: '$9',
-		period: '/month',
-		features: [
-			'Up to 20 projects',
-			'Dashboard access',
-			'Export data',
-			'Email support',
-		],
-		productId: 'prod_4tHvpNEWtUFrf8LaGBqyh8',
+		productId: null, // бесплатный план — чекаут не нужен
 	},
 	pro: {
 		name: 'Pro',
@@ -54,9 +53,49 @@ const PLAN_DETAILS = {
 			'API access',
 			'Priority support',
 		],
-		productId: 'prod_TkVdhx4EhreepQ0TwmrrL',
+		productId: 'prod_TkVdhx4EhreepQ0TwmrrL', // ID продукта из платёжки для подписки Pro
 	},
 } as const
+
+// ── Одноразовые продукты ────────────────────────────────────────────────────
+// UI-конфиг для одноразовых покупок (аддоны).
+// Дают фичи/лимиты поверх подписочного плана пользователя.
+// Ключ должен совпадать с ключом продукта на бэкенде (значение в ONE_TIME_PRODUCTS в constants/billing.js).
+// "productId" — ID продукта из дашборда платёжки (Creem, Stripe и т.д.).
+//
+// Чтобы добавить новый одноразовый продукт:
+//   1. Создай one-time продукт в дашборде платёжки
+//   2. Добавь запись ниже: название, цена, список фич, ID продукта из платёжки
+//   3. На бэкенде тоже добавь: ONE_TIME_PRODUCTS + PRODUCTS в constants/billing.js
+//
+// Купленные продукты автоматически скрываются (фильтруются по plan.products из API).
+
+const PRODUCT_DETAILS = {
+	// ключ = внутренний ключ продукта (совпадает с Order.productKey на бэкенде)
+	export_pack: {
+		name: 'Starter Pack',                          // название для UI
+		price: '$9',                                    // цена для отображения
+		features: ['Export data', '5000 MB storage'],   // список фич на карточке
+		productId: 'prod_4tHvpNEWtUFrf8LaGBqyh8',      // ID продукта из платёжки для чекаута
+	},
+} as const
+
+// ── Helpers ─────────────────────────────────────────────────────────────────
+
+const getProductDisplayName = (productKey: string) => {
+	const details = PRODUCT_DETAILS[productKey as keyof typeof PRODUCT_DETAILS]
+	return details ? details.name : productKey
+}
+
+const isProductPurchased = (products: string[], productKey: string) =>
+	products.includes(productKey)
+
+const getAvailableProducts = (purchasedProducts: string[]) =>
+	Object.entries(PRODUCT_DETAILS).filter(
+		([key]) => !isProductPurchased(purchasedProducts, key),
+	)
+
+// ── Component ───────────────────────────────────────────────────────────────
 
 interface BillingPlanTabProps {
 	plan: Plan
@@ -72,6 +111,8 @@ export function BillingPlanTab({
 	const [cancelling, setCancelling] = useState(false)
 
 	const currentIndex = PLAN_HIERARCHY.indexOf(plan.key)
+	const availableProducts = getAvailableProducts(plan.products)
+	const hasPurchasedProducts = plan.products.length > 0
 
 	const handleCancel = async () => {
 		setCancelling(true)
@@ -88,6 +129,7 @@ export function BillingPlanTab({
 
 	return (
 		<div className="space-y-6 pt-6">
+			{/* ── Current Plan ────────────────────────────────────────── */}
 			<Card>
 				<CardHeader>
 					<div className="flex items-center gap-3">
@@ -109,9 +151,19 @@ export function BillingPlanTab({
 				</CardHeader>
 				<CardContent>
 					<div className="text-muted-foreground flex gap-6 text-sm">
-						<span>Projects: {plan.limits.projects === Infinity ? '∞' : plan.limits.projects}</span>
+						<span>
+							Projects:{' '}
+							{plan.limits.projects === Infinity
+								? '∞'
+								: plan.limits.projects}
+						</span>
 						<span>Storage: {plan.limits.storage} MB</span>
 					</div>
+					{hasPurchasedProducts && (
+						<div className="text-muted-foreground mt-2 text-sm">
+							Products: {plan.products.map(getProductDisplayName).join(', ')}
+						</div>
+					)}
 					{subscription &&
 						subscription.status !== 'canceled' &&
 						subscription.status !== 'expired' && (
@@ -150,55 +202,108 @@ export function BillingPlanTab({
 				</CardContent>
 			</Card>
 
-			<div className="grid gap-6 lg:grid-cols-3">
-				{PLAN_HIERARCHY.map((key, index) => {
-					const details = PLAN_DETAILS[key as keyof typeof PLAN_DETAILS]
-					const isCurrent = key === plan.key
-					const isHigher = index > currentIndex
+			{/* ── Subscription Plans ──────────────────────────────────── */}
+			<div>
+				<h3 className="mb-4 text-lg font-semibold">Subscription Plans</h3>
+				<div className="grid gap-6 lg:grid-cols-2">
+					{PLAN_HIERARCHY.map((key, index) => {
+						const details =
+							PLAN_DETAILS[key as keyof typeof PLAN_DETAILS]
+						const isCurrent = key === plan.key
+						const isHigher = index > currentIndex
 
-					return (
-						<Card
-							key={key}
-							className={isCurrent ? 'border-primary border-2' : ''}
-						>
-							<CardHeader>
-								<div className="flex items-center justify-between">
-									<CardTitle>{details.name}</CardTitle>
-									{isCurrent && <Badge>Current</Badge>}
-								</div>
-								<div className="flex items-baseline gap-1">
-									<span className="text-3xl font-semibold">
-										{details.price}
-									</span>
-									<span className="text-muted-foreground text-sm">
-										{details.period}
-									</span>
-								</div>
-							</CardHeader>
-							<CardContent>
-								<ul className="mb-6 space-y-2">
-									{details.features.map((feature) => (
-										<li
-											key={feature}
-											className="flex items-center gap-2 text-sm"
+						return (
+							<Card
+								key={key}
+								className={isCurrent ? 'border-primary border-2' : ''}
+							>
+								<CardHeader>
+									<div className="flex items-center justify-between">
+										<CardTitle>{details.name}</CardTitle>
+										{isCurrent && <Badge>Current</Badge>}
+									</div>
+									<div className="flex items-baseline gap-1">
+										<span className="text-3xl font-semibold">
+											{details.price}
+										</span>
+										<span className="text-muted-foreground text-sm">
+											{details.period}
+										</span>
+									</div>
+								</CardHeader>
+								<CardContent>
+									<ul className="mb-6 space-y-2">
+										{details.features.map((feature) => (
+											<li
+												key={feature}
+												className="flex items-center gap-2 text-sm"
+											>
+												<Check className="text-primary h-4 w-4 shrink-0" />
+												{feature}
+											</li>
+										))}
+									</ul>
+									{isHigher && details.productId && (
+										<CreemCheckout
+											productId={details.productId}
+											checkoutPath="/api/checkout"
 										>
-											<Check className="text-primary h-4 w-4 shrink-0" />
-											{feature}
-										</li>
-									))}
-								</ul>
-								{isHigher && details.productId && (
-									<CreemCheckout productId={details.productId} checkoutPath="/api/checkout">
+											<Button className="w-full">
+												Upgrade to {details.name}
+											</Button>
+										</CreemCheckout>
+									)}
+								</CardContent>
+							</Card>
+						)
+					})}
+				</div>
+			</div>
+
+			{/* ── Products ───────────────────────────────────────────── */}
+			{availableProducts.length > 0 && (
+				<div>
+					<h3 className="mb-4 text-lg font-semibold">Products</h3>
+					<div className="grid gap-6 lg:grid-cols-2">
+						{availableProducts.map(([key, details]) => (
+							<Card key={key}>
+								<CardHeader>
+									<div className="flex items-center justify-between">
+										<CardTitle>{details.name}</CardTitle>
+										<Badge variant="secondary">One-time</Badge>
+									</div>
+									<div className="flex items-baseline gap-1">
+										<span className="text-3xl font-semibold">
+											{details.price}
+										</span>
+									</div>
+								</CardHeader>
+								<CardContent>
+									<ul className="mb-6 space-y-2">
+										{details.features.map((feature) => (
+											<li
+												key={feature}
+												className="flex items-center gap-2 text-sm"
+											>
+												<Check className="text-primary h-4 w-4 shrink-0" />
+												{feature}
+											</li>
+										))}
+									</ul>
+									<CreemCheckout
+										productId={details.productId}
+										checkoutPath="/api/checkout"
+									>
 										<Button className="w-full">
-											Upgrade to {details.name}
+											Buy {details.name}
 										</Button>
 									</CreemCheckout>
-								)}
-							</CardContent>
-						</Card>
-					)
-				})}
-			</div>
+								</CardContent>
+							</Card>
+						))}
+					</div>
+				</div>
+			)}
 		</div>
 	)
 }

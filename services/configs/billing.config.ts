@@ -3,9 +3,10 @@ import { endpoint } from '@/services/api/types'
 import type { ApiResponse } from './user.config'
 
 interface Plan {
-	key: 'free' | 'starter' | 'pro'
+	key: 'free' | 'pro'
 	features: { dashboard: boolean; export: boolean; apiAccess: boolean }
 	limits: { projects: number; storage: number }
+	products: string[]
 }
 
 interface BillingSubscription {
@@ -37,6 +38,18 @@ interface BillingPayment {
 	updatedAt: string
 }
 
+interface BillingOrder {
+	id: string
+	userId: string
+	providerOrderId: string
+	productKey: string
+	providerProductId: string
+	amount: number
+	currency: string
+	createdAt: string
+	updatedAt: string
+}
+
 const billingApiConfig = {
 	plan: endpoint<void, ApiResponse<Plan>>({
 		url: () => `/api/billing/plan`,
@@ -56,6 +69,12 @@ const billingApiConfig = {
 		defaultErrorMessage: 'Failed to fetch payments',
 	}),
 
+	orders: endpoint<void, ApiResponse<BillingOrder[]>>({
+		url: () => `/api/billing/orders`,
+		method: getData,
+		defaultErrorMessage: 'Failed to fetch orders',
+	}),
+
 	cancel: endpoint<void, ApiResponse<BillingSubscription>>({
 		url: () => `/api/billing/cancel`,
 		method: postData,
@@ -68,4 +87,5 @@ export type {
 	Plan,
 	BillingSubscription,
 	BillingPayment,
+	BillingOrder,
 }

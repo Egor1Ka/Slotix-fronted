@@ -63,17 +63,6 @@
 						"Community support"
 					]
 				},
-				"starter": {
-					"name": "Starter",
-					"price": "$9",
-					"period": "/month",
-					"description": "For growing projects",
-					"features": [
-						"Up to 20 projects",
-						"Export data",
-						"Email support"
-					]
-				},
 				"pro": {
 					"name": "Pro",
 					"price": "$29",

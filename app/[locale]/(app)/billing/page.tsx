@@ -52,8 +52,7 @@ export default function BillingPage() {
 			<div className="mx-auto max-w-4xl space-y-6 p-6">
 				<Skeleton className="h-8 w-32" />
 				<Skeleton className="h-10 w-48" />
-				<div className="grid gap-6 lg:grid-cols-3">
-					<Skeleton className="h-64" />
+				<div className="grid gap-6 lg:grid-cols-2">
 					<Skeleton className="h-64" />
 					<Skeleton className="h-64" />
 				</div>

@@ -14,7 +14,7 @@ export function SignupForm({
 	const t = useTranslations('signup')
 
 	const handleGoogleSignup = () => {
-		window.location.href = '/api/auth/google'
+		window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`
 	}
 
 	return (

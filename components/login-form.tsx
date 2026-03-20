@@ -22,7 +22,7 @@ export function LoginForm({
 		if (callbackUrl && isSafeRedirectPath(callbackUrl)) {
 			document.cookie = `callbackUrl=${encodeURIComponent(callbackUrl)};path=/;max-age=600;samesite=lax`
 		}
-		window.location.href = '/api/auth/google'
+		window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`
 	}
 
 	return (
