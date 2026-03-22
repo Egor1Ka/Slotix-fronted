@@ -3,7 +3,7 @@ import { endpoint } from '@/services/api/types'
 import type { ApiResponse } from './user.config'
 
 interface Plan {
-	key: 'free' | 'pro'
+	key: string
 	features: { dashboard: boolean; export: boolean; apiAccess: boolean }
 	limits: { projects: number; storage: number }
 	products: string[]
@@ -50,6 +50,28 @@ interface BillingOrder {
 	updatedAt: string
 }
 
+interface CatalogPlan {
+	key: string
+	price: number
+	currency: string
+	period: string
+	productId: string | null
+}
+
+interface CatalogProduct {
+	key: string
+	type: string
+	price: number
+	currency: string
+	productId: string
+}
+
+interface BillingCatalog {
+	plans: CatalogPlan[]
+	products: CatalogProduct[]
+	hierarchy: string[]
+}
+
 const billingApiConfig = {
 	plan: endpoint<void, ApiResponse<Plan>>({
 		url: () => `/api/billing/plan`,
@@ -80,6 +102,12 @@ const billingApiConfig = {
 		method: postData,
 		defaultErrorMessage: 'Failed to cancel subscription',
 	}),
+
+	catalog: endpoint<void, ApiResponse<BillingCatalog>>({
+		url: () => `/api/billing/catalog`,
+		method: getData,
+		defaultErrorMessage: 'Failed to fetch billing catalog',
+	}),
 }
 
 export default billingApiConfig
@@ -88,4 +116,7 @@ export type {
 	BillingSubscription,
 	BillingPayment,
 	BillingOrder,
+	BillingCatalog,
+	CatalogPlan,
+	CatalogProduct,
 }

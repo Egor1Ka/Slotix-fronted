@@ -34,6 +34,8 @@ import { toast } from 'sonner'
 
 const PLAN_HIERARCHY = ['free', 'pro']
 
+
+/// Конфиг планов должен приходить из бэкенда в виде массива объектов с полями: name, price, period, features, productId мы не должны хранить это в фронте 
 const PLAN_DETAILS = {
 	free: {
 		name: 'Free',

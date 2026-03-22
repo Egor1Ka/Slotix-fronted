@@ -48,10 +48,14 @@ const defaultInterceptors = {
 export const authApi = createApiMethods(authApiConfig)
 export const userApi = createApiMethods(userApiConfig, defaultInterceptors)
 export const billingApi = createApiMethods(billingApiConfig, defaultInterceptors)
+export const billingServerApi = createApiMethods(billingApiConfig)
 export type { User, UpdateUserBody } from './configs/user.config'
 export type {
 	Plan,
 	BillingSubscription,
 	BillingPayment,
 	BillingOrder,
+	BillingCatalog,
+	CatalogPlan,
+	CatalogProduct,
 } from './configs/billing.config'
