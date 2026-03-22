@@ -1,13 +1,7 @@
 import 'server-only'
 
 import { cookies } from 'next/headers'
-import type { User } from '@/services/configs/user.config'
-
-interface ApiResponse<T> {
-	data: T
-	statusCode: number
-	status: string
-}
+import type { User, ApiResponse } from '@/services/configs/user.config'
 
 export async function getUser(): Promise<User | null> {
 	const cookieStore = await cookies()

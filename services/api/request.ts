@@ -10,14 +10,15 @@ function buildUrl(
 ): string {
 	const base = url(pathParams)
 
-	const filtered = Object.entries(queryParams).reduce<Record<string, string>>(
-		(acc, [key, value]) => {
-			if (value !== undefined && value !== null) {
-				acc[key] = String(value)
-			}
-			return acc
-		},
-		{},
+	const isDefinedEntry = ([, value]: [string, unknown]) =>
+		value !== undefined && value !== null
+	const toStringEntry = ([key, value]: [string, unknown]): [string, string] => [
+		key,
+		String(value),
+	]
+
+	const filtered = Object.fromEntries(
+		Object.entries(queryParams).filter(isDefinedEntry).map(toStringEntry),
 	)
 
 	const query = new URLSearchParams(filtered).toString()

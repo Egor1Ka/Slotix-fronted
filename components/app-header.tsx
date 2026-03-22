@@ -14,9 +14,9 @@ import {
 	DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import { EditProfileDialog } from '@/components/edit-profile-dialog'
-import { authApi } from '@/services'
 import type { User } from '@/services'
 import { useUser } from '@/lib/auth/user-provider'
+import { useLogout } from '@/hooks/use-logout'
 
 export function AppHeader() {
 	const router = useRouter()
@@ -24,10 +24,7 @@ export function AppHeader() {
 	const [currentUser, setCurrentUser] = useState<User>(user)
 	const [editOpen, setEditOpen] = useState(false)
 
-	const handleLogout = async () => {
-		await authApi.logout({ silent: true })
-		router.push('/login')
-	}
+	const handleLogout = useLogout()
 
 	const handleNameUpdated = (updatedUser: User) => {
 		setCurrentUser(updatedUser)

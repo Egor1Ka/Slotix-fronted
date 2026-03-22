@@ -95,7 +95,7 @@ export function BillingPlanTab({
 								}
 								className="capitalize"
 							>
-								{subscription.status.replace('_', ' ')}
+								{subscription.status.replaceAll('_', ' ')}
 							</Badge>
 						)}
 					</div>

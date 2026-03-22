@@ -56,15 +56,15 @@ export function BillingHistoryTab({ payments }: BillingHistoryTabProps) {
 							</TableCell>
 							<TableCell>
 								{(payment.amount / 100).toFixed(2)}{' '}
-								{/* {payment.currency.toUpperCase()} */}
+								{payment.currency.toUpperCase()}
 							</TableCell>
 							<TableCell>
 								<Badge variant="outline" className="capitalize">
-									{payment.type.replace('_', ' ')}
+									{payment.type.replaceAll('_', ' ')}
 								</Badge>
 							</TableCell>
 							<TableCell className="text-muted-foreground">
-								{payment.eventType.replace('.', ' ')}
+								{payment.eventType.replaceAll('.', ' ')}
 							</TableCell>
 						</TableRow>
 					))}

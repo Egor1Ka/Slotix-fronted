@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { isSafeRedirectPath } from '@/lib/utils'
 
 const protectedPaths = ['/dashboard', '/billing', '/shadcndemo']
 const authPaths = ['/login', '/signup']
@@ -11,9 +12,6 @@ const isProtectedPath = (pathname: string): boolean =>
 
 const isAuthPath = (pathname: string): boolean =>
 	authPaths.some((path) => pathname === path || pathname.startsWith(`${path}/`))
-
-const isSafeRedirectPath = (path: string): boolean =>
-	path.startsWith('/') && !path.startsWith('//') && !path.includes('://')
 
 function consumeCallbackUrl(request: NextRequest): NextResponse {
 	const rawCallbackUrl = request.cookies.get('callbackUrl')?.value

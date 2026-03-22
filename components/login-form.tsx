@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
-import { cn } from '@/lib/utils'
+import { cn, isSafeRedirectPath } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Field, FieldDescription, FieldGroup } from '@/components/ui/field'
@@ -12,9 +12,6 @@ export function LoginForm({
 	...props
 }: React.ComponentProps<'div'>) {
 	const t = useTranslations('login')
-
-	const isSafeRedirectPath = (path: string) =>
-		path.startsWith('/') && !path.startsWith('//') && !path.includes('://')
 
 	const handleGoogleLogin = () => {
 		const searchParams = new URLSearchParams(window.location.search)

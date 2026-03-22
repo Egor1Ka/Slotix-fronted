@@ -1,19 +1,13 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { authApi } from '@/services'
+import { useLogout } from '@/hooks/use-logout'
 
 export function LogoutButton({
 	children,
 	...props
 }: React.ComponentProps<typeof Button>) {
-	const router = useRouter()
-
-	const handleLogout = async () => {
-		await authApi.logout({ silent: true })
-		router.push('/login')
-	}
+	const handleLogout = useLogout()
 
 	return (
 		<Button onClick={handleLogout} {...props}>

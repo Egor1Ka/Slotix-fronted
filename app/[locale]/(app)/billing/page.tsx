@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
@@ -25,7 +25,7 @@ export default function BillingPage() {
 	const [catalog, setCatalog] = useState<BillingCatalog | null>(null)
 	const [loading, setLoading] = useState(true)
 
-	const fetchData = async () => {
+	const fetchData = useCallback(async () => {
 		try {
 			const [planRes, subRes, payRes, catalogRes] = await Promise.all([
 				billingApi.plan(),
@@ -42,11 +42,11 @@ export default function BillingPage() {
 		} finally {
 			setLoading(false)
 		}
-	}
+	}, [])
 
 	useEffect(() => {
 		fetchData()
-	}, [])
+	}, [fetchData])
 
 	useEffect(() => {
 		if (searchParams.get('checkout') === 'success') {
