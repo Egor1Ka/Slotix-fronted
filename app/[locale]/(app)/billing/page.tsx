@@ -8,7 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { BillingPlanTab } from '@/components/billing-plan-tab'
 import { BillingHistoryTab } from '@/components/billing-history-tab'
 import { billingApi } from '@/services'
-import type { Plan, BillingSubscription, BillingPayment } from '@/services'
+import type { Plan, BillingSubscription, BillingPayment, BillingCatalog } from '@/services'
 
 export default function BillingPage() {
 	const searchParams = useSearchParams()
@@ -17,18 +17,21 @@ export default function BillingPage() {
 		null,
 	)
 	const [payments, setPayments] = useState<BillingPayment[]>([])
+	const [catalog, setCatalog] = useState<BillingCatalog | null>(null)
 	const [loading, setLoading] = useState(true)
 
 	const fetchData = async () => {
 		try {
-			const [planRes, subRes, payRes] = await Promise.all([
+			const [planRes, subRes, payRes, catalogRes] = await Promise.all([
 				billingApi.plan(),
 				billingApi.subscription(),
 				billingApi.payments(),
+				billingApi.catalog(),
 			])
 			setPlan(planRes.data)
 			setSubscription(subRes.data)
 			setPayments(payRes.data)
+			setCatalog(catalogRes.data)
 		} catch {
 			// errors handled by toast interceptor
 		} finally {
@@ -60,7 +63,7 @@ export default function BillingPage() {
 		)
 	}
 
-	if (!plan) {
+	if (!plan || !catalog) {
 		return (
 			<div className="text-muted-foreground p-6 text-center">
 				Failed to load billing data
@@ -80,6 +83,7 @@ export default function BillingPage() {
 					<BillingPlanTab
 						plan={plan}
 						subscription={subscription}
+						catalog={catalog}
 						onPlanChanged={fetchData}
 					/>
 				</TabsContent>
