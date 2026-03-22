@@ -25,8 +25,11 @@ import { toast } from 'sonner'
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
-const hasI18nKeys = (t: ReturnType<typeof useTranslations>, prefix: string, key: string) =>
-	t.has(`${prefix}.${key}.name`)
+const hasI18nKeys = (
+	t: ReturnType<typeof useTranslations>,
+	prefix: string,
+	key: string,
+) => t.has(`${prefix}.${key}.name`)
 
 // ── Component ───────────────────────────────────────────────────────────────
 
@@ -101,9 +104,7 @@ export function BillingPlanTab({
 					<div className="text-muted-foreground flex gap-6 text-sm">
 						<span>
 							Projects:{' '}
-							{plan.limits.projects === Infinity
-								? '∞'
-								: plan.limits.projects}
+							{plan.limits.projects === Infinity ? '∞' : plan.limits.projects}
 						</span>
 						<span>Storage: {plan.limits.storage} MB</span>
 					</div>
@@ -225,12 +226,16 @@ export function BillingPlanTab({
 						{availableProducts.map((product) => {
 							if (!hasI18nKeys(t, 'products', product.key)) {
 								if (process.env.NODE_ENV === 'development') {
-									console.warn(`Missing i18n keys for billing product: ${product.key}`)
+									console.warn(
+										`Missing i18n keys for billing product: ${product.key}`,
+									)
 								}
 								return null
 							}
 
-							const features: string[] = t.raw(`products.${product.key}.features`)
+							const features: string[] = t.raw(
+								`products.${product.key}.features`,
+							)
 
 							return (
 								<Card key={product.key}>

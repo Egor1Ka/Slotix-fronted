@@ -32,9 +32,7 @@ function consumeCallbackUrl(request: NextRequest): NextResponse {
 	return response
 }
 
-export function authMiddleware(
-	request: NextRequest,
-): NextResponse | null {
+export function authMiddleware(request: NextRequest): NextResponse | null {
 	const { pathname } = request.nextUrl
 	const accessToken = request.cookies.get('accessToken')?.value
 

@@ -8,7 +8,12 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { BillingPlanTab } from '@/components/billing-plan-tab'
 import { BillingHistoryTab } from '@/components/billing-history-tab'
 import { billingApi } from '@/services'
-import type { Plan, BillingSubscription, BillingPayment, BillingCatalog } from '@/services'
+import type {
+	Plan,
+	BillingSubscription,
+	BillingPayment,
+	BillingCatalog,
+} from '@/services'
 
 export default function BillingPage() {
 	const searchParams = useSearchParams()

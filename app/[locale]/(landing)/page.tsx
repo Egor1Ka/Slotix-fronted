@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
+import type { BillingCatalog } from '@/services/server'
 import { billingServerApi } from '@/services/server'
 import { formatPrice } from '@/lib/billing'
 import {
@@ -34,8 +35,15 @@ const featureLayout = [
 export default async function LandingPage() {
 	const t = await getTranslations('landing')
 	const tBilling = await getTranslations('billing')
-	const catalogRes = await billingServerApi.catalog()
-	const catalog = catalogRes.data
+	const fallbackCatalog: BillingCatalog = {
+		plans: [],
+		products: [],
+		hierarchy: ['free', 'pro'],
+	}
+	const catalog = await billingServerApi
+		.catalog()
+		.then((res) => res.data)
+		.catch(() => fallbackCatalog)
 	const planKeys = catalog.hierarchy
 
 	return (

@@ -115,10 +115,7 @@
 		"products": {
 			"export_pack": {
 				"name": "Starter Pack",
-				"features": [
-					"Export data",
-					"5000 MB storage"
-				]
+				"features": ["Export data", "5000 MB storage"]
 			}
 		},
 		"period": {
