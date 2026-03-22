@@ -1,7 +1,7 @@
 ---
 name: add-billing-product
 description: Add a new subscription plan, one-time purchase, or billing product to both backend and frontend
-argument-hint: "[type] [key] [creem-id] [price] [details...]"
+argument-hint: "[type] [key] [price] [details...]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent
 ---
 
@@ -17,7 +17,6 @@ The skill needs ALL of the following before making any changes. Parse what the u
 |-------|----------|---------|-------|
 | `type` | always | `subscription` or `one_time` | Determines which constants to update |
 | `key` | always | `business`, `analytics_pack` | Internal system name, snake_case |
-| `creemProductId` | always | `prod_xxx123` | From Creem dashboard |
 | `price` | always | `4900` | In cents |
 | `currency` | always | `USD` | ISO 4217 |
 | `period` | subscription only | `month` or `year` | Billing period |
@@ -40,6 +39,7 @@ If the user says "generate texts yourself" / "сгенерируй сам" or si
 **Backend** (`/Users/egorzozula/Desktop/BackendTemplate/`):
 - `src/modules/billing/constants/billing.js` — all product/plan constants
 - `src/modules/billing/hooks/productHooks.js` — lifecycle hooks (subscription only)
+- `.env.example` — product ID env var placeholders
 
 **Frontend** (`/Users/egorzozula/Desktop/Template-frontend/`):
 - `i18n/messages/en.json` — English translations (billing namespace)
@@ -62,6 +62,7 @@ Read these files to understand the current structure:
 ```
 /Users/egorzozula/Desktop/BackendTemplate/src/modules/billing/constants/billing.js
 /Users/egorzozula/Desktop/BackendTemplate/src/modules/billing/hooks/productHooks.js
+/Users/egorzozula/Desktop/BackendTemplate/.env.example
 /Users/egorzozula/Desktop/Template-frontend/i18n/messages/en.json
 /Users/egorzozula/Desktop/Template-frontend/i18n/messages/uk.json
 ```
@@ -74,10 +75,10 @@ Edit `src/modules/billing/constants/billing.js`:
 
 a) Add to `SUBSCRIPTION_PRODUCTS`:
 ```js
-export const SUBSCRIPTION_PRODUCTS = {
+export const SUBSCRIPTION_PRODUCTS = fromEnvEntries(
   // ... existing entries
-  ${creemProductId}: "${key}",
-};
+  [process.env.CREEM_PRODUCT_${KEY_UPPER}, "${key}"],
+);
 ```
 
 b) Add to `PLANS`:
@@ -99,7 +100,7 @@ export const PLAN_CATALOG = {
     price: ${price},
     currency: "${currency}",
     period: "${period}",
-    productId: "${creemProductId}",
+    productId: process.env.CREEM_PRODUCT_${KEY_UPPER},
   },
 };
 ```
@@ -113,10 +114,10 @@ export const PLAN_HIERARCHY = ["free", "pro", "${key}"];
 
 a) Add to `ONE_TIME_PRODUCTS`:
 ```js
-export const ONE_TIME_PRODUCTS = {
+export const ONE_TIME_PRODUCTS = fromEnvEntries(
   // ... existing entries
-  ${creemProductId}: "${key}",
-};
+  [process.env.CREEM_PRODUCT_${KEY_UPPER}, "${key}"],
+);
 ```
 
 b) Add to `PRODUCTS`:
@@ -139,12 +140,31 @@ export const PRODUCT_CATALOG = {
     type: "one_time",
     price: ${price},
     currency: "${currency}",
-    productId: "${creemProductId}",
+    productId: process.env.CREEM_PRODUCT_${KEY_UPPER},
   },
 };
 ```
 
-### 4. Update backend hooks (subscription only)
+### 4. Update `.env.example`
+
+Add placeholder for the new product to `.env.example`:
+
+```env
+CREEM_PRODUCT_${KEY_UPPER}=prod_your_${key}_id
+```
+
+### 5. Update `requiredProductEnvVars`
+
+Add the new env var name to the validation array in `billing.js`:
+
+```js
+const requiredProductEnvVars = [
+  // ... existing entries
+  "CREEM_PRODUCT_${KEY_UPPER}",
+];
+```
+
+### 6. Update backend hooks (subscription only)
 
 Edit `src/modules/billing/hooks/productHooks.js` — add empty hooks for the new plan:
 
@@ -159,7 +179,7 @@ const PRODUCT_HOOKS = {
 };
 ```
 
-### 5. Update frontend i18n
+### 7. Update frontend i18n
 
 Edit `i18n/messages/en.json` — add under `billing.plans.${key}` (for subscription) or `billing.products.${key}` (for one-time):
 
@@ -174,7 +194,7 @@ Edit `i18n/messages/uk.json` — same structure with Ukrainian texts.
 
 For subscription plans, also add `description` if provided.
 
-### 6. Summary
+### 8. Summary
 
 Print a summary of all changes made:
 
@@ -183,9 +203,13 @@ Added ${type} product "${key}":
   Backend:
     - constants/billing.js: ${list of constants updated}
     - hooks/productHooks.js: ${if subscription: "empty hooks added" | if one_time: "n/a"}
+    - .env.example: CREEM_PRODUCT_${KEY_UPPER} placeholder added
+    - requiredProductEnvVars: "CREEM_PRODUCT_${KEY_UPPER}" added
   Frontend:
     - en.json: billing.${plans|products}.${key}
     - uk.json: billing.${plans|products}.${key}
+
+  ⚠️ Add your Creem product ID to .env: CREEM_PRODUCT_${KEY_UPPER}=prod_xxx
 ```
 
 ## What to ask the user
@@ -193,11 +217,10 @@ Added ${type} product "${key}":
 When collecting missing information, ask in this order:
 1. Type: "Subscription (recurring) or one-time purchase?"
 2. Key: "System name for this product? (snake_case, e.g. `business`, `analytics_pack`)"
-3. Creem Product ID: "Product ID from Creem dashboard? (e.g. `prod_xxx`)"
-4. Price: "Price in cents? (e.g. 4900 = $49.00)"
-5. Currency: "Currency? (default: USD)"
-6. Period (subscription only): "Billing period — month or year?"
-7. Hierarchy position (subscription only): "Where in the plan hierarchy? (current: free → pro)"
-8. Features: "Which features does this product enable? Current feature keys: `dashboard`, `export`, `apiAccess`. You can add new ones."
-9. Limits: "What limits does this product set? Current limit keys: `projects`, `storage`. You can add new ones."
-10. i18n: "Display texts for EN and UK? Or should I generate them based on features/limits? (say 'generate' for auto-generation)"
+3. Price: "Price in cents? (e.g. 4900 = $49.00)"
+4. Currency: "Currency? (default: USD)"
+5. Period (subscription only): "Billing period — month or year?"
+6. Hierarchy position (subscription only): "Where in the plan hierarchy? (current: free → pro)"
+7. Features: "Which features does this product enable? Current feature keys: `dashboard`, `export`, `apiAccess`. You can add new ones."
+8. Limits: "What limits does this product set? Current limit keys: `projects`, `storage`. You can add new ones."
+9. i18n: "Display texts for EN and UK? Or should I generate them based on features/limits? (say 'generate' for auto-generation)"
