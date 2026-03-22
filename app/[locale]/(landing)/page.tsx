@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
-import { billingServerApi } from '@/services'
+import { billingServerApi } from '@/services/server'
 import { formatPrice } from '@/lib/billing'
 import {
 	Zap,
@@ -172,7 +172,8 @@ export default async function LandingPage() {
 
 					<div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-2">
 						{planKeys.map((key) => {
-							const features: string[] = t.raw(`pricing.plans.${key}.features`)
+							const features: string[] = tBilling.raw(`plans.${key}.features`)
+							const catalogPlan = catalog.plans.find((p) => p.key === key)
 							const isPro = key === 'pro'
 							return (
 								<div
@@ -186,18 +187,22 @@ export default async function LandingPage() {
 									)}
 									<div className="mb-6">
 										<h3 className="text-lg font-semibold">
-											{t(`pricing.plans.${key}.name`)}
+											{tBilling(`plans.${key}.name`)}
 										</h3>
 										<p className="text-muted-foreground mt-1 text-sm">
-											{t(`pricing.plans.${key}.description`)}
+											{tBilling(`plans.${key}.description`)}
 										</p>
 									</div>
 									<div className="mb-8 flex items-baseline gap-1">
 										<span className="font-display text-5xl font-semibold tracking-tight italic">
-											{t(`pricing.plans.${key}.price`)}
+											{catalogPlan
+												? formatPrice(catalogPlan.price, catalogPlan.currency)
+												: '$0'}
 										</span>
 										<span className="text-muted-foreground text-sm">
-											{t(`pricing.plans.${key}.period`)}
+											{catalogPlan
+												? tBilling(`period.${catalogPlan.period}`)
+												: ''}
 										</span>
 									</div>
 									<ul className="mb-8 flex flex-col gap-3">
