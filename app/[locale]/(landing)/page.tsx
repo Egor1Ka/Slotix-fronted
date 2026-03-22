@@ -1,5 +1,7 @@
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
+import { billingServerApi } from '@/services'
+import { formatPrice } from '@/lib/billing'
 import {
 	Zap,
 	Shield,
@@ -31,7 +33,10 @@ const featureLayout = [
 
 export default async function LandingPage() {
 	const t = await getTranslations('landing')
-	const planKeys = ['free', 'pro'] as const
+	const tBilling = await getTranslations('billing')
+	const catalogRes = await billingServerApi.catalog()
+	const catalog = catalogRes.data
+	const planKeys = catalog.hierarchy
 
 	return (
 		<div className="flex flex-col">

@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import type { BillingCatalog, BillingSubscription, Plan } from '@/services'
 import { billingApi } from '@/services'
+import { formatPrice } from '@/lib/billing'
 import { CreemCheckout } from '@creem_io/nextjs'
 import { Check } from 'lucide-react'
 import { useTranslations } from 'next-intl'
@@ -23,13 +24,6 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
-
-const formatPrice = (cents: number, currency: string) =>
-	new Intl.NumberFormat('en-US', {
-		style: 'currency',
-		currency,
-		minimumFractionDigits: 0,
-	}).format(cents / 100)
 
 const hasI18nKeys = (t: ReturnType<typeof useTranslations>, prefix: string, key: string) =>
 	t.has(`${prefix}.${key}.name`)
