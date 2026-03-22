@@ -14,106 +14,58 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import type { BillingSubscription, Plan } from '@/services'
+import type { BillingCatalog, BillingSubscription, Plan } from '@/services'
 import { billingApi } from '@/services'
 import { CreemCheckout } from '@creem_io/nextjs'
 import { Check } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-// ── Подписочные планы ───────────────────────────────────────────────────────
-// UI-конфиг для подписочных планов.
-// "productId" — ID продукта из дашборда платёжки (Creem, Stripe и т.д.).
-//               Для бесплатного плана — null (чекаут не нужен).
-//
-// Чтобы добавить новый подписочный план:
-//   1. Создай recurring-продукт в дашборде платёжки
-//   2. Добавь ключ плана в PLAN_HIERARCHY (порядок: слабый → сильный)
-//   3. Добавь запись ниже с ID продукта из платёжки
-//   4. На бэкенде тоже добавь: SUBSCRIPTION_PRODUCTS + PLANS в constants/billing.js
-
-const PLAN_HIERARCHY = ['free', 'pro']
-
-
-/// Конфиг планов должен приходить из бэкенда в виде массива объектов с полями: name, price, period, features, productId мы не должны хранить это в фронте 
-const PLAN_DETAILS = {
-	free: {
-		name: 'Free',
-		price: '$0',
-		period: '/month',
-		features: ['Up to 3 projects', 'Dashboard access', 'Community support'],
-		productId: null, // бесплатный план — чекаут не нужен
-	},
-	pro: {
-		name: 'Pro',
-		price: '$29',
-		period: '/month',
-		features: [
-			'Unlimited projects',
-			'Dashboard access',
-			'Export data',
-			'API access',
-			'Priority support',
-		],
-		productId: 'prod_TkVdhx4EhreepQ0TwmrrL', // ID продукта из платёжки для подписки Pro
-	},
-} as const
-
-// ── Одноразовые продукты ────────────────────────────────────────────────────
-// UI-конфиг для одноразовых покупок (аддоны).
-// Дают фичи/лимиты поверх подписочного плана пользователя.
-// Ключ должен совпадать с ключом продукта на бэкенде (значение в ONE_TIME_PRODUCTS в constants/billing.js).
-// "productId" — ID продукта из дашборда платёжки (Creem, Stripe и т.д.).
-//
-// Чтобы добавить новый одноразовый продукт:
-//   1. Создай one-time продукт в дашборде платёжки
-//   2. Добавь запись ниже: название, цена, список фич, ID продукта из платёжки
-//   3. На бэкенде тоже добавь: ONE_TIME_PRODUCTS + PRODUCTS в constants/billing.js
-//
-// Купленные продукты автоматически скрываются (фильтруются по plan.products из API).
-
-const PRODUCT_DETAILS = {
-	// ключ = внутренний ключ продукта (совпадает с Order.productKey на бэкенде)
-	export_pack: {
-		name: 'Starter Pack',                          // название для UI
-		price: '$9',                                    // цена для отображения
-		features: ['Export data', '5000 MB storage'],   // список фич на карточке
-		productId: 'prod_4tHvpNEWtUFrf8LaGBqyh8',      // ID продукта из платёжки для чекаута
-	},
-} as const
-
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
-const getProductDisplayName = (productKey: string) => {
-	const details = PRODUCT_DETAILS[productKey as keyof typeof PRODUCT_DETAILS]
-	return details ? details.name : productKey
-}
+const formatPrice = (cents: number, currency: string) =>
+	new Intl.NumberFormat('en-US', {
+		style: 'currency',
+		currency,
+		minimumFractionDigits: 0,
+	}).format(cents / 100)
 
-const isProductPurchased = (products: string[], productKey: string) =>
-	products.includes(productKey)
-
-const getAvailableProducts = (purchasedProducts: string[]) =>
-	Object.entries(PRODUCT_DETAILS).filter(
-		([key]) => !isProductPurchased(purchasedProducts, key),
-	)
+const hasI18nKeys = (t: ReturnType<typeof useTranslations>, prefix: string, key: string) =>
+	t.has(`${prefix}.${key}.name`)
 
 // ── Component ───────────────────────────────────────────────────────────────
 
 interface BillingPlanTabProps {
 	plan: Plan
 	subscription: BillingSubscription | null
+	catalog: BillingCatalog
 	onPlanChanged: () => void
 }
 
 export function BillingPlanTab({
 	plan,
 	subscription,
+	catalog,
 	onPlanChanged,
 }: BillingPlanTabProps) {
 	const [cancelling, setCancelling] = useState(false)
+	const t = useTranslations('billing')
 
-	const currentIndex = PLAN_HIERARCHY.indexOf(plan.key)
-	const availableProducts = getAvailableProducts(plan.products)
+	const currentIndex = catalog.hierarchy.indexOf(plan.key)
+
+	const isProductPurchased = (productKey: string) =>
+		plan.products.includes(productKey)
+
+	const getAvailableProducts = () =>
+		catalog.products.filter((product) => !isProductPurchased(product.key))
+
+	const getProductDisplayName = (productKey: string) => {
+		if (!hasI18nKeys(t, 'products', productKey)) return productKey
+		return t(`products.${productKey}.name`)
+	}
+
+	const availableProducts = getAvailableProducts()
 	const hasPurchasedProducts = plan.products.length > 0
 
 	const handleCancel = async () => {
@@ -208,11 +160,20 @@ export function BillingPlanTab({
 			<div>
 				<h3 className="mb-4 text-lg font-semibold">Subscription Plans</h3>
 				<div className="grid gap-6 lg:grid-cols-2">
-					{PLAN_HIERARCHY.map((key, index) => {
-						const details =
-							PLAN_DETAILS[key as keyof typeof PLAN_DETAILS]
+					{catalog.hierarchy.map((key, index) => {
+						if (!hasI18nKeys(t, 'plans', key)) {
+							if (process.env.NODE_ENV === 'development') {
+								console.warn(`Missing i18n keys for billing plan: ${key}`)
+							}
+							return null
+						}
+
+						const catalogPlan = catalog.plans.find((p) => p.key === key)
+						if (!catalogPlan) return null
+
 						const isCurrent = key === plan.key
 						const isHigher = index > currentIndex
+						const features: string[] = t.raw(`plans.${key}.features`)
 
 						return (
 							<Card
@@ -221,21 +182,21 @@ export function BillingPlanTab({
 							>
 								<CardHeader>
 									<div className="flex items-center justify-between">
-										<CardTitle>{details.name}</CardTitle>
+										<CardTitle>{t(`plans.${key}.name`)}</CardTitle>
 										{isCurrent && <Badge>Current</Badge>}
 									</div>
 									<div className="flex items-baseline gap-1">
 										<span className="text-3xl font-semibold">
-											{details.price}
+											{formatPrice(catalogPlan.price, catalogPlan.currency)}
 										</span>
 										<span className="text-muted-foreground text-sm">
-											{details.period}
+											{t(`period.${catalogPlan.period}`)}
 										</span>
 									</div>
 								</CardHeader>
 								<CardContent>
 									<ul className="mb-6 space-y-2">
-										{details.features.map((feature) => (
+										{features.map((feature) => (
 											<li
 												key={feature}
 												className="flex items-center gap-2 text-sm"
@@ -245,13 +206,13 @@ export function BillingPlanTab({
 											</li>
 										))}
 									</ul>
-									{isHigher && details.productId && (
+									{isHigher && catalogPlan.productId && (
 										<CreemCheckout
-											productId={details.productId}
+											productId={catalogPlan.productId}
 											checkoutPath="/api/checkout"
 										>
 											<Button className="w-full">
-												Upgrade to {details.name}
+												Upgrade to {t(`plans.${key}.name`)}
 											</Button>
 										</CreemCheckout>
 									)}
@@ -267,42 +228,53 @@ export function BillingPlanTab({
 				<div>
 					<h3 className="mb-4 text-lg font-semibold">Products</h3>
 					<div className="grid gap-6 lg:grid-cols-2">
-						{availableProducts.map(([key, details]) => (
-							<Card key={key}>
-								<CardHeader>
-									<div className="flex items-center justify-between">
-										<CardTitle>{details.name}</CardTitle>
-										<Badge variant="secondary">One-time</Badge>
-									</div>
-									<div className="flex items-baseline gap-1">
-										<span className="text-3xl font-semibold">
-											{details.price}
-										</span>
-									</div>
-								</CardHeader>
-								<CardContent>
-									<ul className="mb-6 space-y-2">
-										{details.features.map((feature) => (
-											<li
-												key={feature}
-												className="flex items-center gap-2 text-sm"
-											>
-												<Check className="text-primary h-4 w-4 shrink-0" />
-												{feature}
-											</li>
-										))}
-									</ul>
-									<CreemCheckout
-										productId={details.productId}
-										checkoutPath="/api/checkout"
-									>
-										<Button className="w-full">
-											Buy {details.name}
-										</Button>
-									</CreemCheckout>
-								</CardContent>
-							</Card>
-						))}
+						{availableProducts.map((product) => {
+							if (!hasI18nKeys(t, 'products', product.key)) {
+								if (process.env.NODE_ENV === 'development') {
+									console.warn(`Missing i18n keys for billing product: ${product.key}`)
+								}
+								return null
+							}
+
+							const features: string[] = t.raw(`products.${product.key}.features`)
+
+							return (
+								<Card key={product.key}>
+									<CardHeader>
+										<div className="flex items-center justify-between">
+											<CardTitle>{t(`products.${product.key}.name`)}</CardTitle>
+											<Badge variant="secondary">One-time</Badge>
+										</div>
+										<div className="flex items-baseline gap-1">
+											<span className="text-3xl font-semibold">
+												{formatPrice(product.price, product.currency)}
+											</span>
+										</div>
+									</CardHeader>
+									<CardContent>
+										<ul className="mb-6 space-y-2">
+											{features.map((feature) => (
+												<li
+													key={feature}
+													className="flex items-center gap-2 text-sm"
+												>
+													<Check className="text-primary h-4 w-4 shrink-0" />
+													{feature}
+												</li>
+											))}
+										</ul>
+										<CreemCheckout
+											productId={product.productId}
+											checkoutPath="/api/checkout"
+										>
+											<Button className="w-full">
+												Buy {t(`products.${product.key}.name`)}
+											</Button>
+										</CreemCheckout>
+									</CardContent>
+								</Card>
+							)
+						})}
 					</div>
 				</div>
 			)}
