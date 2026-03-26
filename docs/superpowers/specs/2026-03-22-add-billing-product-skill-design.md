@@ -10,19 +10,19 @@ A Claude Code skill that collects all required information, then automatically e
 
 ## Input Data
 
-| Field | Required | Example |
-|-------|----------|---------|
-| type | always | `subscription` or `one_time` |
-| key | always | `business` (snake_case) |
-| creemProductId | always | `prod_xxx123` |
-| price | always | `4900` (cents) |
-| currency | always | `USD` |
-| period | subscription only | `month` or `year` |
-| hierarchyPosition | subscription only | `after pro` |
-| features | always | `{ export: true, apiAccess: true }` |
-| limits | always | `{ projects: Infinity, storage: 100000 }` |
-| i18n EN | always (or "generate") | `{ name: "Business", features: [...] }` |
-| i18n UK | always (or "generate") | `{ name: "Бізнес", features: [...] }` |
+| Field             | Required               | Example                                   |
+| ----------------- | ---------------------- | ----------------------------------------- |
+| type              | always                 | `subscription` or `one_time`              |
+| key               | always                 | `business` (snake_case)                   |
+| creemProductId    | always                 | `prod_xxx123`                             |
+| price             | always                 | `4900` (cents)                            |
+| currency          | always                 | `USD`                                     |
+| period            | subscription only      | `month` or `year`                         |
+| hierarchyPosition | subscription only      | `after pro`                               |
+| features          | always                 | `{ export: true, apiAccess: true }`       |
+| limits            | always                 | `{ projects: Infinity, storage: 100000 }` |
+| i18n EN           | always (or "generate") | `{ name: "Business", features: [...] }`   |
+| i18n UK           | always (or "generate") | `{ name: "Бізнес", features: [...] }`     |
 
 ## Input Mode
 
@@ -33,10 +33,12 @@ If user says "generate texts" for i18n, skill reads existing entries as style re
 ## Files Modified
 
 **Backend** (`BackendTemplate`):
+
 1. `src/modules/billing/constants/billing.js` — SUBSCRIPTION_PRODUCTS/ONE_TIME_PRODUCTS, PLANS/PRODUCTS, PLAN_CATALOG/PRODUCT_CATALOG, PLAN_HIERARCHY
 2. `src/modules/billing/hooks/productHooks.js` — empty lifecycle hooks (subscription only)
 
 **Frontend** (`Template-frontend`):
+
 1. `i18n/messages/en.json` — `billing.plans.{key}` or `billing.products.{key}`
 2. `i18n/messages/uk.json` — same structure, Ukrainian texts
 

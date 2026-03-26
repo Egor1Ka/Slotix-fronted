@@ -61,3 +61,21 @@ export type {
 	CatalogPlan,
 	CatalogProduct,
 } from './configs/billing.config'
+export type {
+	BookingStatus,
+	StaffMember,
+	StaffBySlugResponse,
+	EventType,
+	WeeklyHours,
+	TimeRange,
+	ScheduleTemplate,
+	ScheduleOverride,
+	CreateScheduleOverrideBody,
+	Invitee,
+	CreateBookingBody,
+	BookingResponse,
+	StaffBooking,
+	CancelByIdBody,
+	OrgBySlugResponse,
+	OrgStaffMember,
+} from './configs/booking.types'
