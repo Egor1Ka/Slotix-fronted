@@ -35,6 +35,7 @@ import { createToastInterceptor } from './api/interceptors/with-toast'
 import authApiConfig from './configs/auth.config'
 import userApiConfig from './configs/user.config'
 import billingApiConfig from './configs/billing.config'
+import orgApiConfig from './configs/org.config'
 
 const defaultInterceptors = {
 	interceptors: {
@@ -51,6 +52,7 @@ export const billingApi = createApiMethods(
 	billingApiConfig,
 	defaultInterceptors,
 )
+export const orgApi = createApiMethods(orgApiConfig, defaultInterceptors)
 export type { User, UpdateUserBody } from './configs/user.config'
 export type {
 	Plan,
@@ -79,3 +81,4 @@ export type {
 	OrgByIdResponse,
 	OrgStaffMember,
 } from './configs/booking.types'
+export type { OrgListItem, CreateOrgBody } from './configs/org.types'
