@@ -12,7 +12,6 @@ type BookingStatus =
 interface StaffMember {
 	id: string
 	name: string
-	slug: string
 	avatar: string
 	position: string | null
 }
@@ -20,7 +19,6 @@ interface StaffMember {
 interface StaffBySlugResponse {
 	id: string
 	name: string
-	slug: string
 	avatar: string
 	position: string | null
 	orgId: string | null
@@ -133,7 +131,7 @@ interface CancelByIdBody {
 
 // ── Org ──
 
-interface OrgBySlugResponse {
+interface OrgByIdResponse {
 	id: string
 	name: string
 	slug: string
@@ -142,6 +140,18 @@ interface OrgBySlugResponse {
 
 interface OrgStaffMember extends StaffMember {
 	bookingCount: number
+}
+
+// ── Calendar Display ──
+
+interface CalendarDisplayBooking {
+	startMin: number
+	duration: number
+	label: string
+	color: string
+	date: string
+	bookingId: string
+	status: BookingStatus
 }
 
 export type {
@@ -160,6 +170,7 @@ export type {
 	BookingResponse,
 	StaffBooking,
 	CancelByIdBody,
-	OrgBySlugResponse,
+	OrgByIdResponse,
 	OrgStaffMember,
+	CalendarDisplayBooking,
 }

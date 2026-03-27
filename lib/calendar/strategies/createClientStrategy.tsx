@@ -21,8 +21,7 @@ import {
 	type SlotMode,
 	type Slot,
 } from '@/lib/slot-engine'
-import type { EventType, ScheduleTemplate } from '@/services/configs/booking.types'
-import type { CalendarDisplayBooking } from '@/lib/mock'
+import type { EventType, ScheduleTemplate, CalendarDisplayBooking } from '@/services/configs/booking.types'
 import { ServiceList } from '@/components/booking/ServiceList'
 import { SlotModeSelector } from '@/components/booking/SlotModeSelector'
 import { BookingPanel } from '@/components/booking/BookingPanel'

@@ -20,8 +20,7 @@ import type { ViewMode, CalendarBlock } from './types'
 import type { CalendarViewConfig } from './view-config'
 import {
 	PX_PER_HOUR,
-	TOTAL_HOURS,
-	HOUR_LABELS,
+	createGridConfig,
 	getCalendarLocale,
 	minutesToPx,
 	durationToPx,
@@ -97,6 +96,7 @@ function CalendarCore({
 	const locale = useLocale()
 	const calendarLocale = getCalendarLocale(locale)
 
+	const grid = createGridConfig(workStart, workEnd)
 	const title = strategy.getTitle(date, view)
 
 	const handlePrev = () => onDateChange(navigate(view, date, -1))
@@ -137,7 +137,7 @@ function CalendarCore({
 						'cursor-pointer',
 				)}
 				style={{
-					top: minutesToPx(block.startMin),
+					top: minutesToPx(block.startMin, grid.displayStart),
 					height: durationToPx(block.duration),
 					backgroundColor: block.color,
 					opacity: block.opacity ?? 1,
@@ -166,7 +166,7 @@ function CalendarCore({
 						'hover:bg-accent/20',
 					)}
 					style={{
-						top: minutesToPx(block.startMin),
+						top: minutesToPx(block.startMin, grid.displayStart),
 						height: durationToPx(block.duration),
 						borderColor: block.color,
 					}}
@@ -181,7 +181,7 @@ function CalendarCore({
 		if (block.blockType === 'booking') {
 			if (viewConfig.blockedTimeVisibility === 'hidden') return null
 			if (viewConfig.blockedTimeVisibility === 'grey')
-				return <GreyBlock key={block.id} block={block} />
+				return <GreyBlock key={block.id} block={block} displayStart={grid.displayStart} />
 			return renderBookingBlock(block)
 		}
 
@@ -192,7 +192,7 @@ function CalendarCore({
 		<div
 			key={hour}
 			className="absolute right-0 left-0 flex items-start"
-			style={{ top: minutesToPx(hour * 60) }}
+			style={{ top: minutesToPx(hour * 60, grid.displayStart) }}
 		>
 			<span className="text-muted-foreground w-12 -translate-y-1/2 pr-2 text-right text-xs">
 				{formatHour(hour)}
@@ -204,7 +204,7 @@ function CalendarCore({
 	const renderDayView = () => {
 		const workStartMin = timeToMin(workStart)
 		const workEndMin = timeToMin(workEnd)
-		const workTopPx = minutesToPx(workStartMin)
+		const workTopPx = minutesToPx(workStartMin, grid.displayStart)
 		const workHeightPx = durationToPx(workEndMin - workStartMin)
 		const blocks = strategy.getBlocks(date)
 
@@ -214,14 +214,14 @@ function CalendarCore({
 			if (target !== e.currentTarget) return
 			const rect = e.currentTarget.getBoundingClientRect()
 			const y = e.clientY - rect.top
-			const minutes = Math.floor((y / PX_PER_HOUR) * 60) + 9 * 60
+			const minutes = Math.floor((y / PX_PER_HOUR) * 60) + grid.displayStart
 			strategy.onCellClick(date, minutes)
 		}
 
 		return (
 			<div
 				className="relative"
-				style={{ height: TOTAL_HOURS * PX_PER_HOUR }}
+				style={{ height: grid.totalHours * PX_PER_HOUR }}
 				onClick={handleGridClick}
 			>
 				<div className="bg-muted/30 absolute inset-0 left-12 rounded-md" />
@@ -229,7 +229,7 @@ function CalendarCore({
 					className="bg-card absolute right-0 left-12 rounded-md"
 					style={{ top: workTopPx, height: workHeightPx }}
 				/>
-				{HOUR_LABELS.map(renderHourLine)}
+				{grid.hourLabels.map(renderHourLine)}
 				{blocks.map(renderBlock)}
 			</div>
 		)
@@ -240,15 +240,15 @@ function CalendarCore({
 		const today = getTodayStr()
 		const workStartMin = timeToMin(workStart)
 		const workEndMin = timeToMin(workEnd)
-		const workTopPx = minutesToPx(workStartMin)
+		const workTopPx = minutesToPx(workStartMin, grid.displayStart)
 		const workHeightPx = durationToPx(workEndMin - workStartMin)
-		const gridHeight = TOTAL_HOURS * PX_PER_HOUR
+		const gridHeight = grid.totalHours * PX_PER_HOUR
 
 		const renderHourLabel = (hour: number) => (
 			<div
 				key={hour}
 				className="text-muted-foreground absolute right-0 -translate-y-1/2 pr-2 text-right text-xs"
-				style={{ top: minutesToPx(hour * 60) }}
+				style={{ top: minutesToPx(hour * 60, grid.displayStart) }}
 			>
 				{formatHour(hour)}
 			</div>
@@ -258,7 +258,7 @@ function CalendarCore({
 			<div
 				key={`line-${hour}`}
 				className="border-border/30 absolute right-0 left-0 border-t"
-				style={{ top: minutesToPx(hour * 60) }}
+				style={{ top: minutesToPx(hour * 60, grid.displayStart) }}
 			/>
 		)
 
@@ -276,7 +276,7 @@ function CalendarCore({
 						}}
 						className="hover:bg-accent/20 absolute inset-x-0.5 cursor-pointer rounded-sm border border-dashed transition-colors"
 						style={{
-							top: minutesToPx(block.startMin),
+							top: minutesToPx(block.startMin, grid.displayStart),
 							height: durationToPx(block.duration),
 							borderColor: block.color,
 						}}
@@ -296,7 +296,7 @@ function CalendarCore({
 							key={block.id}
 							className="bg-muted pointer-events-none absolute inset-x-0.5 cursor-default rounded-sm"
 							style={{
-								top: minutesToPx(block.startMin),
+								top: minutesToPx(block.startMin, grid.displayStart),
 								height: durationToPx(block.duration),
 								opacity: 0.6,
 							}}
@@ -320,7 +320,7 @@ function CalendarCore({
 					key={block.id}
 					className="absolute inset-x-0.5 overflow-hidden rounded-sm px-0.5 text-[10px] leading-tight text-white"
 					style={{
-						top: minutesToPx(block.startMin),
+						top: minutesToPx(block.startMin, grid.displayStart),
 						height: durationToPx(block.duration),
 						backgroundColor: block.color,
 						opacity: block.opacity ?? 1,
@@ -429,10 +429,10 @@ function CalendarCore({
 						className="relative w-12 shrink-0"
 						style={{ height: gridHeight }}
 					>
-						{HOUR_LABELS.map(renderHourLabel)}
+						{grid.hourLabels.map(renderHourLabel)}
 					</div>
 					<div className="relative flex flex-1" style={{ height: gridHeight }}>
-						{HOUR_LABELS.map(renderWeekHourLine)}
+						{grid.hourLabels.map(renderWeekHourLine)}
 						{weekDates.map(renderDayColumn)}
 					</div>
 				</div>

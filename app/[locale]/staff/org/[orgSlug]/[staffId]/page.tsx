@@ -1,16 +1,16 @@
 import { Suspense } from 'react'
 import { getTranslations } from 'next-intl/server'
 import { CalendarViewConfigProvider } from '@/lib/calendar/CalendarViewConfigContext'
-import { STAFF_PUBLIC_CONFIG } from '@/lib/calendar/view-config'
+import { ORG_ADMIN_CONFIG } from '@/lib/calendar/view-config'
 import { BookingLayout } from '@/components/booking/BookingLayout'
-import { BookingPage } from './BookingPage'
+import { OrgCalendarPage } from '@/components/booking/OrgCalendarPage'
 
-export default async function StaffPublicPage({
+export default async function OrgAdminStaffPage({
 	params,
 }: {
-	params: Promise<{ staffSlug: string }>
+	params: Promise<{ orgSlug: string; staffId: string }>
 }) {
-	const { staffSlug } = await params
+	const { orgSlug, staffId } = await params
 	const t = await getTranslations('booking')
 
 	return (
@@ -22,8 +22,8 @@ export default async function StaffPublicPage({
 					</div>
 				}
 			>
-				<CalendarViewConfigProvider config={STAFF_PUBLIC_CONFIG}>
-					<BookingPage staffSlug={staffSlug} />
+				<CalendarViewConfigProvider config={ORG_ADMIN_CONFIG}>
+					<OrgCalendarPage orgSlug={orgSlug} staffId={staffId} />
 				</CalendarViewConfigProvider>
 			</Suspense>
 		</BookingLayout>

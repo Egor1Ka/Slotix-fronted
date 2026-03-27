@@ -2,12 +2,26 @@ interface DateFilterable {
 	date: string
 }
 
-const DISPLAY_START = 9 * 60
+const DEFAULT_DISPLAY_START = 9 * 60
 const PX_PER_HOUR = 48
-const TOTAL_HOURS = 10
+const PADDING_HOURS = 1
 
-const createHourLabel = (_: unknown, i: number): number => 9 + i
-const HOUR_LABELS = Array.from({ length: TOTAL_HOURS + 1 }, createHourLabel)
+interface GridConfig {
+	displayStart: number
+	totalHours: number
+	hourLabels: number[]
+}
+
+const parseHour = (time: string): number => parseInt(time.split(':')[0], 10)
+
+const createGridConfig = (workStart: string, workEnd: string): GridConfig => {
+	const startHour = Math.max(0, parseHour(workStart) - PADDING_HOURS)
+	const endHour = Math.min(24, parseHour(workEnd) + PADDING_HOURS)
+	const totalHours = endHour - startHour
+	const createLabel = (_: unknown, i: number): number => startHour + i
+	const hourLabels = Array.from({ length: totalHours + 1 }, createLabel)
+	return { displayStart: startHour * 60, totalHours, hourLabels }
+}
 
 // ── Locale System (Intl-driven) ──
 
@@ -62,8 +76,8 @@ const getCalendarLocale = (locale: string): CalendarLocale => {
 	return built
 }
 
-const minutesToPx = (min: number): number =>
-	((min - DISPLAY_START) / 60) * PX_PER_HOUR
+const minutesToPx = (min: number, displayStart: number = DEFAULT_DISPLAY_START): number =>
+	((min - displayStart) / 60) * PX_PER_HOUR
 
 const durationToPx = (min: number): number => (min / 60) * PX_PER_HOUR
 
@@ -184,11 +198,31 @@ const getWorkHoursForDate = (
 	}
 }
 
-export type { CalendarLocale }
+interface StaffLike {
+	id: string
+}
+
+const getFirstStaffId = <T extends StaffLike>(staffList: T[] | null): string | null => {
+	if (!staffList || !staffList[0]) return null
+	return staffList[0].id
+}
+
+const filterByStaffId = <T extends StaffLike>(staffId: string) => (staff: T): boolean =>
+	staff.id === staffId
+
+const getStaffToLoad = <T extends StaffLike>(
+	staffList: T[],
+	selectedStaffId: string | null,
+	behavior: string,
+): T[] => {
+	if (!selectedStaffId || behavior !== 'select-one') return staffList
+	return staffList.filter(filterByStaffId(selectedStaffId))
+}
+
+export type { CalendarLocale, GridConfig }
 export {
 	PX_PER_HOUR,
-	TOTAL_HOURS,
-	HOUR_LABELS,
+	createGridConfig,
 	getCalendarLocale,
 	minutesToPx,
 	durationToPx,
@@ -205,4 +239,7 @@ export {
 	addMonths,
 	findEventType,
 	getWorkHoursForDate,
+	getFirstStaffId,
+	filterByStaffId,
+	getStaffToLoad,
 }

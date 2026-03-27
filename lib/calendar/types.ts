@@ -18,6 +18,7 @@ interface CalendarBlock {
 	onClick?: () => void
 	draggable?: boolean
 	blockType: BlockType
+	bookingId?: string
 }
 
 interface ConfirmedBooking {

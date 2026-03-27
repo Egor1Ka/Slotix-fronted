@@ -21,11 +21,23 @@ interface ClientInfoFormProps {
 function ClientInfoForm({ onSubmit, isSubmitting }: ClientInfoFormProps) {
 	const t = useTranslations('booking')
 
-	const clientInfoSchema = z.object({
-		name: z.string().min(2, t('validation.nameMin')),
-		phone: z.string().optional(),
-		email: z.string().email(t('validation.invalidEmail')).optional().or(z.literal('')),
-	})
+	const clientInfoSchema = z
+		.object({
+			name: z.string().min(2, t('validation.nameMin')),
+			phone: z.string().optional(),
+			email: z
+				.string()
+				.email(t('validation.invalidEmail'))
+				.optional()
+				.or(z.literal('')),
+		})
+		.refine(
+			(data) => (data.email && data.email.length > 0) || (data.phone && data.phone.length > 0),
+			{
+				message: t('validation.contactRequired'),
+				path: ['phone'],
+			},
+		)
 
 	const {
 		register,

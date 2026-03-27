@@ -12,7 +12,7 @@ import type {
 export const mockStaff: StaffBySlugResponse = {
 	id: '507f1f77bcf86cd799439011',
 	name: 'Анна Коваленко',
-	slug: 'anna-kovalenko',
+
 	avatar: '/avatars/anna.jpg',
 	position: 'Стиліст',
 	orgId: null,
@@ -222,7 +222,7 @@ export const toCalendarDisplayBooking = (
 const mockOrgStaffMember1: StaffBySlugResponse = {
 	id: '507f1f77bcf86cd799439011',
 	name: 'Анна Коваленко',
-	slug: 'anna-kovalenko',
+
 	avatar: '/avatars/anna.jpg',
 	position: 'Стиліст',
 	orgId: '807f1f77bcf86cd799439001',
@@ -232,7 +232,7 @@ const mockOrgStaffMember1: StaffBySlugResponse = {
 const mockOrgStaffMember2: StaffBySlugResponse = {
 	id: '507f1f77bcf86cd799439012',
 	name: 'Олена Шевченко',
-	slug: 'olena-shevchenko',
+
 	avatar: '/avatars/olena.jpg',
 	position: 'Колорист',
 	orgId: '807f1f77bcf86cd799439001',
@@ -242,7 +242,7 @@ const mockOrgStaffMember2: StaffBySlugResponse = {
 const mockOrgStaffMember3: StaffBySlugResponse = {
 	id: '507f1f77bcf86cd799439013',
 	name: 'Ірина Бондаренко',
-	slug: 'iryna-bondarenko',
+
 	avatar: '/avatars/iryna.jpg',
 	position: 'Манікюрист',
 	orgId: '807f1f77bcf86cd799439001',

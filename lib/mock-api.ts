@@ -9,7 +9,7 @@ import type {
 	StaffBooking,
 	BookingStatus,
 	CancelByIdBody,
-	OrgBySlugResponse,
+	OrgByIdResponse,
 	OrgStaffMember,
 	SlotMode,
 } from '@/services/configs/booking.types'
@@ -52,7 +52,7 @@ const delay = (ms: number = 100): Promise<void> =>
 
 const getStaffBySlug = async (slug: string): Promise<StaffBySlugResponse> => {
 	await delay()
-	if (slug === mockStaff.slug) return { ...mockStaff }
+	if (slug === mockStaff.id) return { ...mockStaff }
 	throw new Error(`Staff not found: ${slug}`)
 }
 
@@ -215,9 +215,9 @@ const cancelById = async (
 
 // ── Org API ──
 
-const getOrgBySlug = async (slug: string): Promise<OrgBySlugResponse> => {
+const getOrgById = async (id: string): Promise<OrgByIdResponse> => {
 	await delay()
-	if (slug === 'demo-org') {
+	if (id === '807f1f77bcf86cd799439001') {
 		return {
 			id: '807f1f77bcf86cd799439001',
 			name: 'Demo Studio',
@@ -225,7 +225,7 @@ const getOrgBySlug = async (slug: string): Promise<OrgBySlugResponse> => {
 			logo: null,
 		}
 	}
-	throw new Error(`Org not found: ${slug}`)
+	throw new Error(`Org not found: ${id}`)
 }
 
 const getOrgStaff = async (
@@ -328,7 +328,7 @@ export const slotsApi = {
 }
 
 export const orgApi = {
-	getBySlug: getOrgBySlug,
+	getById: getOrgById,
 	getStaff: getOrgStaff,
 }
 

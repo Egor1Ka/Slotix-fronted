@@ -99,11 +99,15 @@ function ScheduleEditor({ schedule, onSave }: ScheduleEditorProps) {
 		register,
 		handleSubmit,
 		watch,
-		formState: { isSubmitting },
+		formState: { isSubmitting, errors },
 	} = useForm<ScheduleFormData>({
 		resolver: zodResolver(scheduleFormSchema),
 		defaultValues: toFormData(schedule),
 	})
+
+	if (Object.keys(errors).length > 0) {
+		console.error('[ScheduleEditor] form errors:', JSON.stringify(errors, null, 2))
+	}
 
 	const { fields } = useFieldArray({
 		control,
@@ -111,6 +115,7 @@ function ScheduleEditor({ schedule, onSave }: ScheduleEditorProps) {
 	})
 
 	const handleFormSubmit = async (data: ScheduleFormData) => {
+		console.log('[ScheduleEditor] submitting:', JSON.stringify(data, null, 2))
 		const toWeeklyHours = (day: ScheduleFormData['weeklyHours'][number]): WeeklyHours => ({
 			dayOfWeek: day.dayOfWeek,
 			enabled: day.enabled,
@@ -118,6 +123,7 @@ function ScheduleEditor({ schedule, onSave }: ScheduleEditorProps) {
 		})
 
 		await onSave(data.weeklyHours.map(toWeeklyHours))
+		console.log('[ScheduleEditor] save completed')
 	}
 
 	const renderDay = (_field: (typeof fields)[number], index: number) => (

@@ -15,12 +15,12 @@ import { useTranslations } from 'next-intl'
 import { useLocale } from 'next-intl'
 import { useViewConfig } from '@/lib/calendar/CalendarViewConfigContext'
 import { formatDateISO, getWeekDates } from '@/lib/calendar/utils'
-import { staffApi, eventTypeApi, bookingApi, scheduleApi } from '@/lib/mock-api'
-import { toCalendarDisplayBooking } from '@/lib/mock'
+import { staffApi, eventTypeApi, bookingApi, scheduleApi } from '@/lib/booking-api-client'
+import { toCalendarDisplayBooking } from '@/lib/booking-utils'
 import { getWorkHoursForDate } from '@/lib/calendar/utils'
-import type { StaffBySlugResponse, EventType, ScheduleTemplate } from '@/services/configs/booking.types'
-import type { CalendarDisplayBooking } from '@/lib/mock'
+import type { StaffBySlugResponse, EventType, ScheduleTemplate, CalendarDisplayBooking, StaffBooking, BookingStatus } from '@/services/configs/booking.types'
 import type { ClientInfoData } from '@/components/booking/ClientInfoForm'
+import type { BookingDetail } from '@/components/booking/BookingDetailPanel'
 
 const todayStr = (): string => formatDateISO(new Date())
 const browserTimezone = (): string =>
@@ -35,6 +35,7 @@ interface StaffData {
 	eventTypes: EventType[]
 	schedule: ScheduleTemplate
 	bookings: CalendarDisplayBooking[]
+	staffBookings: StaffBooking[]
 }
 
 function BookingPage({ staffSlug }: BookingPageProps) {
@@ -60,6 +61,7 @@ function BookingPage({ staffSlug }: BookingPageProps) {
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
 	const [isSubmitting, setIsSubmitting] = useState(false)
+	const [selectedBooking, setSelectedBooking] = useState<BookingDetail | null>(null)
 	const loadedRangeRef = useRef<{ from: string; to: string; view: string } | null>(null)
 
 	useEffect(() => {
@@ -95,16 +97,16 @@ function BookingPage({ staffSlug }: BookingPageProps) {
 				setError(null)
 
 				const { from, to } = range
-				const staff = await staffApi.getBySlug(staffSlug)
-				const [eventTypes, schedule, staffBookings] = await Promise.all([
+				const staff = await staffApi.getById(staffSlug)
+				const [eventTypes, schedule] = await Promise.all([
 					eventTypeApi.getByStaff(staff.id),
 					scheduleApi.getTemplate(staff.id),
-					bookingApi.getByStaff(staff.id, from, to),
 				])
+				const staffBookings = await bookingApi.getByStaff(staff.id, from, to, eventTypes)
 
 				const bookings = staffBookings.map(toCalendarDisplayBooking)
 
-				setStaffData({ staff, eventTypes, schedule, bookings })
+				setStaffData({ staff, eventTypes, schedule, bookings, staffBookings })
 				loadedRangeRef.current = { ...range, view }
 			} catch (err) {
 				const message =
@@ -129,14 +131,17 @@ function BookingPage({ staffSlug }: BookingPageProps) {
 	}
 
 	const handleEventTypeSelect = (eventTypeId: string) => {
-		setParams({ eventType: eventTypeId, slot: null })
+		const isDeselect = eventTypeId === selectedEventTypeId
+		setParams({ eventType: isDeselect ? null : eventTypeId, slot: null })
 		setConfirmedBooking(null)
+		setSelectedBooking(null)
 	}
 
 	const handleSlotSelect = (time: string, slotDate?: string) => {
 		const updates: Record<string, string | null> = { slot: time }
 		if (slotDate && slotDate !== dateStr) updates.date = slotDate
 		setParams(updates)
+		setSelectedBooking(null)
 	}
 
 	const handleModeChange = (mode: SlotMode) => {
@@ -245,9 +250,14 @@ function BookingPage({ staffSlug }: BookingPageProps) {
 
 	const handleSaveSchedule = async (weeklyHours: ScheduleTemplate['weeklyHours']) => {
 		if (!staffData) return
-		await scheduleApi.updateTemplate(staffData.staff.id, staffData.schedule.orgId, weeklyHours)
-		const schedule = await scheduleApi.getTemplate(staffData.staff.id)
-		setStaffData({ ...staffData, schedule })
+		try {
+			await scheduleApi.updateTemplate(staffData.staff.id, staffData.schedule.orgId, weeklyHours)
+			const schedule = await scheduleApi.getTemplate(staffData.staff.id)
+			setStaffData({ ...staffData, schedule })
+		} catch (err) {
+			const message = err instanceof Error ? err.message : t('bookingFailed')
+			setError(message)
+		}
 	}
 
 	const handleSaveOverride = async (body: Parameters<typeof scheduleApi.createOverride>[0]) => {
@@ -259,6 +269,52 @@ function BookingPage({ staffSlug }: BookingPageProps) {
 
 	const handleResetSlot = () => {
 		setParams({ slot: null })
+	}
+
+	const handleBookingClick = (bookingId: string) => {
+		if (!staffData) return
+		const booking = staffData.staffBookings.find((b) => b.id === bookingId)
+		if (!booking) return
+
+		setParams({ eventType: null, slot: null })
+		setConfirmedBooking(null)
+
+		const eventType = staffData.eventTypes.find(
+			(e) => e.id === booking.eventTypeId,
+		)
+		const startDate = new Date(booking.startAt)
+		const endDate = new Date(booking.endAt)
+		const durationMin = Math.round(
+			(endDate.getTime() - startDate.getTime()) / 60000,
+		)
+
+		setSelectedBooking({
+			id: booking.id,
+			eventTypeName: booking.eventTypeName,
+			color: eventType ? eventType.color : '#888',
+			startAt: booking.startAt,
+			endAt: booking.endAt,
+			durationMin,
+			date: booking.startAt.split('T')[0],
+			status: booking.status,
+			invitee: {
+				name: booking.invitee.name,
+				email: booking.invitee.email,
+				phone: booking.invitee.phone,
+			},
+			payment: { status: 'none', amount: 0, currency: 'uah' },
+		})
+	}
+
+	const handleCloseBooking = () => {
+		setSelectedBooking(null)
+	}
+
+	const handleBookingStatusChange = (bookingId: string, newStatus: BookingStatus) => {
+		setSelectedBooking((prev) =>
+			prev && prev.id === bookingId ? { ...prev, status: newStatus } : prev,
+		)
+		loadedRangeRef.current = null
 	}
 
 	if (loading) {
@@ -311,6 +367,10 @@ function BookingPage({ staffSlug }: BookingPageProps) {
 				isSubmitting,
 				onSaveSchedule: handleSaveSchedule,
 				onSaveOverride: handleSaveOverride,
+				onBookingClick: handleBookingClick,
+				selectedBooking,
+				onCloseBooking: handleCloseBooking,
+				onBookingStatusChange: handleBookingStatusChange,
 			})
 		: createClientStrategy({
 				eventTypes: staffData.eventTypes,

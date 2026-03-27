@@ -21,14 +21,15 @@ import {
 	type SlotMode,
 	type Slot,
 } from '@/lib/slot-engine'
-import type { EventType, ScheduleTemplate, WeeklyHours, CreateScheduleOverrideBody } from '@/services/configs/booking.types'
-import type { CalendarDisplayBooking } from '@/lib/mock'
+import type { EventType, ScheduleTemplate, WeeklyHours, CreateScheduleOverrideBody, CalendarDisplayBooking } from '@/services/configs/booking.types'
 import { ServiceList } from '@/components/booking/ServiceList'
 import { SlotModeSelector } from '@/components/booking/SlotModeSelector'
 import { StaffBookingPanel } from '@/components/booking/StaffBookingPanel'
 import { ScheduleSheetButton } from '@/components/booking/ScheduleSheetButton'
 import { Separator } from '@/components/ui/separator'
 import type { ClientInfoData } from '@/components/booking/ClientInfoForm'
+import { BookingDetailPanel, type BookingDetail } from '@/components/booking/BookingDetailPanel'
+import type { BookingStatus } from '@/services/configs/booking.types'
 
 interface StaffStrategyParams {
 	staffName: string
@@ -49,6 +50,10 @@ interface StaffStrategyParams {
 	isSubmitting: boolean
 	onSaveSchedule: (weeklyHours: WeeklyHours[]) => Promise<void>
 	onSaveOverride: (body: CreateScheduleOverrideBody) => Promise<void>
+	onBookingClick?: (bookingId: string) => void
+	selectedBooking?: BookingDetail | null
+	onCloseBooking?: () => void
+	onBookingStatusChange?: (bookingId: string, newStatus: BookingStatus) => void
 	locale: string
 }
 
@@ -72,6 +77,10 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 		isSubmitting,
 		onSaveSchedule,
 		onSaveOverride,
+		onBookingClick,
+		selectedBooking = null,
+		onCloseBooking,
+		onBookingStatusChange,
 		locale,
 	} = params
 
@@ -114,6 +123,10 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 				label: booking.label,
 				sublabel: `${minToTime(booking.startMin)}–${minToTime(booking.startMin + booking.duration)}`,
 				blockType: 'booking',
+				bookingId: booking.bookingId,
+				onClick: onBookingClick
+					? () => onBookingClick(booking.bookingId)
+					: undefined,
 			})
 
 			const bookingBlocks = dayBookings.map(toBookingBlock)
@@ -201,6 +214,16 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 		},
 
 		renderPanel() {
+			if (selectedBooking && onCloseBooking && onBookingStatusChange) {
+				return (
+					<BookingDetailPanel
+						booking={selectedBooking}
+						onClose={onCloseBooking}
+						onStatusChange={onBookingStatusChange}
+					/>
+				)
+			}
+
 			return (
 				<StaffBookingPanel
 					selectedEventType={selectedEventType}

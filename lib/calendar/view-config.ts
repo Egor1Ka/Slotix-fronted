@@ -15,7 +15,7 @@ const ORG_PUBLIC_CONFIG: CalendarViewConfig = {
 	staffTabBehavior: 'select-one',
 	onEmptyCellClick: 'open-booking-flow',
 	onBlockClick: 'none',
-	canBookForClient: false,
+	canBookForClient: true,
 }
 
 const ORG_ADMIN_CONFIG: CalendarViewConfig = {
@@ -35,7 +35,7 @@ const STAFF_PUBLIC_CONFIG: CalendarViewConfig = {
 	staffTabBehavior: 'select-one',
 	onEmptyCellClick: 'open-booking-flow',
 	onBlockClick: 'none',
-	canBookForClient: false,
+	canBookForClient: true,
 }
 
 const STAFF_SELF_CONFIG: CalendarViewConfig = {

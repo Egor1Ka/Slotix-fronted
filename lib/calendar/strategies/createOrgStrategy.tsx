@@ -21,13 +21,14 @@ import {
 	type SlotMode,
 	type Slot,
 } from '@/lib/slot-engine'
-import type { EventType, ScheduleTemplate } from '@/services/configs/booking.types'
-import type { CalendarDisplayBooking } from '@/lib/mock'
+import type { EventType, ScheduleTemplate, CalendarDisplayBooking } from '@/services/configs/booking.types'
 import { ServiceList } from '@/components/booking/ServiceList'
 import { SlotModeSelector } from '@/components/booking/SlotModeSelector'
 import { StaffBookingPanel } from '@/components/booking/StaffBookingPanel'
 import { Separator } from '@/components/ui/separator'
 import type { ClientInfoData } from '@/components/booking/ClientInfoForm'
+import { BookingDetailsPanel, type BookingDetail } from '@/components/booking/BookingDetailsPanel'
+import type { BookingStatus } from '@/services/configs/booking.types'
 
 interface OrgStrategyParams {
 	orgName: string
@@ -47,6 +48,12 @@ interface OrgStrategyParams {
 	onResetSlot?: () => void
 	onModeChange?: (mode: SlotMode) => void
 	isSubmitting?: boolean
+	bookingError?: string | null
+	selectedBooking?: BookingDetail | null
+	onBookingSelect?: (bookingId: string) => void
+	onBookingStatusChange?: (bookingId: string, status: BookingStatus) => Promise<void>
+	onBookingReschedule?: (bookingId: string, newStartAt: string) => Promise<void>
+	onBookingClose?: () => void
 	locale: string
 	selectStaffLabel?: string
 	bookingDetailsLabel?: string
@@ -71,6 +78,12 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 		onResetSlot,
 		onModeChange,
 		isSubmitting = false,
+		bookingError = null,
+		selectedBooking = null,
+		onBookingSelect,
+		onBookingStatusChange,
+		onBookingReschedule,
+		onBookingClose,
 		locale,
 		selectStaffLabel = 'Select a staff member to view the schedule',
 		bookingDetailsLabel = 'Booking details',
@@ -114,6 +127,9 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 			label: booking.label,
 			sublabel: `${minToTime(booking.startMin)}–${minToTime(booking.startMin + booking.duration)}`,
 			blockType: 'booking',
+			onClick: onBookingSelect
+				? () => onBookingSelect(booking.bookingId)
+				: undefined,
 		})
 
 		return dayBookings.map(toBookingBlock)
@@ -191,7 +207,7 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 		},
 
 		renderSidebar() {
-			if (!canBookForClient || eventTypes.length === 0) {
+			if (eventTypes.length === 0) {
 				return (
 					<div className="text-muted-foreground p-4 text-sm">
 						{selectStaffLabel}
@@ -216,6 +232,27 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 		},
 
 		renderPanel() {
+			if (selectedBooking) {
+				const bookingEventType = findEventType(eventTypes, selectedBooking.eventTypeId)
+				return (
+					<>
+						{bookingError && (
+							<div className="text-destructive bg-destructive/10 rounded-md p-3 text-sm mb-3">
+								{bookingError}
+							</div>
+						)}
+						<BookingDetailsPanel
+							booking={selectedBooking}
+							eventTypeName={bookingEventType?.name ?? ''}
+							eventTypeColor={bookingEventType?.color ?? '#888'}
+							onChangeStatus={onBookingStatusChange ?? (async () => {})}
+							onReschedule={onBookingReschedule ?? (async () => {})}
+							onClose={onBookingClose ?? (() => {})}
+						/>
+					</>
+				)
+			}
+
 			if (!canBookForClient) {
 				return (
 					<div className="text-muted-foreground p-4 text-sm">
@@ -225,16 +262,23 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 			}
 
 			return (
-				<StaffBookingPanel
-					selectedEventType={selectedEventType}
-					selectedSlot={selectedSlot}
-					slotMode={slotMode}
-					confirmedBooking={confirmedBooking}
-					onConfirmWithClient={onConfirmWithClient ?? (() => {})}
-					onCancel={onCancel ?? (() => {})}
-					onResetSlot={onResetSlot ?? (() => {})}
-					isSubmitting={isSubmitting}
-				/>
+				<>
+					{bookingError && (
+						<div className="text-destructive bg-destructive/10 rounded-md p-3 text-sm mb-3">
+							{bookingError}
+						</div>
+					)}
+					<StaffBookingPanel
+						selectedEventType={selectedEventType}
+						selectedSlot={selectedSlot}
+						slotMode={slotMode}
+						confirmedBooking={confirmedBooking}
+						onConfirmWithClient={onConfirmWithClient ?? (() => {})}
+						onCancel={onCancel ?? (() => {})}
+						onResetSlot={onResetSlot ?? (() => {})}
+						isSubmitting={isSubmitting}
+					/>
+				</>
 			)
 		},
 

@@ -76,6 +76,6 @@ export type {
 	BookingResponse,
 	StaffBooking,
 	CancelByIdBody,
-	OrgBySlugResponse,
+	OrgByIdResponse,
 	OrgStaffMember,
 } from './configs/booking.types'
