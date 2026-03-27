@@ -232,5 +232,41 @@
 			"serviceUnavailable": "Service is temporarily unavailable. Please try again later.",
 			"unknown": "An unexpected error occurred. Please try again."
 		}
+	},
+	"sidebar": {
+		"myOrganizations": "My organizations",
+		"mySchedule": "My schedule",
+		"generalSchedule": "General schedule",
+		"backToOrgs": "Back to organizations",
+		"logout": "Log out",
+		"staff": "Staff"
+	},
+	"organizations": {
+		"title": "My organizations",
+		"create": "Create organization",
+		"empty": "You don't have any organizations yet",
+		"role": {
+			"owner": "Owner",
+			"admin": "Admin",
+			"member": "Member"
+		},
+		"status": {
+			"active": "Active",
+			"invited": "Invited",
+			"suspended": "Suspended"
+		},
+		"form": {
+			"name": "Name",
+			"namePlaceholder": "Organization name",
+			"currency": "Currency",
+			"brandColor": "Brand color",
+			"logo": "Logo URL",
+			"logoPlaceholder": "https://example.com/logo.png",
+			"timezone": "Timezone",
+			"country": "Country",
+			"submit": "Create",
+			"cancel": "Cancel"
+		},
+		"created": "Organization created"
 	}
 }

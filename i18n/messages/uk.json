@@ -232,5 +232,41 @@
 			"serviceUnavailable": "Сервіс тимчасово недоступний. Спробуйте пізніше.",
 			"unknown": "Виникла несподівана помилка. Спробуйте ще раз."
 		}
+	},
+	"sidebar": {
+		"myOrganizations": "Мої організації",
+		"mySchedule": "Мій розклад",
+		"generalSchedule": "Загальний розклад",
+		"backToOrgs": "Назад до організацій",
+		"logout": "Вийти",
+		"staff": "Персонал"
+	},
+	"organizations": {
+		"title": "Мої організації",
+		"create": "Створити організацію",
+		"empty": "У вас ще немає організацій",
+		"role": {
+			"owner": "Власник",
+			"admin": "Адмін",
+			"member": "Учасник"
+		},
+		"status": {
+			"active": "Активний",
+			"invited": "Запрошений",
+			"suspended": "Призупинений"
+		},
+		"form": {
+			"name": "Назва",
+			"namePlaceholder": "Назва організації",
+			"currency": "Валюта",
+			"brandColor": "Колір бренду",
+			"logo": "URL логотипу",
+			"logoPlaceholder": "https://example.com/logo.png",
+			"timezone": "Часовий пояс",
+			"country": "Країна",
+			"submit": "Створити",
+			"cancel": "Скасувати"
+		},
+		"created": "Організацію створено"
 	}
 }
