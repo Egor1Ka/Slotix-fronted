@@ -1,6 +1,9 @@
 export { useOrgInfo } from './useOrgInfo'
 export type { UseOrgInfoResult } from './useOrgInfo'
 
+export { useStaffBySlug } from './useStaffBySlug'
+export type { UseStaffBySlugResult } from './useStaffBySlug'
+
 export { useStaffSchedule } from './useStaffSchedule'
 export type { UseStaffScheduleResult } from './useStaffSchedule'
 

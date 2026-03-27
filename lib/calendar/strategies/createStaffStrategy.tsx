@@ -28,7 +28,7 @@ import { StaffBookingPanel } from '@/components/booking/StaffBookingPanel'
 import { ScheduleSheetButton } from '@/components/booking/ScheduleSheetButton'
 import { Separator } from '@/components/ui/separator'
 import type { ClientInfoData } from '@/components/booking/ClientInfoForm'
-import { BookingDetailPanel, type BookingDetail } from '@/components/booking/BookingDetailPanel'
+import { BookingDetailsPanel, type BookingDetail } from '@/components/booking/BookingDetailsPanel'
 import type { BookingStatus } from '@/services/configs/booking.types'
 
 interface StaffStrategyParams {
@@ -53,7 +53,8 @@ interface StaffStrategyParams {
 	onBookingClick?: (bookingId: string) => void
 	selectedBooking?: BookingDetail | null
 	onCloseBooking?: () => void
-	onBookingStatusChange?: (bookingId: string, newStatus: BookingStatus) => void
+	onBookingStatusChange?: (bookingId: string, newStatus: BookingStatus) => Promise<void>
+	onBookingReschedule?: (bookingId: string, newStartAt: string) => Promise<void>
 	locale: string
 }
 
@@ -81,6 +82,7 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 		selectedBooking = null,
 		onCloseBooking,
 		onBookingStatusChange,
+		onBookingReschedule,
 		locale,
 	} = params
 
@@ -215,11 +217,15 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 
 		renderPanel() {
 			if (selectedBooking && onCloseBooking && onBookingStatusChange) {
+				const bookingEventType = findEventType(eventTypes, selectedBooking.eventTypeId)
 				return (
-					<BookingDetailPanel
+					<BookingDetailsPanel
 						booking={selectedBooking}
+						eventTypeName={bookingEventType?.name ?? ''}
+						eventTypeColor={bookingEventType?.color ?? '#888'}
+						onChangeStatus={onBookingStatusChange}
+						onReschedule={onBookingReschedule ?? (async () => {})}
 						onClose={onCloseBooking}
-						onStatusChange={onBookingStatusChange}
 					/>
 				)
 			}

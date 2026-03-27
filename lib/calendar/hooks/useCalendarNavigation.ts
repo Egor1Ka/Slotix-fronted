@@ -5,7 +5,7 @@ import type { ViewMode } from '../types'
 import type { SlotMode } from '@/lib/slot-engine'
 
 interface UseCalendarNavigationParams {
-	orgSlug: string
+	orgSlug?: string
 	dateStr: string
 	selectedEventTypeId: string | null
 }
@@ -52,12 +52,14 @@ const useCalendarNavigation = (
 	}
 
 	const buildOrgBasePath = (): string => {
+		if (!orgSlug) return pathname
 		const parts = pathname.split('/')
 		const orgIdIndex = parts.indexOf(orgSlug)
 		return parts.slice(0, orgIdIndex + 1).join('/')
 	}
 
 	const handleStaffSelect = (id: string | null) => {
+		if (!orgSlug) return
 		const basePath = buildOrgBasePath()
 		const urlParams = new URLSearchParams(searchParams.toString())
 		urlParams.delete('eventType')

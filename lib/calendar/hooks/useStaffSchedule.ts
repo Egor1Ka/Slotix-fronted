@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { eventTypeApi, scheduleApi } from '@/lib/booking-api-client'
 import type { EventType, ScheduleTemplate } from '@/services/configs/booking.types'
 
 interface UseStaffScheduleResult {
 	eventTypes: EventType[]
 	schedule: ScheduleTemplate | null
+	reloadSchedule: () => void
 	loading: boolean
 	error: string | null
 }
@@ -18,6 +19,14 @@ const useStaffSchedule = (staffId: string | null): UseStaffScheduleResult => {
 	const [error, setError] = useState<string | null>(null)
 	const loadedStaffIdRef = useRef<string | null>(null)
 	const hasLoadedRef = useRef(false)
+	const [reloadTick, setReloadTick] = useState(0)
+
+	const incrementTick = (n: number): number => n + 1
+
+	const reloadSchedule = useCallback(() => {
+		loadedStaffIdRef.current = null
+		setReloadTick(incrementTick)
+	}, [])
 
 	useEffect(() => {
 		if (!staffId) {
@@ -51,9 +60,9 @@ const useStaffSchedule = (staffId: string | null): UseStaffScheduleResult => {
 		}
 
 		loadSchedule()
-	}, [staffId])
+	}, [staffId, reloadTick])
 
-	return { eventTypes, schedule, loading, error }
+	return { eventTypes, schedule, reloadSchedule, loading, error }
 }
 
 export type { UseStaffScheduleResult }

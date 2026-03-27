@@ -1,11 +1,10 @@
 'use client'
 
-import { useSearchParams, useRouter } from 'next/navigation'
-import { useState, useEffect, useRef } from 'react'
+import { useMemo } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { type SlotMode } from '@/lib/slot-engine'
 import {
 	type ViewMode,
-	type ConfirmedBooking,
 	CalendarProvider,
 	CalendarCore,
 	createClientStrategy,
@@ -14,308 +13,181 @@ import {
 import { useTranslations } from 'next-intl'
 import { useLocale } from 'next-intl'
 import { useViewConfig } from '@/lib/calendar/CalendarViewConfigContext'
-import { formatDateISO, getWeekDates } from '@/lib/calendar/utils'
-import { staffApi, eventTypeApi, bookingApi, scheduleApi } from '@/lib/booking-api-client'
-import { toCalendarDisplayBooking } from '@/lib/booking-utils'
-import { getWorkHoursForDate } from '@/lib/calendar/utils'
-import type { StaffBySlugResponse, EventType, ScheduleTemplate, CalendarDisplayBooking, StaffBooking, BookingStatus } from '@/services/configs/booking.types'
-import type { ClientInfoData } from '@/components/booking/ClientInfoForm'
-import type { BookingDetail } from '@/components/booking/BookingDetailPanel'
+import { formatDateISO, getWorkHoursForDate, getFirstStaffId } from '@/lib/calendar/utils'
+import { scheduleApi } from '@/lib/booking-api-client'
+import {
+	useStaffBySlug,
+	useStaffSchedule,
+	useStaffBookings,
+	useCalendarNavigation,
+	useBookingActions,
+} from '@/lib/calendar/hooks'
+import type { OrgStaffMember, ScheduleTemplate } from '@/services/configs/booking.types'
+
+// ── Module-level constants ──
 
 const todayStr = (): string => formatDateISO(new Date())
-const browserTimezone = (): string =>
-	Intl.DateTimeFormat().resolvedOptions().timeZone
+
+const isDisabledDay = (wh: { dayOfWeek: number; enabled: boolean }): boolean =>
+	!wh.enabled
+const toDayOfWeek = (wh: { dayOfWeek: number }): number => wh.dayOfWeek
+
+const toStaffMember = (staff: {
+	id: string
+	name: string
+}): OrgStaffMember => ({
+	id: staff.id,
+	name: staff.name,
+	avatar: '',
+	position: null,
+	bookingCount: 0,
+})
+
+const DEFAULT_WEEKLY_HOURS = Array.from(
+	{ length: 7 },
+	(_: unknown, i: number) => ({
+		dayOfWeek: i,
+		enabled: i >= 1 && i <= 5,
+		slots: i >= 1 && i <= 5 ? [{ start: '10:00', end: '18:00' }] : [],
+	}),
+)
+
+const DEFAULT_SCHEDULE: ScheduleTemplate = {
+	staffId: '',
+	orgId: null,
+	weeklyHours: DEFAULT_WEEKLY_HOURS,
+	slotStepMin: 30,
+	slotMode: 'fixed',
+	timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+}
+
+// ── Component ──
 
 interface BookingPageProps {
 	staffSlug: string
 }
 
-interface StaffData {
-	staff: StaffBySlugResponse
-	eventTypes: EventType[]
-	schedule: ScheduleTemplate
-	bookings: CalendarDisplayBooking[]
-	staffBookings: StaffBooking[]
-}
-
 function BookingPage({ staffSlug }: BookingPageProps) {
 	const searchParams = useSearchParams()
-	const router = useRouter()
-
 	const viewConfig = useViewConfig()
 	const canBookForClient = viewConfig.canBookForClient
-
 	const t = useTranslations('booking')
-	const locale = useLocale()
 	const tCalendar = useTranslations('calendar')
+	const locale = useLocale()
 
-	const selectedEventTypeId = searchParams.get('eventType')
+	// ── URL state ──
+
 	const dateStr = searchParams.get('date') ?? todayStr()
+	const view = (searchParams.get('view') as ViewMode) ?? 'day'
+	const selectedEventTypeId = searchParams.get('eventType')
 	const selectedSlotTime = searchParams.get('slot')
 	const slotMode = (searchParams.get('mode') as SlotMode) ?? 'fixed'
-	const view = (searchParams.get('view') as ViewMode) ?? 'day'
 
-	const [confirmedBooking, setConfirmedBooking] =
-		useState<ConfirmedBooking | null>(null)
-	const [staffData, setStaffData] = useState<StaffData | null>(null)
-	const [loading, setLoading] = useState(true)
-	const [error, setError] = useState<string | null>(null)
-	const [isSubmitting, setIsSubmitting] = useState(false)
-	const [selectedBooking, setSelectedBooking] = useState<BookingDetail | null>(null)
-	const loadedRangeRef = useRef<{ from: string; to: string; view: string } | null>(null)
+	// ── Data ──
 
-	useEffect(() => {
-		const computeDateRange = (): { from: string; to: string } => {
-			if (view === 'week') {
-				const weekDates = getWeekDates(dateStr)
-				return { from: weekDates[0], to: weekDates[6] }
-			}
-			if (view === 'month') {
-				const d = new Date(dateStr + 'T00:00:00')
-				const year = d.getFullYear()
-				const month = d.getMonth()
-				const firstDay = formatDateISO(new Date(year, month, 1))
-				const lastDay = formatDateISO(new Date(year, month + 1, 0))
-				return { from: firstDay, to: lastDay }
-			}
-			return { from: dateStr, to: dateStr }
-		}
+	const { staff, loading: staffLoading, error: staffError } =
+		useStaffBySlug(staffSlug)
 
-		const range = computeDateRange()
-		const loaded = loadedRangeRef.current
-		const isWithinLoadedRange =
-			loaded !== null &&
-			loaded.view === view &&
-			dateStr >= loaded.from &&
-			dateStr <= loaded.to
+	const { eventTypes, schedule, reloadSchedule, loading: scheduleLoading, error: scheduleError } =
+		useStaffSchedule(staff?.id ?? null)
 
-		if (isWithinLoadedRange) return
+	const staffToLoad = useMemo(() => {
+		if (!staff) return []
+		return [toStaffMember(staff)]
+	}, [staff])
 
-		const loadStaffData = async () => {
-			try {
-				setLoading(true)
-				setError(null)
+	const { bookings, reloadBookings, loading: bookingsLoading, error: bookingsError } =
+		useStaffBookings(staffToLoad, dateStr, view, eventTypes)
 
-				const { from, to } = range
-				const staff = await staffApi.getById(staffSlug)
-				const [eventTypes, schedule] = await Promise.all([
-					eventTypeApi.getByStaff(staff.id),
-					scheduleApi.getTemplate(staff.id),
-				])
-				const staffBookings = await bookingApi.getByStaff(staff.id, from, to, eventTypes)
+	const loading = staffLoading || scheduleLoading || bookingsLoading
+	const error = staffError || scheduleError || bookingsError
 
-				const bookings = staffBookings.map(toCalendarDisplayBooking)
+	// ── Navigation ──
 
-				setStaffData({ staff, eventTypes, schedule, bookings, staffBookings })
-				loadedRangeRef.current = { ...range, view }
-			} catch (err) {
-				const message =
-					err instanceof Error ? err.message : t('loadError')
-				setError(message)
-			} finally {
-				setLoading(false)
-			}
-		}
+	const navigation = useCalendarNavigation({ dateStr, selectedEventTypeId })
 
-		loadStaffData()
-	}, [staffSlug, dateStr, view])
+	// ── Booking actions ──
 
-	const setParams = (updates: Record<string, string | null>) => {
-		const params = new URLSearchParams(searchParams.toString())
-		const applyEntry = ([key, value]: [string, string | null]) => {
-			if (value === null) params.delete(key)
-			else params.set(key, value)
-		}
-		Object.entries(updates).forEach(applyEntry)
-		router.replace(`?${params.toString()}`, { scroll: false })
+	const bookingActions = useBookingActions(
+		{
+			staffId: staff?.id ?? null,
+			staffList: staffToLoad,
+			eventTypes,
+			selectedEventTypeId,
+			selectedSlotTime,
+			dateStr,
+			reloadBookings,
+			getFirstStaffId,
+			t,
+		},
+		navigation.setParams,
+	)
+
+	// ── Navigation wrappers (reset booking state on navigation) ──
+
+	const resetBookingState = () => {
+		bookingActions.setConfirmedBooking(null)
+		bookingActions.setBookingError(null)
+		bookingActions.handleBookingClose()
 	}
 
-	const handleEventTypeSelect = (eventTypeId: string) => {
-		const isDeselect = eventTypeId === selectedEventTypeId
-		setParams({ eventType: isDeselect ? null : eventTypeId, slot: null })
-		setConfirmedBooking(null)
-		setSelectedBooking(null)
+	const onDateChange = (newDate: string) => {
+		navigation.handleDateChange(newDate)
+		resetBookingState()
 	}
 
-	const handleSlotSelect = (time: string, slotDate?: string) => {
-		const updates: Record<string, string | null> = { slot: time }
-		if (slotDate && slotDate !== dateStr) updates.date = slotDate
-		setParams(updates)
-		setSelectedBooking(null)
+	const onDayClick = (newDate: string) => {
+		navigation.handleDayClick(newDate)
+		resetBookingState()
 	}
 
-	const handleModeChange = (mode: SlotMode) => {
-		setParams({ mode, slot: null })
-		setConfirmedBooking(null)
+	const onEventTypeSelect = (eventTypeId: string) => {
+		navigation.handleEventTypeSelect(eventTypeId)
+		resetBookingState()
 	}
 
-	const handleViewChange = (newView: ViewMode) => {
-		setParams({ view: newView, slot: null })
+	const onSlotSelect = (time: string, slotDate?: string) => {
+		navigation.handleSlotSelect(time, slotDate)
+		bookingActions.handleBookingClose()
 	}
 
-	const handleDateChange = (newDate: string) => {
-		setParams({ date: newDate, slot: null })
-		setConfirmedBooking(null)
+	const onModeChange = (mode: SlotMode) => {
+		navigation.handleModeChange(mode)
+		resetBookingState()
 	}
 
-	const handleDayClick = (newDate: string) => {
-		setParams({ date: newDate, view: 'day', slot: null })
-		setConfirmedBooking(null)
-	}
+	// ── Schedule editing (staff-specific) ──
 
-	const createBookingWithInvitee = async (invitee: {
-		name: string
-		email: string | null
-		phone: string | null
-		phoneCountry: string | null
-	}) => {
-		if (!staffData || !selectedEventTypeId || !selectedSlotTime) return
-
-		const eventType = staffData.eventTypes.find(
-			(e) => e.id === selectedEventTypeId,
+	const handleSaveSchedule = async (
+		weeklyHours: ScheduleTemplate['weeklyHours'],
+	) => {
+		if (!staff) return
+		await scheduleApi.updateTemplate(
+			staff.id,
+			schedule?.orgId ?? null,
+			weeklyHours,
 		)
-		if (!eventType) return
-
-		const startAt = `${dateStr}T${selectedSlotTime}:00.000Z`
-
-		try {
-			setIsSubmitting(true)
-			const response = await bookingApi.create({
-				eventTypeId: selectedEventTypeId,
-				staffId: staffData.staff.id,
-				startAt,
-				timezone: browserTimezone(),
-				invitee,
-			})
-
-			setConfirmedBooking({
-				bookingId: response.id,
-				eventTypeId: response.eventTypeId,
-				eventTypeName: response.eventTypeName,
-				startAt: response.startAt,
-				endAt: response.endAt,
-				timezone: response.timezone,
-				locationId: response.locationId,
-				cancelToken: response.cancelToken,
-				status: response.status,
-				color: eventType.color,
-				durationMin: eventType.durationMin,
-				price: eventType.price,
-				currency: eventType.currency,
-				invitee: response.invitee,
-			})
-		} catch (err) {
-			const message =
-				err instanceof Error ? err.message : t('bookingFailed')
-			setError(message)
-		} finally {
-			setIsSubmitting(false)
-		}
+		reloadSchedule()
 	}
+
+	const handleSaveOverride = async (
+		body: Parameters<typeof scheduleApi.createOverride>[0],
+	) => {
+		await scheduleApi.createOverride(body)
+		reloadSchedule()
+	}
+
+	// ── Client confirm (no client info) ──
 
 	const handleConfirm = async () => {
-		await createBookingWithInvitee({
+		await bookingActions.handleConfirmWithClient({
 			name: t('defaultClient'),
-			email: null,
-			phone: null,
-			phoneCountry: null,
+			email: '',
+			phone: '',
 		})
 	}
 
-	const handleConfirmWithClient = async (data: ClientInfoData) => {
-		await createBookingWithInvitee({
-			name: data.name,
-			email: data.email || null,
-			phone: data.phone || null,
-			phoneCountry: null,
-		})
-	}
-
-	const handleCancel = async () => {
-		if (!confirmedBooking) return
-
-		try {
-			await bookingApi.cancelById({
-				bookingId: confirmedBooking.bookingId,
-				reason: t('cancelledByStaff'),
-			})
-			setConfirmedBooking(null)
-			setParams({ slot: null })
-		} catch (err) {
-			const message =
-				err instanceof Error ? err.message : t('cancelFailed')
-			setError(message)
-		}
-	}
-
-	const handleSaveSchedule = async (weeklyHours: ScheduleTemplate['weeklyHours']) => {
-		if (!staffData) return
-		try {
-			await scheduleApi.updateTemplate(staffData.staff.id, staffData.schedule.orgId, weeklyHours)
-			const schedule = await scheduleApi.getTemplate(staffData.staff.id)
-			setStaffData({ ...staffData, schedule })
-		} catch (err) {
-			const message = err instanceof Error ? err.message : t('bookingFailed')
-			setError(message)
-		}
-	}
-
-	const handleSaveOverride = async (body: Parameters<typeof scheduleApi.createOverride>[0]) => {
-		await scheduleApi.createOverride(body)
-		if (!staffData) return
-		const schedule = await scheduleApi.getTemplate(staffData.staff.id)
-		setStaffData({ ...staffData, schedule })
-	}
-
-	const handleResetSlot = () => {
-		setParams({ slot: null })
-	}
-
-	const handleBookingClick = (bookingId: string) => {
-		if (!staffData) return
-		const booking = staffData.staffBookings.find((b) => b.id === bookingId)
-		if (!booking) return
-
-		setParams({ eventType: null, slot: null })
-		setConfirmedBooking(null)
-
-		const eventType = staffData.eventTypes.find(
-			(e) => e.id === booking.eventTypeId,
-		)
-		const startDate = new Date(booking.startAt)
-		const endDate = new Date(booking.endAt)
-		const durationMin = Math.round(
-			(endDate.getTime() - startDate.getTime()) / 60000,
-		)
-
-		setSelectedBooking({
-			id: booking.id,
-			eventTypeName: booking.eventTypeName,
-			color: eventType ? eventType.color : '#888',
-			startAt: booking.startAt,
-			endAt: booking.endAt,
-			durationMin,
-			date: booking.startAt.split('T')[0],
-			status: booking.status,
-			invitee: {
-				name: booking.invitee.name,
-				email: booking.invitee.email,
-				phone: booking.invitee.phone,
-			},
-			payment: { status: 'none', amount: 0, currency: 'uah' },
-		})
-	}
-
-	const handleCloseBooking = () => {
-		setSelectedBooking(null)
-	}
-
-	const handleBookingStatusChange = (bookingId: string, newStatus: BookingStatus) => {
-		setSelectedBooking((prev) =>
-			prev && prev.id === bookingId ? { ...prev, status: newStatus } : prev,
-		)
-		loadedRangeRef.current = null
-	}
+	// ── Guards ──
 
 	if (loading) {
 		return (
@@ -325,7 +197,7 @@ function BookingPage({ staffSlug }: BookingPageProps) {
 		)
 	}
 
-	if (error || !staffData) {
+	if (error || !staff) {
 		return (
 			<div className="flex items-center justify-center py-20">
 				<p className="text-destructive text-sm">
@@ -335,70 +207,74 @@ function BookingPage({ staffSlug }: BookingPageProps) {
 		)
 	}
 
-	const workHours = getWorkHoursForDate(staffData.schedule.weeklyHours, dateStr)
+	// ── Derived data ──
+
+	const scheduleSource = schedule ?? DEFAULT_SCHEDULE
+	const workHours = getWorkHoursForDate(scheduleSource.weeklyHours, dateStr)
 	const workStart = workHours?.workStart ?? '10:00'
 	const workEnd = workHours?.workEnd ?? '18:00'
-
-	const isDisabledDay = (wh: { dayOfWeek: number; enabled: boolean }): boolean =>
-		!wh.enabled
-	const toDayOfWeek = (wh: { dayOfWeek: number }): number => wh.dayOfWeek
-	const disabledDays = staffData.schedule.weeklyHours
+	const disabledDays = scheduleSource.weeklyHours
 		.filter(isDisabledDay)
 		.map(toDayOfWeek)
+
+	// ── Strategy ──
 
 	const strategy = canBookForClient
 		? createStaffStrategy({
 				staffName: tCalendar('mySchedule'),
 				locale,
-				eventTypes: staffData.eventTypes,
-				bookings: staffData.bookings,
-				schedule: staffData.schedule,
+				eventTypes,
+				bookings,
+				schedule: scheduleSource,
 				selectedEventTypeId,
 				selectedSlot: selectedSlotTime,
 				slotMode,
-				confirmedBooking,
+				confirmedBooking: bookingActions.confirmedBooking,
 				date: dateStr,
-				onSelectEventType: handleEventTypeSelect,
-				onSelectSlot: handleSlotSelect,
-				onConfirmWithClient: handleConfirmWithClient,
-				onCancel: handleCancel,
-				onResetSlot: handleResetSlot,
-				onModeChange: handleModeChange,
-				isSubmitting,
+				onSelectEventType: onEventTypeSelect,
+				onSelectSlot: onSlotSelect,
+				onConfirmWithClient: bookingActions.handleConfirmWithClient,
+				onCancel: bookingActions.handleCancel,
+				onResetSlot: bookingActions.handleResetSlot,
+				onModeChange,
+				isSubmitting: bookingActions.isSubmitting,
 				onSaveSchedule: handleSaveSchedule,
 				onSaveOverride: handleSaveOverride,
-				onBookingClick: handleBookingClick,
-				selectedBooking,
-				onCloseBooking: handleCloseBooking,
-				onBookingStatusChange: handleBookingStatusChange,
+				onBookingClick: bookingActions.handleBookingSelect,
+				selectedBooking: bookingActions.selectedBooking,
+				onCloseBooking: bookingActions.handleBookingClose,
+				onBookingStatusChange: bookingActions.handleBookingStatusChange,
+				onBookingReschedule: bookingActions.handleBookingReschedule,
 			})
 		: createClientStrategy({
-				eventTypes: staffData.eventTypes,
-				bookings: staffData.bookings,
-				schedule: staffData.schedule,
-				staffName: staffData.staff.name,
+				eventTypes,
+				bookings,
+				schedule: scheduleSource,
+				staffName: staff.name,
 				locale,
 				selectedEventTypeId,
 				selectedSlot: selectedSlotTime,
 				slotMode,
-				confirmedBooking,
+				confirmedBooking: bookingActions.confirmedBooking,
 				date: dateStr,
-				onSelectEventType: handleEventTypeSelect,
-				onSelectSlot: handleSlotSelect,
+				onSelectEventType: onEventTypeSelect,
+				onSelectSlot: onSlotSelect,
 				onConfirm: handleConfirm,
-				onCancel: handleCancel,
-				onResetSlot: handleResetSlot,
-				onModeChange: handleModeChange,
+				onCancel: bookingActions.handleCancel,
+				onResetSlot: bookingActions.handleResetSlot,
+				onModeChange,
 			})
+
+	// ── Render ──
 
 	return (
 		<CalendarProvider strategy={strategy}>
 			<CalendarCore
 				date={dateStr}
 				view={view}
-				onViewChange={handleViewChange}
-				onDateChange={handleDateChange}
-				onDayClick={handleDayClick}
+				onViewChange={navigation.handleViewChange}
+				onDateChange={onDateChange}
+				onDayClick={onDayClick}
 				workStart={workStart}
 				workEnd={workEnd}
 				disabledDays={disabledDays}
