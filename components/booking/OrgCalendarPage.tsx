@@ -21,8 +21,9 @@ import {
 	useStaffBookings,
 	useCalendarNavigation,
 	useBookingActions,
+	useOrgSchedules,
 } from '@/lib/calendar/hooks'
-import type { ScheduleTemplate } from '@/services/configs/booking.types'
+import type { ScheduleTemplate, OrgStaffMember } from '@/services/configs/booking.types'
 
 // ── Module-level constants ──
 
@@ -78,6 +79,7 @@ function OrgCalendarPage({ orgSlug, staffId: staffIdProp }: OrgCalendarPageProps
 	// ── Data ──
 
 	const { org, staffList, loading: orgLoading, error: orgError } = useOrgInfo(orgSlug)
+	const orgSchedules = useOrgSchedules(orgSlug)
 
 	const activeStaffId = staffIdProp ?? getFirstStaffId(staffList)
 
@@ -108,7 +110,10 @@ function OrgCalendarPage({ orgSlug, staffId: staffIdProp }: OrgCalendarPageProps
 	const { bookings, reloadBookings, loading: bookingsLoading, error: bookingsError } =
 		useStaffBookings(staffToLoad, dateStr, view, eventTypes)
 
-	const loading = orgLoading || scheduleLoading || bookingsLoading || filtering.loading
+	// Начальная загрузка — блокирует рендер полностью
+	const initialLoading = orgLoading || orgSchedules.loading || (scheduleLoading && !schedule)
+	// Фоновая загрузка — календарь остаётся, данные обновляются
+	const contentLoading = scheduleLoading || bookingsLoading || filtering.loading
 	const error = orgError || scheduleError || bookingsError
 
 	// ── Booking actions ──
@@ -163,7 +168,7 @@ function OrgCalendarPage({ orgSlug, staffId: staffIdProp }: OrgCalendarPageProps
 
 	// ── Guards ──
 
-	if (loading) {
+	if (initialLoading) {
 		return (
 			<div className="flex items-center justify-center py-20">
 				<p className="text-muted-foreground text-sm">{t('loading')}</p>
@@ -183,11 +188,19 @@ function OrgCalendarPage({ orgSlug, staffId: staffIdProp }: OrgCalendarPageProps
 
 	// ── Derived data ──
 
-	const scheduleSource = schedule ?? DEFAULT_SCHEDULE
-	const workHours = getWorkHoursForDate(scheduleSource.weeklyHours, dateStr)
-	const workStart = workHours?.workStart ?? '10:00'
-	const workEnd = workHours?.workEnd ?? '18:00'
-	const disabledDays = scheduleSource.weeklyHours.filter(isDisabledDay).map(toDayOfWeek)
+	// Рабочие часы: если выбран сотрудник — его, иначе объединённые
+	const staffSchedule = selectedStaffId ? orgSchedules.getStaffSchedule(selectedStaffId) : null
+	const scheduleSource = staffSchedule ?? schedule ?? DEFAULT_SCHEDULE
+
+	const workHoursData = selectedStaffId
+		? getWorkHoursForDate(scheduleSource.weeklyHours, dateStr)
+		: orgSchedules.getOrgWorkHours(dateStr)
+
+	const workStart = workHoursData?.workStart ?? '10:00'
+	const workEnd = workHoursData?.workEnd ?? '18:00'
+
+	// Выходные дни: если выбран сотрудник — его, иначе дни когда никто не работает
+	const disabledDays = orgSchedules.getDisabledDays(selectedStaffId)
 
 	// ── Strategy ──
 
@@ -199,7 +212,7 @@ function OrgCalendarPage({ orgSlug, staffId: staffIdProp }: OrgCalendarPageProps
 		bookings,
 		canBookForClient: viewConfig.canBookForClient,
 		eventTypes,
-		schedule: schedule ?? undefined,
+		schedule: staffSchedule ?? schedule ?? undefined,
 		selectedEventTypeId,
 		selectedSlot: selectedSlotTime,
 		slotMode,
@@ -221,10 +234,17 @@ function OrgCalendarPage({ orgSlug, staffId: staffIdProp }: OrgCalendarPageProps
 		onBookingStatusChange: bookingActions.handleBookingStatusChange,
 		onBookingReschedule: bookingActions.handleBookingReschedule,
 		onBookingClose: bookingActions.handleBookingClose,
+		loading: contentLoading,
 	})
 
-	// На публичных страницах показываем только подходящих сотрудников
-	const displayStaff = viewConfig.filterByStaffCapability ? filtering.filteredStaff : staffList
+	// Фильтрация: рабочий день + фильтрация по услугам
+	const workingStaff = orgSchedules.getWorkingStaff(dateStr, staffList)
+	const isWorkingStaff = (staff: OrgStaffMember): boolean =>
+		workingStaff.some((ws) => ws.id === staff.id)
+
+	const displayStaff = viewConfig.filterByStaffCapability
+		? filtering.filteredStaff.filter(isWorkingStaff)
+		: workingStaff
 
 	const staffTabsSlot = viewConfig.showStaffTabs ? (
 		<StaffTabs
@@ -232,6 +252,7 @@ function OrgCalendarPage({ orgSlug, staffId: staffIdProp }: OrgCalendarPageProps
 			selectedId={selectedStaffId}
 			behavior={viewConfig.staffTabBehavior}
 			onSelect={onStaffSelect}
+			loading={contentLoading}
 		/>
 	) : null
 
