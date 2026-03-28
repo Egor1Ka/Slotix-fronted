@@ -281,6 +281,13 @@ const updateScheduleTemplate = async (
 	return toFrontendSchedule(raw)
 }
 
+const getSchedulesByOrg = async (orgId: string): Promise<ScheduleTemplate[]> => {
+	const raw = await get<BackendScheduleTemplate[]>(
+		`/schedule/templates/by-org/${orgId}`,
+	)
+	return raw.map(toFrontendSchedule)
+}
+
 const createScheduleOverride = async (
 	body: CreateScheduleOverrideBody,
 ): Promise<ScheduleOverride> =>
@@ -382,6 +389,7 @@ export const eventTypeApi = {
 
 export const scheduleApi = {
 	getTemplate: getScheduleTemplate,
+	getByOrg: getSchedulesByOrg,
 	updateTemplate: updateScheduleTemplate,
 	createOverride: createScheduleOverride,
 }
