@@ -6,6 +6,7 @@ interface CalendarViewConfig {
 	onEmptyCellClick: 'open-booking-flow' | 'none'
 	onBlockClick: 'open-booking-details' | 'none'
 	canBookForClient: boolean
+	filterByStaffCapability: boolean
 }
 
 const ORG_PUBLIC_CONFIG: CalendarViewConfig = {
@@ -16,6 +17,7 @@ const ORG_PUBLIC_CONFIG: CalendarViewConfig = {
 	onEmptyCellClick: 'open-booking-flow',
 	onBlockClick: 'none',
 	canBookForClient: true,
+	filterByStaffCapability: true,
 }
 
 const ORG_ADMIN_CONFIG: CalendarViewConfig = {
@@ -26,6 +28,7 @@ const ORG_ADMIN_CONFIG: CalendarViewConfig = {
 	onEmptyCellClick: 'open-booking-flow',
 	onBlockClick: 'open-booking-details',
 	canBookForClient: true,
+	filterByStaffCapability: false,
 }
 
 const STAFF_PUBLIC_CONFIG: CalendarViewConfig = {
@@ -36,6 +39,7 @@ const STAFF_PUBLIC_CONFIG: CalendarViewConfig = {
 	onEmptyCellClick: 'open-booking-flow',
 	onBlockClick: 'none',
 	canBookForClient: true,
+	filterByStaffCapability: false,
 }
 
 const STAFF_SELF_CONFIG: CalendarViewConfig = {
@@ -46,6 +50,7 @@ const STAFF_SELF_CONFIG: CalendarViewConfig = {
 	onEmptyCellClick: 'open-booking-flow',
 	onBlockClick: 'open-booking-details',
 	canBookForClient: true,
+	filterByStaffCapability: false,
 }
 
 export {

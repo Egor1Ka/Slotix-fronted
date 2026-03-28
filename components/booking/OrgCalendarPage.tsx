@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { type SlotMode } from '@/lib/slot-engine'
 import {
@@ -16,6 +16,7 @@ import { formatDateISO, getWorkHoursForDate, getFirstStaffId, getStaffToLoad } f
 import { StaffTabs } from '@/components/booking/StaffTabs'
 import {
 	useOrgInfo,
+	useOrgFiltering,
 	useStaffSchedule,
 	useStaffBookings,
 	useCalendarNavigation,
@@ -70,14 +71,34 @@ function OrgCalendarPage({ orgSlug, staffId: staffIdProp }: OrgCalendarPageProps
 	const selectedSlotTime = searchParams.get('slot') ?? null
 	const slotMode = (searchParams.get('mode') as SlotMode) ?? 'fixed'
 
+	// ── Navigation (до данных, т.к. фильтрация использует handleStaffSelect) ──
+
+	const navigation = useCalendarNavigation({ orgSlug, dateStr, selectedEventTypeId })
+
 	// ── Data ──
 
 	const { org, staffList, loading: orgLoading, error: orgError } = useOrgInfo(orgSlug)
 
 	const activeStaffId = staffIdProp ?? getFirstStaffId(staffList)
 
-	const { eventTypes, schedule, loading: scheduleLoading, error: scheduleError } =
+	// Автовыбор сотрудника при фильтрации — сохраняет eventType в URL
+	const handleStaffAutoSelect = useCallback((staffId: string) => {
+		navigation.handleStaffAutoSelect(staffId)
+	}, [navigation])
+
+	const filtering = useOrgFiltering({
+		orgId: orgSlug,
+		allStaff: staffList,
+		selectedStaffId,
+		selectedEventTypeId,
+		onStaffAutoSelect: handleStaffAutoSelect,
+	})
+
+	const { eventTypes: scheduleEventTypes, schedule, loading: scheduleLoading, error: scheduleError } =
 		useStaffSchedule(activeStaffId)
+
+	// На публичных страницах используем отфильтрованные услуги
+	const eventTypes = viewConfig.filterByStaffCapability ? filtering.filteredEventTypes : scheduleEventTypes
 
 	const staffToLoad = useMemo(
 		() => getStaffToLoad(staffList, selectedStaffId, viewConfig.staffTabBehavior),
@@ -87,12 +108,8 @@ function OrgCalendarPage({ orgSlug, staffId: staffIdProp }: OrgCalendarPageProps
 	const { bookings, reloadBookings, loading: bookingsLoading, error: bookingsError } =
 		useStaffBookings(staffToLoad, dateStr, view, eventTypes)
 
-	const loading = orgLoading || scheduleLoading || bookingsLoading
+	const loading = orgLoading || scheduleLoading || bookingsLoading || filtering.loading
 	const error = orgError || scheduleError || bookingsError
-
-	// ── Navigation ──
-
-	const navigation = useCalendarNavigation({ orgSlug, dateStr, selectedEventTypeId })
 
 	// ── Booking actions ──
 
@@ -206,9 +223,12 @@ function OrgCalendarPage({ orgSlug, staffId: staffIdProp }: OrgCalendarPageProps
 		onBookingClose: bookingActions.handleBookingClose,
 	})
 
+	// На публичных страницах показываем только подходящих сотрудников
+	const displayStaff = viewConfig.filterByStaffCapability ? filtering.filteredStaff : staffList
+
 	const staffTabsSlot = viewConfig.showStaffTabs ? (
 		<StaffTabs
-			staff={staffList}
+			staff={displayStaff}
 			selectedId={selectedStaffId}
 			behavior={viewConfig.staffTabBehavior}
 			onSelect={onStaffSelect}
@@ -229,6 +249,7 @@ function OrgCalendarPage({ orgSlug, staffId: staffIdProp }: OrgCalendarPageProps
 				workEnd={workEnd}
 				disabledDays={disabledDays}
 				staffTabsSlot={staffTabsSlot}
+				publicUrl={`/${locale}/org/${orgSlug}`}
 			/>
 		</CalendarProvider>
 	)

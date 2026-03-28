@@ -16,6 +16,7 @@ interface UseCalendarNavigationResult {
 	handleDateChange: (newDate: string) => void
 	handleDayClick: (newDate: string) => void
 	handleStaffSelect: (id: string | null) => void
+	handleStaffAutoSelect: (id: string) => void
 	handleEventTypeSelect: (eventTypeId: string) => void
 	handleSlotSelect: (time: string, slotDate?: string) => void
 	handleModeChange: (mode: SlotMode) => void
@@ -62,11 +63,22 @@ const useCalendarNavigation = (
 		if (!orgSlug) return
 		const basePath = buildOrgBasePath()
 		const urlParams = new URLSearchParams(searchParams.toString())
-		urlParams.delete('eventType')
 		urlParams.delete('slot')
 		const query = urlParams.toString()
 		const suffix = query ? `?${query}` : ''
 		const target = id ? `${basePath}/${id}${suffix}` : `${basePath}${suffix}`
+		router.replace(target, { scroll: false })
+	}
+
+	// Автовыбор сотрудника при фильтрации — сохраняет eventType в URL
+	const handleStaffAutoSelect = (id: string) => {
+		if (!orgSlug) return
+		const basePath = buildOrgBasePath()
+		const urlParams = new URLSearchParams(searchParams.toString())
+		urlParams.delete('slot')
+		const query = urlParams.toString()
+		const suffix = query ? `?${query}` : ''
+		const target = `${basePath}/${id}${suffix}`
 		router.replace(target, { scroll: false })
 	}
 
@@ -91,6 +103,7 @@ const useCalendarNavigation = (
 		handleDateChange,
 		handleDayClick,
 		handleStaffSelect,
+		handleStaffAutoSelect,
 		handleEventTypeSelect,
 		handleSlotSelect,
 		handleModeChange,

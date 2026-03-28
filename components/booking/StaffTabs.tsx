@@ -52,7 +52,14 @@ function StaffTabs({ staff, selectedId, behavior, onSelect }: StaffTabsProps) {
 					{getInitials(member.name)}
 				</AvatarFallback>
 			</Avatar>
-			<span className="text-sm font-medium">{member.name}</span>
+			<div className="flex flex-col items-start">
+				<span className="text-sm font-medium">{member.name}</span>
+				{member.position && (
+					<span className="text-muted-foreground text-[10px] leading-tight">
+						{member.position}
+					</span>
+				)}
+			</div>
 			<Badge variant="secondary" className="text-[10px]">
 				{member.bookingCount}
 			</Badge>

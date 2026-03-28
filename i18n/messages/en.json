@@ -211,7 +211,9 @@
 		"week": "Week",
 		"month": "Month",
 		"servicesAndMode": "Services & mode",
-		"mySchedule": "My schedule"
+		"mySchedule": "My schedule",
+		"copyPublicLink": "Public link",
+		"linkCopied": "Link copied!"
 	},
 	"errors": {
 		"title": "Something went wrong",

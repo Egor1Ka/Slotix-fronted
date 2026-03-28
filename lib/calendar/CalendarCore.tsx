@@ -10,7 +10,14 @@ import {
 	SheetHeader,
 	SheetTitle,
 } from '@/components/ui/sheet'
-import { ChevronLeftIcon, ChevronRightIcon, MenuIcon } from 'lucide-react'
+import {
+	ChevronLeftIcon,
+	ChevronRightIcon,
+	MenuIcon,
+	LinkIcon,
+	CheckIcon,
+} from 'lucide-react'
+import { toast } from 'sonner'
 import { useTranslations } from 'next-intl'
 import { useLocale } from 'next-intl'
 import { useCalendarStrategy } from './CalendarContext'
@@ -40,6 +47,7 @@ const DEFAULT_VIEW_CONFIG: CalendarViewConfig = {
 	onEmptyCellClick: 'open-booking-flow',
 	onBlockClick: 'none',
 	canBookForClient: false,
+	filterByStaffCapability: false,
 }
 
 type ViewOption = { value: ViewMode; labelKey: string }
@@ -61,6 +69,7 @@ interface CalendarCoreProps {
 	disabledDays?: number[]
 	staffTabsSlot?: React.ReactNode
 	columnHeaderSlot?: (dayDate: string, index: number) => React.ReactNode
+	publicUrl?: string
 }
 
 const navigate = (view: ViewMode, date: string, direction: number): string => {
@@ -88,6 +97,7 @@ function CalendarCore({
 	disabledDays = [],
 	staffTabsSlot,
 	columnHeaderSlot,
+	publicUrl,
 }: CalendarCoreProps) {
 	const strategy = useCalendarStrategy()
 	const viewConfig = useSafeViewConfig()
@@ -99,8 +109,19 @@ function CalendarCore({
 	const grid = createGridConfig(workStart, workEnd)
 	const title = strategy.getTitle(date, view)
 
+	const [linkCopied, setLinkCopied] = useState(false)
+
 	const handlePrev = () => onDateChange(navigate(view, date, -1))
 	const handleNext = () => onDateChange(navigate(view, date, 1))
+
+	const handleCopyPublicLink = () => {
+		if (!publicUrl) return
+		const fullUrl = `${window.location.origin}${publicUrl}`
+		navigator.clipboard.writeText(fullUrl)
+		setLinkCopied(true)
+		toast.success(t('linkCopied'))
+		setTimeout(() => setLinkCopied(false), 2000)
+	}
 	const handleOpenSheet = () => setSheetOpen(true)
 	const handleSheetChange = (open: boolean) => setSheetOpen(open)
 
@@ -548,8 +569,25 @@ function CalendarCore({
 								<ChevronRightIcon />
 							</Button>
 						</div>
-						<div className="flex gap-1">
-							{VIEW_OPTIONS.map(renderViewOption)}
+						<div className="flex items-center gap-2">
+							{publicUrl && (
+								<Button
+									variant="outline"
+									size="sm"
+									onClick={handleCopyPublicLink}
+									className="gap-1.5"
+								>
+									{linkCopied ? (
+										<CheckIcon className="size-4" />
+									) : (
+										<LinkIcon className="size-4" />
+									)}
+									{t('copyPublicLink')}
+								</Button>
+							)}
+							<div className="flex gap-1">
+								{VIEW_OPTIONS.map(renderViewOption)}
+							</div>
 						</div>
 					</div>
 

@@ -65,9 +65,10 @@ const DEFAULT_SCHEDULE: ScheduleTemplate = {
 
 interface BookingPageProps {
 	staffSlug: string
+	publicUrl?: string
 }
 
-function BookingPage({ staffSlug }: BookingPageProps) {
+function BookingPage({ staffSlug, publicUrl }: BookingPageProps) {
 	const searchParams = useSearchParams()
 	const viewConfig = useViewConfig()
 	const canBookForClient = viewConfig.canBookForClient
@@ -278,6 +279,7 @@ function BookingPage({ staffSlug }: BookingPageProps) {
 				workStart={workStart}
 				workEnd={workEnd}
 				disabledDays={disabledDays}
+				publicUrl={publicUrl}
 			/>
 		</CalendarProvider>
 	)

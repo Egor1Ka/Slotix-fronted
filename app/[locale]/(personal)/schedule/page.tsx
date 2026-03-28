@@ -1,7 +1,7 @@
 'use client'
 
 import { Suspense } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { CalendarViewConfigProvider } from '@/lib/calendar/CalendarViewConfigContext'
 import { STAFF_SELF_CONFIG } from '@/lib/calendar/view-config'
 import { BookingPage } from '@/app/[locale]/book/[staffSlug]/BookingPage'
@@ -10,6 +10,7 @@ import { useUser } from '@/lib/auth/user-provider'
 export default function PersonalSchedulePage() {
 	const user = useUser()
 	const t = useTranslations('booking')
+	const locale = useLocale()
 
 	return (
 		<Suspense
@@ -20,7 +21,10 @@ export default function PersonalSchedulePage() {
 			}
 		>
 			<CalendarViewConfigProvider config={STAFF_SELF_CONFIG}>
-				<BookingPage staffSlug={user.id} />
+				<BookingPage
+					staffSlug={user.id}
+					publicUrl={`/${locale}/book/${user.id}`}
+				/>
 			</CalendarViewConfigProvider>
 		</Suspense>
 	)

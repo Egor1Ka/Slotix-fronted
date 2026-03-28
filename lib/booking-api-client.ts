@@ -231,6 +231,14 @@ const getEventTypesByStaff = async (staffId: string): Promise<EventType[]> => {
 	return raw.map(toFrontendEventType)
 }
 
+const getEventTypesByOrg = async (orgId: string): Promise<EventType[]> => {
+	const raw = await get<BackendEventType[]>(`/event-types?orgId=${orgId}`)
+	return raw.map(toFrontendEventType)
+}
+
+const getStaffForEventType = async (eventTypeId: string): Promise<OrgStaffMember[]> =>
+	get<OrgStaffMember[]>(`/event-types/${eventTypeId}/staff`)
+
 // ── Schedule API ──
 
 const getScheduleTemplate = async (staffId: string): Promise<ScheduleTemplate> => {
@@ -368,6 +376,8 @@ export const staffApi = {
 
 export const eventTypeApi = {
 	getByStaff: getEventTypesByStaff,
+	getByOrg: getEventTypesByOrg,
+	getStaffForEventType,
 }
 
 export const scheduleApi = {
