@@ -5,7 +5,6 @@ import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import { XIcon } from 'lucide-react'
 import { bookingApi } from '@/lib/booking-api-client'
 import { formatLocalTime } from './BookingPanelParts'
 import type { BookingStatus } from '@/services/configs/booking.types'
@@ -37,7 +36,10 @@ interface BookingDetailPanelProps {
 	onStatusChange: (bookingId: string, newStatus: BookingStatus) => void
 }
 
-const STATUS_VARIANT: Record<BookingStatus, 'default' | 'secondary' | 'destructive' | 'outline'> = {
+const STATUS_VARIANT: Record<
+	BookingStatus,
+	'default' | 'secondary' | 'destructive' | 'outline'
+> = {
 	confirmed: 'default',
 	pending_payment: 'secondary',
 	completed: 'outline',
@@ -50,14 +52,22 @@ const ALLOWED_TRANSITIONS: Record<string, BookingStatus[]> = {
 	confirmed: ['completed', 'no_show', 'cancelled'],
 }
 
-const ACTION_CONFIG: Record<string, { translationKey: string; variant: 'default' | 'outline' | 'destructive' }> = {
+const ACTION_CONFIG: Record<
+	string,
+	{ translationKey: string; variant: 'default' | 'outline' | 'destructive' }
+> = {
 	completed: { translationKey: 'markCompleted', variant: 'default' },
 	no_show: { translationKey: 'markNoShow', variant: 'outline' },
 	cancelled: { translationKey: 'markCancelled', variant: 'destructive' },
 	confirmed: { translationKey: 'confirmed', variant: 'default' },
 }
 
-function BookingDetailPanel({ booking, onClose, onStatusChange }: BookingDetailPanelProps) {
+function BookingDetailPanel({
+	booking,
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	onClose,
+	onStatusChange,
+}: BookingDetailPanelProps) {
 	const t = useTranslations('booking')
 	const [isUpdating, setIsUpdating] = useState(false)
 	const [error, setError] = useState<string | null>(null)
@@ -107,22 +117,13 @@ function BookingDetailPanel({ booking, onClose, onStatusChange }: BookingDetailP
 	}
 
 	return (
-		<div className="flex flex-col gap-3">
-			<div className="flex items-center justify-between">
-				<div className="flex items-center gap-2">
-					<div
-						className="size-3 rounded-full"
-						style={{ backgroundColor: booking.color }}
-					/>
-					<span className="text-sm font-semibold">{booking.eventTypeName}</span>
-				</div>
-				<button
-					type="button"
-					onClick={onClose}
-					className="text-muted-foreground hover:text-foreground"
-				>
-					<XIcon className="size-4" />
-				</button>
+		<div className="flex flex-col gap-4">
+			<div className="flex items-center gap-2">
+				<div
+					className="size-3 shrink-0 rounded-full"
+					style={{ backgroundColor: booking.color }}
+				/>
+				<span className="text-sm font-semibold">{booking.eventTypeName}</span>
 			</div>
 
 			<Separator />
@@ -133,7 +134,9 @@ function BookingDetailPanel({ booking, onClose, onStatusChange }: BookingDetailP
 				<span className="text-muted-foreground">{t('endTime')}</span>
 				<span className="font-medium">{formatLocalTime(booking.endAt)}</span>
 				<span className="text-muted-foreground">{t('duration')}</span>
-				<span className="font-medium">{booking.durationMin} {t('min')}</span>
+				<span className="font-medium">
+					{booking.durationMin} {t('min')}
+				</span>
 				<span className="text-muted-foreground">{t('date')}</span>
 				<span className="font-medium">{formatDate(booking.startAt)}</span>
 			</div>
@@ -183,9 +186,7 @@ function BookingDetailPanel({ booking, onClose, onStatusChange }: BookingDetailP
 				</>
 			)}
 
-			{error && (
-				<p className="text-destructive text-xs">{error}</p>
-			)}
+			{error && <p className="text-destructive text-xs">{error}</p>}
 		</div>
 	)
 }

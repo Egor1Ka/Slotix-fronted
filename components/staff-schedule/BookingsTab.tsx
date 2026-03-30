@@ -188,16 +188,18 @@ function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
 			)}
 
 			<Sheet open={selectedBooking !== null} onOpenChange={handleCloseSheet}>
-				<SheetContent>
-					<SheetHeader>
+				<SheetContent className="sm:max-w-md">
+					<SheetHeader className="px-6 pt-6">
 						<SheetTitle>{t('bookingDetails')}</SheetTitle>
 					</SheetHeader>
 					{selectedBooking && (
-						<BookingDetailPanel
-							booking={toBookingDetail(selectedBooking)}
-							onClose={handleCloseSheet}
-							onStatusChange={handleStatusChange}
-						/>
+						<div className="px-6 pb-6">
+							<BookingDetailPanel
+								booking={toBookingDetail(selectedBooking)}
+								onClose={handleCloseSheet}
+								onStatusChange={handleStatusChange}
+							/>
+						</div>
 					)}
 				</SheetContent>
 			</Sheet>

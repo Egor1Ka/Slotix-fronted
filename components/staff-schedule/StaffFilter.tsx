@@ -7,7 +7,6 @@ import {
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
-	SelectValue,
 } from '@/components/ui/select'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import type { OrgStaffMember } from '@/services/configs/booking.types'
@@ -43,6 +42,9 @@ function StaffOptionContent({ member }: { member: OrgStaffMember }) {
 	)
 }
 
+const findById = (staff: OrgStaffMember[], id: string | null): OrgStaffMember | undefined =>
+	staff.find((member) => member.id === id)
+
 function StaffFilter({ staff, selectedId, onSelect }: StaffFilterProps) {
 	const t = useTranslations('staffSchedule')
 
@@ -52,10 +54,12 @@ function StaffFilter({ staff, selectedId, onSelect }: StaffFilterProps) {
 	}
 
 	const renderStaffOption = (member: OrgStaffMember) => (
-		<SelectItem key={member.id} value={member.id} label={member.name}>
+		<SelectItem key={member.id} value={member.id}>
 			<StaffOptionContent member={member} />
 		</SelectItem>
 	)
+
+	const selectedMember = findById(staff, selectedId)
 
 	return (
 		<div data-slot="staff-filter" className="flex items-center gap-2">
@@ -65,7 +69,13 @@ function StaffFilter({ staff, selectedId, onSelect }: StaffFilterProps) {
 				onValueChange={handleValueChange}
 			>
 				<SelectTrigger className="w-full max-w-sm">
-					<SelectValue placeholder={t('selectStaff')} />
+					{selectedMember ? (
+						<StaffOptionContent member={selectedMember} />
+					) : (
+						<span className="text-muted-foreground">
+							{t('selectStaff')}
+						</span>
+					)}
 				</SelectTrigger>
 				<SelectContent>{staff.map(renderStaffOption)}</SelectContent>
 			</Select>
