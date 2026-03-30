@@ -37,6 +37,7 @@ import {
 	getMonthGrid,
 	addDays,
 	addMonths,
+	resolveOverlaps,
 } from './utils'
 
 const DEFAULT_VIEW_CONFIG: CalendarViewConfig = {
@@ -67,6 +68,7 @@ interface CalendarCoreProps {
 	workStart: string
 	workEnd: string
 	disabledDays?: number[]
+	isDayOff?: boolean
 	staffTabsSlot?: React.ReactNode
 	columnHeaderSlot?: (dayDate: string, index: number) => React.ReactNode
 	publicUrl?: string
@@ -86,6 +88,30 @@ const useSafeViewConfig = (): CalendarViewConfig => {
 	}
 }
 
+const OVERLAP_GAP_PX = 2
+
+interface OverlapStyle {
+	width: string
+	left: string
+}
+
+const getOverlapStyle = (
+	block: CalendarBlock,
+	baseLeftPx: number,
+	baseRightPx: number,
+): OverlapStyle | null => {
+	if (!block.totalColumns || block.totalColumns <= 1) return null
+	const col = block.column ?? 0
+	const total = block.totalColumns
+	const availableWidth = `100% - ${baseLeftPx + baseRightPx}px`
+	const colWidth = `(${availableWidth}) / ${total}`
+	const gapOffset = `${OVERLAP_GAP_PX / 2}px`
+	return {
+		width: `calc(${colWidth} - ${OVERLAP_GAP_PX}px)`,
+		left: `calc(${baseLeftPx}px + ${col} * (${colWidth}) + ${gapOffset})`,
+	}
+}
+
 function CalendarCore({
 	date,
 	view,
@@ -95,6 +121,7 @@ function CalendarCore({
 	workStart,
 	workEnd,
 	disabledDays = [],
+	isDayOff = false,
 	staffTabsSlot,
 	columnHeaderSlot,
 	publicUrl,
@@ -149,11 +176,14 @@ function CalendarCore({
 			block.onClick?.()
 		}
 
+		const overlap = getOverlapStyle(block, 48, 0)
+
 		return (
 			<div
 				key={block.id}
 				className={cn(
-					'absolute right-0 left-12 overflow-hidden rounded-md px-2 py-1 text-xs text-white',
+					'absolute overflow-hidden rounded-md px-2 py-1 text-xs text-white',
+					!overlap && 'right-0 left-12',
 					viewConfig.onBlockClick === 'open-booking-details' &&
 						'cursor-pointer',
 				)}
@@ -162,6 +192,7 @@ function CalendarCore({
 					height: durationToPx(block.duration),
 					backgroundColor: block.color,
 					opacity: block.opacity ?? 1,
+					...(overlap && { width: overlap.width, left: overlap.left }),
 				}}
 				onClick={handleBlockClick}
 			>
@@ -227,7 +258,9 @@ function CalendarCore({
 		const workEndMin = timeToMin(workEnd)
 		const workTopPx = minutesToPx(workStartMin, grid.displayStart)
 		const workHeightPx = durationToPx(workEndMin - workStartMin)
-		const blocks = strategy.getBlocks(date)
+		const isInGridRange = (block: CalendarBlock): boolean =>
+			block.startMin + block.duration > grid.displayStart
+		const blocks = resolveOverlaps(strategy.getBlocks(date)).filter(isInGridRange)
 
 		const handleGridClick = (e: React.MouseEvent<HTMLDivElement>) => {
 			if (viewConfig.onEmptyCellClick === 'none') return
@@ -246,12 +279,14 @@ function CalendarCore({
 				onClick={handleGridClick}
 			>
 				<div className="bg-muted/30 absolute inset-0 left-12 rounded-md" />
-				<div
-					className="bg-card absolute right-0 left-12 rounded-md"
-					style={{ top: workTopPx, height: workHeightPx }}
-				/>
+				{!isDayOff && (
+					<div
+						className="bg-card absolute right-0 left-12 rounded-md"
+						style={{ top: workTopPx, height: workHeightPx }}
+					/>
+				)}
 				{grid.hourLabels.map(renderHourLine)}
-				{blocks.map(renderBlock)}
+				{!isDayOff && blocks.map(renderBlock)}
 			</div>
 		)
 	}
@@ -336,15 +371,21 @@ function CalendarCore({
 				block.onClick?.()
 			}
 
+			const overlap = getOverlapStyle(block, 2, 2)
+
 			return (
 				<div
 					key={block.id}
-					className="absolute inset-x-0.5 overflow-hidden rounded-sm px-0.5 text-[10px] leading-tight text-white"
+					className={cn(
+						'absolute overflow-hidden rounded-sm px-0.5 text-[10px] leading-tight text-white',
+						!overlap && 'inset-x-0.5',
+					)}
 					style={{
 						top: minutesToPx(block.startMin, grid.displayStart),
 						height: durationToPx(block.duration),
 						backgroundColor: block.color,
 						opacity: block.opacity ?? 1,
+						...(overlap && { width: overlap.width, left: overlap.left }),
 					}}
 					onClick={handleWeekBlockClick}
 				>
@@ -398,7 +439,7 @@ function CalendarCore({
 
 		const renderDayColumn = (dayDate: string) => {
 			const isDisabled = isDayDisabled(dayDate)
-			const blocks = isDisabled ? [] : strategy.getBlocks(dayDate)
+			const blocks = isDisabled ? [] : resolveOverlaps(strategy.getBlocks(dayDate))
 			const isToday = dayDate === today
 			const handleClick = () => {
 				if (isDisabled) return
