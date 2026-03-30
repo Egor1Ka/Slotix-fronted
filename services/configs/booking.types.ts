@@ -36,6 +36,9 @@ interface EventType {
 	currency: string
 	color: string
 	description: string | null
+	staffPolicy: 'any' | 'by_position' | 'specific'
+	assignedPositions: string[]
+	assignedStaff: string[]
 }
 
 // ── Schedule ──

@@ -158,6 +158,9 @@ const toFrontendEventType = (raw: BackendEventType): EventType => ({
 	currency: raw.price ? raw.price.currency : 'usd',
 	color: raw.color,
 	description: null,
+	staffPolicy: 'any',
+	assignedPositions: [],
+	assignedStaff: [],
 })
 
 const toFrontendWeeklyHours = (raw: BackendWeeklyHours): WeeklyHours => ({

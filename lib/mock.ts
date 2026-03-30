@@ -31,6 +31,9 @@ export const mockEventTypes: EventType[] = [
 		currency: 'UAH',
 		color: '#8B5CF6',
 		description: null,
+		staffPolicy: 'any',
+		assignedPositions: [],
+		assignedStaff: [],
 	},
 	{
 		id: '607f1f77bcf86cd799439002',
@@ -41,6 +44,9 @@ export const mockEventTypes: EventType[] = [
 		currency: 'UAH',
 		color: '#EC4899',
 		description: null,
+		staffPolicy: 'any',
+		assignedPositions: [],
+		assignedStaff: [],
 	},
 	{
 		id: '607f1f77bcf86cd799439003',
@@ -51,6 +57,9 @@ export const mockEventTypes: EventType[] = [
 		currency: 'UAH',
 		color: '#06B6D4',
 		description: null,
+		staffPolicy: 'any',
+		assignedPositions: [],
+		assignedStaff: [],
 	},
 	{
 		id: '607f1f77bcf86cd799439004',
@@ -61,6 +70,9 @@ export const mockEventTypes: EventType[] = [
 		currency: 'UAH',
 		color: '#F59E0B',
 		description: null,
+		staffPolicy: 'any',
+		assignedPositions: [],
+		assignedStaff: [],
 	},
 ]
 
