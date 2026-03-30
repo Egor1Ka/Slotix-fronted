@@ -25,8 +25,8 @@ const getInitials = (name: string): string =>
 		.toUpperCase()
 		.slice(0, 2)
 
-const renderStaffOption = (member: OrgStaffMember) => (
-	<SelectItem key={member.id} value={member.id}>
+function StaffOptionContent({ member }: { member: OrgStaffMember }) {
+	return (
 		<div className="flex items-center gap-2">
 			<Avatar className="size-5">
 				<AvatarImage src={member.avatar} alt={member.name} />
@@ -36,13 +36,11 @@ const renderStaffOption = (member: OrgStaffMember) => (
 			</Avatar>
 			<span>{member.name}</span>
 			{member.position && (
-				<span className="text-muted-foreground text-xs">
-					{member.position}
-				</span>
+				<span className="text-muted-foreground text-xs">{member.position}</span>
 			)}
 		</div>
-	</SelectItem>
-)
+	)
+}
 
 function StaffFilter({ staff, selectedId, onSelect }: StaffFilterProps) {
 	const t = useTranslations('staffSchedule')
@@ -52,14 +50,18 @@ function StaffFilter({ staff, selectedId, onSelect }: StaffFilterProps) {
 		onSelect(value)
 	}
 
+	const renderStaffOption = (member: OrgStaffMember) => (
+		<SelectItem key={member.id} value={member.id} label={member.name}>
+			<StaffOptionContent member={member} />
+		</SelectItem>
+	)
+
 	return (
 		<Select value={selectedId ?? undefined} onValueChange={handleValueChange}>
 			<SelectTrigger className="w-full max-w-sm">
 				<SelectValue placeholder={t('selectStaff')} />
 			</SelectTrigger>
-			<SelectContent>
-				{staff.map(renderStaffOption)}
-			</SelectContent>
+			<SelectContent>{staff.map(renderStaffOption)}</SelectContent>
 		</Select>
 	)
 }

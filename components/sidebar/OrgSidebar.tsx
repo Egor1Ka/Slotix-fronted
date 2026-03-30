@@ -4,7 +4,15 @@ import { usePathname, useParams } from 'next/navigation'
 import { useLocale, useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
-import { Calendar, ArrowLeft, Users, Briefcase, Settings2, ClipboardList } from 'lucide-react'
+import {
+	Calendar,
+	ArrowLeft,
+	Users,
+	Briefcase,
+	Settings2,
+	ClipboardList,
+	CalendarDays,
+} from 'lucide-react'
 import {
 	Sidebar,
 	SidebarContent,
@@ -72,6 +80,7 @@ function OrgSidebar() {
 	const positionsHref = buildHref(`/manage/${orgId}/positions`)
 	const servicesHref = buildHref(`/manage/${orgId}/services`)
 	const staffScheduleHref = buildHref(`/manage/${orgId}/staff-schedule`)
+	const myScheduleHref = buildHref(`/org/${orgId}/my-schedule`)
 	const orgsHref = buildHref('/organizations')
 
 	const getInitial = (name: string): string => name.charAt(0).toUpperCase()
@@ -103,11 +112,7 @@ function OrgSidebar() {
 					{org ? (
 						<>
 							{org.logo ? (
-								<img
-									src={org.logo}
-									alt={org.name}
-									className="size-6 rounded"
-								/>
+								<img src={org.logo} alt={org.name} className="size-6 rounded" />
 							) : (
 								<div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded text-xs font-bold">
 									{getInitial(org.name)}
@@ -151,15 +156,24 @@ function OrgSidebar() {
 									<span>{t('services')}</span>
 								</SidebarMenuButton>
 							</SidebarMenuItem>
-						<SidebarMenuItem>
-							<SidebarMenuButton
-								render={<Link href={staffScheduleHref} />}
-								isActive={isActive(staffScheduleHref)}
-							>
-								<ClipboardList className="size-4" />
-								<span>{t('staffSchedule')}</span>
-							</SidebarMenuButton>
-						</SidebarMenuItem>
+							<SidebarMenuItem>
+								<SidebarMenuButton
+									render={<Link href={staffScheduleHref} />}
+									isActive={isActive(staffScheduleHref)}
+								>
+									<ClipboardList className="size-4" />
+									<span>{t('staffSchedule')}</span>
+								</SidebarMenuButton>
+							</SidebarMenuItem>
+							<SidebarMenuItem>
+								<SidebarMenuButton
+									render={<Link href={myScheduleHref} />}
+									isActive={isActive(myScheduleHref)}
+								>
+									<CalendarDays className="size-4" />
+									<span>{t('mySchedule')}</span>
+								</SidebarMenuButton>
+							</SidebarMenuItem>
 						</SidebarMenu>
 					</SidebarGroupContent>
 				</SidebarGroup>
