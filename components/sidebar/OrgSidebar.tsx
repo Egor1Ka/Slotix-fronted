@@ -4,7 +4,7 @@ import { usePathname, useParams } from 'next/navigation'
 import { useLocale, useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
-import { Calendar, ArrowLeft, Users } from 'lucide-react'
+import { Calendar, ArrowLeft, Users, Briefcase, Settings2 } from 'lucide-react'
 import {
 	Sidebar,
 	SidebarContent,
@@ -69,6 +69,8 @@ function OrgSidebar() {
 
 	// Используем /manage/ для админских маршрутов орги (отличается от /org/ для публичных)
 	const orgScheduleHref = buildHref(`/manage/${orgId}`)
+	const positionsHref = buildHref(`/manage/${orgId}/positions`)
+	const servicesHref = buildHref(`/manage/${orgId}/services`)
 	const orgsHref = buildHref('/organizations')
 
 	const getInitial = (name: string): string => name.charAt(0).toUpperCase()
@@ -128,6 +130,24 @@ function OrgSidebar() {
 								>
 									<Calendar className="size-4" />
 									<span>{t('generalSchedule')}</span>
+								</SidebarMenuButton>
+							</SidebarMenuItem>
+							<SidebarMenuItem>
+								<SidebarMenuButton
+									render={<Link href={positionsHref} />}
+									isActive={isActive(positionsHref)}
+								>
+									<Briefcase className="size-4" />
+									<span>{t('positions')}</span>
+								</SidebarMenuButton>
+							</SidebarMenuItem>
+							<SidebarMenuItem>
+								<SidebarMenuButton
+									render={<Link href={servicesHref} />}
+									isActive={isActive(servicesHref)}
+								>
+									<Settings2 className="size-4" />
+									<span>{t('services')}</span>
 								</SidebarMenuButton>
 							</SidebarMenuItem>
 						</SidebarMenu>
