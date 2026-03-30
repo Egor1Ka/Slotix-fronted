@@ -4,7 +4,7 @@ import { usePathname, useParams } from 'next/navigation'
 import { useLocale, useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
-import { Calendar, ArrowLeft, Users, Briefcase, Settings2 } from 'lucide-react'
+import { Calendar, ArrowLeft, Users, Briefcase, Settings2, ClipboardList } from 'lucide-react'
 import {
 	Sidebar,
 	SidebarContent,
@@ -71,6 +71,7 @@ function OrgSidebar() {
 	const orgScheduleHref = buildHref(`/manage/${orgId}`)
 	const positionsHref = buildHref(`/manage/${orgId}/positions`)
 	const servicesHref = buildHref(`/manage/${orgId}/services`)
+	const staffScheduleHref = buildHref(`/manage/${orgId}/staff-schedule`)
 	const orgsHref = buildHref('/organizations')
 
 	const getInitial = (name: string): string => name.charAt(0).toUpperCase()
@@ -150,6 +151,15 @@ function OrgSidebar() {
 									<span>{t('services')}</span>
 								</SidebarMenuButton>
 							</SidebarMenuItem>
+						<SidebarMenuItem>
+							<SidebarMenuButton
+								render={<Link href={staffScheduleHref} />}
+								isActive={isActive(staffScheduleHref)}
+							>
+								<ClipboardList className="size-4" />
+								<span>{t('staffSchedule')}</span>
+							</SidebarMenuButton>
+						</SidebarMenuItem>
 						</SidebarMenu>
 					</SidebarGroupContent>
 				</SidebarGroup>
