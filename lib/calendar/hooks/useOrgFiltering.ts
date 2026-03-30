@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { eventTypeApi } from '@/lib/booking-api-client'
 import type { EventType, OrgStaffMember } from '@/services/configs/booking.types'
 
@@ -9,6 +9,7 @@ interface UseOrgFilteringProps {
 	allStaff: OrgStaffMember[]
 	selectedStaffId: string | null
 	selectedEventTypeId: string | null
+	workingStaffIds: string[]
 	onStaffAutoSelect: (staffId: string) => void
 }
 
@@ -31,11 +32,15 @@ const isStaffAllowed = (allowedStaff: OrgStaffMember[]) => (staff: OrgStaffMembe
 const isInOrgSet = (orgIds: Set<string>) => (eventType: EventType): boolean =>
 	orgIds.has(eventType.id)
 
+// Строит ключ из массива ID для сравнения (отсортированный)
+const buildStaffKey = (ids: string[]): string => [...ids].sort().join(',')
+
 const useOrgFiltering = ({
 	orgId,
 	allStaff,
 	selectedStaffId,
 	selectedEventTypeId,
+	workingStaffIds,
 	onStaffAutoSelect,
 }: UseOrgFilteringProps): UseOrgFilteringResult => {
 	// Все услуги организации (загружаются один раз)
@@ -44,10 +49,13 @@ const useOrgFiltering = ({
 	const [staffEventTypes, setStaffEventTypes] = useState<EventType[]>([])
 	// Сотрудники для текущей выбранной услуги
 	const [eventTypeStaff, setEventTypeStaff] = useState<OrgStaffMember[] | null>(null)
+	// ID услуг, доступных у работающих сегодня сотрудников
+	const [workingStaffEventTypeIds, setWorkingStaffEventTypeIds] = useState<Set<string> | null>(null)
 	const [loading, setLoading] = useState(false)
 	const lastStaffIdRef = useRef<string | null>(null)
 	const lastEventTypeIdRef = useRef<string | null>(null)
 	const lastOrgIdRef = useRef<string | null>(null)
+	const lastWorkingStaffKeyRef = useRef<string | null>(null)
 
 	// Загружаем все услуги организации при монтировании / смене orgId
 	useEffect(() => {
@@ -117,12 +125,12 @@ const useOrgFiltering = ({
 				setEventTypeStaff(staff)
 
 				// Если текущий сотрудник не может выполнять эту услугу — автовыбор первого
-				const currentStaffCanPerform = selectedStaffId
-					? staff.some(matchesStaffId(selectedStaffId))
-					: false
-
-				if (!currentStaffCanPerform && staff.length > 0) {
-					onStaffAutoSelect(staff[0].id)
+				// Если никто не выбран (null) — не форсируем выбор
+				if (selectedStaffId) {
+					const currentStaffCanPerform = staff.some(matchesStaffId(selectedStaffId))
+					if (!currentStaffCanPerform && staff.length > 0) {
+						onStaffAutoSelect(staff[0].id)
+					}
 				}
 			} catch {
 				setEventTypeStaff(null)
@@ -134,13 +142,59 @@ const useOrgFiltering = ({
 		loadStaff()
 	}, [selectedEventTypeId, selectedStaffId, onStaffAutoSelect])
 
+	// Загружаем услуги всех работающих сегодня сотрудников (когда никто конкретный не выбран)
+	useEffect(() => {
+		if (allOrgEventTypes.length === 0 || workingStaffIds.length === 0) {
+			setWorkingStaffEventTypeIds(null)
+			lastWorkingStaffKeyRef.current = null
+			return
+		}
+
+		const currentKey = buildStaffKey(workingStaffIds)
+		if (lastWorkingStaffKeyRef.current === currentKey) return
+		lastWorkingStaffKeyRef.current = currentKey
+
+		const loadWorkingStaffEventTypes = async () => {
+			try {
+				const fetchStaffEventTypes = (staffId: string) =>
+					eventTypeApi.getByStaff(staffId)
+
+				const allTypesArrays = await Promise.all(
+					workingStaffIds.map(fetchStaffEventTypes),
+				)
+
+				const orgIds = new Set(allOrgEventTypes.map((et) => et.id))
+				const collectId = (acc: Set<string>, types: EventType[]): Set<string> => {
+					const addOrgType = (et: EventType) => {
+						if (orgIds.has(et.id)) acc.add(et.id)
+					}
+					types.forEach(addOrgType)
+					return acc
+				}
+
+				const availableIds = allTypesArrays.reduce(collectId, new Set<string>())
+				setWorkingStaffEventTypeIds(availableIds)
+			} catch {
+				setWorkingStaffEventTypeIds(null)
+			}
+		}
+
+		loadWorkingStaffEventTypes()
+	}, [workingStaffIds, allOrgEventTypes])
+
 	// Фильтрация сотрудников: если выбрана услуга — только подходящие
 	const filteredStaff = eventTypeStaff
 		? allStaff.filter(isStaffAllowed(eventTypeStaff))
 		: allStaff
 
-	// Фильтрация услуг: если выбран сотрудник — его org-услуги, иначе все org-услуги
-	const filteredEventTypes = selectedStaffId ? staffEventTypes : allOrgEventTypes
+	// Фильтрация услуг: если выбран сотрудник — его org-услуги,
+	// иначе — только те org-услуги, которые может выполнить хотя бы один работающий сотрудник
+	const isAvailableToday = (et: EventType): boolean =>
+		workingStaffEventTypeIds ? workingStaffEventTypeIds.has(et.id) : true
+
+	const filteredEventTypes = selectedStaffId
+		? staffEventTypes
+		: allOrgEventTypes.filter(isAvailableToday)
 
 	return {
 		filteredStaff,

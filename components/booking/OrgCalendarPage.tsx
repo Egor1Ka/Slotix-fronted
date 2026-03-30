@@ -88,11 +88,19 @@ function OrgCalendarPage({ orgSlug, staffId: staffIdProp }: OrgCalendarPageProps
 		navigation.handleStaffAutoSelect(staffId)
 	}, [navigation])
 
+	// ID сотрудников, работающих в выбранный день — для фильтрации услуг
+	const toStaffId = (s: OrgStaffMember): string => s.id
+	const workingStaffIds = useMemo(
+		() => orgSchedules.getWorkingStaff(dateStr, staffList).map(toStaffId),
+		[orgSchedules, dateStr, staffList],
+	)
+
 	const filtering = useOrgFiltering({
 		orgId: orgSlug,
 		allStaff: staffList,
 		selectedStaffId,
 		selectedEventTypeId,
+		workingStaffIds,
 		onStaffAutoSelect: viewConfig.filterByStaffCapability ? handleStaffAutoSelect : () => {},
 	})
 
