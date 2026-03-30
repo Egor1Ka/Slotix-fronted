@@ -36,6 +36,8 @@ import authApiConfig from './configs/auth.config'
 import userApiConfig from './configs/user.config'
 import billingApiConfig from './configs/billing.config'
 import orgApiConfig from './configs/org.config'
+import positionApiConfig from './configs/position.config'
+import eventTypeApiConfig from './configs/event-type.config'
 
 const defaultInterceptors = {
 	interceptors: {
@@ -53,6 +55,14 @@ export const billingApi = createApiMethods(
 	defaultInterceptors,
 )
 export const orgApi = createApiMethods(orgApiConfig, defaultInterceptors)
+export const positionApi = createApiMethods(
+	positionApiConfig,
+	defaultInterceptors,
+)
+export const eventTypeApi = createApiMethods(
+	eventTypeApiConfig,
+	defaultInterceptors,
+)
 export type { User, UpdateUserBody } from './configs/user.config'
 export type {
 	Plan,
@@ -82,3 +92,13 @@ export type {
 	OrgStaffMember,
 } from './configs/booking.types'
 export type { OrgListItem, CreateOrgBody } from './configs/org.types'
+export type {
+	Position,
+	CreatePositionBody,
+	UpdatePositionBody,
+} from './configs/position.types'
+export type {
+	StaffPolicy,
+	CreateEventTypeBody,
+	UpdateEventTypeBody,
+} from './configs/event-type.types'
