@@ -58,16 +58,17 @@ const useStaffBookings = (
 			setError(null)
 
 			try {
-				const fetchStaffBookings = (staff: OrgStaffMember) =>
-					bookingApi.getByStaff(staff.id, range.from, range.to, eventTypes)
+				const fetchAndMap = async (staff: OrgStaffMember) => {
+					const staffBookings = await bookingApi.getByStaff(staff.id, range.from, range.to, eventTypes)
+					const mapWithStaff = toCalendarDisplayBooking({ name: staff.name, avatar: staff.avatar })
+					return staffBookings.map(mapWithStaff)
+				}
 
 				const bookingArrays = await Promise.all(
-					staffToLoad.map(fetchStaffBookings),
+					staffToLoad.map(fetchAndMap),
 				)
 
-				const allBookings = bookingArrays
-					.flat()
-					.map(toCalendarDisplayBooking)
+				const allBookings = bookingArrays.flat()
 
 				setBookings(allBookings)
 				loadedRangeRef.current = { ...range, view, staffKey }

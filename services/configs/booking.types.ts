@@ -155,6 +155,8 @@ interface CalendarDisplayBooking {
 	date: string
 	bookingId: string
 	status: BookingStatus
+	staffName: string
+	staffAvatar: string
 }
 
 export type {

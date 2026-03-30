@@ -16,16 +16,24 @@ const diffMinutes = (startISO: string, endISO: string): number => {
 	return Math.round((end - start) / 60000)
 }
 
-const toCalendarDisplayBooking = (
-	b: StaffBooking,
-): CalendarDisplayBooking => ({
-	startMin: timeToMinFromISO(b.startAt),
-	duration: diffMinutes(b.startAt, b.endAt),
-	label: `${b.eventTypeName} — ${b.invitee.name}`,
-	color: b.color,
-	date: dateFromISO(b.startAt),
-	bookingId: b.id,
-	status: b.status,
-})
+interface StaffInfo {
+	name: string
+	avatar: string
+}
 
+const toCalendarDisplayBooking =
+	(staff: StaffInfo) =>
+	(b: StaffBooking): CalendarDisplayBooking => ({
+		startMin: timeToMinFromISO(b.startAt),
+		duration: diffMinutes(b.startAt, b.endAt),
+		label: `${b.eventTypeName} — ${staff.name}`,
+		color: b.color,
+		date: dateFromISO(b.startAt),
+		bookingId: b.id,
+		status: b.status,
+		staffName: staff.name,
+		staffAvatar: staff.avatar,
+	})
+
+export type { StaffInfo }
 export { toCalendarDisplayBooking }
