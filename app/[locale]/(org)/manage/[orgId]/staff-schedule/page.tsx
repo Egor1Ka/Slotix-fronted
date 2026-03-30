@@ -66,7 +66,7 @@ export default function AdminStaffSchedulePage() {
 	}
 
 	return (
-		<div className="mx-auto w-full max-w-3xl space-y-6 px-4 py-6 sm:px-6">
+		<div className="max-w-3xl space-y-6 py-6">
 			<div className="space-y-4">
 				<h1 className="text-lg font-semibold">{t('staffSchedule')}</h1>
 				<StaffFilter
