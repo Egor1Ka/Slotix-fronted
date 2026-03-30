@@ -91,6 +91,7 @@ const useSafeViewConfig = (): CalendarViewConfig => {
 const OVERLAP_GAP_PX = 2
 const DAY_HOUR_LABEL_WIDTH_PX = 48
 const WEEK_BLOCK_INSET_PX = 2
+const SHORT_EVENT_THRESHOLD_MIN = 30
 
 interface OverlapStyle {
 	width: string
@@ -179,6 +180,7 @@ function CalendarCore({
 		}
 
 		const overlap = getOverlapStyle(block, DAY_HOUR_LABEL_WIDTH_PX, 0)
+		const isShort = block.duration <= SHORT_EVENT_THRESHOLD_MIN
 
 		return (
 			<div
@@ -198,10 +200,25 @@ function CalendarCore({
 				}}
 				onClick={handleBlockClick}
 			>
-				{block.label && (
-					<div className="truncate font-medium">{block.label}</div>
-				)}
-				{block.sublabel && <div className="opacity-80">{block.sublabel}</div>}
+				<div className={cn('flex items-center gap-1.5', isShort ? 'flex-row' : 'flex-col items-start')}>
+					<div className="flex min-w-0 items-center gap-1.5">
+						{block.avatarUrl && (
+							<img
+								src={block.avatarUrl}
+								alt=""
+								className="size-4 shrink-0 rounded-full object-cover"
+							/>
+						)}
+						{block.label && (
+							<span className="truncate font-medium">{block.label}</span>
+						)}
+					</div>
+					{block.sublabel && (
+						<span className={cn('shrink-0 opacity-80', isShort && 'before:content-[\"\\B7_\"]')}>
+							{block.sublabel}
+						</span>
+					)}
+				</div>
 			</div>
 		)
 	}
