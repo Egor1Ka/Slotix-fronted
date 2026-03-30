@@ -24,6 +24,7 @@ import {
 import type {
 	EventType,
 	ScheduleTemplate,
+	ScheduleOverride,
 	WeeklyHours,
 	CreateScheduleOverrideBody,
 	CalendarDisplayBooking,
@@ -40,11 +41,35 @@ import {
 } from '@/components/booking/BookingDetailsPanel'
 import type { BookingStatus } from '@/services/configs/booking.types'
 
+const normalizeDate = (d: string): string =>
+	d.includes('T') ? d.split('T')[0] : d
+
+const getBreakBookings = (
+	overridesList: ScheduleOverride[],
+	sid: string,
+	blockDate: string,
+): { startMin: number; duration: number }[] => {
+	const dateOnly = normalizeDate(blockDate)
+	const matchesStaffAndDate = (o: ScheduleOverride): boolean =>
+		o.staffId === sid && normalizeDate(o.date) === dateOnly
+	const override = overridesList.find(matchesStaffAndDate)
+	if (!override) return []
+	const isPartialDayOff = !override.enabled && override.slots.length > 0
+	if (!isPartialDayOff) return []
+	const toBreakBooking = (slot: { start: string; end: string }) => ({
+		startMin: timeToMin(slot.start),
+		duration: timeToMin(slot.end) - timeToMin(slot.start),
+	})
+	return override.slots.map(toBreakBooking)
+}
+
 interface StaffStrategyParams {
 	staffName: string
 	eventTypes: EventType[]
 	bookings: CalendarDisplayBooking[]
 	schedule: ScheduleTemplate
+	overrides?: ScheduleOverride[]
+	staffId?: string
 	selectedEventTypeId: string | null
 	selectedSlot: string | null
 	slotMode: SlotMode
@@ -77,6 +102,8 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 		eventTypes,
 		bookings,
 		schedule,
+		overrides: overridesList = [],
+		staffId: strategyStaffId,
 		selectedEventTypeId,
 		selectedSlot,
 		slotMode,
@@ -151,7 +178,12 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 
 			if (!selectedEventType || confirmedBooking) return bookingBlocks
 
-			const workHours = getWorkHoursForDate(schedule.weeklyHours, blockDate)
+			const workHours = getWorkHoursForDate(
+				schedule.weeklyHours,
+				blockDate,
+				strategyStaffId ? overridesList : undefined,
+				strategyStaffId,
+			)
 			if (!workHours) return bookingBlocks
 
 			const dayBookingsForSlots = getBookingsForDate(bookings, blockDate)
@@ -159,6 +191,13 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 				startMin: b.startMin,
 				duration: b.duration,
 			})
+			const breakBookings = strategyStaffId
+				? getBreakBookings(overridesList, strategyStaffId, blockDate)
+				: []
+			const allBookingsForSlots = [
+				...dayBookingsForSlots.map(toSlotEngine),
+				...breakBookings,
+			]
 
 			const slots = getAvailableSlots({
 				workStart: workHours.workStart,
@@ -166,7 +205,7 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 				duration: selectedEventType.durationMin,
 				slotStep: schedule.slotStepMin,
 				slotMode,
-				bookings: dayBookingsForSlots.map(toSlotEngine),
+				bookings: allBookingsForSlots,
 				minNotice: 0,
 				nowMin: 0,
 			})
@@ -208,7 +247,20 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 				]
 			})()
 
-			return [...bookingBlocks, ...dropZoneBlocks, ...pendingBlock]
+			const breakBlocks: CalendarBlock[] = strategyStaffId
+				? getBreakBookings(overridesList, strategyStaffId, blockDate).map(
+						(brk, index) => ({
+							id: `break-${blockDate}-${index}`,
+							startMin: brk.startMin,
+							duration: brk.duration,
+							date: blockDate,
+							color: '',
+							blockType: 'locked' as const,
+						}),
+					)
+				: []
+
+			return [...bookingBlocks, ...breakBlocks, ...dropZoneBlocks, ...pendingBlock]
 		},
 
 		renderSidebar() {
@@ -270,7 +322,12 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 		onCellClick(clickDate: string, startMin: number) {
 			if (!selectedEventType) return
 
-			const workHours = getWorkHoursForDate(schedule.weeklyHours, clickDate)
+			const workHours = getWorkHoursForDate(
+				schedule.weeklyHours,
+				clickDate,
+				strategyStaffId ? overridesList : undefined,
+				strategyStaffId,
+			)
 			if (!workHours) return
 
 			const dayBookingsForSlots = getBookingsForDate(bookings, clickDate)
@@ -278,6 +335,9 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 				startMin: b.startMin,
 				duration: b.duration,
 			})
+			const clickBreakBookings = strategyStaffId
+				? getBreakBookings(overridesList, strategyStaffId, clickDate)
+				: []
 
 			const slots = getAvailableSlots({
 				workStart: workHours.workStart,
@@ -285,7 +345,10 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 				duration: selectedEventType.durationMin,
 				slotStep: schedule.slotStepMin,
 				slotMode,
-				bookings: dayBookingsForSlots.map(toSlotEngine),
+				bookings: [
+					...dayBookingsForSlots.map(toSlotEngine),
+					...clickBreakBookings,
+				],
 				minNotice: 0,
 				nowMin: 0,
 			})

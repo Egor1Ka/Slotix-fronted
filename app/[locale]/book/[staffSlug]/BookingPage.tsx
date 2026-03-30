@@ -262,6 +262,8 @@ function BookingPage({ staffSlug, publicUrl }: BookingPageProps) {
 				eventTypes,
 				bookings,
 				schedule: scheduleSource,
+				overrides: staffOverrides,
+				staffId: staff?.id,
 				selectedEventTypeId,
 				selectedSlot: selectedSlotTime,
 				slotMode,
