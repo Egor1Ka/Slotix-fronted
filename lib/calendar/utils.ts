@@ -1,3 +1,5 @@
+import type { CalendarBlock } from './types'
+
 interface DateFilterable {
 	date: string
 }
@@ -219,6 +221,94 @@ const getStaffToLoad = <T extends StaffLike>(
 	return staffList.filter(filterByStaffId(selectedStaffId))
 }
 
+// ── Overlap Detection ──
+
+const isBooking = (block: CalendarBlock): boolean => block.blockType === 'booking'
+
+const blocksOverlap = (a: CalendarBlock, b: CalendarBlock): boolean =>
+	a.startMin < b.startMin + b.duration && b.startMin < a.startMin + a.duration
+
+const byStartThenDuration = (a: CalendarBlock, b: CalendarBlock): number =>
+	a.startMin !== b.startMin ? a.startMin - b.startMin : b.duration - a.duration
+
+const findFirstFreeColumn = (usedColumns: number[]): number => {
+	const sorted = [...usedColumns].sort((a, b) => a - b)
+	const findGap = (col: number, idx: number): boolean => col !== idx
+	const gapIdx = sorted.findIndex(findGap)
+	return gapIdx === -1 ? sorted.length : gapIdx
+}
+
+const buildOverlapGroups = (bookings: CalendarBlock[]): CalendarBlock[][] => {
+	const sorted = [...bookings].sort(byStartThenDuration)
+	const groups: CalendarBlock[][] = []
+	const visited = new Set<string>()
+
+	const collectGroup = (start: CalendarBlock): CalendarBlock[] => {
+		const group: CalendarBlock[] = [start]
+		visited.add(start.id)
+
+		const overlapsWithGroup = (block: CalendarBlock): boolean =>
+			group.some((member) => blocksOverlap(member, block))
+
+		let changed = true
+		while (changed) {
+			changed = false
+			sorted.forEach((block) => {
+				if (visited.has(block.id)) return
+				if (!overlapsWithGroup(block)) return
+				group.push(block)
+				visited.add(block.id)
+				changed = true
+			})
+		}
+
+		return group
+	}
+
+	sorted.forEach((block) => {
+		if (visited.has(block.id)) return
+		groups.push(collectGroup(block))
+	})
+
+	return groups
+}
+
+const assignColumns = (group: CalendarBlock[]): CalendarBlock[] => {
+	const sorted = [...group].sort(byStartThenDuration)
+	const assignments = new Map<string, number>()
+
+	sorted.forEach((block) => {
+		const overlapping = sorted.filter(
+			(other) => assignments.has(other.id) && blocksOverlap(block, other),
+		)
+		const usedColumns = overlapping.map((other) => assignments.get(other.id)!)
+		assignments.set(block.id, findFirstFreeColumn(usedColumns))
+	})
+
+	const maxColumn = Math.max(...Array.from(assignments.values())) + 1
+
+	const applyLayout = (block: CalendarBlock): CalendarBlock => ({
+		...block,
+		column: assignments.get(block.id)!,
+		totalColumns: maxColumn,
+	})
+
+	return sorted.map(applyLayout)
+}
+
+const resolveOverlaps = (blocks: CalendarBlock[]): CalendarBlock[] => {
+	const bookings = blocks.filter(isBooking)
+	const nonBookings = blocks.filter((b) => !isBooking(b))
+
+	if (bookings.length <= 1) return blocks
+
+	const groups = buildOverlapGroups(bookings)
+
+	const resolvedBookings = groups.flatMap(assignColumns)
+
+	return [...nonBookings, ...resolvedBookings]
+}
+
 export type { CalendarLocale, GridConfig }
 export {
 	PX_PER_HOUR,
@@ -242,4 +332,5 @@ export {
 	getFirstStaffId,
 	filterByStaffId,
 	getStaffToLoad,
+	resolveOverlaps,
 }
