@@ -12,8 +12,13 @@ import {
 } from '@/lib/calendar'
 import { useTranslations } from 'next-intl'
 import { useLocale } from 'next-intl'
+import { toast } from 'sonner'
 import { useViewConfig } from '@/lib/calendar/CalendarViewConfigContext'
-import { formatDateISO, getWorkHoursForDate, getFirstStaffId } from '@/lib/calendar/utils'
+import {
+	formatDateISO,
+	getWorkHoursForDate,
+	getFirstStaffId,
+} from '@/lib/calendar/utils'
 import { scheduleApi } from '@/lib/booking-api-client'
 import {
 	useStaffBySlug,
@@ -22,7 +27,10 @@ import {
 	useCalendarNavigation,
 	useBookingActions,
 } from '@/lib/calendar/hooks'
-import type { OrgStaffMember, ScheduleTemplate } from '@/services/configs/booking.types'
+import type {
+	OrgStaffMember,
+	ScheduleTemplate,
+} from '@/services/configs/booking.types'
 
 // ── Module-level constants ──
 
@@ -86,19 +94,32 @@ function BookingPage({ staffSlug, publicUrl }: BookingPageProps) {
 
 	// ── Data ──
 
-	const { staff, loading: staffLoading, error: staffError } =
-		useStaffBySlug(staffSlug)
+	const {
+		staff,
+		loading: staffLoading,
+		error: staffError,
+	} = useStaffBySlug(staffSlug)
 
-	const { eventTypes, schedule, reloadSchedule, loading: scheduleLoading, error: scheduleError } =
-		useStaffSchedule(staff?.id ?? null)
+	const {
+		eventTypes,
+		schedule,
+		overrides: staffOverrides,
+		reloadSchedule,
+		loading: scheduleLoading,
+		error: scheduleError,
+	} = useStaffSchedule(staff?.id ?? null)
 
 	const staffToLoad = useMemo(() => {
 		if (!staff) return []
 		return [toStaffMember(staff)]
 	}, [staff])
 
-	const { bookings, reloadBookings, loading: bookingsLoading, error: bookingsError } =
-		useStaffBookings(staffToLoad, dateStr, view, eventTypes)
+	const {
+		bookings,
+		reloadBookings,
+		loading: bookingsLoading,
+		error: bookingsError,
+	} = useStaffBookings(staffToLoad, dateStr, view, eventTypes)
 
 	const loading = staffLoading || scheduleLoading || bookingsLoading
 	const error = staffError || scheduleError || bookingsError
@@ -163,19 +184,35 @@ function BookingPage({ staffSlug, publicUrl }: BookingPageProps) {
 		weeklyHours: ScheduleTemplate['weeklyHours'],
 	) => {
 		if (!staff) return
-		await scheduleApi.updateTemplate(
-			staff.id,
-			schedule?.orgId ?? null,
-			weeklyHours,
-		)
-		reloadSchedule()
+		try {
+			await scheduleApi.updateTemplate(
+				staff.id,
+				schedule?.orgId ?? null,
+				weeklyHours,
+			)
+			reloadSchedule()
+			toast.success(tCalendar('scheduleSaved'))
+		} catch (err) {
+			const message =
+				err instanceof Error ? err.message : tCalendar('scheduleSaveError')
+			toast.error(message)
+			throw err
+		}
 	}
 
 	const handleSaveOverride = async (
 		body: Parameters<typeof scheduleApi.createOverride>[0],
 	) => {
-		await scheduleApi.createOverride(body)
-		reloadSchedule()
+		try {
+			await scheduleApi.createOverride(body)
+			reloadSchedule()
+			toast.success(tCalendar('overrideSaved'))
+		} catch (err) {
+			const message =
+				err instanceof Error ? err.message : tCalendar('overrideSaveError')
+			toast.error(message)
+			throw err
+		}
 	}
 
 	// ── Client confirm (no client info) ──
@@ -201,9 +238,7 @@ function BookingPage({ staffSlug, publicUrl }: BookingPageProps) {
 	if (error || !staff) {
 		return (
 			<div className="flex items-center justify-center py-20">
-				<p className="text-destructive text-sm">
-					{error ?? t('loadError')}
-				</p>
+				<p className="text-destructive text-sm">{error ?? t('loadError')}</p>
 			</div>
 		)
 	}
@@ -246,11 +281,14 @@ function BookingPage({ staffSlug, publicUrl }: BookingPageProps) {
 				onCloseBooking: bookingActions.handleBookingClose,
 				onBookingStatusChange: bookingActions.handleBookingStatusChange,
 				onBookingReschedule: bookingActions.handleBookingReschedule,
+				showScheduleEditor: viewConfig.showScheduleEditor,
 			})
 		: createClientStrategy({
 				eventTypes,
 				bookings,
 				schedule: scheduleSource,
+				overrides: staffOverrides,
+				staffId: staff.id,
 				staffName: staff.name,
 				locale,
 				selectedEventTypeId,

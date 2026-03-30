@@ -49,6 +49,7 @@ const DEFAULT_VIEW_CONFIG: CalendarViewConfig = {
 	onBlockClick: 'none',
 	canBookForClient: false,
 	filterByStaffCapability: false,
+	showScheduleEditor: false,
 }
 
 type ViewOption = { value: ViewMode; labelKey: string }
@@ -200,7 +201,12 @@ function CalendarCore({
 				}}
 				onClick={handleBlockClick}
 			>
-				<div className={cn('flex items-center gap-1.5', isShort ? 'flex-row' : 'flex-col items-start')}>
+				<div
+					className={cn(
+						'flex items-center gap-1.5',
+						isShort ? 'flex-row' : 'flex-col items-start',
+					)}
+				>
 					<div className="flex min-w-0 items-center gap-1.5">
 						{block.avatarUrl && (
 							<img
@@ -214,7 +220,12 @@ function CalendarCore({
 						)}
 					</div>
 					{block.sublabel && (
-						<span className={cn('shrink-0 opacity-80', isShort && 'before:content-[\"\\B7_\"]')}>
+						<span
+							className={cn(
+								'shrink-0 opacity-80',
+								isShort && 'before:content-[\"\\B7_\"]',
+							)}
+						>
 							{block.sublabel}
 						</span>
 					)}
@@ -249,10 +260,29 @@ function CalendarCore({
 			)
 		}
 
+		if (block.blockType === 'locked') {
+			return (
+				<div
+					key={block.id}
+					className="bg-muted/40 absolute right-0 left-12 rounded-md"
+					style={{
+						top: minutesToPx(block.startMin, grid.displayStart),
+						height: durationToPx(block.duration),
+					}}
+				/>
+			)
+		}
+
 		if (block.blockType === 'booking') {
 			if (viewConfig.blockedTimeVisibility === 'hidden') return null
 			if (viewConfig.blockedTimeVisibility === 'grey')
-				return <GreyBlock key={block.id} block={block} displayStart={grid.displayStart} />
+				return (
+					<GreyBlock
+						key={block.id}
+						block={block}
+						displayStart={grid.displayStart}
+					/>
+				)
 			return renderBookingBlock(block)
 		}
 
@@ -279,7 +309,9 @@ function CalendarCore({
 		const workHeightPx = durationToPx(workEndMin - workStartMin)
 		const isInGridRange = (block: CalendarBlock): boolean =>
 			block.startMin + block.duration > grid.displayStart
-		const blocks = resolveOverlaps(strategy.getBlocks(date)).filter(isInGridRange)
+		const blocks = resolveOverlaps(strategy.getBlocks(date)).filter(
+			isInGridRange,
+		)
 
 		const handleGridClick = (e: React.MouseEvent<HTMLDivElement>) => {
 			if (viewConfig.onEmptyCellClick === 'none') return
@@ -363,6 +395,19 @@ function CalendarCore({
 				)
 			}
 
+			if (block.blockType === 'locked') {
+				return (
+					<div
+						key={block.id}
+						className="bg-muted/40 pointer-events-none absolute inset-x-0.5 rounded-sm"
+						style={{
+							top: minutesToPx(block.startMin, grid.displayStart),
+							height: durationToPx(block.duration),
+						}}
+					/>
+				)
+			}
+
 			if (block.blockType === 'booking') {
 				if (viewConfig.blockedTimeVisibility === 'hidden') return null
 				if (viewConfig.blockedTimeVisibility === 'grey') {
@@ -382,15 +427,16 @@ function CalendarCore({
 
 			const handleWeekBlockClick = (e: React.MouseEvent) => {
 				e.stopPropagation()
-				if (
-					block.blockType === 'booking' &&
-					viewConfig.onBlockClick === 'none'
-				)
+				if (block.blockType === 'booking' && viewConfig.onBlockClick === 'none')
 					return
 				block.onClick?.()
 			}
 
-			const overlap = getOverlapStyle(block, WEEK_BLOCK_INSET_PX, WEEK_BLOCK_INSET_PX)
+			const overlap = getOverlapStyle(
+				block,
+				WEEK_BLOCK_INSET_PX,
+				WEEK_BLOCK_INSET_PX,
+			)
 
 			return (
 				<div
@@ -435,17 +481,16 @@ function CalendarCore({
 						isDisabled && 'opacity-40',
 					)}
 				>
-					<div className="text-muted-foreground">{calendarLocale.daysShort[index]}</div>
+					<div className="text-muted-foreground">
+						{calendarLocale.daysShort[index]}
+					</div>
 					<div
 						className={cn(
 							'mx-auto mt-0.5 flex size-6 items-center justify-center rounded-full',
 							isToday &&
 								!isDisabled &&
 								'bg-primary text-primary-foreground font-medium',
-							!isToday &&
-								isSelected &&
-								!isDisabled &&
-								'bg-accent font-medium',
+							!isToday && isSelected && !isDisabled && 'bg-accent font-medium',
 						)}
 					>
 						{dayNum}
@@ -458,7 +503,9 @@ function CalendarCore({
 
 		const renderDayColumn = (dayDate: string) => {
 			const isDisabled = isDayDisabled(dayDate)
-			const blocks = isDisabled ? [] : resolveOverlaps(strategy.getBlocks(dayDate))
+			const blocks = isDisabled
+				? []
+				: resolveOverlaps(strategy.getBlocks(dayDate))
 			const isToday = dayDate === today
 			const handleClick = () => {
 				if (isDisabled) return
@@ -544,6 +591,10 @@ function CalendarCore({
 			const isToday = cellDate === today
 			const dayNum = new Date(cellDate + 'T00:00:00').getDate()
 			const handleClick = () => {
+				if (onDayClick) {
+					onDayClick(cellDate)
+					return
+				}
 				onDateChange(cellDate)
 				onViewChange('day')
 			}

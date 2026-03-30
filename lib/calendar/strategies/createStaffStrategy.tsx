@@ -21,14 +21,23 @@ import {
 	type SlotMode,
 	type Slot,
 } from '@/lib/slot-engine'
-import type { EventType, ScheduleTemplate, WeeklyHours, CreateScheduleOverrideBody, CalendarDisplayBooking } from '@/services/configs/booking.types'
+import type {
+	EventType,
+	ScheduleTemplate,
+	WeeklyHours,
+	CreateScheduleOverrideBody,
+	CalendarDisplayBooking,
+} from '@/services/configs/booking.types'
 import { ServiceList } from '@/components/booking/ServiceList'
 import { SlotModeSelector } from '@/components/booking/SlotModeSelector'
 import { StaffBookingPanel } from '@/components/booking/StaffBookingPanel'
 import { ScheduleSheetButton } from '@/components/booking/ScheduleSheetButton'
 import { Separator } from '@/components/ui/separator'
 import type { ClientInfoData } from '@/components/booking/ClientInfoForm'
-import { BookingDetailsPanel, type BookingDetail } from '@/components/booking/BookingDetailsPanel'
+import {
+	BookingDetailsPanel,
+	type BookingDetail,
+} from '@/components/booking/BookingDetailsPanel'
 import type { BookingStatus } from '@/services/configs/booking.types'
 
 interface StaffStrategyParams {
@@ -53,9 +62,13 @@ interface StaffStrategyParams {
 	onBookingClick?: (bookingId: string) => void
 	selectedBooking?: BookingDetail | null
 	onCloseBooking?: () => void
-	onBookingStatusChange?: (bookingId: string, newStatus: BookingStatus) => Promise<void>
+	onBookingStatusChange?: (
+		bookingId: string,
+		newStatus: BookingStatus,
+	) => Promise<void>
 	onBookingReschedule?: (bookingId: string, newStartAt: string) => Promise<void>
 	locale: string
+	showScheduleEditor?: boolean
 }
 
 const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
@@ -84,6 +97,7 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 		onBookingStatusChange,
 		onBookingReschedule,
 		locale,
+		showScheduleEditor = false,
 	} = params
 
 	const calendarLocale = getCalendarLocale(locale)
@@ -137,7 +151,7 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 
 			if (!selectedEventType || confirmedBooking) return bookingBlocks
 
-			const workHours = getWorkHoursForDate(schedule.weeklyHours,blockDate)
+			const workHours = getWorkHoursForDate(schedule.weeklyHours, blockDate)
 			if (!workHours) return bookingBlocks
 
 			const dayBookingsForSlots = getBookingsForDate(bookings, blockDate)
@@ -207,19 +221,26 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 					/>
 					<Separator className="my-4" />
 					<SlotModeSelector value={slotMode} onChange={onModeChange} />
-					<Separator className="my-4" />
-					<ScheduleSheetButton
-						schedule={schedule}
-						onSaveSchedule={onSaveSchedule}
-						onSaveOverride={onSaveOverride}
-					/>
+					{showScheduleEditor && (
+						<>
+							<Separator className="my-4" />
+							<ScheduleSheetButton
+								schedule={schedule}
+								onSaveSchedule={onSaveSchedule}
+								onSaveOverride={onSaveOverride}
+							/>
+						</>
+					)}
 				</>
 			)
 		},
 
 		renderPanel() {
 			if (selectedBooking && onCloseBooking && onBookingStatusChange) {
-				const bookingEventType = findEventType(eventTypes, selectedBooking.eventTypeId)
+				const bookingEventType = findEventType(
+					eventTypes,
+					selectedBooking.eventTypeId,
+				)
 				return (
 					<BookingDetailsPanel
 						booking={selectedBooking}
@@ -249,7 +270,7 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 		onCellClick(clickDate: string, startMin: number) {
 			if (!selectedEventType) return
 
-			const workHours = getWorkHoursForDate(schedule.weeklyHours,clickDate)
+			const workHours = getWorkHoursForDate(schedule.weeklyHours, clickDate)
 			if (!workHours) return
 
 			const dayBookingsForSlots = getBookingsForDate(bookings, clickDate)
@@ -280,7 +301,8 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 		getTitle(titleDate: string, view: ViewMode): string {
 			if (view === 'week')
 				return `${staffName} — ${formatWeekRange(getWeekDates(titleDate), calendarLocale)}`
-			if (view === 'month') return `${staffName} — ${formatMonth(titleDate, calendarLocale)}`
+			if (view === 'month')
+				return `${staffName} — ${formatMonth(titleDate, calendarLocale)}`
 			return `${staffName} — ${formatDateLocale(titleDate, calendarLocale)}`
 		},
 	}
