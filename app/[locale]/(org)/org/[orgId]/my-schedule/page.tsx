@@ -7,7 +7,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { StaffScheduleTabs } from '@/components/staff-schedule/StaffScheduleTabs'
 import { useUser } from '@/lib/auth/user-provider'
 import { orgApi } from '@/lib/booking-api-client'
-import type { OrgStaffMember, OrgByIdResponse } from '@/services/configs/booking.types'
+import type { OrgStaffMember } from '@/services/configs/booking.types'
 
 export default function MySchedulePage() {
 	const params = useParams<{ orgId: string }>()
@@ -64,11 +64,7 @@ export default function MySchedulePage() {
 				{t('mySchedule')} — {orgName}
 			</h1>
 
-			<StaffScheduleTabs
-				staffId={staffId}
-				orgId={orgId}
-				readOnly={false}
-			/>
+			<StaffScheduleTabs staffId={staffId} orgId={orgId} readOnly={false} />
 		</div>
 	)
 }

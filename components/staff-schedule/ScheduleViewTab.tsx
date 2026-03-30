@@ -1,13 +1,16 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { useTranslations, useLocale } from 'next-intl'
+import { useLocale } from 'next-intl'
 import { Spinner } from '@/components/ui/spinner'
 import { Separator } from '@/components/ui/separator'
 import { ScheduleEditor } from '@/components/booking/ScheduleEditor'
 import { getCalendarLocale } from '@/lib/calendar/utils'
 import { scheduleApi } from '@/lib/booking-api-client'
-import type { ScheduleTemplate, WeeklyHours } from '@/services/configs/booking.types'
+import type {
+	ScheduleTemplate,
+	WeeklyHours,
+} from '@/services/configs/booking.types'
 
 interface ScheduleViewTabProps {
 	staffId: string
@@ -26,7 +29,10 @@ function ReadOnlySchedule({ schedule }: { schedule: ScheduleTemplate }) {
 		const dayName = calendarLocale.daysLong[day.dayOfWeek]
 
 		return (
-			<div key={day.dayOfWeek} className="flex items-center justify-between py-2">
+			<div
+				key={day.dayOfWeek}
+				className="flex items-center justify-between py-2"
+			>
 				<span className="text-sm font-medium">{dayName}</span>
 				{day.enabled ? (
 					<span className="text-sm">{formatSlots(day.slots)}</span>
@@ -50,7 +56,6 @@ function ReadOnlySchedule({ schedule }: { schedule: ScheduleTemplate }) {
 }
 
 function ScheduleViewTab({ staffId, orgId, readOnly }: ScheduleViewTabProps) {
-	const t = useTranslations('booking')
 	const [schedule, setSchedule] = useState<ScheduleTemplate | null>(null)
 	const [loading, setLoading] = useState(true)
 

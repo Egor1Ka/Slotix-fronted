@@ -10,7 +10,10 @@ import { Spinner } from '@/components/ui/spinner'
 import { ScheduleOverrideForm } from '@/components/booking/ScheduleOverrideForm'
 import { OverrideListItem } from './OverrideListItem'
 import { scheduleApi } from '@/lib/booking-api-client'
-import type { ScheduleOverride, CreateScheduleOverrideBody } from '@/services/configs/booking.types'
+import type {
+	ScheduleOverride,
+	CreateScheduleOverrideBody,
+} from '@/services/configs/booking.types'
 
 interface OverridesTabProps {
 	staffId: string
@@ -27,6 +30,7 @@ const sortByDate = (a: ScheduleOverride, b: ScheduleOverride): number =>
 const sortByDateDesc = (a: ScheduleOverride, b: ScheduleOverride): number =>
 	new Date(b.date).getTime() - new Date(a.date).getTime()
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function OverridesTab({ staffId, orgId, readOnly }: OverridesTabProps) {
 	const t = useTranslations('staffSchedule')
 	const [overrides, setOverrides] = useState<ScheduleOverride[]>([])
@@ -78,17 +82,28 @@ function OverridesTab({ staffId, orgId, readOnly }: OverridesTabProps) {
 		.filter((o) => isDatePast(o.date))
 		.sort(sortByDateDesc)
 
-	const renderOverrideItem = (isPast: boolean) => (override: ScheduleOverride) => (
+	const renderFutureItem = (override: ScheduleOverride) => (
 		<OverrideListItem
 			key={override.id}
 			override={override}
 			readOnly={readOnly}
-			isPast={isPast}
+			isPast={false}
 			onDelete={handleDelete}
 		/>
 	)
 
-	const hasNoOverrides = futureOverrides.length === 0 && pastOverrides.length === 0
+	const renderPastItem = (override: ScheduleOverride) => (
+		<OverrideListItem
+			key={override.id}
+			override={override}
+			readOnly={readOnly}
+			isPast
+			onDelete={handleDelete}
+		/>
+	)
+
+	const hasNoOverrides =
+		futureOverrides.length === 0 && pastOverrides.length === 0
 
 	return (
 		<div className="flex flex-col gap-4">
@@ -108,16 +123,14 @@ function OverridesTab({ staffId, orgId, readOnly }: OverridesTabProps) {
 				</>
 			)}
 
-			{hasNoOverrides && (
-				<Empty>{t('noOverrides')}</Empty>
-			)}
+			{hasNoOverrides && <Empty>{t('noOverrides')}</Empty>}
 
 			{futureOverrides.length > 0 && (
 				<div className="flex flex-col gap-2">
 					<h4 className="text-muted-foreground text-xs font-semibold uppercase">
 						{t('futureOverrides')}
 					</h4>
-					{futureOverrides.map(renderOverrideItem(false))}
+					{futureOverrides.map(renderFutureItem)}
 				</div>
 			)}
 
@@ -126,7 +139,7 @@ function OverridesTab({ staffId, orgId, readOnly }: OverridesTabProps) {
 					<h4 className="text-muted-foreground text-xs font-semibold uppercase">
 						{t('pastOverrides')}
 					</h4>
-					{pastOverrides.map(renderOverrideItem(true))}
+					{pastOverrides.map(renderPastItem)}
 				</div>
 			)}
 		</div>

@@ -82,7 +82,8 @@ const toBookingDetail = (booking: StaffBooking): BookingDetail => ({
 	payment: { status: 'unknown', amount: 0, currency: '' },
 })
 
-function BookingsTab({ staffId, orgId, readOnly: _readOnly }: BookingsTabProps) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
 	const t = useTranslations('staffSchedule')
 	const [bookings, setBookings] = useState<StaffBooking[]>([])
 	const [eventTypes, setEventTypes] = useState<EventType[]>([])
@@ -98,9 +99,7 @@ function BookingsTab({ staffId, orgId, readOnly: _readOnly }: BookingsTabProps) 
 			const { dateFrom, dateTo } = getWeekRange(weekOffset)
 
 			const types =
-				eventTypes.length > 0
-					? eventTypes
-					: await eventTypeApi.getByOrg(orgId)
+				eventTypes.length > 0 ? eventTypes : await eventTypeApi.getByOrg(orgId)
 
 			if (eventTypes.length === 0) {
 				setEventTypes(types)
