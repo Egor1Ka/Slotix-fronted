@@ -93,7 +93,7 @@ function OrgCalendarPage({ orgSlug, staffId: staffIdProp }: OrgCalendarPageProps
 		allStaff: staffList,
 		selectedStaffId,
 		selectedEventTypeId,
-		onStaffAutoSelect: handleStaffAutoSelect,
+		onStaffAutoSelect: viewConfig.filterByStaffCapability ? handleStaffAutoSelect : () => {},
 	})
 
 	const { eventTypes: scheduleEventTypes, schedule, loading: scheduleLoading, error: scheduleError } =
@@ -196,6 +196,11 @@ function OrgCalendarPage({ orgSlug, staffId: staffIdProp }: OrgCalendarPageProps
 		? getWorkHoursForDate(scheduleSource.weeklyHours, dateStr)
 		: orgSchedules.getOrgWorkHours(dateStr)
 
+	// Выходной организации: никто не работает (только для day view, без выбранного сотрудника)
+	const isOrgDayOff = view === 'day' && !selectedStaffId && !workHoursData
+	// Выбранный сотрудник не работает в этот день
+	const isStaffDayOff = view === 'day' && !!selectedStaffId && !workHoursData
+
 	const workStart = workHoursData?.workStart ?? '10:00'
 	const workEnd = workHoursData?.workEnd ?? '18:00'
 
@@ -207,11 +212,16 @@ function OrgCalendarPage({ orgSlug, staffId: staffIdProp }: OrgCalendarPageProps
 	const strategy = createOrgStrategy({
 		orgName: org.name,
 		locale,
+		selectedStaffId,
 		selectStaffLabel: t('selectStaffToView'),
+		selectStaffToBookLabel: t('selectStaffToBook'),
 		bookingDetailsLabel: t('bookingDetails'),
+		dayOffLabel: isStaffDayOff ? t('staffDayOff') : t('dayOff'),
+		isDayOff: isOrgDayOff,
+		isStaffDayOff,
 		bookings,
 		canBookForClient: viewConfig.canBookForClient,
-		eventTypes,
+		eventTypes: isOrgDayOff ? [] : eventTypes,
 		schedule: staffSchedule ?? schedule ?? undefined,
 		selectedEventTypeId,
 		selectedSlot: selectedSlotTime,
@@ -235,6 +245,7 @@ function OrgCalendarPage({ orgSlug, staffId: staffIdProp }: OrgCalendarPageProps
 		onBookingReschedule: bookingActions.handleBookingReschedule,
 		onBookingClose: bookingActions.handleBookingClose,
 		loading: contentLoading,
+		staffList,
 	})
 
 	// Фильтрация: рабочий день + фильтрация по услугам
@@ -269,6 +280,8 @@ function OrgCalendarPage({ orgSlug, staffId: staffIdProp }: OrgCalendarPageProps
 				workStart={workStart}
 				workEnd={workEnd}
 				disabledDays={disabledDays}
+				isDayOff={isOrgDayOff || isStaffDayOff}
+
 				staffTabsSlot={staffTabsSlot}
 				publicUrl={`/${locale}/org/${orgSlug}`}
 			/>

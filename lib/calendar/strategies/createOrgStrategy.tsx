@@ -21,7 +21,7 @@ import {
 	type SlotMode,
 	type Slot,
 } from '@/lib/slot-engine'
-import type { EventType, ScheduleTemplate, CalendarDisplayBooking } from '@/services/configs/booking.types'
+import type { EventType, ScheduleTemplate, CalendarDisplayBooking, OrgStaffMember } from '@/services/configs/booking.types'
 import { ServiceList } from '@/components/booking/ServiceList'
 import { SlotModeSelector } from '@/components/booking/SlotModeSelector'
 import { StaffBookingPanel } from '@/components/booking/StaffBookingPanel'
@@ -63,6 +63,7 @@ interface OrgStrategyParams {
 	isDayOff?: boolean
 	isStaffDayOff?: boolean
 	loading?: boolean
+	staffList?: OrgStaffMember[]
 }
 
 const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
@@ -99,6 +100,7 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 		isDayOff = false,
 		isStaffDayOff = false,
 		loading = false,
+		staffList = [],
 	} = params
 
 	const calendarLocale = getCalendarLocale(locale)
@@ -266,6 +268,10 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 
 			if (selectedBooking) {
 				const bookingEventType = findEventType(eventTypes, selectedBooking.eventTypeId)
+				const staffUserId = selectedBooking.hosts[0]?.userId ?? null
+				const findStaffByUserId = (s: OrgStaffMember): boolean => s.id === staffUserId
+				const bookingStaff = staffList.find(findStaffByUserId)
+
 				return (
 					<>
 						{bookingError && (
@@ -277,6 +283,9 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 							booking={selectedBooking}
 							eventTypeName={bookingEventType?.name ?? ''}
 							eventTypeColor={bookingEventType?.color ?? '#888'}
+							staffName={bookingStaff?.name}
+							staffAvatar={bookingStaff?.avatar}
+							staffPosition={bookingStaff?.position ?? undefined}
 							onChangeStatus={onBookingStatusChange ?? (async () => {})}
 							onReschedule={onBookingReschedule ?? (async () => {})}
 							onClose={onBookingClose ?? (() => {})}

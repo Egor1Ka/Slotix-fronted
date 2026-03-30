@@ -27,6 +27,9 @@ interface BookingDetailsPanelProps {
 	booking: BookingDetail
 	eventTypeName: string
 	eventTypeColor: string
+	staffName?: string
+	staffAvatar?: string
+	staffPosition?: string
 	onChangeStatus: (bookingId: string, status: BookingStatus) => Promise<void>
 	onReschedule: (bookingId: string, newStartAt: string) => Promise<void>
 	onClose: () => void
@@ -229,10 +232,53 @@ function ActionButtons({
 	)
 }
 
+function StaffSection({
+	staffName,
+	staffAvatar,
+	staffPosition,
+}: {
+	staffName: string
+	staffAvatar?: string
+	staffPosition?: string
+}) {
+	const renderAvatar = () => {
+		if (staffAvatar) {
+			return (
+				<img
+					src={staffAvatar}
+					alt={staffName}
+					className="size-8 shrink-0 rounded-full object-cover"
+				/>
+			)
+		}
+
+		return (
+			<div className="bg-muted text-muted-foreground flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-medium">
+				{staffName.charAt(0).toUpperCase()}
+			</div>
+		)
+	}
+
+	return (
+		<div className="flex items-center gap-3">
+			{renderAvatar()}
+			<div className="flex flex-col">
+				<span className="text-sm font-medium">{staffName}</span>
+				{staffPosition && (
+					<span className="text-muted-foreground text-xs">{staffPosition}</span>
+				)}
+			</div>
+		</div>
+	)
+}
+
 function BookingDetailsPanel({
 	booking,
 	eventTypeName,
 	eventTypeColor,
+	staffName,
+	staffAvatar,
+	staffPosition,
 	onChangeStatus,
 	onClose,
 }: BookingDetailsPanelProps) {
@@ -246,6 +292,16 @@ function BookingDetailsPanel({
 				onClose={onClose}
 				closeLabel={t('close')}
 			/>
+			{staffName && (
+				<>
+					<Separator />
+					<StaffSection
+						staffName={staffName}
+						staffAvatar={staffAvatar}
+						staffPosition={staffPosition}
+					/>
+				</>
+			)}
 			<Separator />
 			<TimeGrid booking={booking} t={t} />
 			<Separator />
