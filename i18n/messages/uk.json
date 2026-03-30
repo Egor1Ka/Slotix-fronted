@@ -165,6 +165,9 @@
 		"cancelledByAdmin": "Скасовано адміністратором",
 		"defaultClient": "Клієнт",
 		"selectStaffToView": "Оберіть мастера для перегляду розкладу",
+		"selectStaffToBook": "Оберіть виконавця для створення запису",
+		"dayOff": "Вихідний — сьогодні ніхто не працює",
+		"staffDayOff": "Цей спеціаліст сьогодні не працює",
 		"bookingDetails": "Деталі запису",
 		"date": "Дата",
 		"clientName_label": "Ім'я клієнта",
@@ -241,7 +244,9 @@
 		"generalSchedule": "Загальний розклад",
 		"backToOrgs": "Назад до організацій",
 		"logout": "Вийти",
-		"staff": "Персонал"
+		"staff": "Персонал",
+		"positions": "Позиції",
+		"services": "Послуги"
 	},
 	"organizations": {
 		"title": "Мої організації",
@@ -270,5 +275,52 @@
 			"cancel": "Скасувати"
 		},
 		"created": "Організацію створено"
+	},
+	"positions": {
+		"title": "Позиції",
+		"add": "Додати позицію",
+		"edit": "Редагувати позицію",
+		"delete": "Видалити позицію",
+		"cancel": "Скасувати",
+		"deleteConfirm": "Ви впевнені, що хочете видалити цю позицію?",
+		"empty": "Позицій ще немає",
+		"emptyDescription": "Створіть першу позицію для організації",
+		"name": "Назва",
+		"level": "Рівень",
+		"color": "Колір",
+		"staffCount": "Співробітники",
+		"namePlaceholder": "Наприклад: Барбер",
+		"created": "Позицію створено",
+		"updated": "Позицію оновлено",
+		"deleted": "Позицію видалено"
+	},
+	"services": {
+		"title": "Послуги",
+		"add": "Додати послугу",
+		"edit": "Редагувати послугу",
+		"delete": "Видалити послугу",
+		"cancel": "Скасувати",
+		"deleteConfirm": "Ви впевнені, що хочете видалити цю послугу?",
+		"empty": "Послуг ще немає",
+		"emptyDescription": "Створіть першу послугу для організації",
+		"name": "Назва",
+		"duration": "Тривалість",
+		"durationMin": "хв",
+		"price": "Ціна",
+		"color": "Колір",
+		"description": "Опис",
+		"descriptionPlaceholder": "Опис послуги (необов'язково)",
+		"namePlaceholder": "Наприклад: Стрижка",
+		"staffPolicy": "Хто виконує",
+		"staffPolicyAny": "Усі співробітники",
+		"staffPolicyByPosition": "За позицією",
+		"staffPolicySpecific": "Конкретні співробітники",
+		"assignedPositions": "Позиції",
+		"assignedStaff": "Співробітники",
+		"selectPositions": "Оберіть позиції",
+		"selectStaff": "Оберіть співробітників",
+		"created": "Послугу створено",
+		"updated": "Послугу оновлено",
+		"deleted": "Послугу видалено"
 	}
 }
