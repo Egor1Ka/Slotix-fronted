@@ -47,8 +47,13 @@ const renderStaffOption = (member: OrgStaffMember) => (
 function StaffFilter({ staff, selectedId, onSelect }: StaffFilterProps) {
 	const t = useTranslations('staffSchedule')
 
+	const handleValueChange = (value: string | null) => {
+		if (!value) return
+		onSelect(value)
+	}
+
 	return (
-		<Select value={selectedId ?? undefined} onValueChange={onSelect}>
+		<Select value={selectedId ?? undefined} onValueChange={handleValueChange}>
 			<SelectTrigger className="w-full max-w-sm">
 				<SelectValue placeholder={t('selectStaff')} />
 			</SelectTrigger>
