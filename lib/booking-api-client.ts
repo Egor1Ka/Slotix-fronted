@@ -299,6 +299,15 @@ const createScheduleOverride = async (
 ): Promise<ScheduleOverride> =>
 	post<ScheduleOverride>('/schedule/override', body)
 
+const getScheduleOverrides = async (
+	staffId: string,
+): Promise<ScheduleOverride[]> =>
+	get<ScheduleOverride[]>(`/schedule/overrides?staffId=${staffId}`)
+
+const deleteScheduleOverride = async (overrideId: string): Promise<void> => {
+	await del<void>(`/schedule/override/${overrideId}`)
+}
+
 // ── Booking API ──
 
 const createBooking = async (
@@ -398,6 +407,8 @@ export const scheduleApi = {
 	getByOrg: getSchedulesByOrg,
 	updateTemplate: updateScheduleTemplate,
 	createOverride: createScheduleOverride,
+	getOverrides: getScheduleOverrides,
+	deleteOverride: deleteScheduleOverride,
 }
 
 export const bookingApi = {
