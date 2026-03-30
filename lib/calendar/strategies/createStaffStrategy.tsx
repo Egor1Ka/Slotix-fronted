@@ -105,6 +105,8 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 				date: confirmedDate,
 				bookingId: confirmedBooking.bookingId,
 				status: confirmedBooking.status,
+				staffName: '',
+				staffAvatar: '',
 			},
 		]
 	})()

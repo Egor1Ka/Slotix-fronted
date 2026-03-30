@@ -55,8 +55,14 @@ interface OrgStrategyParams {
 	onBookingReschedule?: (bookingId: string, newStartAt: string) => Promise<void>
 	onBookingClose?: () => void
 	locale: string
+	selectedStaffId?: string | null
 	selectStaffLabel?: string
+	selectStaffToBookLabel?: string
 	bookingDetailsLabel?: string
+	dayOffLabel?: string
+	isDayOff?: boolean
+	isStaffDayOff?: boolean
+	loading?: boolean
 }
 
 const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
@@ -85,8 +91,14 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 		onBookingReschedule,
 		onBookingClose,
 		locale,
+		selectedStaffId = null,
 		selectStaffLabel = 'Select a staff member to view the schedule',
+		selectStaffToBookLabel = 'Select a staff member to book',
 		bookingDetailsLabel = 'Booking details',
+		dayOffLabel = 'Day off',
+		isDayOff = false,
+		isStaffDayOff = false,
+		loading = false,
 	} = params
 
 	const calendarLocale = getCalendarLocale(locale)
@@ -108,6 +120,8 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 				date: confirmedDate,
 				bookingId: confirmedBooking.bookingId,
 				status: confirmedBooking.status,
+				staffName: '',
+				staffAvatar: '',
 			},
 		]
 	})()
@@ -127,6 +141,7 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 			label: booking.label,
 			sublabel: `${minToTime(booking.startMin)}–${minToTime(booking.startMin + booking.duration)}`,
 			blockType: 'booking',
+			avatarUrl: booking.staffAvatar || undefined,
 			onClick: onBookingSelect
 				? () => onBookingSelect(booking.bookingId)
 				: undefined,
@@ -136,7 +151,7 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 	}
 
 	const buildSlotBlocks = (blockDate: string): CalendarBlock[] => {
-		if (!canBookForClient || !selectedEventType || !schedule || confirmedBooking)
+		if (!canBookForClient || !selectedEventType || !selectedStaffId || !schedule || confirmedBooking)
 			return []
 
 		const workHours = getWorkHoursForDate(schedule.weeklyHours,blockDate)
@@ -207,7 +222,15 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 		},
 
 		renderSidebar() {
-			if (eventTypes.length === 0) {
+			if (isDayOff) {
+				return (
+					<div className="text-muted-foreground p-4 text-sm">
+						{dayOffLabel}
+					</div>
+				)
+			}
+
+			if (eventTypes.length === 0 && !loading) {
 				return (
 					<div className="text-muted-foreground p-4 text-sm">
 						{selectStaffLabel}
@@ -221,6 +244,7 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 						eventTypes={eventTypes}
 						selectedId={selectedEventTypeId}
 						onSelect={onSelectEventType ?? (() => {})}
+						loading={loading}
 					/>
 					<Separator className="my-4" />
 					<SlotModeSelector
@@ -232,6 +256,14 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 		},
 
 		renderPanel() {
+			if (isDayOff || isStaffDayOff) {
+				return (
+					<div className="text-muted-foreground p-4 text-sm">
+						{dayOffLabel}
+					</div>
+				)
+			}
+
 			if (selectedBooking) {
 				const bookingEventType = findEventType(eventTypes, selectedBooking.eventTypeId)
 				return (
@@ -261,6 +293,15 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 				)
 			}
 
+			// Услуга выбрана, но сотрудник — нет
+			if (selectedEventType && !selectedStaffId) {
+				return (
+					<div className="text-muted-foreground p-4 text-sm">
+						{selectStaffToBookLabel}
+					</div>
+				)
+			}
+
 			return (
 				<>
 					{bookingError && (
@@ -283,7 +324,7 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 		},
 
 		onCellClick(clickDate: string, startMin: number) {
-			if (!canBookForClient || !selectedEventType || !schedule) return
+			if (!canBookForClient || !selectedEventType || !selectedStaffId || !schedule) return
 
 			const workHours = getWorkHoursForDate(schedule.weeklyHours,clickDate)
 			if (!workHours) return

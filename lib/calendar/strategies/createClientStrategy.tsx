@@ -87,6 +87,8 @@ const createClientStrategy = (
 				date: confirmedDate,
 				bookingId: confirmedBooking.bookingId,
 				status: confirmedBooking.status,
+				staffName: '',
+				staffAvatar: '',
 			},
 		]
 	})()

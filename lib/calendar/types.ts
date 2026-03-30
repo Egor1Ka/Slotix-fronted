@@ -21,6 +21,7 @@ interface CalendarBlock {
 	bookingId?: string
 	column?: number
 	totalColumns?: number
+	avatarUrl?: string
 }
 
 interface ConfirmedBooking {
