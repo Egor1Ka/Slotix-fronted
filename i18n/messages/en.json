@@ -204,6 +204,8 @@
 			"override": "Date exception",
 			"date": "Date",
 			"workDay": "Work day",
+			"fullDayOff": "Full day off",
+			"breakHours": "Unavailable from — to",
 			"reason": "Reason",
 			"reasonPlaceholder": "Vacation, sick day...",
 			"addException": "Add exception"
@@ -216,7 +218,11 @@
 		"servicesAndMode": "Services & mode",
 		"mySchedule": "My schedule",
 		"copyPublicLink": "Public link",
-		"linkCopied": "Link copied!"
+		"linkCopied": "Link copied!",
+		"scheduleSaved": "Schedule saved",
+		"scheduleSaveError": "Failed to save schedule",
+		"overrideSaved": "Day off saved",
+		"overrideSaveError": "Failed to save day off"
 	},
 	"errors": {
 		"title": "Something went wrong",
@@ -247,7 +253,8 @@
 		"logout": "Log out",
 		"staff": "Staff",
 		"positions": "Positions",
-		"services": "Services"
+		"services": "Services",
+		"myScheduleSettings": "Schedule Settings"
 	},
 	"organizations": {
 		"title": "My organizations",
@@ -346,6 +353,12 @@
 		"selectStaffHint": "Use the filter above to view a staff member's schedule",
 		"prevWeek": "Previous week",
 		"nextWeek": "Next week",
-		"bookingDetails": "Booking Details"
+		"bookingDetails": "Booking Details",
+		"scheduleSaved": "Schedule saved",
+		"scheduleSaveError": "Failed to save schedule",
+		"overrideSaved": "Day off saved",
+		"overrideSaveError": "Failed to save day off",
+		"overrideDeleted": "Day off deleted",
+		"overrideDeleteError": "Failed to delete day off"
 	}
 }

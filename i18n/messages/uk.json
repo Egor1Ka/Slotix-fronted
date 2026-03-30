@@ -204,6 +204,8 @@
 			"override": "Виняток на дату",
 			"date": "Дата",
 			"workDay": "Робочий день",
+			"fullDayOff": "Весь день вихідний",
+			"breakHours": "Недоступний з — до",
 			"reason": "Причина",
 			"reasonPlaceholder": "Відпустка, хвороба...",
 			"addException": "Додати виняток"
@@ -216,7 +218,11 @@
 		"servicesAndMode": "Послуги та режим",
 		"mySchedule": "Мій розклад",
 		"copyPublicLink": "Публічне посилання",
-		"linkCopied": "Посилання скопійовано!"
+		"linkCopied": "Посилання скопійовано!",
+		"scheduleSaved": "Розклад збережено",
+		"scheduleSaveError": "Не вдалося зберегти розклад",
+		"overrideSaved": "Вихідний збережено",
+		"overrideSaveError": "Не вдалося зберегти вихідний"
 	},
 	"errors": {
 		"title": "Щось пішло не так",
@@ -247,7 +253,8 @@
 		"logout": "Вийти",
 		"staff": "Персонал",
 		"positions": "Позиції",
-		"services": "Послуги"
+		"services": "Послуги",
+		"myScheduleSettings": "Налаштування розкладу"
 	},
 	"organizations": {
 		"title": "Мої організації",
@@ -346,6 +353,12 @@
 		"selectStaffHint": "Скористайтесь фільтром вище щоб переглянути розклад",
 		"prevWeek": "Попередній тиждень",
 		"nextWeek": "Наступний тиждень",
-		"bookingDetails": "Деталі букінгу"
+		"bookingDetails": "Деталі букінгу",
+		"scheduleSaved": "Розклад збережено",
+		"scheduleSaveError": "Не вдалося зберегти розклад",
+		"overrideSaved": "Вихідний збережено",
+		"overrideSaveError": "Не вдалося зберегти вихідний",
+		"overrideDeleted": "Вихідний видалено",
+		"overrideDeleteError": "Не вдалося видалити вихідний"
 	}
 }
