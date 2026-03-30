@@ -242,6 +242,7 @@
 		"myOrganizations": "My organizations",
 		"mySchedule": "My schedule",
 		"generalSchedule": "General schedule",
+		"staffSchedule": "Staff Schedule",
 		"backToOrgs": "Back to organizations",
 		"logout": "Log out",
 		"staff": "Staff",
@@ -322,5 +323,26 @@
 		"created": "Service created",
 		"updated": "Service updated",
 		"deleted": "Service deleted"
+	},
+	"staffSchedule": {
+		"mySchedule": "My Schedule",
+		"staffSchedule": "Staff Schedule",
+		"scheduleTab": "Schedule",
+		"overridesTab": "Days Off",
+		"bookingsTab": "Bookings",
+		"selectStaff": "Select a staff member",
+		"selectStaffDescription": "Choose a staff member to view their schedule",
+		"noOverrides": "No days off",
+		"futureOverrides": "Upcoming",
+		"pastOverrides": "Past",
+		"addOverride": "Add day off",
+		"deleteOverride": "Delete",
+		"deleteOverrideConfirm": "Are you sure you want to delete this day off?",
+		"dayOff": "Day off",
+		"customHours": "Custom hours",
+		"noBookings": "No bookings",
+		"prevWeek": "Previous week",
+		"nextWeek": "Next week",
+		"bookingDetails": "Booking Details"
 	}
 }

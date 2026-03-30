@@ -242,6 +242,7 @@
 		"myOrganizations": "Мої організації",
 		"mySchedule": "Мій розклад",
 		"generalSchedule": "Загальний розклад",
+		"staffSchedule": "Розклад співробітників",
 		"backToOrgs": "Назад до організацій",
 		"logout": "Вийти",
 		"staff": "Персонал",
@@ -322,5 +323,26 @@
 		"created": "Послугу створено",
 		"updated": "Послугу оновлено",
 		"deleted": "Послугу видалено"
+	},
+	"staffSchedule": {
+		"mySchedule": "Мій розклад",
+		"staffSchedule": "Розклад співробітників",
+		"scheduleTab": "Розклад",
+		"overridesTab": "Вихідні",
+		"bookingsTab": "Букінги",
+		"selectStaff": "Оберіть співробітника",
+		"selectStaffDescription": "Оберіть співробітника для перегляду розкладу",
+		"noOverrides": "Немає вихідних",
+		"futureOverrides": "Майбутні",
+		"pastOverrides": "Минулі",
+		"addOverride": "Додати вихідний",
+		"deleteOverride": "Видалити",
+		"deleteOverrideConfirm": "Ви впевнені, що хочете видалити цей вихідний?",
+		"dayOff": "Вихідний",
+		"customHours": "Особливий графік",
+		"noBookings": "Немає букінгів",
+		"prevWeek": "Попередній тиждень",
+		"nextWeek": "Наступний тиждень",
+		"bookingDetails": "Деталі букінгу"
 	}
 }
