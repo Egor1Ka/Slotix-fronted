@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
+import { toast } from 'sonner'
 import { Spinner } from '@/components/ui/spinner'
 import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
@@ -16,7 +17,7 @@ import type {
 
 interface ScheduleViewTabProps {
 	staffId: string
-	orgId: string
+	orgId?: string
 	readOnly: boolean
 }
 
@@ -77,28 +78,37 @@ function ReadOnlySchedule({ schedule }: { schedule: ScheduleTemplate }) {
 }
 
 function ScheduleViewTab({ staffId, orgId, readOnly }: ScheduleViewTabProps) {
+	const t = useTranslations('staffSchedule')
 	const [schedule, setSchedule] = useState<ScheduleTemplate | null>(null)
 	const [loading, setLoading] = useState(true)
 
 	const fetchSchedule = useCallback(async () => {
 		setLoading(true)
 		try {
-			const data = await scheduleApi.getTemplate(staffId)
+			const data = await scheduleApi.getTemplate(staffId, orgId)
 			setSchedule(data)
 		} catch {
 			// обрабатывается интерцептором toast
 		} finally {
 			setLoading(false)
 		}
-	}, [staffId])
+	}, [staffId, orgId])
 
 	useEffect(() => {
 		fetchSchedule()
 	}, [fetchSchedule])
 
 	const handleSave = async (weeklyHours: WeeklyHours[]) => {
-		await scheduleApi.updateTemplate(staffId, orgId, weeklyHours)
-		await fetchSchedule()
+		try {
+			await scheduleApi.updateTemplate(staffId, orgId ?? null, weeklyHours)
+			await fetchSchedule()
+			toast.success(t('scheduleSaved'))
+		} catch (err) {
+			const message =
+				err instanceof Error ? err.message : t('scheduleSaveError')
+			toast.error(message)
+			throw err
+		}
 	}
 
 	if (loading) {

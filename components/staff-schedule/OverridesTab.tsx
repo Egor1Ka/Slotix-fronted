@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
+import { toast } from 'sonner'
 import { Plus, CalendarOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
@@ -22,12 +23,14 @@ import type {
 
 interface OverridesTabProps {
 	staffId: string
-	orgId: string
+	orgId?: string
 	readOnly: boolean
 }
 
-const isDatePast = (dateStr: string): boolean =>
-	new Date(dateStr + 'T23:59:59') < new Date()
+const isDatePast = (dateStr: string): boolean => {
+	const dateOnly = dateStr.includes('T') ? dateStr.split('T')[0] : dateStr
+	return new Date(dateOnly + 'T23:59:59') < new Date()
+}
 
 const sortByDate = (a: ScheduleOverride, b: ScheduleOverride): number =>
 	new Date(a.date).getTime() - new Date(b.date).getTime()
@@ -45,28 +48,44 @@ function OverridesTab({ staffId, orgId, readOnly }: OverridesTabProps) {
 	const fetchOverrides = useCallback(async () => {
 		setLoading(true)
 		try {
-			const data = await scheduleApi.getOverrides(staffId)
+			const data = await scheduleApi.getOverrides(staffId, orgId)
 			setOverrides(data)
 		} catch {
 			// обрабатывается интерцептором toast
 		} finally {
 			setLoading(false)
 		}
-	}, [staffId])
+	}, [staffId, orgId])
 
 	useEffect(() => {
 		fetchOverrides()
 	}, [fetchOverrides])
 
 	const handleSave = async (body: CreateScheduleOverrideBody) => {
-		await scheduleApi.createOverride(body)
-		setShowForm(false)
-		await fetchOverrides()
+		try {
+			await scheduleApi.createOverride(body)
+			setShowForm(false)
+			const overrides = await scheduleApi.getOverrides(staffId, orgId)
+			setOverrides(overrides)
+			toast.success(t('overrideSaved'))
+		} catch (err) {
+			const message =
+				err instanceof Error ? err.message : t('overrideSaveError')
+			toast.error(message)
+			throw err
+		}
 	}
 
 	const handleDelete = async (id: string) => {
-		await scheduleApi.deleteOverride(id)
-		await fetchOverrides()
+		try {
+			await scheduleApi.deleteOverride(id)
+			await fetchOverrides()
+			toast.success(t('overrideDeleted'))
+		} catch (err) {
+			const message =
+				err instanceof Error ? err.message : t('overrideDeleteError')
+			toast.error(message)
+		}
 	}
 
 	const toggleForm = () => setShowForm((prev) => !prev)
@@ -123,7 +142,7 @@ function OverridesTab({ staffId, orgId, readOnly }: OverridesTabProps) {
 
 			{!readOnly && showForm && (
 				<div className="rounded-lg border p-4">
-					<ScheduleOverrideForm staffId={staffId} onSave={handleSave} />
+					<ScheduleOverrideForm staffId={staffId} orgId={orgId} onSave={handleSave} />
 				</div>
 			)}
 

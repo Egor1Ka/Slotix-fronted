@@ -25,7 +25,7 @@ import type { BookingDetail } from '@/components/booking/BookingDetailPanel'
 
 interface BookingsTabProps {
 	staffId: string
-	orgId: string
+	orgId?: string
 	readOnly: boolean
 }
 
@@ -117,8 +117,12 @@ function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
 		try {
 			const { dateFrom, dateTo } = getWeekRange(weekOffset)
 
+			const fetchEventTypes = orgId
+				? () => eventTypeApi.getByOrg(orgId)
+				: () => eventTypeApi.getByStaff(staffId)
+
 			const types =
-				eventTypes.length > 0 ? eventTypes : await eventTypeApi.getByOrg(orgId)
+				eventTypes.length > 0 ? eventTypes : await fetchEventTypes()
 
 			if (eventTypes.length === 0) {
 				setEventTypes(types)

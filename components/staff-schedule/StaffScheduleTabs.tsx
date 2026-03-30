@@ -10,7 +10,7 @@ import { BookingsTab } from './BookingsTab'
 
 interface StaffScheduleTabsProps {
 	staffId: string
-	orgId: string
+	orgId?: string
 	readOnly: boolean
 }
 
