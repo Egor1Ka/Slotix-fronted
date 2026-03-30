@@ -49,7 +49,7 @@
 
 | Метод | Шлях | Опис |
 |-------|------|------|
-| `GET` | `/positions?orgId=X` | Список позицій організації |
+| `GET` | `/positions?orgId=X` | Список позицій організації (кожна включає `staffCount`) |
 | `POST` | `/positions` | Створити позицію (`orgId`, `name`, `level`, `color`) |
 | `PATCH` | `/positions/:id` | Оновити позицію |
 | `DELETE` | `/positions/:id` | Видалити позицію |
@@ -228,14 +228,44 @@ z.object({
   assignedPositions: z.array(z.string()).optional(),
   assignedStaff: z.array(z.string()).optional(),
 }).refine(
-  // assignedPositions обов'язковий при staffPolicy = "by_position"
-  // assignedStaff обов'язковий при staffPolicy = "specific"
+  (data) => {
+    if (data.staffPolicy === "by_position") return data.assignedPositions && data.assignedPositions.length > 0
+    if (data.staffPolicy === "specific") return data.assignedStaff && data.assignedStaff.length > 0
+    return true
+  },
+  { message: "Оберіть позиції або співробітників відповідно до обраної політики" }
 )
 ```
 
 ---
 
-## 8. Порядок реалізації
+## 8. Оновлення існуючих типів
+
+Існуючий `EventType` в `booking.types.ts` не має полів `staffPolicy`, `assignedPositions`, `assignedStaff`. Потрібно розширити:
+
+```typescript
+interface EventType {
+  // існуючі поля залишаються
+  id: string
+  name: string
+  slug: string
+  durationMin: number
+  price: number
+  currency: string
+  color: string
+  description: string | null
+  // нові поля
+  staffPolicy: "any" | "by_position" | "specific"
+  assignedPositions: string[]
+  assignedStaff: string[]
+}
+```
+
+Існуючий `StaffMember.position: string | null` — бекенд вже повертає `position` як рядок (name з Position). Це залишається без змін — DTO на бекенді розгортає `positionId` у `position.name`.
+
+---
+
+## 9. Порядок реалізації
 
 1. Бекенд Position CRUD → фронтенд Position API + типи + сторінка
 2. Бекенд EventType CRUD → фронтенд EventType API + типи + сторінка
