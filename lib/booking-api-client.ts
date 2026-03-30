@@ -82,6 +82,9 @@ interface BackendEventType {
 	minNotice: number
 	slotStepMin: number
 	active: boolean
+	staffPolicy: 'any' | 'by_position' | 'specific'
+	assignedPositions: string[]
+	assignedStaff: string[]
 }
 
 interface BackendWeeklyHours {
@@ -158,9 +161,9 @@ const toFrontendEventType = (raw: BackendEventType): EventType => ({
 	currency: raw.price ? raw.price.currency : 'usd',
 	color: raw.color,
 	description: null,
-	staffPolicy: 'any',
-	assignedPositions: [],
-	assignedStaff: [],
+	staffPolicy: raw.staffPolicy ?? 'any',
+	assignedPositions: raw.assignedPositions ?? [],
+	assignedStaff: raw.assignedStaff ?? [],
 })
 
 const toFrontendWeeklyHours = (raw: BackendWeeklyHours): WeeklyHours => ({
