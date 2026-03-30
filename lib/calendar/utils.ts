@@ -238,6 +238,7 @@ const findFirstFreeColumn = (usedColumns: number[]): number => {
 	return gapIdx === -1 ? sorted.length : gapIdx
 }
 
+// Imperative style justified: graph traversal (transitive closure) requires iterative convergence
 const buildOverlapGroups = (bookings: CalendarBlock[]): CalendarBlock[][] => {
 	const sorted = [...bookings].sort(byStartThenDuration)
 	const groups: CalendarBlock[][] = []
@@ -281,7 +282,8 @@ const assignColumns = (group: CalendarBlock[]): CalendarBlock[] => {
 		const overlapping = sorted.filter(
 			(other) => assignments.has(other.id) && blocksOverlap(block, other),
 		)
-		const usedColumns = overlapping.map((other) => assignments.get(other.id)!)
+		const getAssignedColumn = (other: CalendarBlock): number => assignments.get(other.id) ?? 0
+		const usedColumns = overlapping.map(getAssignedColumn)
 		assignments.set(block.id, findFirstFreeColumn(usedColumns))
 	})
 
@@ -289,16 +291,18 @@ const assignColumns = (group: CalendarBlock[]): CalendarBlock[] => {
 
 	const applyLayout = (block: CalendarBlock): CalendarBlock => ({
 		...block,
-		column: assignments.get(block.id)!,
+		column: assignments.get(block.id) ?? 0,
 		totalColumns: maxColumn,
 	})
 
 	return sorted.map(applyLayout)
 }
 
+const isNotBooking = (block: CalendarBlock): boolean => !isBooking(block)
+
 const resolveOverlaps = (blocks: CalendarBlock[]): CalendarBlock[] => {
 	const bookings = blocks.filter(isBooking)
-	const nonBookings = blocks.filter((b) => !isBooking(b))
+	const nonBookings = blocks.filter(isNotBooking)
 
 	if (bookings.length <= 1) return blocks
 

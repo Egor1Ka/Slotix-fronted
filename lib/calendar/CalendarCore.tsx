@@ -89,6 +89,8 @@ const useSafeViewConfig = (): CalendarViewConfig => {
 }
 
 const OVERLAP_GAP_PX = 2
+const DAY_HOUR_LABEL_WIDTH_PX = 48
+const WEEK_BLOCK_INSET_PX = 2
 
 interface OverlapStyle {
 	width: string
@@ -176,7 +178,7 @@ function CalendarCore({
 			block.onClick?.()
 		}
 
-		const overlap = getOverlapStyle(block, 48, 0)
+		const overlap = getOverlapStyle(block, DAY_HOUR_LABEL_WIDTH_PX, 0)
 
 		return (
 			<div
@@ -371,7 +373,7 @@ function CalendarCore({
 				block.onClick?.()
 			}
 
-			const overlap = getOverlapStyle(block, 2, 2)
+			const overlap = getOverlapStyle(block, WEEK_BLOCK_INSET_PX, WEEK_BLOCK_INSET_PX)
 
 			return (
 				<div
