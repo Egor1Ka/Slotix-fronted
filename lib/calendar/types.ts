@@ -19,6 +19,8 @@ interface CalendarBlock {
 	draggable?: boolean
 	blockType: BlockType
 	bookingId?: string
+	column?: number
+	totalColumns?: number
 }
 
 interface ConfirmedBooking {
