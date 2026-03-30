@@ -61,7 +61,7 @@ export default function MySchedulePage() {
 	if (!staffId) return null
 
 	return (
-		<div className="max-w-3xl space-y-6 py-6">
+		<div className="max-w-3xl space-y-6 px-4 py-6">
 			<div className="flex items-center gap-3">
 				<h1 className="text-lg font-semibold">{t('mySchedule')}</h1>
 				{orgName && (
