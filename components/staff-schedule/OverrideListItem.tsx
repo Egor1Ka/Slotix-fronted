@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { Trash2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import type { ScheduleOverride } from '@/services/configs/booking.types'
 
 interface OverrideListItemProps {
@@ -25,7 +26,12 @@ const formatDate = (dateStr: string): string =>
 const formatSlots = (slots: { start: string; end: string }[]): string =>
 	slots.map((s) => `${s.start} — ${s.end}`).join(', ')
 
-function OverrideListItem({ override, readOnly, isPast, onDelete }: OverrideListItemProps) {
+function OverrideListItem({
+	override,
+	readOnly,
+	isPast,
+	onDelete,
+}: OverrideListItemProps) {
 	const t = useTranslations('staffSchedule')
 	const [isDeleting, setIsDeleting] = useState(false)
 
@@ -37,13 +43,25 @@ function OverrideListItem({ override, readOnly, isPast, onDelete }: OverrideList
 
 	const label = override.enabled ? t('customHours') : t('dayOff')
 	const variant = override.enabled ? 'secondary' : 'destructive'
+	const canDelete = !readOnly && !isPast
 
 	return (
-		<div className="flex items-center justify-between rounded-lg border p-3">
+		<div
+			data-slot="override-list-item"
+			className={cn(
+				'group flex items-center justify-between rounded-lg border p-3',
+				'transition-shadow hover:shadow-sm',
+				isPast && 'opacity-60',
+			)}
+		>
 			<div className="flex flex-col gap-1">
 				<div className="flex items-center gap-2">
-					<span className="text-sm font-medium">{formatDate(override.date)}</span>
-					<Badge variant={variant}>{label}</Badge>
+					<span className="text-sm font-medium">
+						{formatDate(override.date)}
+					</span>
+					<Badge variant={variant} className="text-[10px]">
+						{label}
+					</Badge>
 				</div>
 				{override.enabled && override.slots.length > 0 && (
 					<span className="text-muted-foreground text-xs">
@@ -56,12 +74,13 @@ function OverrideListItem({ override, readOnly, isPast, onDelete }: OverrideList
 					</span>
 				)}
 			</div>
-			{!readOnly && !isPast && (
+			{canDelete && (
 				<Button
 					variant="ghost"
-					size="sm"
+					size="icon-sm"
 					onClick={handleDelete}
 					disabled={isDeleting}
+					className="opacity-0 transition-opacity group-hover:opacity-100"
 				>
 					<Trash2 className="size-4" />
 				</Button>

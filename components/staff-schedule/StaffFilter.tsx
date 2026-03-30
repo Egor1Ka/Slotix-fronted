@@ -1,6 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
+import { Users } from 'lucide-react'
 import {
 	Select,
 	SelectContent,
@@ -57,12 +58,18 @@ function StaffFilter({ staff, selectedId, onSelect }: StaffFilterProps) {
 	)
 
 	return (
-		<Select value={selectedId ?? undefined} onValueChange={handleValueChange}>
-			<SelectTrigger className="w-full max-w-sm">
-				<SelectValue placeholder={t('selectStaff')} />
-			</SelectTrigger>
-			<SelectContent>{staff.map(renderStaffOption)}</SelectContent>
-		</Select>
+		<div data-slot="staff-filter" className="flex items-center gap-2">
+			<Users className="text-muted-foreground size-4 shrink-0" />
+			<Select
+				value={selectedId ?? undefined}
+				onValueChange={handleValueChange}
+			>
+				<SelectTrigger className="w-full max-w-sm">
+					<SelectValue placeholder={t('selectStaff')} />
+				</SelectTrigger>
+				<SelectContent>{staff.map(renderStaffOption)}</SelectContent>
+			</Select>
+		</div>
 	)
 }
 

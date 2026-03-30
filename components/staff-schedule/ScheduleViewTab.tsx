@@ -4,7 +4,9 @@ import { useState, useEffect, useCallback } from 'react'
 import { useLocale } from 'next-intl'
 import { Spinner } from '@/components/ui/spinner'
 import { Separator } from '@/components/ui/separator'
+import { Badge } from '@/components/ui/badge'
 import { ScheduleEditor } from '@/components/booking/ScheduleEditor'
+import { cn } from '@/lib/utils'
 import { getCalendarLocale } from '@/lib/calendar/utils'
 import { scheduleApi } from '@/lib/booking-api-client'
 import type {
@@ -21,36 +23,55 @@ interface ScheduleViewTabProps {
 const formatSlots = (slots: { start: string; end: string }[]): string =>
 	slots.map((s) => `${s.start} — ${s.end}`).join(', ')
 
+function ReadOnlyDayRow({
+	day,
+	dayName,
+}: {
+	day: WeeklyHours
+	dayName: string
+}) {
+	return (
+		<div
+			data-slot="schedule-day-row"
+			className={cn(
+				'flex items-center justify-between py-2.5',
+				!day.enabled && 'opacity-50',
+			)}
+		>
+			<span className="text-sm font-medium">{dayName}</span>
+			{day.enabled ? (
+				<Badge variant="secondary" className="font-mono text-xs">
+					{formatSlots(day.slots)}
+				</Badge>
+			) : (
+				<span className="text-muted-foreground text-sm">—</span>
+			)}
+		</div>
+	)
+}
+
 function ReadOnlySchedule({ schedule }: { schedule: ScheduleTemplate }) {
 	const locale = useLocale()
 	const calendarLocale = getCalendarLocale(locale)
 
-	const renderDay = (day: WeeklyHours) => {
-		const dayName = calendarLocale.daysLong[day.dayOfWeek]
+	const isLastDay = (index: number): boolean =>
+		index >= schedule.weeklyHours.length - 1
 
-		return (
-			<div
-				key={day.dayOfWeek}
-				className="flex items-center justify-between py-2"
-			>
-				<span className="text-sm font-medium">{dayName}</span>
-				{day.enabled ? (
-					<span className="text-sm">{formatSlots(day.slots)}</span>
-				) : (
-					<span className="text-muted-foreground text-sm">—</span>
-				)}
-			</div>
-		)
-	}
+	const renderDay = (day: WeeklyHours, index: number) => (
+		<div key={day.dayOfWeek}>
+			<ReadOnlyDayRow
+				day={day}
+				dayName={calendarLocale.daysLong[day.dayOfWeek]}
+			/>
+			{!isLastDay(index) && <Separator />}
+		</div>
+	)
 
 	return (
-		<div className="flex flex-col">
-			{schedule.weeklyHours.map((day, index) => (
-				<div key={day.dayOfWeek}>
-					{renderDay(day)}
-					{index < schedule.weeklyHours.length - 1 && <Separator />}
-				</div>
-			))}
+		<div data-slot="readonly-schedule" className="rounded-lg border p-4">
+			<div className="flex flex-col">
+				{schedule.weeklyHours.map(renderDay)}
+			</div>
 		</div>
 	)
 }
@@ -82,8 +103,8 @@ function ScheduleViewTab({ staffId, orgId, readOnly }: ScheduleViewTabProps) {
 
 	if (loading) {
 		return (
-			<div className="flex justify-center py-8">
-				<Spinner />
+			<div className="flex justify-center py-12">
+				<Spinner className="size-6" />
 			</div>
 		)
 	}

@@ -2,10 +2,15 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
-import { Plus } from 'lucide-react'
+import { Plus, CalendarOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { Empty } from '@/components/ui/empty'
+import {
+	Empty,
+	EmptyHeader,
+	EmptyTitle,
+	EmptyDescription,
+} from '@/components/ui/empty'
 import { Spinner } from '@/components/ui/spinner'
 import { ScheduleOverrideForm } from '@/components/booking/ScheduleOverrideForm'
 import { OverrideListItem } from './OverrideListItem'
@@ -68,8 +73,8 @@ function OverridesTab({ staffId, orgId, readOnly }: OverridesTabProps) {
 
 	if (loading) {
 		return (
-			<div className="flex justify-center py-8">
-				<Spinner />
+			<div className="flex justify-center py-12">
+				<Spinner className="size-6" />
 			</div>
 		)
 	}
@@ -106,7 +111,7 @@ function OverridesTab({ staffId, orgId, readOnly }: OverridesTabProps) {
 		futureOverrides.length === 0 && pastOverrides.length === 0
 
 	return (
-		<div className="flex flex-col gap-4">
+		<div data-slot="overrides-tab" className="flex flex-col gap-6">
 			{!readOnly && (
 				<div className="flex justify-end">
 					<Button variant="outline" size="sm" onClick={toggleForm}>
@@ -117,29 +122,44 @@ function OverridesTab({ staffId, orgId, readOnly }: OverridesTabProps) {
 			)}
 
 			{!readOnly && showForm && (
-				<>
+				<div className="rounded-lg border p-4">
 					<ScheduleOverrideForm staffId={staffId} onSave={handleSave} />
-					<Separator />
-				</>
-			)}
-
-			{hasNoOverrides && <Empty>{t('noOverrides')}</Empty>}
-
-			{futureOverrides.length > 0 && (
-				<div className="flex flex-col gap-2">
-					<h4 className="text-muted-foreground text-xs font-semibold uppercase">
-						{t('futureOverrides')}
-					</h4>
-					{futureOverrides.map(renderFutureItem)}
 				</div>
 			)}
 
+			{hasNoOverrides && (
+				<Empty className="rounded-xl border border-dashed py-12">
+					<EmptyHeader>
+						<CalendarOff className="text-muted-foreground mx-auto mb-2 size-8" />
+						<EmptyTitle>{t('noOverrides')}</EmptyTitle>
+						<EmptyDescription>
+							{!readOnly ? t('noOverridesHint') : ''}
+						</EmptyDescription>
+					</EmptyHeader>
+				</Empty>
+			)}
+
+			{futureOverrides.length > 0 && (
+				<div className="flex flex-col gap-2">
+					<h4 className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
+						{t('futureOverrides')}
+					</h4>
+					<div className="flex flex-col gap-1.5">
+						{futureOverrides.map(renderFutureItem)}
+					</div>
+				</div>
+			)}
+
+			{futureOverrides.length > 0 && pastOverrides.length > 0 && <Separator />}
+
 			{pastOverrides.length > 0 && (
 				<div className="flex flex-col gap-2">
-					<h4 className="text-muted-foreground text-xs font-semibold uppercase">
+					<h4 className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
 						{t('pastOverrides')}
 					</h4>
-					{pastOverrides.map(renderPastItem)}
+					<div className="flex flex-col gap-1.5">
+						{pastOverrides.map(renderPastItem)}
+					</div>
 				</div>
 			)}
 		</div>

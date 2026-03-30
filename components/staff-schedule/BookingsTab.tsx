@@ -2,9 +2,14 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, CalendarX } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Empty } from '@/components/ui/empty'
+import {
+	Empty,
+	EmptyHeader,
+	EmptyTitle,
+	EmptyDescription,
+} from '@/components/ui/empty'
 import { Spinner } from '@/components/ui/spinner'
 import {
 	Sheet,
@@ -82,6 +87,20 @@ const toBookingDetail = (booking: StaffBooking): BookingDetail => ({
 	payment: { status: 'unknown', amount: 0, currency: '' },
 })
 
+const renderDateGroup =
+	(
+		onBookingClick: (booking: StaffBooking) => void,
+		grouped: Map<string, StaffBooking[]>,
+	) =>
+	(date: string) => (
+		<BookingDateGroup
+			key={date}
+			date={date}
+			bookings={grouped.get(date) ?? []}
+			onBookingClick={onBookingClick}
+		/>
+	)
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
 	const t = useTranslations('staffSchedule')
@@ -135,13 +154,13 @@ function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
 	const sortedDates = [...grouped.keys()].sort(sortDatesAsc)
 
 	return (
-		<div className="flex flex-col gap-4">
-			<div className="flex items-center justify-between">
+		<div data-slot="bookings-tab" className="flex flex-col gap-4">
+			<div className="bg-muted/30 flex items-center justify-between rounded-lg p-1">
 				<Button variant="ghost" size="sm" onClick={handlePrevWeek}>
 					<ChevronLeft className="mr-1 size-4" />
 					{t('prevWeek')}
 				</Button>
-				<span className="text-muted-foreground text-sm font-medium">
+				<span className="text-sm font-medium">
 					{formatWeekLabel(dateFrom, dateTo)}
 				</span>
 				<Button variant="ghost" size="sm" onClick={handleNextWeek}>
@@ -151,21 +170,20 @@ function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
 			</div>
 
 			{loading ? (
-				<div className="flex justify-center py-8">
-					<Spinner />
+				<div className="flex justify-center py-12">
+					<Spinner className="size-6" />
 				</div>
 			) : sortedDates.length === 0 ? (
-				<Empty>{t('noBookings')}</Empty>
+				<Empty className="rounded-xl border border-dashed py-12">
+					<EmptyHeader>
+						<CalendarX className="text-muted-foreground mx-auto mb-2 size-8" />
+						<EmptyTitle>{t('noBookings')}</EmptyTitle>
+						<EmptyDescription>{t('noBookingsHint')}</EmptyDescription>
+					</EmptyHeader>
+				</Empty>
 			) : (
 				<div className="flex flex-col gap-4">
-					{sortedDates.map((date) => (
-						<BookingDateGroup
-							key={date}
-							date={date}
-							bookings={grouped.get(date) ?? []}
-							onBookingClick={handleBookingClick}
-						/>
-					))}
+					{sortedDates.map(renderDateGroup(handleBookingClick, grouped))}
 				</div>
 			)}
 

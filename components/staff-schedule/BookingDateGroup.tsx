@@ -16,7 +16,11 @@ const formatDateHeader = (dateStr: string): string =>
 		month: 'long',
 	})
 
-function BookingDateGroup({ date, bookings, onBookingClick }: BookingDateGroupProps) {
+function BookingDateGroup({
+	date,
+	bookings,
+	onBookingClick,
+}: BookingDateGroupProps) {
 	const renderItem = (booking: StaffBooking) => (
 		<BookingListItem
 			key={booking.id}
@@ -26,13 +30,13 @@ function BookingDateGroup({ date, bookings, onBookingClick }: BookingDateGroupPr
 	)
 
 	return (
-		<div className="flex flex-col gap-2">
-			<h4 className="text-muted-foreground sticky top-0 bg-background py-1 text-xs font-semibold uppercase">
-				{formatDateHeader(date)}
-			</h4>
-			<div className="flex flex-col gap-1">
-				{bookings.map(renderItem)}
+		<div data-slot="booking-date-group" className="flex flex-col gap-2">
+			<div className="bg-muted/50 sticky top-0 z-10 -mx-1 rounded-md px-3 py-1.5">
+				<h4 className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
+					{formatDateHeader(date)}
+				</h4>
 			</div>
+			<div className="flex flex-col gap-1.5">{bookings.map(renderItem)}</div>
 		</div>
 	)
 }

@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Spinner } from '@/components/ui/spinner'
+import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
 import { StaffScheduleTabs } from '@/components/staff-schedule/StaffScheduleTabs'
 import { useUser } from '@/lib/auth/user-provider'
 import { orgApi } from '@/lib/booking-api-client'
@@ -51,7 +53,7 @@ export default function MySchedulePage() {
 	if (loading) {
 		return (
 			<div className="flex min-h-[50vh] items-center justify-center">
-				<Spinner />
+				<Spinner className="size-6" />
 			</div>
 		)
 	}
@@ -59,10 +61,17 @@ export default function MySchedulePage() {
 	if (!staffId) return null
 
 	return (
-		<div className="container max-w-3xl py-6">
-			<h1 className="mb-4 text-lg font-semibold">
-				{t('mySchedule')} — {orgName}
-			</h1>
+		<div className="container max-w-3xl space-y-6 py-6">
+			<div className="flex items-center gap-3">
+				<h1 className="text-lg font-semibold">{t('mySchedule')}</h1>
+				{orgName && (
+					<Badge variant="outline" className="text-xs">
+						{orgName}
+					</Badge>
+				)}
+			</div>
+
+			<Separator />
 
 			<StaffScheduleTabs staffId={staffId} orgId={orgId} readOnly={false} />
 		</div>

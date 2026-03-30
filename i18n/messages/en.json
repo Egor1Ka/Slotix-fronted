@@ -341,6 +341,9 @@
 		"dayOff": "Day off",
 		"customHours": "Custom hours",
 		"noBookings": "No bookings",
+		"noBookingsHint": "Try navigating to a different week",
+		"noOverridesHint": "Add a day off or custom hours to get started",
+		"selectStaffHint": "Use the filter above to view a staff member's schedule",
 		"prevWeek": "Previous week",
 		"nextWeek": "Next week",
 		"bookingDetails": "Booking Details"
