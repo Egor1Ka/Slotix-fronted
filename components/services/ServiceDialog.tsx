@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { useForm, Controller } from 'react-hook-form'
+import { useForm, Controller, type FieldErrors } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { toast } from 'sonner'
@@ -33,13 +33,16 @@ const PALETTE = [
 	'#F97316',
 ]
 
-const serviceSchema = z
-	.object({
-		name: z.string().min(2),
-		durationMin: z.number().min(1),
-		price: z.number().min(0),
-		color: z.string().regex(/^#[0-9a-fA-F]{6}$/),
-		description: z.string().optional(),
+const baseServiceSchema = z.object({
+	name: z.string().min(2),
+	durationMin: z.number().min(1),
+	price: z.number().min(0),
+	color: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+	description: z.string().optional(),
+})
+
+const orgServiceSchema = baseServiceSchema
+	.extend({
 		staffPolicy: z.enum(['any', 'by_position', 'specific']),
 		assignedPositions: z.array(z.string()),
 		assignedStaff: z.array(z.string()),
@@ -63,12 +66,17 @@ const serviceSchema = z
 		{ path: ['assignedStaff'], message: 'Select at least one staff member' },
 	)
 
-type ServiceFormData = z.infer<typeof serviceSchema>
+const personalServiceSchema = baseServiceSchema
+
+type OrgServiceFormData = z.infer<typeof orgServiceSchema>
+type PersonalServiceFormData = z.infer<typeof personalServiceSchema>
+type ServiceFormData = OrgServiceFormData | PersonalServiceFormData
 
 interface ServiceDialogProps {
 	open: boolean
 	onOpenChange: (open: boolean) => void
-	orgId: string
+	ownerId: string
+	ownerType: 'org' | 'user'
 	currency: string
 	eventType?: EventType
 	onSuccess: () => void
@@ -77,13 +85,15 @@ interface ServiceDialogProps {
 function ServiceDialog({
 	open,
 	onOpenChange,
-	orgId,
+	ownerId,
+	ownerType,
 	currency,
 	eventType,
 	onSuccess,
 }: ServiceDialogProps) {
 	const t = useTranslations('services')
 	const isEdit = !!eventType
+	const isOrg = ownerType === 'org'
 
 	const [positions, setPositions] = useState<Position[]>([])
 	const [staff, setStaff] = useState<OrgStaffMember[]>([])
@@ -99,7 +109,7 @@ function ServiceDialog({
 		watch,
 		control,
 	} = useForm<ServiceFormData>({
-		resolver: zodResolver(serviceSchema),
+		resolver: zodResolver(isOrg ? orgServiceSchema : personalServiceSchema),
 		defaultValues: {
 			name: '',
 			durationMin: 30,
@@ -118,11 +128,12 @@ function ServiceDialog({
 	const assignedStaff = watch('assignedStaff')
 
 	const loadReferenceData = useCallback(async () => {
+		if (!isOrg) return
 		setLoadingData(true)
 		try {
 			const [positionsRes, staffRes] = await Promise.all([
-				positionApi.getByOrg({ pathParams: { orgId } }),
-				orgApi.getStaff({ pathParams: { id: orgId } }),
+				positionApi.getByOrg({ pathParams: { orgId: ownerId } }),
+				orgApi.getStaff({ pathParams: { id: ownerId } }),
 			])
 			setPositions(positionsRes.data)
 			setStaff(staffRes.data)
@@ -131,26 +142,49 @@ function ServiceDialog({
 		} finally {
 			setLoadingData(false)
 		}
-	}, [orgId])
+	}, [ownerId, isOrg])
 
 	useEffect(() => {
 		if (open) {
 			loadReferenceData()
-			reset({
+
+			const baseDefaults = {
 				name: eventType?.name ?? '',
 				durationMin: eventType?.durationMin ?? 30,
 				price: eventType?.price ?? 0,
 				color: eventType?.color ?? PALETTE[0],
 				description: eventType?.description ?? '',
-				staffPolicy: eventType?.staffPolicy ?? 'any',
-				assignedPositions: eventType?.assignedPositions ?? [],
-				assignedStaff: eventType?.assignedStaff ?? [],
-			})
+			}
+
+			const orgDefaults = isOrg
+				? {
+						staffPolicy: eventType?.staffPolicy ?? 'any',
+						assignedPositions: eventType?.assignedPositions ?? [],
+						assignedStaff: eventType?.assignedStaff ?? [],
+					}
+				: {}
+
+			reset({ ...baseDefaults, ...orgDefaults })
 		}
-	}, [open, eventType, reset, loadReferenceData])
+	}, [open, eventType, reset, loadReferenceData, isOrg])
 
 	const onSubmit = async (data: ServiceFormData) => {
 		try {
+			const ownerField = isOrg ? { orgId: ownerId } : { userId: ownerId }
+			const staffFields = isOrg
+				? {
+						staffPolicy: (data as OrgServiceFormData).staffPolicy,
+						assignedPositions:
+							(data as OrgServiceFormData).staffPolicy === 'by_position'
+								? (data as OrgServiceFormData).assignedPositions
+								: [],
+						assignedStaff:
+							(data as OrgServiceFormData).staffPolicy === 'specific'
+								? (data as OrgServiceFormData).assignedStaff
+								: [],
+					}
+				: {}
+
 			if (isEdit) {
 				await eventTypeApi.update({
 					pathParams: { id: eventType.id },
@@ -161,37 +195,21 @@ function ServiceDialog({
 						currency,
 						color: data.color,
 						description: data.description,
-						staffPolicy: data.staffPolicy,
-						assignedPositions:
-							data.staffPolicy === 'by_position'
-								? data.assignedPositions
-								: [],
-						assignedStaff:
-							data.staffPolicy === 'specific'
-								? data.assignedStaff
-								: [],
+						...staffFields,
 					},
 				})
 				toast.success(t('updated'))
 			} else {
 				await eventTypeApi.create({
 					body: {
-						orgId,
+						...ownerField,
 						name: data.name,
 						durationMin: data.durationMin,
 						price: data.price,
 						currency,
 						color: data.color,
 						description: data.description,
-						staffPolicy: data.staffPolicy,
-						assignedPositions:
-							data.staffPolicy === 'by_position'
-								? data.assignedPositions
-								: [],
-						assignedStaff:
-							data.staffPolicy === 'specific'
-								? data.assignedStaff
-								: [],
+						...staffFields,
 					},
 				})
 				toast.success(t('created'))
@@ -218,7 +236,7 @@ function ServiceDialog({
 			type="button"
 			className={`size-7 rounded-full border-2 transition-transform ${
 				isColorSelected(color)
-					? 'scale-110 border-foreground'
+					? 'border-foreground scale-110'
 					: 'border-transparent hover:border-gray-400'
 			}`}
 			style={{ backgroundColor: color }}
@@ -278,6 +296,8 @@ function ServiceDialog({
 		)
 	}
 
+	const orgErrors = errors as unknown as FieldErrors<OrgServiceFormData>
+
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-md">
@@ -291,9 +311,7 @@ function ServiceDialog({
 				) : (
 					<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 						<Field data-invalid={!!errors.name || undefined}>
-							<FieldLabel htmlFor="service-name">
-								{t('name')}
-							</FieldLabel>
+							<FieldLabel htmlFor="service-name">{t('name')}</FieldLabel>
 							<Input
 								id="service-name"
 								placeholder={t('namePlaceholder')}
@@ -303,9 +321,7 @@ function ServiceDialog({
 						</Field>
 
 						<div className="grid grid-cols-2 gap-3">
-							<Field
-								data-invalid={!!errors.durationMin || undefined}
-							>
+							<Field data-invalid={!!errors.durationMin || undefined}>
 								<FieldLabel htmlFor="service-duration">
 									{t('duration')} ({t('durationMin')})
 								</FieldLabel>
@@ -357,77 +373,95 @@ function ServiceDialog({
 							<FieldError errors={[errors.description]} />
 						</Field>
 
-						<Field data-invalid={!!errors.staffPolicy || undefined}>
-							<FieldLabel>{t('staffPolicy')}</FieldLabel>
-							<Controller
-								control={control}
-								name="staffPolicy"
-								render={({ field }) => (
-									<RadioGroup
-										value={field.value}
-										onValueChange={field.onChange}
-										className="gap-3"
+						{isOrg && (
+							<>
+								<Field
+									data-invalid={
+										!!orgErrors.staffPolicy || undefined
+									}
+								>
+									<FieldLabel>{t('staffPolicy')}</FieldLabel>
+									<Controller
+										control={control}
+										name="staffPolicy"
+										render={({ field }) => (
+											<RadioGroup
+												value={field.value}
+												onValueChange={field.onChange}
+												className="gap-3"
+											>
+												<label className="flex items-center gap-2 text-sm">
+													<RadioGroupItem value="any" />
+													{t('staffPolicyAny')}
+												</label>
+												<label className="flex items-center gap-2 text-sm">
+													<RadioGroupItem value="by_position" />
+													{t('staffPolicyByPosition')}
+												</label>
+												<label className="flex items-center gap-2 text-sm">
+													<RadioGroupItem value="specific" />
+													{t('staffPolicySpecific')}
+												</label>
+											</RadioGroup>
+										)}
+									/>
+									<FieldError
+										errors={[
+											orgErrors.staffPolicy,
+										]}
+									/>
+								</Field>
+
+								{staffPolicy === 'by_position' && (
+									<Field
+										data-invalid={
+											!!orgErrors.assignedPositions ||
+											undefined
+										}
 									>
-										<label className="flex items-center gap-2 text-sm">
-											<RadioGroupItem value="any" />
-											{t('staffPolicyAny')}
-										</label>
-										<label className="flex items-center gap-2 text-sm">
-											<RadioGroupItem value="by_position" />
-											{t('staffPolicyByPosition')}
-										</label>
-										<label className="flex items-center gap-2 text-sm">
-											<RadioGroupItem value="specific" />
-											{t('staffPolicySpecific')}
-										</label>
-									</RadioGroup>
+										<FieldLabel>{t('assignedPositions')}</FieldLabel>
+										{positions.length === 0 ? (
+											<p className="text-muted-foreground text-sm">
+												{t('selectPositions')}
+											</p>
+										) : (
+											<div className="flex flex-wrap gap-2">
+												{positions.map(renderPositionChip)}
+											</div>
+										)}
+										<FieldError
+											errors={[
+												orgErrors.assignedPositions,
+											]}
+										/>
+									</Field>
 								)}
-							/>
-							<FieldError errors={[errors.staffPolicy]} />
-						</Field>
 
-						{staffPolicy === 'by_position' && (
-							<Field
-								data-invalid={
-									!!errors.assignedPositions || undefined
-								}
-							>
-								<FieldLabel>
-									{t('assignedPositions')}
-								</FieldLabel>
-								{positions.length === 0 ? (
-									<p className="text-muted-foreground text-sm">
-										{t('selectPositions')}
-									</p>
-								) : (
-									<div className="flex flex-wrap gap-2">
-										{positions.map(renderPositionChip)}
-									</div>
+								{staffPolicy === 'specific' && (
+									<Field
+										data-invalid={
+											!!orgErrors.assignedStaff ||
+											undefined
+										}
+									>
+										<FieldLabel>{t('assignedStaff')}</FieldLabel>
+										{staff.length === 0 ? (
+											<p className="text-muted-foreground text-sm">
+												{t('selectStaff')}
+											</p>
+										) : (
+											<div className="flex flex-wrap gap-2">
+												{staff.map(renderStaffChip)}
+											</div>
+										)}
+										<FieldError
+											errors={[
+												orgErrors.assignedStaff,
+											]}
+										/>
+									</Field>
 								)}
-								<FieldError
-									errors={[errors.assignedPositions]}
-								/>
-							</Field>
-						)}
-
-						{staffPolicy === 'specific' && (
-							<Field
-								data-invalid={
-									!!errors.assignedStaff || undefined
-								}
-							>
-								<FieldLabel>{t('assignedStaff')}</FieldLabel>
-								{staff.length === 0 ? (
-									<p className="text-muted-foreground text-sm">
-										{t('selectStaff')}
-									</p>
-								) : (
-									<div className="flex flex-wrap gap-2">
-										{staff.map(renderStaffChip)}
-									</div>
-								)}
-								<FieldError errors={[errors.assignedStaff]} />
-							</Field>
+							</>
 						)}
 
 						<DialogFooter>
