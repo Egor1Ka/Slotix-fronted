@@ -176,7 +176,23 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 
 			const bookingBlocks = dayBookings.map(toBookingBlock)
 
-			if (!selectedEventType || confirmedBooking) return bookingBlocks
+			const breakBookings = strategyStaffId
+				? getBreakBookings(overridesList, strategyStaffId, blockDate)
+				: []
+
+			const breakBlocks: CalendarBlock[] = breakBookings.map(
+				(brk, index) => ({
+					id: `break-${blockDate}-${index}`,
+					startMin: brk.startMin,
+					duration: brk.duration,
+					date: blockDate,
+					color: '',
+					blockType: 'locked' as const,
+				}),
+			)
+
+			if (!selectedEventType || confirmedBooking)
+				return [...bookingBlocks, ...breakBlocks]
 
 			const workHours = getWorkHoursForDate(
 				schedule.weeklyHours,
@@ -184,16 +200,13 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 				strategyStaffId ? overridesList : undefined,
 				strategyStaffId,
 			)
-			if (!workHours) return bookingBlocks
+			if (!workHours) return [...bookingBlocks, ...breakBlocks]
 
 			const dayBookingsForSlots = getBookingsForDate(bookings, blockDate)
 			const toSlotEngine = (b: CalendarDisplayBooking) => ({
 				startMin: b.startMin,
 				duration: b.duration,
 			})
-			const breakBookings = strategyStaffId
-				? getBreakBookings(overridesList, strategyStaffId, blockDate)
-				: []
 			const allBookingsForSlots = [
 				...dayBookingsForSlots.map(toSlotEngine),
 				...breakBookings,
@@ -246,19 +259,6 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 					},
 				]
 			})()
-
-			const breakBlocks: CalendarBlock[] = strategyStaffId
-				? getBreakBookings(overridesList, strategyStaffId, blockDate).map(
-						(brk, index) => ({
-							id: `break-${blockDate}-${index}`,
-							startMin: brk.startMin,
-							duration: brk.duration,
-							date: blockDate,
-							color: '',
-							blockType: 'locked' as const,
-						}),
-					)
-				: []
 
 			return [...bookingBlocks, ...breakBlocks, ...dropZoneBlocks, ...pendingBlock]
 		},
