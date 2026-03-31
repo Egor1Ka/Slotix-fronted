@@ -3,7 +3,13 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
-import { PencilIcon, Plus, Trash2Icon } from 'lucide-react'
+import {
+	BanknoteIcon,
+	ClockIcon,
+	PencilIcon,
+	Plus,
+	Trash2Icon,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
 	AlertDialog,
@@ -24,43 +30,52 @@ import {
 	EmptyTitle,
 } from '@/components/ui/empty'
 import { ServiceDialog } from '@/components/services/ServiceDialog'
+import { cn } from '@/lib/utils'
 import { eventTypeApi } from '@/services'
 import { eventTypeApi as bookingEventTypeApi } from '@/lib/booking-api-client'
 import type { EventType } from '@/services'
 
-const POLICY_BADGE_VARIANT = {
-	any: 'default',
-	by_position: 'secondary',
-	specific: 'outline',
+const POLICY_BADGE_CLASS = {
+	any: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800',
+	by_position:
+		'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950 dark:text-indigo-300 dark:border-indigo-800',
+	specific:
+		'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-800',
 } as const
 
 interface ServicesListProps {
-	orgId: string
+	ownerId: string
+	ownerType: 'org' | 'user'
 	currency: string
 }
 
-function ServicesList({ orgId, currency }: ServicesListProps) {
+function ServicesList({ ownerId, ownerType, currency }: ServicesListProps) {
 	const t = useTranslations('services')
 	const [services, setServices] = useState<EventType[]>([])
 	const [loading, setLoading] = useState(true)
 	const [dialogOpen, setDialogOpen] = useState(false)
-	const [editingService, setEditingService] = useState<
-		EventType | undefined
-	>(undefined)
+	const [editingService, setEditingService] = useState<EventType | undefined>(
+		undefined,
+	)
 	const [deleteTarget, setDeleteTarget] = useState<EventType | undefined>(
 		undefined,
 	)
 
+	const fetchByOwnerType =
+		ownerType === 'org'
+			? bookingEventTypeApi.getByOrg
+			: bookingEventTypeApi.getByUser
+
 	const fetchServices = useCallback(async () => {
 		try {
-			const data = await bookingEventTypeApi.getByOrg(orgId)
+			const data = await fetchByOwnerType(ownerId)
 			setServices(data)
 		} catch {
 			// Toast вже показано інтерцептором
 		} finally {
 			setLoading(false)
 		}
-	}, [orgId])
+	}, [ownerId, fetchByOwnerType])
 
 	useEffect(() => {
 		fetchServices()
@@ -111,39 +126,55 @@ function ServicesList({ orgId, currency }: ServicesListProps) {
 	const renderService = (service: EventType) => (
 		<div
 			key={service.id}
-			className="flex items-center justify-between rounded-lg border p-3"
+			className="group bg-card relative flex items-center justify-between overflow-hidden rounded-lg border transition-shadow hover:shadow-sm"
 		>
-			<div className="flex items-center gap-3">
-				<span
-					className="size-4 shrink-0 rounded-full"
-					style={{ backgroundColor: service.color }}
-				/>
-				<div>
-					<div className="text-sm font-medium">{service.name}</div>
-					<div className="text-muted-foreground text-xs">
-						{service.durationMin} {t('durationMin')} &middot;{' '}
-						{service.price} {service.currency}
+			<span
+				className="absolute inset-y-0 left-0 w-1 shrink-0 rounded-l-lg"
+				style={{ backgroundColor: service.color }}
+			/>
+			<div className="flex min-w-0 flex-1 items-center gap-4 py-3 pr-3 pl-5">
+				<div className="min-w-0 flex-1">
+					<div className="truncate text-base font-medium">{service.name}</div>
+					<div className="mt-1 flex items-center gap-3">
+						<span className="text-muted-foreground flex items-center gap-1 text-xs">
+							<ClockIcon className="size-3 shrink-0" />
+							{service.durationMin} {t('durationMin')}
+						</span>
+						<span className="text-muted-foreground flex items-center gap-1 text-xs">
+							<BanknoteIcon className="size-3 shrink-0" />
+							{service.price} {service.currency}
+						</span>
 					</div>
 				</div>
 			</div>
-			<div className="flex items-center gap-2">
-				<Badge variant={POLICY_BADGE_VARIANT[service.staffPolicy]}>
-					{getPolicyLabel(service.staffPolicy)}
-				</Badge>
-				<Button
-					variant="ghost"
-					size="icon-sm"
-					onClick={openEditDialog(service)}
-				>
-					<PencilIcon />
-				</Button>
-				<Button
-					variant="ghost"
-					size="icon-sm"
-					onClick={openDeleteDialog(service)}
-				>
-					<Trash2Icon />
-				</Button>
+			<div className="flex shrink-0 items-center gap-2 py-3 pr-3">
+				{ownerType === 'org' && (
+					<Badge
+						variant="outline"
+						className={cn(
+							'hidden text-xs sm:inline-flex',
+							POLICY_BADGE_CLASS[service.staffPolicy],
+						)}
+					>
+						{getPolicyLabel(service.staffPolicy)}
+					</Badge>
+				)}
+				<div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+					<Button
+						variant="ghost"
+						size="icon-sm"
+						onClick={openEditDialog(service)}
+					>
+						<PencilIcon />
+					</Button>
+					<Button
+						variant="ghost"
+						size="icon-sm"
+						onClick={openDeleteDialog(service)}
+					>
+						<Trash2Icon />
+					</Button>
+				</div>
 			</div>
 		</div>
 	)
@@ -157,7 +188,7 @@ function ServicesList({ orgId, currency }: ServicesListProps) {
 	}
 
 	return (
-		<div className="space-y-4">
+		<div className="mx-auto max-w-2xl space-y-4">
 			<div className="flex items-center justify-between">
 				<h2 className="text-lg font-semibold">{t('title')}</h2>
 				<Button onClick={openCreateDialog}>
@@ -170,21 +201,18 @@ function ServicesList({ orgId, currency }: ServicesListProps) {
 				<Empty className="border">
 					<EmptyHeader>
 						<EmptyTitle>{t('empty')}</EmptyTitle>
-						<EmptyDescription>
-							{t('emptyDescription')}
-						</EmptyDescription>
+						<EmptyDescription>{t('emptyDescription')}</EmptyDescription>
 					</EmptyHeader>
 				</Empty>
 			) : (
-				<div className="space-y-2">
-					{services.map(renderService)}
-				</div>
+				<div className="space-y-2">{services.map(renderService)}</div>
 			)}
 
 			<ServiceDialog
 				open={dialogOpen}
 				onOpenChange={setDialogOpen}
-				orgId={orgId}
+				ownerId={ownerId}
+				ownerType={ownerType}
 				currency={currency}
 				eventType={editingService}
 				onSuccess={handleDialogSuccess}
@@ -205,10 +233,7 @@ function ServicesList({ orgId, currency }: ServicesListProps) {
 					</AlertDialogHeader>
 					<AlertDialogFooter>
 						<AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
-						<AlertDialogAction
-							variant="destructive"
-							onClick={handleDelete}
-						>
+						<AlertDialogAction variant="destructive" onClick={handleDelete}>
 							{t('delete')}
 						</AlertDialogAction>
 					</AlertDialogFooter>
