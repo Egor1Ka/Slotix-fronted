@@ -9,7 +9,7 @@ export default async function ServicesPage({
 
 	return (
 		<div className="container max-w-3xl py-6">
-			<ServicesList orgId={orgId} currency="UAH" />
+			<ServicesList ownerId={orgId} ownerType="org" currency="UAH" />
 		</div>
 	)
 }
