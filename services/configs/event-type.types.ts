@@ -1,14 +1,15 @@
 type StaffPolicy = 'any' | 'by_position' | 'specific'
 
 interface CreateEventTypeBody {
-	orgId: string
+	orgId?: string
+	userId?: string
 	name: string
 	durationMin: number
 	price: number
 	currency: string
 	color?: string
 	description?: string
-	staffPolicy: StaffPolicy
+	staffPolicy?: StaffPolicy
 	assignedPositions?: string[]
 	assignedStaff?: string[]
 }
