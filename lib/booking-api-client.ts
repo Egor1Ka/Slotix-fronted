@@ -40,6 +40,11 @@ const fetchApi = async <T>(
 		...options,
 	})
 
+	const contentType = res.headers.get('content-type') ?? ''
+	if (!contentType.includes('application/json')) {
+		throw new Error(`API error: ${res.status} — expected JSON, got ${contentType || 'unknown'}`)
+	}
+
 	const json: ApiResponse<T> = await res.json()
 
 	if (!res.ok) {
@@ -172,7 +177,9 @@ const toFrontendWeeklyHours = (raw: BackendWeeklyHours): WeeklyHours => ({
 	slots: raw.slots,
 })
 
-const toFrontendSchedule = (raw: BackendScheduleTemplate): ScheduleTemplate => ({
+const toFrontendSchedule = (
+	raw: BackendScheduleTemplate,
+): ScheduleTemplate => ({
 	staffId: raw.staffId,
 	orgId: raw.orgId,
 	weeklyHours: raw.weeklyHours.map(toFrontendWeeklyHours),
@@ -181,7 +188,9 @@ const toFrontendSchedule = (raw: BackendScheduleTemplate): ScheduleTemplate => (
 	timezone: raw.timezone,
 })
 
-const toFrontendBookingResponse = (raw: BackendBookingCreatedDto): BookingResponse => ({
+const toFrontendBookingResponse = (
+	raw: BackendBookingCreatedDto,
+): BookingResponse => ({
 	id: raw.id,
 	eventTypeId: raw.eventTypeId,
 	eventTypeName: raw.eventTypeName,
@@ -242,14 +251,25 @@ const getEventTypesByOrg = async (orgId: string): Promise<EventType[]> => {
 	return raw.map(toFrontendEventType)
 }
 
-const getStaffForEventType = async (eventTypeId: string): Promise<OrgStaffMember[]> =>
+const getEventTypesByUser = async (userId: string): Promise<EventType[]> => {
+	const raw = await get<BackendEventType[]>(`/event-types?userId=${userId}`)
+	return raw.map(toFrontendEventType)
+}
+
+const getStaffForEventType = async (
+	eventTypeId: string,
+): Promise<OrgStaffMember[]> =>
 	get<OrgStaffMember[]>(`/event-types/${eventTypeId}/staff`)
 
 // ── Schedule API ──
 
-const getScheduleTemplate = async (staffId: string): Promise<ScheduleTemplate> => {
+const getScheduleTemplate = async (
+	staffId: string,
+	orgId?: string,
+): Promise<ScheduleTemplate> => {
+	const orgParam = orgId ? `&orgId=${orgId}` : ''
 	const raw = await get<BackendScheduleTemplate>(
-		`/schedule/template?staffId=${staffId}`,
+		`/schedule/template?staffId=${staffId}${orgParam}`,
 	)
 	return toFrontendSchedule(raw)
 }
@@ -272,13 +292,14 @@ const toBackendWeeklyHours = (wh: WeeklyHours): BackendWeeklyHours => ({
 
 const updateScheduleTemplate = async (
 	staffId: string,
-	_orgId: string | null,
+	orgId: string | null,
 	weeklyHours: WeeklyHours[],
 	slotMode?: SlotMode,
 	slotStepMin?: number,
 ): Promise<ScheduleTemplate> => {
 	const body = {
 		staffId,
+		...(orgId && { orgId }),
 		weeklyHours: weeklyHours.map(toBackendWeeklyHours),
 		...(slotMode !== undefined && { slotMode }),
 		...(slotStepMin !== undefined && { slotStepMin }),
@@ -287,7 +308,9 @@ const updateScheduleTemplate = async (
 	return toFrontendSchedule(raw)
 }
 
-const getSchedulesByOrg = async (orgId: string): Promise<ScheduleTemplate[]> => {
+const getSchedulesByOrg = async (
+	orgId: string,
+): Promise<ScheduleTemplate[]> => {
 	const raw = await get<BackendScheduleTemplate[]>(
 		`/schedule/templates/by-org/${orgId}`,
 	)
@@ -301,12 +324,22 @@ const createScheduleOverride = async (
 
 const getScheduleOverrides = async (
 	staffId: string,
-): Promise<ScheduleOverride[]> =>
-	get<ScheduleOverride[]>(`/schedule/overrides?staffId=${staffId}`)
+	orgId?: string,
+): Promise<ScheduleOverride[]> => {
+	const orgParam = orgId ? `&orgId=${orgId}` : ''
+	return get<ScheduleOverride[]>(
+		`/schedule/overrides?staffId=${staffId}${orgParam}`,
+	)
+}
 
 const deleteScheduleOverride = async (overrideId: string): Promise<void> => {
 	await del<void>(`/schedule/override/${overrideId}`)
 }
+
+const getScheduleOverridesByOrg = async (
+	orgId: string,
+): Promise<ScheduleOverride[]> =>
+	get<ScheduleOverride[]>(`/schedule/overrides/by-org/${orgId}`)
 
 // ── Booking API ──
 
@@ -399,6 +432,7 @@ export const staffApi = {
 export const eventTypeApi = {
 	getByStaff: getEventTypesByStaff,
 	getByOrg: getEventTypesByOrg,
+	getByUser: getEventTypesByUser,
 	getStaffForEventType,
 }
 
@@ -408,6 +442,7 @@ export const scheduleApi = {
 	updateTemplate: updateScheduleTemplate,
 	createOverride: createScheduleOverride,
 	getOverrides: getScheduleOverrides,
+	getOverridesByOrg: getScheduleOverridesByOrg,
 	deleteOverride: deleteScheduleOverride,
 }
 
