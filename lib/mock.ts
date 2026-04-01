@@ -354,25 +354,4 @@ export const mockBookingFormConfig: BookingFormConfig = {
 
 // ── Booking Fields ──
 
-export const mockBookingFields: BookingField[] = [
-	{
-		id: 'bf-001',
-		ownerId: '507f1f77bcf86cd799439011',
-		ownerType: 'org',
-		eventTypeId: null,
-		type: 'textarea',
-		label: 'Комментарій',
-		required: false,
-		createdAt: '2026-03-01T10:00:00Z',
-	},
-	{
-		id: 'bf-002',
-		ownerId: '507f1f77bcf86cd799439011',
-		ownerType: 'org',
-		eventTypeId: '607f1f77bcf86cd799439002',
-		type: 'text',
-		label: 'Алергії',
-		required: true,
-		createdAt: '2026-03-15T10:00:00Z',
-	},
-]
+export const mockBookingFields: BookingField[] = []
