@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { bookingApi, bookingFormApi } from '@/lib/booking-api-client'
 import type { ConfirmedBooking } from '../types'
 import type { EventType } from '@/services/configs/booking.types'
@@ -98,9 +98,8 @@ const useBookingActions = (
 
 	// Извлечение значений кастомных полей из данных формы
 	const isCustomField = (key: string): boolean => key.startsWith('custom_')
-	const toCustomFieldValue = (
-		data: Record<string, unknown>,
-	): ((key: string) => CustomFieldValue) =>
+	const toCustomFieldValue =
+		(data: Record<string, unknown>): ((key: string) => CustomFieldValue) =>
 		(key: string) => ({
 			fieldId: key.replace('custom_', ''),
 			value: String(data[key] ?? ''),

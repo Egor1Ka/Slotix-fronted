@@ -3,6 +3,7 @@
 ## Цель
 
 Дать владельцам организаций и персональным пользователям возможность настраивать форму бронирования:
+
 - Управлять обязательностью базовых полей (phone, email) на уровне org/user
 - Переопределять обязательность базовых полей per-service
 - Добавлять кастомные поля (org-level и per-service)
@@ -20,6 +21,7 @@
 ## Подход
 
 **Подход 2 — Отдельная сущность BookingField** с нормализованными данными. Выбран за:
+
 - Простой CRUD отдельных полей
 - Расширяемость (drag & drop order позже)
 - Нормализованная структура данных
@@ -30,30 +32,30 @@
 
 ### BookingField (новая сущность)
 
-| Поле          | Тип                                      | Описание                                   |
-| ------------- | ---------------------------------------- | ------------------------------------------ |
-| `id`          | `string`                                 | Уникальный ID                              |
-| `ownerId`     | `string`                                 | ID организации или пользователя            |
-| `ownerType`   | `'org' \| 'user'`                        | Тип владельца                              |
-| `eventTypeId` | `string \| null`                         | `null` = базовое поле для всех услуг       |
-| `type`        | `'email' \| 'phone' \| 'text' \| 'textarea'` | Тип поля                              |
-| `label`       | `string`                                 | Лейбл поля ("Аллергии", "Telegram" и т.д.) |
-| `required`    | `boolean`                                | Обязательность                             |
-| `createdAt`   | `string`                                 | ISO дата создания (для сортировки)         |
+| Поле          | Тип                                          | Описание                                   |
+| ------------- | -------------------------------------------- | ------------------------------------------ |
+| `id`          | `string`                                     | Уникальный ID                              |
+| `ownerId`     | `string`                                     | ID организации или пользователя            |
+| `ownerType`   | `'org' \| 'user'`                            | Тип владельца                              |
+| `eventTypeId` | `string \| null`                             | `null` = базовое поле для всех услуг       |
+| `type`        | `'email' \| 'phone' \| 'text' \| 'textarea'` | Тип поля                                   |
+| `label`       | `string`                                     | Лейбл поля ("Аллергии", "Telegram" и т.д.) |
+| `required`    | `boolean`                                    | Обязательность                             |
+| `createdAt`   | `string`                                     | ISO дата создания (для сортировки)         |
 
 ### BookingFormConfig (на org/user)
 
-| Поле            | Тип       | Описание                           |
-| --------------- | --------- | ---------------------------------- |
-| `phoneRequired` | `boolean` | Обязательность phone по умолчанию  |
-| `emailRequired` | `boolean` | Обязательность email по умолчанию  |
+| Поле            | Тип       | Описание                          |
+| --------------- | --------- | --------------------------------- |
+| `phoneRequired` | `boolean` | Обязательность phone по умолчанию |
+| `emailRequired` | `boolean` | Обязательность email по умолчанию |
 
 ### baseFieldOverrides (на EventType)
 
-| Поле             | Тип                | Описание                                          |
-| ---------------- | ------------------ | ------------------------------------------------- |
-| `phoneRequired?` | `boolean \| null`  | `null` / отсутствует = наследовать от org/user     |
-| `emailRequired?` | `boolean \| null`  | `null` / отсутствует = наследовать от org/user     |
+| Поле             | Тип               | Описание                                       |
+| ---------------- | ----------------- | ---------------------------------------------- |
+| `phoneRequired?` | `boolean \| null` | `null` / отсутствует = наследовать от org/user |
+| `emailRequired?` | `boolean \| null` | `null` / отсутствует = наследовать от org/user |
 
 ### Логика merge
 
@@ -70,20 +72,20 @@ customFields → поля с eventTypeId=null (org-level) + поля с eventTyp
 
 ### BookingField CRUD
 
-| Метод    | URL                              | Описание                          |
-| -------- | -------------------------------- | --------------------------------- |
-| `GET`    | `/api/booking-fields?ownerId=X&ownerType=org` | Все базовые поля орг    |
+| Метод    | URL                                                         | Описание               |
+| -------- | ----------------------------------------------------------- | ---------------------- |
+| `GET`    | `/api/booking-fields?ownerId=X&ownerType=org`               | Все базовые поля орг   |
 | `GET`    | `/api/booking-fields?ownerId=X&ownerType=org&eventTypeId=Y` | Поля конкретной услуги |
-| `POST`   | `/api/booking-fields`            | Создать поле                      |
-| `PATCH`  | `/api/booking-fields/:id`        | Обновить поле                     |
-| `DELETE` | `/api/booking-fields/:id`        | Удалить поле                      |
+| `POST`   | `/api/booking-fields`                                       | Создать поле           |
+| `PATCH`  | `/api/booking-fields/:id`                                   | Обновить поле          |
+| `DELETE` | `/api/booking-fields/:id`                                   | Удалить поле           |
 
 ### BookingFormConfig
 
-| Метод    | URL                                            | Описание             |
-| -------- | ---------------------------------------------- | -------------------- |
-| `GET`    | `/api/booking-form-config?ownerId=X&ownerType=org` | Текущие настройки |
-| `PATCH`  | `/api/booking-form-config`                     | Обновить настройки   |
+| Метод   | URL                                                | Описание           |
+| ------- | -------------------------------------------------- | ------------------ |
+| `GET`   | `/api/booking-form-config?ownerId=X&ownerType=org` | Текущие настройки  |
+| `PATCH` | `/api/booking-form-config`                         | Обновить настройки |
 
 ### EventType baseFieldOverrides
 
@@ -95,23 +97,28 @@ customFields → поля с eventTypeId=null (org-level) + поля с eventTyp
 
 ### Публичный эндпоинт — готовая форма для клиента
 
-| Метод | URL                              | Описание                    |
-| ----- | -------------------------------- | --------------------------- |
-| `GET` | `/api/booking-form/:eventTypeId` | Merged конфиг для рендера   |
+| Метод | URL                              | Описание                  |
+| ----- | -------------------------------- | ------------------------- |
+| `GET` | `/api/booking-form/:eventTypeId` | Merged конфиг для рендера |
 
 Ответ:
 
 ```json
 {
-  "baseFields": {
-    "name": { "required": true },
-    "phone": { "required": true },
-    "email": { "required": false }
-  },
-  "customFields": [
-    { "id": "abc", "type": "textarea", "label": "Комментарий", "required": false },
-    { "id": "def", "type": "text", "label": "Аллергии", "required": true }
-  ]
+	"baseFields": {
+		"name": { "required": true },
+		"phone": { "required": true },
+		"email": { "required": false }
+	},
+	"customFields": [
+		{
+			"id": "abc",
+			"type": "textarea",
+			"label": "Комментарий",
+			"required": false
+		},
+		{ "id": "def", "type": "text", "label": "Аллергии", "required": true }
+	]
 }
 ```
 
@@ -127,28 +134,28 @@ customFields → поля с eventTypeId=null (org-level) + поля с eventTyp
 type BookingFieldType = 'email' | 'phone' | 'text' | 'textarea'
 
 interface BookingField {
-  id: string
-  ownerId: string
-  ownerType: 'org' | 'user'
-  eventTypeId: string | null
-  type: BookingFieldType
-  label: string
-  required: boolean
-  createdAt: string
+	id: string
+	ownerId: string
+	ownerType: 'org' | 'user'
+	eventTypeId: string | null
+	type: BookingFieldType
+	label: string
+	required: boolean
+	createdAt: string
 }
 
 interface BookingFormConfig {
-  phoneRequired: boolean
-  emailRequired: boolean
+	phoneRequired: boolean
+	emailRequired: boolean
 }
 
 interface MergedBookingForm {
-  baseFields: {
-    name: { required: true }
-    phone: { required: boolean }
-    email: { required: boolean }
-  }
-  customFields: BookingField[]
+	baseFields: {
+		name: { required: true }
+		phone: { required: boolean }
+		email: { required: boolean }
+	}
+	customFields: BookingField[]
 }
 ```
 
@@ -156,12 +163,12 @@ interface MergedBookingForm {
 
 ```typescript
 interface CreateBookingBody {
-  eventTypeId: string
-  staffId: string
-  startAt: string
-  timezone: string
-  invitee: Invitee
-  customFieldValues: { fieldId: string; value: string }[]  // новое
+	eventTypeId: string
+	staffId: string
+	startAt: string
+	timezone: string
+	invitee: Invitee
+	customFieldValues: { fieldId: string; value: string }[] // новое
 }
 ```
 
@@ -172,6 +179,7 @@ interface CreateBookingBody {
 ### ClientInfoForm (рефакторинг)
 
 Становится динамическим:
+
 - Получает `MergedBookingForm` как проп
 - name/phone/email рендерятся с required/optional на основе конфига
 - Кастомные поля рендерятся через маппинг type → компонент:
@@ -184,6 +192,7 @@ interface CreateBookingBody {
 ### BookingFieldEditor (новый)
 
 Форма создания/редактирования кастомного поля:
+
 - Поля: label (input), type (select), required (switch)
 - Используется в настройках орг и в ServiceDialog
 
@@ -196,6 +205,7 @@ interface CreateBookingBody {
 ### ServiceDialog (дополнение)
 
 Новая секция "Форма бронирования":
+
 - Override тогглы для phone/email (3 состояния: наследовать / required / optional)
 - Список кастомных полей привязанных к этой услуге
 - Кнопка [+ Добавить поле] → BookingFieldEditor
@@ -241,6 +251,7 @@ interface CreateBookingBody {
 ## Валидация на бэкенде
 
 При `POST /api/bookings` бэкенд:
+
 1. Резолвит форму (merge org config + service overrides + custom fields)
 2. Проверяет: все required базовые поля заполнены
 3. Проверяет: все required кастомные поля есть в `customFieldValues`
