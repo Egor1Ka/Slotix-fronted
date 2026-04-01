@@ -358,7 +358,22 @@
 		"selectStaff": "Select staff",
 		"created": "Service created",
 		"updated": "Service updated",
-		"deleted": "Service deleted"
+		"deleted": "Service deleted",
+		"bookingForm": {
+			"title": "Booking form",
+			"phoneOverride": "Phone",
+			"emailOverride": "Email",
+			"inherit": "Inherit from org",
+			"required": "Required",
+			"optional": "Optional",
+			"customFields": "Custom fields",
+			"saveFirst": "Save the service first to add custom fields",
+			"addField": "Add field",
+			"fieldCreated": "Field added",
+			"fieldUpdated": "Field updated",
+			"fieldDeleted": "Field deleted",
+			"noCustomFields": "No custom fields yet"
+		}
 	},
 	"staffSchedule": {
 		"mySchedule": "My Schedule",

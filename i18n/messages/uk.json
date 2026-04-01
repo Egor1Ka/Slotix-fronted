@@ -358,7 +358,22 @@
 		"selectStaff": "Оберіть співробітників",
 		"created": "Послугу створено",
 		"updated": "Послугу оновлено",
-		"deleted": "Послугу видалено"
+		"deleted": "Послугу видалено",
+		"bookingForm": {
+			"title": "Форма бронювання",
+			"phoneOverride": "Телефон",
+			"emailOverride": "Email",
+			"inherit": "Успадкувати від організації",
+			"required": "Обов'язково",
+			"optional": "Необов'язково",
+			"customFields": "Додаткові поля",
+			"saveFirst": "Спершу збережіть послугу, щоб додати поля",
+			"addField": "Додати поле",
+			"fieldCreated": "Поле додано",
+			"fieldUpdated": "Поле оновлено",
+			"fieldDeleted": "Поле видалено",
+			"noCustomFields": "Додаткових полів ще немає"
+		}
 	},
 	"staffSchedule": {
 		"mySchedule": "Мій розклад",
