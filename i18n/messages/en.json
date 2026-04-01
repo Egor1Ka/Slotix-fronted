@@ -209,6 +209,33 @@
 			"reason": "Reason",
 			"reasonPlaceholder": "Vacation, sick day...",
 			"addException": "Add exception"
+		},
+		"bookingForm": {
+			"title": "Booking form",
+			"baseFields": "Base fields",
+			"phoneRequired": "Phone required",
+			"emailRequired": "Email required",
+			"customFields": "Custom fields",
+			"serviceFields": "Service-specific fields",
+			"addField": "Add field",
+			"editField": "Edit field",
+			"fieldLabel": "Field label",
+			"fieldType": "Field type",
+			"fieldRequired": "Required",
+			"inherit": "Inherit",
+			"required": "Required",
+			"optional": "Optional",
+			"typeEmail": "Email",
+			"typePhone": "Phone",
+			"typeText": "Text",
+			"typeTextarea": "Text (multiline)",
+			"deleteFieldConfirm": "Delete this field?",
+			"fieldCreated": "Field added",
+			"fieldUpdated": "Field updated",
+			"fieldDeleted": "Field deleted",
+			"configUpdated": "Form settings updated",
+			"overrides": "Override for this service",
+			"noCustomFields": "No custom fields yet"
 		}
 	},
 	"calendar": {
@@ -254,7 +281,8 @@
 		"staff": "Staff",
 		"positions": "Positions",
 		"services": "Services",
-		"myScheduleSettings": "Schedule Settings"
+		"myScheduleSettings": "Schedule Settings",
+		"myServices": "My Services"
 	},
 	"organizations": {
 		"title": "My organizations",
@@ -311,6 +339,7 @@
 		"deleteConfirm": "Are you sure you want to delete this service?",
 		"empty": "No services yet",
 		"emptyDescription": "Create the first service for the organization",
+		"emptyDescriptionPersonal": "Create your first personal service",
 		"name": "Name",
 		"duration": "Duration",
 		"durationMin": "min",

@@ -209,6 +209,33 @@
 			"reason": "Причина",
 			"reasonPlaceholder": "Відпустка, хвороба...",
 			"addException": "Додати виняток"
+		},
+		"bookingForm": {
+			"title": "Форма бронювання",
+			"baseFields": "Базові поля",
+			"phoneRequired": "Телефон обов'язковий",
+			"emailRequired": "Email обов'язковий",
+			"customFields": "Додаткові поля",
+			"serviceFields": "Поля для цієї послуги",
+			"addField": "Додати поле",
+			"editField": "Редагувати поле",
+			"fieldLabel": "Назва поля",
+			"fieldType": "Тип поля",
+			"fieldRequired": "Обов'язкове",
+			"inherit": "Успадкувати",
+			"required": "Обов'язкове",
+			"optional": "Необов'язкове",
+			"typeEmail": "Email",
+			"typePhone": "Телефон",
+			"typeText": "Текст",
+			"typeTextarea": "Текст (багаторядковий)",
+			"deleteFieldConfirm": "Видалити це поле?",
+			"fieldCreated": "Поле додано",
+			"fieldUpdated": "Поле оновлено",
+			"fieldDeleted": "Поле видалено",
+			"configUpdated": "Налаштування форми оновлено",
+			"overrides": "Перевизначення для цієї послуги",
+			"noCustomFields": "Додаткових полів поки немає"
 		}
 	},
 	"calendar": {
@@ -254,7 +281,8 @@
 		"staff": "Персонал",
 		"positions": "Позиції",
 		"services": "Послуги",
-		"myScheduleSettings": "Налаштування розкладу"
+		"myScheduleSettings": "Налаштування розкладу",
+		"myServices": "Мої послуги"
 	},
 	"organizations": {
 		"title": "Мої організації",
@@ -311,6 +339,7 @@
 		"deleteConfirm": "Ви впевнені, що хочете видалити цю послугу?",
 		"empty": "Послуг ще немає",
 		"emptyDescription": "Створіть першу послугу для організації",
+		"emptyDescriptionPersonal": "Створіть першу особисту послугу",
 		"name": "Назва",
 		"duration": "Тривалість",
 		"durationMin": "хв",
