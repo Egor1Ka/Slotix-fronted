@@ -1,3 +1,6 @@
+import type { BaseFieldOverrides } from './booking-field.types'
+import type { CustomFieldValue } from './booking-field.types'
+
 // ── Booking Status ──
 
 type BookingStatus =
@@ -39,6 +42,7 @@ interface EventType {
 	staffPolicy: 'any' | 'by_position' | 'specific'
 	assignedPositions: string[]
 	assignedStaff: string[]
+	baseFieldOverrides: BaseFieldOverrides | null
 }
 
 // ── Schedule ──
@@ -76,6 +80,7 @@ interface ScheduleOverride {
 
 interface CreateScheduleOverrideBody {
 	staffId: string
+	orgId?: string
 	date: string
 	enabled: boolean
 	slots: TimeRange[]
@@ -97,6 +102,7 @@ interface CreateBookingBody {
 	startAt: string
 	timezone: string
 	invitee: Invitee
+	customFieldValues?: CustomFieldValue[]
 }
 
 interface BookingResponse {

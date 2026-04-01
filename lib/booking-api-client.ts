@@ -90,6 +90,7 @@ interface BackendEventType {
 	staffPolicy: 'any' | 'by_position' | 'specific'
 	assignedPositions: string[]
 	assignedStaff: string[]
+	baseFieldOverrides: { phoneRequired?: boolean | null; emailRequired?: boolean | null } | null
 }
 
 interface BackendWeeklyHours {
@@ -169,6 +170,7 @@ const toFrontendEventType = (raw: BackendEventType): EventType => ({
 	staffPolicy: raw.staffPolicy ?? 'any',
 	assignedPositions: raw.assignedPositions ?? [],
 	assignedStaff: raw.assignedStaff ?? [],
+	baseFieldOverrides: raw.baseFieldOverrides ?? null,
 })
 
 const toFrontendWeeklyHours = (raw: BackendWeeklyHours): WeeklyHours => ({

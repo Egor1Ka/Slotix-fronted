@@ -1,3 +1,5 @@
+import type { BaseFieldOverrides } from './booking-field.types'
+
 type StaffPolicy = 'any' | 'by_position' | 'specific'
 
 interface CreateEventTypeBody {
@@ -12,6 +14,7 @@ interface CreateEventTypeBody {
 	staffPolicy?: StaffPolicy
 	assignedPositions?: string[]
 	assignedStaff?: string[]
+	baseFieldOverrides?: BaseFieldOverrides
 }
 
 interface UpdateEventTypeBody {
@@ -24,6 +27,7 @@ interface UpdateEventTypeBody {
 	staffPolicy?: StaffPolicy
 	assignedPositions?: string[]
 	assignedStaff?: string[]
+	baseFieldOverrides?: BaseFieldOverrides
 }
 
 export type { StaffPolicy, CreateEventTypeBody, UpdateEventTypeBody }

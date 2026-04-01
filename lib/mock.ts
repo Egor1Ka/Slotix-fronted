@@ -34,6 +34,7 @@ export const mockEventTypes: EventType[] = [
 		staffPolicy: 'any',
 		assignedPositions: [],
 		assignedStaff: [],
+		baseFieldOverrides: null,
 	},
 	{
 		id: '607f1f77bcf86cd799439002',
@@ -47,6 +48,7 @@ export const mockEventTypes: EventType[] = [
 		staffPolicy: 'any',
 		assignedPositions: [],
 		assignedStaff: [],
+		baseFieldOverrides: null,
 	},
 	{
 		id: '607f1f77bcf86cd799439003',
@@ -60,6 +62,7 @@ export const mockEventTypes: EventType[] = [
 		staffPolicy: 'any',
 		assignedPositions: [],
 		assignedStaff: [],
+		baseFieldOverrides: null,
 	},
 	{
 		id: '607f1f77bcf86cd799439004',
@@ -73,6 +76,7 @@ export const mockEventTypes: EventType[] = [
 		staffPolicy: 'any',
 		assignedPositions: [],
 		assignedStaff: [],
+		baseFieldOverrides: null,
 	},
 ]
 
@@ -336,4 +340,3 @@ export const mockOrgBookingsByStaff: Record<string, StaffBooking[]> = {
 	[mockOrgStaffMember2.id]: [mockOrgBookings[2]],
 	[mockOrgStaffMember3.id]: [mockOrgBookings[3], mockOrgBookings[4]],
 }
-

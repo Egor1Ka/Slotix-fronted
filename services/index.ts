@@ -38,6 +38,7 @@ import billingApiConfig from './configs/billing.config'
 import orgApiConfig from './configs/org.config'
 import positionApiConfig from './configs/position.config'
 import eventTypeApiConfig from './configs/event-type.config'
+import bookingFieldApiConfig from './configs/booking-field.config'
 
 const defaultInterceptors = {
 	interceptors: {
@@ -61,6 +62,10 @@ export const positionApi = createApiMethods(
 )
 export const eventTypeApi = createApiMethods(
 	eventTypeApiConfig,
+	defaultInterceptors,
+)
+export const bookingFieldApi = createApiMethods(
+	bookingFieldApiConfig,
 	defaultInterceptors,
 )
 export type { User, UpdateUserBody } from './configs/user.config'
@@ -102,3 +107,15 @@ export type {
 	CreateEventTypeBody,
 	UpdateEventTypeBody,
 } from './configs/event-type.types'
+export type {
+	BookingFieldType,
+	BookingField,
+	CreateBookingFieldBody,
+	UpdateBookingFieldBody,
+	BookingFormConfig,
+	UpdateBookingFormConfigBody,
+	BaseFieldOverrides,
+	MergedBaseField,
+	MergedBookingForm,
+	CustomFieldValue,
+} from './configs/booking-field.types'
