@@ -82,8 +82,13 @@ const useBookingActions = (
 			return
 		}
 		const loadFormConfig = async () => {
-			const result = await bookingFormApi.getMergedForm(selectedEventTypeId)
-			setFormConfig(result)
+			try {
+				const result = await bookingFormApi.getMergedForm(selectedEventTypeId)
+				setFormConfig(result)
+			} catch (err) {
+				const message = err instanceof Error ? err.message : t('loadError')
+				setBookingError(message)
+			}
 		}
 		loadFormConfig()
 	}, [selectedEventTypeId])
