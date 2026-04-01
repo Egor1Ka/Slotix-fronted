@@ -43,7 +43,9 @@ const fetchApi = async <T>(
 
 	const contentType = res.headers.get('content-type') ?? ''
 	if (!contentType.includes('application/json')) {
-		throw new Error(`API error: ${res.status} — expected JSON, got ${contentType || 'unknown'}`)
+		throw new Error(
+			`API error: ${res.status} — expected JSON, got ${contentType || 'unknown'}`,
+		)
 	}
 
 	const json: ApiResponse<T> = await res.json()
@@ -91,7 +93,10 @@ interface BackendEventType {
 	staffPolicy: 'any' | 'by_position' | 'specific'
 	assignedPositions: string[]
 	assignedStaff: string[]
-	baseFieldOverrides: { phoneRequired?: boolean | null; emailRequired?: boolean | null } | null
+	baseFieldOverrides: {
+		phoneRequired?: boolean | null
+		emailRequired?: boolean | null
+	} | null
 }
 
 interface BackendWeeklyHours {
@@ -471,8 +476,11 @@ export const orgApi = {
 
 const getMergedBookingForm = async (
 	eventTypeId: string,
-): Promise<MergedBookingForm> =>
-	get<MergedBookingForm>(`/booking-form/merged?eventTypeId=${eventTypeId}`)
+): Promise<MergedBookingForm> => {
+	// TODO: заменить на реальный API когда бэкенд будет готов
+	const { mergedBookingFormApi } = await import('@/lib/mock-api')
+	return mergedBookingFormApi.get(eventTypeId)
+}
 
 export const bookingFormApi = {
 	getMergedForm: getMergedBookingForm,
