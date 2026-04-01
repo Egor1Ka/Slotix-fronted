@@ -35,6 +35,7 @@ import { StaffBookingPanel } from '@/components/booking/StaffBookingPanel'
 import { ScheduleSheetButton } from '@/components/booking/ScheduleSheetButton'
 import { Separator } from '@/components/ui/separator'
 import type { ClientInfoData } from '@/components/booking/ClientInfoForm'
+import type { MergedBookingForm } from '@/services/configs/booking-field.types'
 import {
 	BookingDetailsPanel,
 	type BookingDetail,
@@ -82,6 +83,7 @@ interface StaffStrategyParams {
 	onResetSlot: () => void
 	onModeChange: (mode: SlotMode) => void
 	isSubmitting: boolean
+	formConfig?: MergedBookingForm | null
 	onSaveSchedule: (weeklyHours: WeeklyHours[]) => Promise<void>
 	onSaveOverride: (body: CreateScheduleOverrideBody) => Promise<void>
 	onBookingClick?: (bookingId: string) => void
@@ -116,6 +118,7 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 		onResetSlot,
 		onModeChange,
 		isSubmitting,
+		formConfig = null,
 		onSaveSchedule,
 		onSaveOverride,
 		onBookingClick,
@@ -311,6 +314,7 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 					selectedSlot={selectedSlot}
 					slotMode={slotMode}
 					confirmedBooking={confirmedBooking}
+					formConfig={formConfig}
 					onConfirmWithClient={onConfirmWithClient}
 					onCancel={onCancel}
 					onResetSlot={onResetSlot}

@@ -21,13 +21,23 @@ import {
 	type SlotMode,
 	type Slot,
 } from '@/lib/slot-engine'
-import type { EventType, ScheduleTemplate, CalendarDisplayBooking, OrgStaffMember } from '@/services/configs/booking.types'
+import type {
+	EventType,
+	ScheduleTemplate,
+	ScheduleOverride,
+	CalendarDisplayBooking,
+	OrgStaffMember,
+} from '@/services/configs/booking.types'
 import { ServiceList } from '@/components/booking/ServiceList'
 import { SlotModeSelector } from '@/components/booking/SlotModeSelector'
 import { StaffBookingPanel } from '@/components/booking/StaffBookingPanel'
 import { Separator } from '@/components/ui/separator'
 import type { ClientInfoData } from '@/components/booking/ClientInfoForm'
-import { BookingDetailsPanel, type BookingDetail } from '@/components/booking/BookingDetailsPanel'
+import type { MergedBookingForm } from '@/services/configs/booking-field.types'
+import {
+	BookingDetailsPanel,
+	type BookingDetail,
+} from '@/components/booking/BookingDetailsPanel'
 import type { BookingStatus } from '@/services/configs/booking.types'
 
 interface OrgStrategyParams {
@@ -48,10 +58,14 @@ interface OrgStrategyParams {
 	onResetSlot?: () => void
 	onModeChange?: (mode: SlotMode) => void
 	isSubmitting?: boolean
+	formConfig?: MergedBookingForm | null
 	bookingError?: string | null
 	selectedBooking?: BookingDetail | null
 	onBookingSelect?: (bookingId: string) => void
-	onBookingStatusChange?: (bookingId: string, status: BookingStatus) => Promise<void>
+	onBookingStatusChange?: (
+		bookingId: string,
+		status: BookingStatus,
+	) => Promise<void>
 	onBookingReschedule?: (bookingId: string, newStartAt: string) => Promise<void>
 	onBookingClose?: () => void
 	locale: string
@@ -64,6 +78,29 @@ interface OrgStrategyParams {
 	isStaffDayOff?: boolean
 	loading?: boolean
 	staffList?: OrgStaffMember[]
+	overrides?: ScheduleOverride[]
+}
+
+const normalizeDate = (d: string): string =>
+	d.includes('T') ? d.split('T')[0] : d
+
+const getBreakBookings = (
+	overridesList: ScheduleOverride[],
+	staffId: string,
+	blockDate: string,
+): { startMin: number; duration: number }[] => {
+	const dateOnly = normalizeDate(blockDate)
+	const matchesStaffAndDate = (o: ScheduleOverride): boolean =>
+		o.staffId === staffId && normalizeDate(o.date) === dateOnly
+	const override = overridesList.find(matchesStaffAndDate)
+	if (!override) return []
+	const isPartialDayOff = !override.enabled && override.slots.length > 0
+	if (!isPartialDayOff) return []
+	const toBreakBooking = (slot: { start: string; end: string }) => ({
+		startMin: timeToMin(slot.start),
+		duration: timeToMin(slot.end) - timeToMin(slot.start),
+	})
+	return override.slots.map(toBreakBooking)
 }
 
 const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
@@ -85,6 +122,7 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 		onResetSlot,
 		onModeChange,
 		isSubmitting = false,
+		formConfig = null,
 		bookingError = null,
 		selectedBooking = null,
 		onBookingSelect,
@@ -101,6 +139,7 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 		isStaffDayOff = false,
 		loading = false,
 		staffList = [],
+		overrides = [],
 	} = params
 
 	const calendarLocale = getCalendarLocale(locale)
@@ -153,10 +192,16 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 	}
 
 	const buildSlotBlocks = (blockDate: string): CalendarBlock[] => {
-		if (!canBookForClient || !selectedEventType || !selectedStaffId || !schedule || confirmedBooking)
+		if (
+			!canBookForClient ||
+			!selectedEventType ||
+			!selectedStaffId ||
+			!schedule ||
+			confirmedBooking
+		)
 			return []
 
-		const workHours = getWorkHoursForDate(schedule.weeklyHours,blockDate)
+		const workHours = getWorkHoursForDate(schedule.weeklyHours, blockDate, overrides, selectedStaffId ?? undefined)
 		if (!workHours) return []
 
 		const dayBookingsForSlots = getBookingsForDate(bookings, blockDate)
@@ -165,13 +210,19 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 			duration: b.duration,
 		})
 
+		const breakBookings = getBreakBookings(overrides, selectedStaffId, blockDate)
+		const allBookingsForSlots = [
+			...dayBookingsForSlots.map(toSlotEngine),
+			...breakBookings,
+		]
+
 		const slots = getAvailableSlots({
 			workStart: workHours.workStart,
 			workEnd: workHours.workEnd,
 			duration: selectedEventType.durationMin,
 			slotStep: schedule.slotStepMin,
 			slotMode,
-			bookings: dayBookingsForSlots.map(toSlotEngine),
+			bookings: allBookingsForSlots,
 			minNotice: 0,
 			nowMin: 0,
 		})
@@ -197,7 +248,12 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 	}
 
 	const buildPendingBlock = (blockDate: string): CalendarBlock[] => {
-		if (!canBookForClient || !selectedEventType || !selectedSlot || blockDate !== date)
+		if (
+			!canBookForClient ||
+			!selectedEventType ||
+			!selectedSlot ||
+			blockDate !== date
+		)
 			return []
 		const slotMin = timeToMin(selectedSlot)
 		return [
@@ -215,20 +271,36 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 		]
 	}
 
+	const buildBreakBlocks = (blockDate: string): CalendarBlock[] => {
+		if (!selectedStaffId) return []
+		const breaks = getBreakBookings(overrides, selectedStaffId, blockDate)
+		const toLockedBlock = (
+			brk: { startMin: number; duration: number },
+			index: number,
+		): CalendarBlock => ({
+			id: `break-${blockDate}-${index}`,
+			startMin: brk.startMin,
+			duration: brk.duration,
+			date: blockDate,
+			color: '',
+			blockType: 'locked',
+		})
+		return breaks.map(toLockedBlock)
+	}
+
 	return {
 		getBlocks(blockDate: string): CalendarBlock[] {
 			const bookingBlocks = buildBookingBlocks(blockDate)
+			const breakBlocks = buildBreakBlocks(blockDate)
 			const dropZoneBlocks = buildSlotBlocks(blockDate)
 			const pendingBlocks = buildPendingBlock(blockDate)
-			return [...bookingBlocks, ...dropZoneBlocks, ...pendingBlocks]
+			return [...bookingBlocks, ...breakBlocks, ...dropZoneBlocks, ...pendingBlocks]
 		},
 
 		renderSidebar() {
 			if (isDayOff) {
 				return (
-					<div className="text-muted-foreground p-4 text-sm">
-						{dayOffLabel}
-					</div>
+					<div className="text-muted-foreground p-4 text-sm">{dayOffLabel}</div>
 				)
 			}
 
@@ -260,22 +332,24 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 		renderPanel() {
 			if (isDayOff || isStaffDayOff) {
 				return (
-					<div className="text-muted-foreground p-4 text-sm">
-						{dayOffLabel}
-					</div>
+					<div className="text-muted-foreground p-4 text-sm">{dayOffLabel}</div>
 				)
 			}
 
 			if (selectedBooking) {
-				const bookingEventType = findEventType(eventTypes, selectedBooking.eventTypeId)
+				const bookingEventType = findEventType(
+					eventTypes,
+					selectedBooking.eventTypeId,
+				)
 				const staffUserId = selectedBooking.hosts[0]?.userId ?? null
-				const findStaffByUserId = (s: OrgStaffMember): boolean => s.id === staffUserId
+				const findStaffByUserId = (s: OrgStaffMember): boolean =>
+					s.id === staffUserId
 				const bookingStaff = staffList.find(findStaffByUserId)
 
 				return (
 					<>
 						{bookingError && (
-							<div className="text-destructive bg-destructive/10 rounded-md p-3 text-sm mb-3">
+							<div className="text-destructive bg-destructive/10 mb-3 rounded-md p-3 text-sm">
 								{bookingError}
 							</div>
 						)}
@@ -314,7 +388,7 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 			return (
 				<>
 					{bookingError && (
-						<div className="text-destructive bg-destructive/10 rounded-md p-3 text-sm mb-3">
+						<div className="text-destructive bg-destructive/10 mb-3 rounded-md p-3 text-sm">
 							{bookingError}
 						</div>
 					)}
@@ -323,6 +397,7 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 						selectedSlot={selectedSlot}
 						slotMode={slotMode}
 						confirmedBooking={confirmedBooking}
+						formConfig={formConfig}
 						onConfirmWithClient={onConfirmWithClient ?? (() => {})}
 						onCancel={onCancel ?? (() => {})}
 						onResetSlot={onResetSlot ?? (() => {})}
@@ -333,9 +408,15 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 		},
 
 		onCellClick(clickDate: string, startMin: number) {
-			if (!canBookForClient || !selectedEventType || !selectedStaffId || !schedule) return
+			if (
+				!canBookForClient ||
+				!selectedEventType ||
+				!selectedStaffId ||
+				!schedule
+			)
+				return
 
-			const workHours = getWorkHoursForDate(schedule.weeklyHours,clickDate)
+			const workHours = getWorkHoursForDate(schedule.weeklyHours, clickDate, overrides, selectedStaffId ?? undefined)
 			if (!workHours) return
 
 			const dayBookingsForSlots = getBookingsForDate(bookings, clickDate)
@@ -344,13 +425,19 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 				duration: b.duration,
 			})
 
+			const breakBookings = getBreakBookings(overrides, selectedStaffId, clickDate)
+			const allBookingsForSlots = [
+				...dayBookingsForSlots.map(toSlotEngine),
+				...breakBookings,
+			]
+
 			const slots = getAvailableSlots({
 				workStart: workHours.workStart,
 				workEnd: workHours.workEnd,
 				duration: selectedEventType.durationMin,
 				slotStep: schedule.slotStepMin,
 				slotMode,
-				bookings: dayBookingsForSlots.map(toSlotEngine),
+				bookings: allBookingsForSlots,
 				minNotice: 0,
 				nowMin: 0,
 			})
@@ -366,7 +453,8 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 		getTitle(titleDate: string, view: ViewMode): string {
 			if (view === 'week')
 				return `${orgName} — ${formatWeekRange(getWeekDates(titleDate), calendarLocale)}`
-			if (view === 'month') return `${orgName} — ${formatMonth(titleDate, calendarLocale)}`
+			if (view === 'month')
+				return `${orgName} — ${formatMonth(titleDate, calendarLocale)}`
 			return `${orgName} — ${formatDateLocale(titleDate, calendarLocale)}`
 		},
 	}

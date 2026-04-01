@@ -12,7 +12,12 @@ import {
 import { useTranslations } from 'next-intl'
 import { useLocale } from 'next-intl'
 import { useViewConfig } from '@/lib/calendar/CalendarViewConfigContext'
-import { formatDateISO, getWorkHoursForDate, getFirstStaffId, getStaffToLoad } from '@/lib/calendar/utils'
+import {
+	formatDateISO,
+	getWorkHoursForDate,
+	getFirstStaffId,
+	getStaffToLoad,
+} from '@/lib/calendar/utils'
 import { StaffTabs } from '@/components/booking/StaffTabs'
 import {
 	useOrgInfo,
@@ -23,7 +28,10 @@ import {
 	useBookingActions,
 	useOrgSchedules,
 } from '@/lib/calendar/hooks'
-import type { ScheduleTemplate, OrgStaffMember } from '@/services/configs/booking.types'
+import type {
+	ScheduleTemplate,
+	OrgStaffMember,
+} from '@/services/configs/booking.types'
 
 // ── Module-level constants ──
 
@@ -57,7 +65,10 @@ interface OrgCalendarPageProps {
 	staffId?: string
 }
 
-function OrgCalendarPage({ orgSlug, staffId: staffIdProp }: OrgCalendarPageProps) {
+function OrgCalendarPage({
+	orgSlug,
+	staffId: staffIdProp,
+}: OrgCalendarPageProps) {
 	const searchParams = useSearchParams()
 	const viewConfig = useViewConfig()
 	const t = useTranslations('booking')
@@ -74,19 +85,31 @@ function OrgCalendarPage({ orgSlug, staffId: staffIdProp }: OrgCalendarPageProps
 
 	// ── Navigation (до данных, т.к. фильтрация использует handleStaffSelect) ──
 
-	const navigation = useCalendarNavigation({ orgSlug, dateStr, selectedEventTypeId })
+	const navigation = useCalendarNavigation({
+		orgSlug,
+		dateStr,
+		selectedEventTypeId,
+	})
 
 	// ── Data ──
 
-	const { org, staffList, loading: orgLoading, error: orgError } = useOrgInfo(orgSlug)
+	const {
+		org,
+		staffList,
+		loading: orgLoading,
+		error: orgError,
+	} = useOrgInfo(orgSlug)
 	const orgSchedules = useOrgSchedules(orgSlug)
 
 	const activeStaffId = staffIdProp ?? getFirstStaffId(staffList)
 
 	// Автовыбор сотрудника при фильтрации — сохраняет eventType в URL
-	const handleStaffAutoSelect = useCallback((staffId: string) => {
-		navigation.handleStaffAutoSelect(staffId)
-	}, [navigation])
+	const handleStaffAutoSelect = useCallback(
+		(staffId: string) => {
+			navigation.handleStaffAutoSelect(staffId)
+		},
+		[navigation],
+	)
 
 	// ID сотрудников, работающих в выбранный день — для фильтрации услуг
 	const toStaffId = (s: OrgStaffMember): string => s.id
@@ -101,25 +124,39 @@ function OrgCalendarPage({ orgSlug, staffId: staffIdProp }: OrgCalendarPageProps
 		selectedStaffId,
 		selectedEventTypeId,
 		workingStaffIds,
-		onStaffAutoSelect: viewConfig.filterByStaffCapability ? handleStaffAutoSelect : () => {},
+		onStaffAutoSelect: viewConfig.filterByStaffCapability
+			? handleStaffAutoSelect
+			: () => {},
 	})
 
-	const { eventTypes: scheduleEventTypes, schedule, loading: scheduleLoading, error: scheduleError } =
-		useStaffSchedule(activeStaffId)
+	const {
+		eventTypes: scheduleEventTypes,
+		schedule,
+		loading: scheduleLoading,
+		error: scheduleError,
+	} = useStaffSchedule(activeStaffId, orgSlug)
 
 	// На публичных страницах используем отфильтрованные услуги
-	const eventTypes = viewConfig.filterByStaffCapability ? filtering.filteredEventTypes : scheduleEventTypes
+	const eventTypes = viewConfig.filterByStaffCapability
+		? filtering.filteredEventTypes
+		: scheduleEventTypes
 
 	const staffToLoad = useMemo(
-		() => getStaffToLoad(staffList, selectedStaffId, viewConfig.staffTabBehavior),
+		() =>
+			getStaffToLoad(staffList, selectedStaffId, viewConfig.staffTabBehavior),
 		[staffList, selectedStaffId, viewConfig.staffTabBehavior],
 	)
 
-	const { bookings, reloadBookings, loading: bookingsLoading, error: bookingsError } =
-		useStaffBookings(staffToLoad, dateStr, view, eventTypes)
+	const {
+		bookings,
+		reloadBookings,
+		loading: bookingsLoading,
+		error: bookingsError,
+	} = useStaffBookings(staffToLoad, dateStr, view, eventTypes)
 
 	// Начальная загрузка — блокирует рендер полностью
-	const initialLoading = orgLoading || orgSchedules.loading || (scheduleLoading && !schedule)
+	const initialLoading =
+		orgLoading || orgSchedules.loading || (scheduleLoading && !schedule)
 	// Фоновая загрузка — календарь остаётся, данные обновляются
 	const contentLoading = scheduleLoading || bookingsLoading || filtering.loading
 	const error = orgError || scheduleError || bookingsError
@@ -187,9 +224,7 @@ function OrgCalendarPage({ orgSlug, staffId: staffIdProp }: OrgCalendarPageProps
 	if (error || !org) {
 		return (
 			<div className="flex items-center justify-center py-20">
-				<p className="text-destructive text-sm">
-					{error ?? t('loadError')}
-				</p>
+				<p className="text-destructive text-sm">{error ?? t('loadError')}</p>
 			</div>
 		)
 	}
@@ -197,11 +232,13 @@ function OrgCalendarPage({ orgSlug, staffId: staffIdProp }: OrgCalendarPageProps
 	// ── Derived data ──
 
 	// Рабочие часы: если выбран сотрудник — его, иначе объединённые
-	const staffSchedule = selectedStaffId ? orgSchedules.getStaffSchedule(selectedStaffId) : null
+	const staffSchedule = selectedStaffId
+		? orgSchedules.getStaffSchedule(selectedStaffId)
+		: null
 	const scheduleSource = staffSchedule ?? schedule ?? DEFAULT_SCHEDULE
 
 	const workHoursData = selectedStaffId
-		? getWorkHoursForDate(scheduleSource.weeklyHours, dateStr)
+		? getWorkHoursForDate(scheduleSource.weeklyHours, dateStr, orgSchedules.overrides, selectedStaffId)
 		: orgSchedules.getOrgWorkHours(dateStr)
 
 	// Выходной организации: никто не работает (только для day view, без выбранного сотрудника)
@@ -246,6 +283,7 @@ function OrgCalendarPage({ orgSlug, staffId: staffIdProp }: OrgCalendarPageProps
 		onResetSlot: bookingActions.handleResetSlot,
 		onModeChange,
 		isSubmitting: bookingActions.isSubmitting,
+		formConfig: bookingActions.formConfig,
 		bookingError: bookingActions.bookingError,
 		selectedBooking: bookingActions.selectedBooking,
 		onBookingSelect: bookingActions.handleBookingSelect,
@@ -254,6 +292,7 @@ function OrgCalendarPage({ orgSlug, staffId: staffIdProp }: OrgCalendarPageProps
 		onBookingClose: bookingActions.handleBookingClose,
 		loading: contentLoading,
 		staffList,
+		overrides: orgSchedules.overrides,
 	})
 
 	// Фильтрация: рабочий день + фильтрация по услугам
@@ -289,7 +328,6 @@ function OrgCalendarPage({ orgSlug, staffId: staffIdProp }: OrgCalendarPageProps
 				workEnd={workEnd}
 				disabledDays={disabledDays}
 				isDayOff={isOrgDayOff || isStaffDayOff}
-
 				staffTabsSlot={staffTabsSlot}
 				publicUrl={`/${locale}/org/${orgSlug}`}
 			/>

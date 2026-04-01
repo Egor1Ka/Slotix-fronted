@@ -1,12 +1,16 @@
 'use client'
 
-import { useState, useCallback } from 'react'
-import { bookingApi } from '@/lib/booking-api-client'
+import { useState, useCallback, useEffect } from 'react'
+import { bookingApi, bookingFormApi } from '@/lib/booking-api-client'
 import type { ConfirmedBooking } from '../types'
 import type { EventType } from '@/services/configs/booking.types'
 import type { BookingStatus } from '@/services/configs/booking.types'
 import type { ClientInfoData } from '@/components/booking/ClientInfoForm'
 import type { BookingDetail } from '@/components/booking/BookingDetailsPanel'
+import type {
+	MergedBookingForm,
+	CustomFieldValue,
+} from '@/services/configs/booking-field.types'
 
 interface UseBookingActionsParams {
 	staffId: string | null
@@ -25,14 +29,21 @@ interface UseBookingActionsResult {
 	confirmedBooking: ConfirmedBooking | null
 	isSubmitting: boolean
 	selectedBooking: BookingDetail | null
+	formConfig: MergedBookingForm | null
 	setBookingError: (error: string | null) => void
 	setConfirmedBooking: (booking: ConfirmedBooking | null) => void
 	handleConfirmWithClient: (data: ClientInfoData) => Promise<void>
 	handleCancel: () => Promise<void>
 	handleResetSlot: () => void
 	handleBookingSelect: (bookingId: string) => Promise<void>
-	handleBookingStatusChange: (bookingId: string, status: BookingStatus) => Promise<void>
-	handleBookingReschedule: (bookingId: string, newStartAt: string) => Promise<void>
+	handleBookingStatusChange: (
+		bookingId: string,
+		status: BookingStatus,
+	) => Promise<void>
+	handleBookingReschedule: (
+		bookingId: string,
+		newStartAt: string,
+	) => Promise<void>
 	handleBookingClose: () => void
 }
 
@@ -56,12 +67,48 @@ const useBookingActions = (
 	} = params
 
 	const [bookingError, setBookingError] = useState<string | null>(null)
-	const [confirmedBooking, setConfirmedBooking] = useState<ConfirmedBooking | null>(null)
+	const [confirmedBooking, setConfirmedBooking] =
+		useState<ConfirmedBooking | null>(null)
 	const [isSubmitting, setIsSubmitting] = useState(false)
-	const [selectedBooking, setSelectedBooking] = useState<BookingDetail | null>(null)
+	const [selectedBooking, setSelectedBooking] = useState<BookingDetail | null>(
+		null,
+	)
+	const [formConfig, setFormConfig] = useState<MergedBookingForm | null>(null)
+
+	// Загрузка конфигурации формы бронирования при смене услуги
+	useEffect(() => {
+		if (!selectedEventTypeId) {
+			setFormConfig(null)
+			return
+		}
+		const loadFormConfig = async () => {
+			const result = await bookingFormApi.getMergedForm(selectedEventTypeId)
+			setFormConfig(result)
+		}
+		loadFormConfig()
+	}, [selectedEventTypeId])
 
 	const findEventTypeById = (id: string | null): EventType | undefined =>
 		eventTypes.find((e) => e.id === id)
+
+	// Извлечение значений кастомных полей из данных формы
+	const isCustomField = (key: string): boolean => key.startsWith('custom_')
+	const toCustomFieldValue = (
+		data: Record<string, unknown>,
+	): ((key: string) => CustomFieldValue) =>
+		(key: string) => ({
+			fieldId: key.replace('custom_', ''),
+			value: String(data[key] ?? ''),
+		})
+	const hasValue = (entry: CustomFieldValue): boolean => entry.value.length > 0
+
+	const extractCustomFieldValues = (
+		data: Record<string, unknown>,
+	): CustomFieldValue[] =>
+		Object.keys(data)
+			.filter(isCustomField)
+			.map(toCustomFieldValue(data))
+			.filter(hasValue)
 
 	const handleConfirmWithClient = async (data: ClientInfoData) => {
 		if (!selectedEventTypeId || !selectedSlotTime) return
@@ -73,6 +120,10 @@ const useBookingActions = (
 		if (!eventType) return
 
 		const startAt = `${dateStr}T${selectedSlotTime}:00.000Z`
+
+		const customFieldValues = extractCustomFieldValues(
+			data as Record<string, unknown>,
+		)
 
 		try {
 			setIsSubmitting(true)
@@ -87,6 +138,7 @@ const useBookingActions = (
 					phone: data.phone || null,
 					phoneCountry: null,
 				},
+				...(customFieldValues.length > 0 && { customFieldValues }),
 			})
 
 			setConfirmedBooking({
@@ -145,7 +197,10 @@ const useBookingActions = (
 		}
 	}
 
-	const handleBookingStatusChange = async (bookingId: string, status: BookingStatus) => {
+	const handleBookingStatusChange = async (
+		bookingId: string,
+		status: BookingStatus,
+	) => {
 		try {
 			await bookingApi.updateStatus(bookingId, status)
 			setSelectedBooking(null)
@@ -156,7 +211,10 @@ const useBookingActions = (
 		}
 	}
 
-	const handleBookingReschedule = async (bookingId: string, newStartAt: string) => {
+	const handleBookingReschedule = async (
+		bookingId: string,
+		newStartAt: string,
+	) => {
 		try {
 			await bookingApi.reschedule(bookingId, newStartAt)
 			setSelectedBooking(null)
@@ -176,6 +234,7 @@ const useBookingActions = (
 		confirmedBooking,
 		isSubmitting,
 		selectedBooking,
+		formConfig,
 		setBookingError,
 		setConfirmedBooking,
 		handleConfirmWithClient,

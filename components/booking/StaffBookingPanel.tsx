@@ -8,12 +8,14 @@ import type { ConfirmedBooking } from '@/lib/calendar/types'
 import { Separator } from '@/components/ui/separator'
 import { EmptyState, ServiceInfo, ConfirmedState } from './BookingPanelParts'
 import { ClientInfoForm, type ClientInfoData } from './ClientInfoForm'
+import type { MergedBookingForm } from '@/services/configs/booking-field.types'
 
 interface StaffBookingPanelProps {
 	selectedEventType: EventType | null
 	selectedSlot: string | null
 	slotMode: SlotMode
 	confirmedBooking: ConfirmedBooking | null
+	formConfig: MergedBookingForm | null
 	onConfirmWithClient: (data: ClientInfoData) => void
 	onCancel: () => void
 	onResetSlot: () => void
@@ -23,12 +25,14 @@ interface StaffBookingPanelProps {
 function PendingSlotWithClientForm({
 	eventType,
 	slotTime,
+	formConfig,
 	onConfirmWithClient,
 	onResetSlot,
 	isSubmitting,
 }: {
 	eventType: EventType
 	slotTime: string
+	formConfig: MergedBookingForm | null
 	onConfirmWithClient: (data: ClientInfoData) => void
 	onResetSlot: () => void
 	isSubmitting: boolean
@@ -54,17 +58,22 @@ function PendingSlotWithClientForm({
 				<span className="text-muted-foreground">{t('endTime')}</span>
 				<span className="font-medium">{endTime}</span>
 				<span className="text-muted-foreground">{t('duration')}</span>
-				<span className="font-medium">{eventType.durationMin} {t('min')}</span>
+				<span className="font-medium">
+					{eventType.durationMin} {t('min')}
+				</span>
 				<span className="text-muted-foreground">{t('price')}</span>
 				<span className="font-medium">
 					{eventType.price} {eventType.currency}
 				</span>
 			</div>
 			<Separator />
-			<ClientInfoForm
-				onSubmit={onConfirmWithClient}
-				isSubmitting={isSubmitting}
-			/>
+			{formConfig && (
+				<ClientInfoForm
+					formConfig={formConfig}
+					onSubmit={onConfirmWithClient}
+					isSubmitting={isSubmitting}
+				/>
+			)}
 			<button
 				type="button"
 				onClick={onResetSlot}
@@ -81,6 +90,7 @@ function StaffBookingPanel({
 	selectedSlot,
 	slotMode,
 	confirmedBooking,
+	formConfig,
 	onConfirmWithClient,
 	onCancel,
 	onResetSlot,
@@ -110,6 +120,7 @@ function StaffBookingPanel({
 		<PendingSlotWithClientForm
 			eventType={selectedEventType}
 			slotTime={selectedSlot}
+			formConfig={formConfig}
 			onConfirmWithClient={onConfirmWithClient}
 			onResetSlot={onResetSlot}
 			isSubmitting={isSubmitting}

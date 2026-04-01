@@ -15,6 +15,7 @@ import type {
 	WeeklyHours,
 } from '@/services/configs/booking.types'
 import type { Slot } from './slot-engine'
+import type { MergedBookingForm } from '@/services/configs/booking-field.types'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:9000'
 
@@ -464,4 +465,15 @@ export const slotsApi = {
 export const orgApi = {
 	getById: getOrgById,
 	getStaff: getOrgStaff,
+}
+
+// ── Booking Form API ──
+
+const getMergedBookingForm = async (
+	eventTypeId: string,
+): Promise<MergedBookingForm> =>
+	get<MergedBookingForm>(`/booking-form/merged?eventTypeId=${eventTypeId}`)
+
+export const bookingFormApi = {
+	getMergedForm: getMergedBookingForm,
 }

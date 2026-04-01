@@ -247,6 +247,7 @@ function BookingPage({ staffSlug, publicUrl }: BookingPageProps) {
 
 	const scheduleSource = schedule ?? DEFAULT_SCHEDULE
 	const workHours = getWorkHoursForDate(scheduleSource.weeklyHours, dateStr)
+	const isDayOff = workHours === null
 	const workStart = workHours?.workStart ?? '10:00'
 	const workEnd = workHours?.workEnd ?? '18:00'
 	const disabledDays = scheduleSource.weeklyHours
@@ -276,6 +277,7 @@ function BookingPage({ staffSlug, publicUrl }: BookingPageProps) {
 				onResetSlot: bookingActions.handleResetSlot,
 				onModeChange,
 				isSubmitting: bookingActions.isSubmitting,
+				formConfig: bookingActions.formConfig,
 				onSaveSchedule: handleSaveSchedule,
 				onSaveOverride: handleSaveOverride,
 				onBookingClick: bookingActions.handleBookingSelect,
@@ -318,6 +320,7 @@ function BookingPage({ staffSlug, publicUrl }: BookingPageProps) {
 				onDayClick={onDayClick}
 				workStart={workStart}
 				workEnd={workEnd}
+				isDayOff={isDayOff}
 				disabledDays={disabledDays}
 				publicUrl={publicUrl}
 			/>
