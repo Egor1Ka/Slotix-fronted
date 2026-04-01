@@ -20,7 +20,17 @@ import {
 	mockStaffBookings,
 	mockOrgStaff,
 	mockOrgBookingsByStaff,
+	mockBookingFields,
+	mockBookingFormConfig,
 } from './mock'
+import type {
+	BookingField,
+	BookingFormConfig,
+	CreateBookingFieldBody,
+	UpdateBookingFieldBody,
+	MergedBookingForm,
+	UpdateBookingFormConfigBody,
+} from '@/services/configs/booking-field.types'
 import {
 	getAvailableSlots,
 	timeToMin,
@@ -80,8 +90,7 @@ const updateScheduleTemplate = async (
 	slotStepMin?: number,
 ): Promise<ScheduleTemplate> => {
 	await delay()
-	if (staffId !== mockStaff.id)
-		throw new Error(`Staff not found: ${staffId}`)
+	if (staffId !== mockStaff.id) throw new Error(`Staff not found: ${staffId}`)
 	const updated = {
 		...mockSchedule,
 		weeklyHours,
@@ -115,15 +124,12 @@ const createBooking = async (
 	await delay(200)
 
 	const eventType = mockEventTypes.find((e) => e.id === body.eventTypeId)
-	if (!eventType)
-		throw new Error(`Event type not found: ${body.eventTypeId}`)
+	if (!eventType) throw new Error(`Event type not found: ${body.eventTypeId}`)
 
 	const bookingId = generateId()
 	const cancelToken = generateCancelToken()
 	const startDate = new Date(body.startAt)
-	const endDate = new Date(
-		startDate.getTime() + eventType.durationMin * 60000,
-	)
+	const endDate = new Date(startDate.getTime() + eventType.durationMin * 60000)
 
 	const response: BookingResponse = {
 		id: bookingId,
@@ -179,10 +185,7 @@ const getStaffBookings = async (
 		!locationId || b.locationId === locationId
 
 	const applyFilters = (bookings: StaffBooking[]): StaffBooking[] =>
-		bookings
-			.filter(isInDateRange)
-			.filter(matchesStatus)
-			.filter(matchesLocation)
+		bookings.filter(isInDateRange).filter(matchesStatus).filter(matchesLocation)
 
 	const orgBookings = mockOrgBookingsByStaff[staffId]
 	if (orgBookings) {
@@ -228,9 +231,7 @@ const getOrgById = async (id: string): Promise<OrgByIdResponse> => {
 	throw new Error(`Org not found: ${id}`)
 }
 
-const getOrgStaff = async (
-	orgId: string,
-): Promise<OrgStaffMember[]> => {
+const getOrgStaff = async (orgId: string): Promise<OrgStaffMember[]> => {
 	await delay()
 	if (orgId === '807f1f77bcf86cd799439001') {
 		return [...mockOrgStaff]
@@ -285,9 +286,7 @@ const getAvailableSlotsForStaff = async (
 	const now = new Date()
 	const todayStr = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, '0')}-${String(now.getUTCDate()).padStart(2, '0')}`
 	const isToday = date === todayStr
-	const nowMin = isToday
-		? now.getUTCHours() * 60 + now.getUTCMinutes()
-		: 0
+	const nowMin = isToday ? now.getUTCHours() * 60 + now.getUTCMinutes() : 0
 
 	return getAvailableSlots({
 		workStart: workSlot.start,
@@ -299,6 +298,125 @@ const getAvailableSlotsForStaff = async (
 		minNotice: 0,
 		nowMin,
 	})
+}
+
+// ── Booking Fields API ──
+
+const bookingFieldsStore: BookingField[] = [...mockBookingFields]
+const formConfigStore: BookingFormConfig = { ...mockBookingFormConfig }
+
+const matchesOwner =
+	(ownerId: string, ownerType: 'org' | 'user') => (field: BookingField) =>
+		field.ownerId === ownerId && field.ownerType === ownerType
+
+const matchesEventType =
+	(eventTypeId?: string | null) => (field: BookingField) =>
+		eventTypeId ? field.eventTypeId === eventTypeId : field.eventTypeId === null
+
+const getBookingFields = async (
+	ownerId: string,
+	ownerType: 'org' | 'user',
+	eventTypeId?: string | null,
+): Promise<BookingField[]> => {
+	await delay()
+	return bookingFieldsStore
+		.filter(matchesOwner(ownerId, ownerType))
+		.filter(matchesEventType(eventTypeId))
+}
+
+const createBookingField = async (
+	body: CreateBookingFieldBody,
+): Promise<BookingField> => {
+	await delay()
+	const newField: BookingField = {
+		id: `bf-${Date.now()}`,
+		ownerId: body.ownerId,
+		ownerType: body.ownerType,
+		eventTypeId: body.eventTypeId ?? null,
+		type: body.type,
+		label: body.label,
+		required: body.required,
+		createdAt: new Date().toISOString(),
+	}
+	bookingFieldsStore.push(newField)
+	return newField
+}
+
+const updateBookingField = async (
+	id: string,
+	body: UpdateBookingFieldBody,
+): Promise<BookingField> => {
+	await delay()
+	const findById = (f: BookingField): boolean => f.id === id
+	const index = bookingFieldsStore.findIndex(findById)
+	if (index === -1) throw new Error(`Booking field not found: ${id}`)
+	bookingFieldsStore[index] = { ...bookingFieldsStore[index], ...body }
+	return bookingFieldsStore[index]
+}
+
+const deleteBookingField = async (id: string): Promise<void> => {
+	await delay()
+	const findById = (f: BookingField): boolean => f.id === id
+	const index = bookingFieldsStore.findIndex(findById)
+	if (index !== -1) bookingFieldsStore.splice(index, 1)
+}
+
+// ── Booking Form Config API ──
+
+const getFormConfig = async (): Promise<BookingFormConfig> => {
+	await delay()
+	return { ...formConfigStore }
+}
+
+const updateFormConfig = async (
+	body: UpdateBookingFormConfigBody,
+): Promise<BookingFormConfig> => {
+	await delay()
+	if (body.phoneRequired !== undefined)
+		formConfigStore.phoneRequired = body.phoneRequired
+	if (body.emailRequired !== undefined)
+		formConfigStore.emailRequired = body.emailRequired
+	return { ...formConfigStore }
+}
+
+// ── Merged Booking Form API ──
+
+const sortByCreatedAt = (a: BookingField, b: BookingField): number =>
+	new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+
+const isOrgLevel = (f: BookingField): boolean => f.eventTypeId === null
+
+const isForEventType =
+	(eventTypeId: string) =>
+	(f: BookingField): boolean =>
+		f.eventTypeId === eventTypeId
+
+const getMergedBookingForm = async (
+	eventTypeId: string,
+): Promise<MergedBookingForm> => {
+	await delay()
+
+	const findEventType = (et: EventType): boolean => et.id === eventTypeId
+	const eventType = mockEventTypes.find(findEventType)
+	const overrides = eventType?.baseFieldOverrides
+
+	const phoneRequired =
+		overrides?.phoneRequired ?? formConfigStore.phoneRequired
+	const emailRequired =
+		overrides?.emailRequired ?? formConfigStore.emailRequired
+
+	const orgFields = bookingFieldsStore.filter(isOrgLevel)
+	const serviceFields = bookingFieldsStore.filter(isForEventType(eventTypeId))
+	const customFields = [...orgFields, ...serviceFields].sort(sortByCreatedAt)
+
+	return {
+		baseFields: {
+			name: { required: true as const },
+			phone: { required: phoneRequired },
+			email: { required: emailRequired },
+		},
+		customFields,
+	}
 }
 
 // ── Exports ──
@@ -332,3 +450,18 @@ export const orgApi = {
 	getStaff: getOrgStaff,
 }
 
+export const bookingFieldApi = {
+	getFields: getBookingFields,
+	create: createBookingField,
+	update: updateBookingField,
+	remove: deleteBookingField,
+}
+
+export const bookingFormConfigApi = {
+	get: getFormConfig,
+	update: updateFormConfig,
+}
+
+export const mergedBookingFormApi = {
+	get: getMergedBookingForm,
+}

@@ -6,6 +6,10 @@ import type {
 	BookingStatus,
 	OrgStaffMember,
 } from '@/services/configs/booking.types'
+import type {
+	BookingField,
+	BookingFormConfig,
+} from '@/services/configs/booking-field.types'
 
 // ── Staff ──
 
@@ -340,3 +344,35 @@ export const mockOrgBookingsByStaff: Record<string, StaffBooking[]> = {
 	[mockOrgStaffMember2.id]: [mockOrgBookings[2]],
 	[mockOrgStaffMember3.id]: [mockOrgBookings[3], mockOrgBookings[4]],
 }
+
+// ── Booking Form Config ──
+
+export const mockBookingFormConfig: BookingFormConfig = {
+	phoneRequired: false,
+	emailRequired: false,
+}
+
+// ── Booking Fields ──
+
+export const mockBookingFields: BookingField[] = [
+	{
+		id: 'bf-001',
+		ownerId: '507f1f77bcf86cd799439011',
+		ownerType: 'org',
+		eventTypeId: null,
+		type: 'textarea',
+		label: 'Комментарій',
+		required: false,
+		createdAt: '2026-03-01T10:00:00Z',
+	},
+	{
+		id: 'bf-002',
+		ownerId: '507f1f77bcf86cd799439011',
+		ownerType: 'org',
+		eventTypeId: '607f1f77bcf86cd799439002',
+		type: 'text',
+		label: 'Алергії',
+		required: true,
+		createdAt: '2026-03-15T10:00:00Z',
+	},
+]
