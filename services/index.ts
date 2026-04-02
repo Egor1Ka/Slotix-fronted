@@ -39,6 +39,7 @@ import orgApiConfig from './configs/org.config'
 import positionApiConfig from './configs/position.config'
 import eventTypeApiConfig from './configs/event-type.config'
 import bookingFieldApiConfig from './configs/booking-field.config'
+import userSearchApiConfig from './configs/user-search.config'
 
 const defaultInterceptors = {
 	interceptors: {
@@ -66,6 +67,10 @@ export const eventTypeApi = createApiMethods(
 )
 export const bookingFieldApi = createApiMethods(
 	bookingFieldApiConfig,
+	defaultInterceptors,
+)
+export const userSearchApi = createApiMethods(
+	userSearchApiConfig,
 	defaultInterceptors,
 )
 export type { User, UpdateUserBody } from './configs/user.config'
@@ -96,7 +101,7 @@ export type {
 	OrgByIdResponse,
 	OrgStaffMember,
 } from './configs/booking.types'
-export type { OrgListItem, CreateOrgBody } from './configs/org.types'
+export type { OrgListItem, CreateOrgBody, AddStaffBody } from './configs/org.types'
 export type {
 	Position,
 	CreatePositionBody,
@@ -115,3 +120,4 @@ export type {
 	MergedBookingForm,
 	CustomFieldValue,
 } from './configs/booking-field.types'
+export type { UserSearchResult } from './configs/user-search.types'

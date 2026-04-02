@@ -17,4 +17,8 @@ interface CreateOrgBody {
 	defaultCountry?: string
 }
 
-export type { OrgListItem, CreateOrgBody }
+interface AddStaffBody {
+	userId: string
+}
+
+export type { OrgListItem, CreateOrgBody, AddStaffBody }
