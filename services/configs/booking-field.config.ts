@@ -1,11 +1,14 @@
-import { getData, postData, patchData, deleteData } from '@/services/api/methods'
+import {
+	getData,
+	postData,
+	patchData,
+	deleteData,
+} from '@/services/api/methods'
 import { endpoint } from '@/services/api/types'
 import type {
 	BookingField,
 	CreateBookingFieldBody,
 	UpdateBookingFieldBody,
-	BookingFormConfig,
-	UpdateBookingFormConfigBody,
 	MergedBookingForm,
 } from './booking-field.types'
 import type { ApiResponse } from './user.config'
@@ -36,20 +39,6 @@ const bookingFieldApiConfig = {
 	remove: endpoint<void, ApiResponse<null>>({
 		url: ({ id }) => `/api/booking-fields/${id}`,
 		method: deleteData,
-	}),
-
-	getFormConfig: endpoint<void, ApiResponse<BookingFormConfig>>({
-		url: ({ ownerId, ownerType }) =>
-			`/api/booking-form-config?ownerId=${ownerId}&ownerType=${ownerType}`,
-		method: getData,
-	}),
-
-	updateFormConfig: endpoint<
-		UpdateBookingFormConfigBody,
-		ApiResponse<BookingFormConfig>
-	>({
-		url: () => `/api/booking-form-config`,
-		method: patchData,
 	}),
 
 	getMergedForm: endpoint<void, ApiResponse<MergedBookingForm>>({

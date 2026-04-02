@@ -21,15 +21,12 @@ import {
 	mockOrgStaff,
 	mockOrgBookingsByStaff,
 	mockBookingFields,
-	mockBookingFormConfig,
 } from './mock'
 import type {
 	BookingField,
-	BookingFormConfig,
 	CreateBookingFieldBody,
 	UpdateBookingFieldBody,
 	MergedBookingForm,
-	UpdateBookingFormConfigBody,
 } from '@/services/configs/booking-field.types'
 import {
 	getAvailableSlots,
@@ -303,7 +300,6 @@ const getAvailableSlotsForStaff = async (
 // ── Booking Fields API ──
 
 const bookingFieldsStore: BookingField[] = [...mockBookingFields]
-const formConfigStore: BookingFormConfig = { ...mockBookingFormConfig }
 
 const matchesOwner =
 	(ownerId: string, ownerType: 'org' | 'user') => (field: BookingField) =>
@@ -361,24 +357,6 @@ const deleteBookingField = async (id: string): Promise<void> => {
 	if (index !== -1) bookingFieldsStore.splice(index, 1)
 }
 
-// ── Booking Form Config API ──
-
-const getFormConfig = async (): Promise<BookingFormConfig> => {
-	await delay()
-	return { ...formConfigStore }
-}
-
-const updateFormConfig = async (
-	body: UpdateBookingFormConfigBody,
-): Promise<BookingFormConfig> => {
-	await delay()
-	if (body.phoneRequired !== undefined)
-		formConfigStore.phoneRequired = body.phoneRequired
-	if (body.emailRequired !== undefined)
-		formConfigStore.emailRequired = body.emailRequired
-	return { ...formConfigStore }
-}
-
 // ── Merged Booking Form API ──
 
 const sortByCreatedAt = (a: BookingField, b: BookingField): number =>
@@ -396,15 +374,6 @@ const getMergedBookingForm = async (
 ): Promise<MergedBookingForm> => {
 	await delay()
 
-	const findEventType = (et: EventType): boolean => et.id === eventTypeId
-	const eventType = mockEventTypes.find(findEventType)
-	const overrides = eventType?.baseFieldOverrides
-
-	const phoneRequired =
-		overrides?.phoneRequired ?? formConfigStore.phoneRequired
-	const emailRequired =
-		overrides?.emailRequired ?? formConfigStore.emailRequired
-
 	const orgFields = bookingFieldsStore.filter(isOrgLevel)
 	const serviceFields = bookingFieldsStore.filter(isForEventType(eventTypeId))
 	const customFields = [...orgFields, ...serviceFields].sort(sortByCreatedAt)
@@ -412,8 +381,6 @@ const getMergedBookingForm = async (
 	return {
 		baseFields: {
 			name: { required: true as const },
-			phone: { required: phoneRequired },
-			email: { required: emailRequired },
 		},
 		customFields,
 	}
@@ -455,11 +422,6 @@ export const bookingFieldApi = {
 	create: createBookingField,
 	update: updateBookingField,
 	remove: deleteBookingField,
-}
-
-export const bookingFormConfigApi = {
-	get: getFormConfig,
-	update: updateFormConfig,
 }
 
 export const mergedBookingFormApi = {

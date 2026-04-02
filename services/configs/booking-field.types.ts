@@ -26,38 +26,16 @@ interface UpdateBookingFieldBody {
 	required?: boolean
 }
 
-interface BookingFormConfig {
-	phoneRequired: boolean
-	emailRequired: boolean
-}
-
-interface UpdateBookingFormConfigBody {
-	ownerId: string
-	ownerType: 'org' | 'user'
-	phoneRequired?: boolean
-	emailRequired?: boolean
-}
-
-interface BaseFieldOverrides {
-	phoneRequired?: boolean | null
-	emailRequired?: boolean | null
-}
-
-interface MergedBaseField {
-	required: boolean
-}
-
 interface MergedBookingForm {
 	baseFields: {
 		name: { required: true }
-		phone: MergedBaseField
-		email: MergedBaseField
 	}
 	customFields: BookingField[]
 }
 
 interface CustomFieldValue {
 	fieldId: string
+	label: string
 	value: string
 }
 
@@ -66,10 +44,6 @@ export type {
 	BookingField,
 	CreateBookingFieldBody,
 	UpdateBookingFieldBody,
-	BookingFormConfig,
-	UpdateBookingFormConfigBody,
-	BaseFieldOverrides,
-	MergedBaseField,
 	MergedBookingForm,
 	CustomFieldValue,
 }

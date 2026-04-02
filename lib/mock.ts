@@ -6,10 +6,7 @@ import type {
 	BookingStatus,
 	OrgStaffMember,
 } from '@/services/configs/booking.types'
-import type {
-	BookingField,
-	BookingFormConfig,
-} from '@/services/configs/booking-field.types'
+import type { BookingField } from '@/services/configs/booking-field.types'
 
 // ── Staff ──
 
@@ -38,7 +35,6 @@ export const mockEventTypes: EventType[] = [
 		staffPolicy: 'any',
 		assignedPositions: [],
 		assignedStaff: [],
-		baseFieldOverrides: null,
 	},
 	{
 		id: '607f1f77bcf86cd799439002',
@@ -52,7 +48,6 @@ export const mockEventTypes: EventType[] = [
 		staffPolicy: 'any',
 		assignedPositions: [],
 		assignedStaff: [],
-		baseFieldOverrides: null,
 	},
 	{
 		id: '607f1f77bcf86cd799439003',
@@ -66,7 +61,6 @@ export const mockEventTypes: EventType[] = [
 		staffPolicy: 'any',
 		assignedPositions: [],
 		assignedStaff: [],
-		baseFieldOverrides: null,
 	},
 	{
 		id: '607f1f77bcf86cd799439004',
@@ -80,7 +74,6 @@ export const mockEventTypes: EventType[] = [
 		staffPolicy: 'any',
 		assignedPositions: [],
 		assignedStaff: [],
-		baseFieldOverrides: null,
 	},
 ]
 
@@ -343,13 +336,6 @@ export const mockOrgBookingsByStaff: Record<string, StaffBooking[]> = {
 	[mockOrgStaffMember1.id]: [mockOrgBookings[0], mockOrgBookings[1]],
 	[mockOrgStaffMember2.id]: [mockOrgBookings[2]],
 	[mockOrgStaffMember3.id]: [mockOrgBookings[3], mockOrgBookings[4]],
-}
-
-// ── Booking Form Config ──
-
-export const mockBookingFormConfig: BookingFormConfig = {
-	phoneRequired: false,
-	emailRequired: false,
 }
 
 // ── Booking Fields ──

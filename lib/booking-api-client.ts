@@ -93,10 +93,6 @@ interface BackendEventType {
 	staffPolicy: 'any' | 'by_position' | 'specific'
 	assignedPositions: string[]
 	assignedStaff: string[]
-	baseFieldOverrides: {
-		phoneRequired?: boolean | null
-		emailRequired?: boolean | null
-	} | null
 }
 
 interface BackendWeeklyHours {
@@ -131,6 +127,7 @@ interface BackendBookingDto {
 	status: BookingStatus
 	inviteeSnapshot: { name: string; email: string | null; phone: string | null }
 	clientNotes: string | null
+	customFieldValues?: { fieldId: string; label: string; value: string }[]
 	payment: { status: string; amount: number; currency: string }
 	createdAt: string
 	updatedAt: string
@@ -176,7 +173,6 @@ const toFrontendEventType = (raw: BackendEventType): EventType => ({
 	staffPolicy: raw.staffPolicy ?? 'any',
 	assignedPositions: raw.assignedPositions ?? [],
 	assignedStaff: raw.assignedStaff ?? [],
-	baseFieldOverrides: raw.baseFieldOverrides ?? null,
 })
 
 const toFrontendWeeklyHours = (raw: BackendWeeklyHours): WeeklyHours => ({

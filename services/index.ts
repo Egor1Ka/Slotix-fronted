@@ -112,10 +112,6 @@ export type {
 	BookingField,
 	CreateBookingFieldBody,
 	UpdateBookingFieldBody,
-	BookingFormConfig,
-	UpdateBookingFormConfigBody,
-	BaseFieldOverrides,
-	MergedBaseField,
 	MergedBookingForm,
 	CustomFieldValue,
 } from './configs/booking-field.types'
