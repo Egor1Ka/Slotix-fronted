@@ -9,6 +9,7 @@ import {
 	SelectTrigger,
 } from '@/components/ui/select'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
 import type { OrgStaffMember } from '@/services/configs/booking.types'
 
 interface StaffFilterProps {
@@ -26,6 +27,8 @@ const getInitials = (name: string): string =>
 		.slice(0, 2)
 
 function StaffOptionContent({ member }: { member: OrgStaffMember }) {
+	const t = useTranslations('staffSchedule')
+
 	return (
 		<div className="flex items-center gap-2">
 			<Avatar className="size-5">
@@ -38,12 +41,19 @@ function StaffOptionContent({ member }: { member: OrgStaffMember }) {
 			{member.position && (
 				<span className="text-muted-foreground text-xs">{member.position}</span>
 			)}
+			{member.status === 'invited' && (
+				<Badge variant="outline" className="text-muted-foreground px-1.5 py-0 text-[10px]">
+					{t('invited')}
+				</Badge>
+			)}
 		</div>
 	)
 }
 
-const findById = (staff: OrgStaffMember[], id: string | null): OrgStaffMember | undefined =>
-	staff.find((member) => member.id === id)
+const findById = (
+	staff: OrgStaffMember[],
+	id: string | null,
+): OrgStaffMember | undefined => staff.find((member) => member.id === id)
 
 function StaffFilter({ staff, selectedId, onSelect }: StaffFilterProps) {
 	const t = useTranslations('staffSchedule')
@@ -64,17 +74,12 @@ function StaffFilter({ staff, selectedId, onSelect }: StaffFilterProps) {
 	return (
 		<div data-slot="staff-filter" className="flex items-center gap-2">
 			<Users className="text-muted-foreground size-4 shrink-0" />
-			<Select
-				value={selectedId ?? undefined}
-				onValueChange={handleValueChange}
-			>
+			<Select value={selectedId ?? undefined} onValueChange={handleValueChange}>
 				<SelectTrigger className="w-full max-w-sm">
 					{selectedMember ? (
 						<StaffOptionContent member={selectedMember} />
 					) : (
-						<span className="text-muted-foreground">
-							{t('selectStaff')}
-						</span>
+						<span className="text-muted-foreground">{t('selectStaff')}</span>
 					)}
 				</SelectTrigger>
 				<SelectContent>{staff.map(renderStaffOption)}</SelectContent>

@@ -147,6 +147,7 @@ interface OrgByIdResponse {
 
 interface OrgStaffMember extends StaffMember {
 	bookingCount: number
+	status?: 'active' | 'invited' | 'suspended'
 }
 
 // ── Calendar Display ──
