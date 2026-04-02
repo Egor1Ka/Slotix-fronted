@@ -10,6 +10,7 @@ import type { BookingDetail } from '@/components/booking/BookingDetailsPanel'
 import type {
 	MergedBookingForm,
 	CustomFieldValue,
+	BookingField,
 } from '@/services/configs/booking-field.types'
 
 interface UseBookingActionsParams {
@@ -98,19 +99,65 @@ const useBookingActions = (
 
 	// Извлечение значений кастомных полей из данных формы
 	const isCustomField = (key: string): boolean => key.startsWith('custom_')
+
+	const findFieldLabel = (fieldId: string): string => {
+		if (!formConfig) return fieldId
+		const match = formConfig.customFields.find((f) => f.id === fieldId)
+		return match ? match.label : fieldId
+	}
+
 	const toCustomFieldValue =
 		(data: Record<string, unknown>): ((key: string) => CustomFieldValue) =>
-		(key: string) => ({
-			fieldId: key.replace('custom_', ''),
-			value: String(data[key] ?? ''),
-		})
+		(key: string) => {
+			const fieldId = key.replace('custom_', '')
+			return {
+				fieldId,
+				label: findFieldLabel(fieldId),
+				value: String(data[key] ?? ''),
+			}
+		}
 	const hasValue = (entry: CustomFieldValue): boolean => entry.value.length > 0
+
+	// Извлечение email/phone из кастомных полей для invitee
+	const findFieldById = (fieldId: string): BookingField | undefined =>
+		formConfig?.customFields.find((f) => f.id === fieldId)
+
+	const isInviteeField = (field: BookingField): boolean =>
+		field.type === 'email' || field.type === 'phone'
+
+	const extractInviteeFromCustomFields = (
+		data: Record<string, unknown>,
+	): { email: string | null; phone: string | null } => {
+		let email: string | null = null
+		let phone: string | null = null
+
+		const processKey = (key: string) => {
+			if (!isCustomField(key)) return
+			const fieldId = key.replace('custom_', '')
+			const field = findFieldById(fieldId)
+			if (!field || !isInviteeField(field)) return
+			const value = String(data[key] ?? '')
+			if (!value) return
+			if (field.type === 'email' && !email) email = value
+			if (field.type === 'phone' && !phone) phone = value
+		}
+		Object.keys(data).forEach(processKey)
+
+		return { email, phone }
+	}
+
+	const isNonInviteeCustomField = (key: string): boolean => {
+		if (!isCustomField(key)) return false
+		const fieldId = key.replace('custom_', '')
+		const field = findFieldById(fieldId)
+		return !field || !isInviteeField(field)
+	}
 
 	const extractCustomFieldValues = (
 		data: Record<string, unknown>,
 	): CustomFieldValue[] =>
 		Object.keys(data)
-			.filter(isCustomField)
+			.filter(isNonInviteeCustomField)
 			.map(toCustomFieldValue(data))
 			.filter(hasValue)
 
@@ -125,25 +172,26 @@ const useBookingActions = (
 
 		const startAt = `${dateStr}T${selectedSlotTime}:00.000Z`
 
-		const customFieldValues = extractCustomFieldValues(
-			data as Record<string, unknown>,
-		)
+		const dataRecord = data as Record<string, unknown>
+		const inviteeFields = extractInviteeFromCustomFields(dataRecord)
+		const customFieldValues = extractCustomFieldValues(dataRecord)
 
 		try {
 			setIsSubmitting(true)
-			const response = await bookingApi.create({
+			const body = {
 				eventTypeId: selectedEventTypeId,
 				staffId: resolvedStaffId,
 				startAt,
 				timezone: browserTimezone(),
 				invitee: {
 					name: data.name,
-					email: data.email || null,
-					phone: data.phone || null,
+					email: inviteeFields.email,
+					phone: inviteeFields.phone,
 					phoneCountry: null,
 				},
 				...(customFieldValues.length > 0 && { customFieldValues }),
-			})
+			}
+			const response = await bookingApi.create(body)
 
 			setConfirmedBooking({
 				bookingId: response.id,
@@ -193,8 +241,59 @@ const useBookingActions = (
 		try {
 			setParams({ eventType: null, slot: null })
 			setConfirmedBooking(null)
+			reloadBookings()
 			const detail = await bookingApi.getById(bookingId)
-			setSelectedBooking(detail as unknown as BookingDetail)
+
+			// Обогатить customFieldValues лейблами из конфига формы
+			const rawValues =
+				(detail as unknown as Record<string, unknown>).customFieldValues ?? []
+			const fieldValues = rawValues as {
+				fieldId: string
+				value: string
+				label?: string
+			}[]
+
+			let enrichedValues: { fieldId: string; label: string; value: string }[] =
+				[]
+
+			if (fieldValues.length > 0) {
+				try {
+					const formCfg = await bookingFormApi.getMergedForm(
+						detail.eventTypeId,
+					)
+					const findLabel = (fieldId: string): string => {
+						const match = formCfg.customFields.find((f) => f.id === fieldId)
+						return match ? match.label : fieldId
+					}
+					const enrichField = (fv: {
+						fieldId: string
+						value: string
+						label?: string
+					}) => ({
+						fieldId: fv.fieldId,
+						label: fv.label ?? findLabel(fv.fieldId),
+						value: fv.value,
+					})
+					enrichedValues = fieldValues.map(enrichField)
+				} catch {
+					const useExistingLabel = (fv: {
+						fieldId: string
+						value: string
+						label?: string
+					}) => ({
+						fieldId: fv.fieldId,
+						label: fv.label ?? fv.fieldId,
+						value: fv.value,
+					})
+					enrichedValues = fieldValues.map(useExistingLabel)
+				}
+			}
+
+			const bookingDetail = {
+				...(detail as unknown as BookingDetail),
+				customFieldValues: enrichedValues,
+			}
+			setSelectedBooking(bookingDetail)
 		} catch (err) {
 			const message = err instanceof Error ? err.message : t('loadError')
 			setBookingError(message)
