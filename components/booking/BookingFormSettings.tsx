@@ -3,20 +3,13 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
-import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
-import { Field, FieldLabel } from '@/components/ui/field'
-import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import { Trash2, Pencil, Plus } from 'lucide-react'
 import { BookingFieldEditor } from './BookingFieldEditor'
-import {
-	bookingFieldApi,
-	bookingFormConfigApi,
-} from '@/lib/mock-api'
+import { bookingFieldApi } from '@/lib/mock-api'
 import type {
 	BookingField,
-	BookingFormConfig,
 	BookingFieldType,
 } from '@/services/configs/booking-field.types'
 
@@ -28,7 +21,6 @@ interface BookingFormSettingsProps {
 function BookingFormSettings({ ownerId, ownerType }: BookingFormSettingsProps) {
 	const t = useTranslations('booking')
 
-	const [config, setConfig] = useState<BookingFormConfig | null>(null)
 	const [fields, setFields] = useState<BookingField[]>([])
 	const [editingField, setEditingField] = useState<BookingField | null>(null)
 	const [isAdding, setIsAdding] = useState(false)
@@ -44,45 +36,13 @@ function BookingFormSettings({ ownerId, ownerType }: BookingFormSettingsProps) {
 	// ── Загрузка данных ──
 
 	const loadData = useCallback(async () => {
-		const [formConfig, bookingFields] = await Promise.all([
-			bookingFormConfigApi.get(),
-			bookingFieldApi.getFields(ownerId, ownerType, null),
-		])
-		setConfig(formConfig)
+		const bookingFields = await bookingFieldApi.getFields(ownerId, ownerType, null)
 		setFields(bookingFields)
 	}, [ownerId, ownerType])
 
 	useEffect(() => {
 		loadData()
 	}, [loadData])
-
-	// ── Переключатели базовых полей ──
-
-	const handlePhoneToggle = useCallback(
-		async (checked: boolean) => {
-			const updated = await bookingFormConfigApi.update({
-				ownerId,
-				ownerType,
-				phoneRequired: checked,
-			})
-			setConfig(updated)
-			toast.success(t('bookingForm.configUpdated'))
-		},
-		[ownerId, ownerType, t],
-	)
-
-	const handleEmailToggle = useCallback(
-		async (checked: boolean) => {
-			const updated = await bookingFormConfigApi.update({
-				ownerId,
-				ownerType,
-				emailRequired: checked,
-			})
-			setConfig(updated)
-			toast.success(t('bookingForm.configUpdated'))
-		},
-		[ownerId, ownerType, t],
-	)
 
 	// ── Добавление / редактирование ──
 
@@ -102,7 +62,11 @@ function BookingFormSettings({ ownerId, ownerType }: BookingFormSettingsProps) {
 	}, [])
 
 	const handleSave = useCallback(
-		async (data: { label: string; type: BookingFieldType; required: boolean }) => {
+		async (data: {
+			label: string
+			type: BookingFieldType
+			required: boolean
+		}) => {
 			setIsSaving(true)
 			try {
 				if (editingField) {
@@ -167,11 +131,7 @@ function BookingFormSettings({ ownerId, ownerType }: BookingFormSettingsProps) {
 				)}
 			</div>
 			<div className="flex gap-1">
-				<Button
-					variant="ghost"
-					size="icon"
-					onClick={createEditHandler(field)}
-				>
+				<Button variant="ghost" size="icon" onClick={createEditHandler(field)}>
 					<Pencil className="h-4 w-4" />
 				</Button>
 				<Button
@@ -185,35 +145,8 @@ function BookingFormSettings({ ownerId, ownerType }: BookingFormSettingsProps) {
 		</div>
 	)
 
-	if (!config) return null
-
 	return (
 		<div className="space-y-6">
-			{/* Базовые поля */}
-			<div className="space-y-4">
-				<h3 className="text-lg font-semibold">
-					{t('bookingForm.baseFields')}
-				</h3>
-
-				<Field orientation="horizontal">
-					<FieldLabel>{t('bookingForm.phoneRequired')}</FieldLabel>
-					<Switch
-						checked={config.phoneRequired}
-						onCheckedChange={handlePhoneToggle}
-					/>
-				</Field>
-
-				<Field orientation="horizontal">
-					<FieldLabel>{t('bookingForm.emailRequired')}</FieldLabel>
-					<Switch
-						checked={config.emailRequired}
-						onCheckedChange={handleEmailToggle}
-					/>
-				</Field>
-			</div>
-
-			<Separator />
-
 			{/* Кастомные поля */}
 			<div className="space-y-4">
 				<div className="flex items-center justify-between">

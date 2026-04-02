@@ -19,13 +19,6 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
@@ -49,16 +42,12 @@ const PALETTE = [
 	'#F97316',
 ]
 
-const overrideEnum = z.enum(['inherit', 'required', 'optional'])
-
 const baseServiceSchema = z.object({
 	name: z.string().min(2),
 	durationMin: z.number().min(1),
 	price: z.number().min(0),
 	color: z.string().regex(/^#[0-9a-fA-F]{6}$/),
 	description: z.string().optional(),
-	phoneOverride: overrideEnum,
-	emailOverride: overrideEnum,
 })
 
 const orgServiceSchema = baseServiceSchema
@@ -91,26 +80,6 @@ const personalServiceSchema = baseServiceSchema
 type OrgServiceFormData = z.infer<typeof orgServiceSchema>
 type PersonalServiceFormData = z.infer<typeof personalServiceSchema>
 type ServiceFormData = OrgServiceFormData | PersonalServiceFormData
-
-// ── Override helpers ──
-
-const OVERRIDE_MAP: Record<string, boolean | null> = {
-	inherit: null,
-	required: true,
-	optional: false,
-}
-
-const toOverrideValue = (value: string): boolean | null =>
-	OVERRIDE_MAP[value] ?? null
-
-type OverrideOption = 'inherit' | 'required' | 'optional'
-
-const fromOverrideValue = (
-	value: boolean | null | undefined,
-): OverrideOption => {
-	if (value === null || value === undefined) return 'inherit'
-	return value ? 'required' : 'optional'
-}
 
 // ── Component ──
 
@@ -164,8 +133,6 @@ function ServiceDialog({
 			price: 0,
 			color: PALETTE[0],
 			description: '',
-			phoneOverride: 'inherit',
-			emailOverride: 'inherit',
 			staffPolicy: 'any',
 			assignedPositions: [],
 			assignedStaff: [],
@@ -217,16 +184,12 @@ function ServiceDialog({
 			loadReferenceData()
 			loadCustomFields()
 
-			const overrides = eventType?.baseFieldOverrides
-
 			const baseDefaults = {
 				name: eventType?.name ?? '',
 				durationMin: eventType?.durationMin ?? 30,
 				price: eventType?.price ?? 0,
 				color: eventType?.color ?? PALETTE[0],
 				description: eventType?.description ?? '',
-				phoneOverride: fromOverrideValue(overrides?.phoneRequired),
-				emailOverride: fromOverrideValue(overrides?.emailRequired),
 			}
 
 			const orgDefaults = isOrg
@@ -263,11 +226,6 @@ function ServiceDialog({
 					}
 				: {}
 
-			const baseFieldOverrides = {
-				phoneRequired: toOverrideValue(data.phoneOverride),
-				emailRequired: toOverrideValue(data.emailOverride),
-			}
-
 			if (isEdit) {
 				await eventTypeApi.update({
 					pathParams: { id: eventType.id },
@@ -278,10 +236,51 @@ function ServiceDialog({
 						currency,
 						color: data.color,
 						description: data.description,
-						baseFieldOverrides,
 						...staffFields,
 					},
 				})
+
+				// Сохранить кастомные поля per-service
+				const existingFields = await bookingFieldApi.getFields(
+					ownerId,
+					ownerType,
+					eventType.id,
+				)
+				const existingIds = existingFields.map((f: BookingField) => f.id)
+				const currentIds = customFields.map((f) => f.id)
+
+				// Удалить поля которых больше нет
+				const isRemoved = (id: string) => !currentIds.includes(id)
+				const removedIds = existingIds.filter(isRemoved)
+				const removeField = (id: string) => bookingFieldApi.remove(id)
+				await Promise.all(removedIds.map(removeField))
+
+				// Создать новые (local- prefix)
+				const isNewField = (f: BookingField) => f.id.startsWith('local-')
+				const createField = (f: BookingField) =>
+					bookingFieldApi.create({
+						ownerId,
+						ownerType,
+						eventTypeId: eventType.id,
+						type: f.type,
+						label: f.label,
+						required: f.required,
+					})
+				await Promise.all(customFields.filter(isNewField).map(createField))
+
+				// Обновить существующие
+				const isExistingChanged = (f: BookingField) =>
+					!f.id.startsWith('local-') && existingIds.includes(f.id)
+				const updateField = (f: BookingField) =>
+					bookingFieldApi.update(f.id, {
+						label: f.label,
+						type: f.type,
+						required: f.required,
+					})
+				await Promise.all(
+					customFields.filter(isExistingChanged).map(updateField),
+				)
+
 				toast.success(t('updated'))
 			} else {
 				await eventTypeApi.create({
@@ -293,7 +292,6 @@ function ServiceDialog({
 						currency,
 						color: data.color,
 						description: data.description,
-						baseFieldOverrides,
 						...staffFields,
 					},
 				})
@@ -412,46 +410,34 @@ function ServiceDialog({
 	}, [])
 
 	const handleSaveField = useCallback(
-		async (data: { label: string; type: BookingFieldType; required: boolean }) => {
-			if (!eventType) return
-			setIsSavingField(true)
-			try {
-				if (editingField) {
-					await bookingFieldApi.update(editingField.id, {
-						label: data.label,
-						type: data.type,
-						required: data.required,
-					})
-					toast.success(t('bookingForm.fieldUpdated'))
-				} else {
-					await bookingFieldApi.create({
-						ownerId,
-						ownerType,
-						eventTypeId: eventType.id,
-						type: data.type,
-						label: data.label,
-						required: data.required,
-					})
-					toast.success(t('bookingForm.fieldCreated'))
+		(data: { label: string; type: BookingFieldType; required: boolean }) => {
+			if (editingField) {
+				const updateField = (f: BookingField): BookingField =>
+					f.id === editingField.id ? { ...f, ...data } : f
+				setCustomFields((prev) => prev.map(updateField))
+			} else {
+				const newField: BookingField = {
+					id: `local-${Date.now()}`,
+					ownerId,
+					ownerType,
+					eventTypeId: eventType?.id ?? null,
+					type: data.type,
+					label: data.label,
+					required: data.required,
+					createdAt: new Date().toISOString(),
 				}
-				setEditingField(null)
-				setIsAddingField(false)
-				await loadCustomFields()
-			} finally {
-				setIsSavingField(false)
+				setCustomFields((prev) => [...prev, newField])
 			}
+			setEditingField(null)
+			setIsAddingField(false)
 		},
-		[editingField, ownerId, ownerType, eventType, t, loadCustomFields],
+		[editingField, ownerId, ownerType, eventType],
 	)
 
-	const handleDeleteField = useCallback(
-		async (fieldId: string) => {
-			await bookingFieldApi.remove(fieldId)
-			toast.success(t('bookingForm.fieldDeleted'))
-			await loadCustomFields()
-		},
-		[t, loadCustomFields],
-	)
+	const handleDeleteField = useCallback((fieldId: string) => {
+		const isNotTarget = (f: BookingField) => f.id !== fieldId
+		setCustomFields((prev) => prev.filter(isNotTarget))
+	}, [])
 
 	const createFieldEditHandler = (field: BookingField) => () => {
 		handleStartEditField(field)
@@ -470,9 +456,7 @@ function ServiceDialog({
 				<span className="text-sm font-medium">{field.label}</span>
 				<Badge variant="secondary">{TYPE_LABELS[field.type]}</Badge>
 				{field.required && (
-					<Badge variant="outline">
-						{t('bookingForm.required')}
-					</Badge>
+					<Badge variant="outline">{t('bookingForm.required')}</Badge>
 				)}
 			</div>
 			<div className="flex gap-1">
@@ -496,25 +480,6 @@ function ServiceDialog({
 		</div>
 	)
 
-	// ── Override select options ──
-
-	const OVERRIDE_OPTIONS = [
-		{ value: 'inherit', label: t('bookingForm.inherit') },
-		{ value: 'required', label: t('bookingForm.required') },
-		{ value: 'optional', label: t('bookingForm.optional') },
-	]
-
-	const renderOverrideOption = ({
-		value,
-		label,
-	}: {
-		value: string
-		label: string
-	}) => (
-		<SelectItem key={value} value={value}>
-			{label}
-		</SelectItem>
-	)
 
 	const orgErrors = errors as unknown as FieldErrors<OrgServiceFormData>
 
@@ -595,11 +560,7 @@ function ServiceDialog({
 
 						{isOrg && (
 							<>
-								<Field
-									data-invalid={
-										!!orgErrors.staffPolicy || undefined
-									}
-								>
+								<Field data-invalid={!!orgErrors.staffPolicy || undefined}>
 									<FieldLabel>{t('staffPolicy')}</FieldLabel>
 									<Controller
 										control={control}
@@ -625,19 +586,12 @@ function ServiceDialog({
 											</RadioGroup>
 										)}
 									/>
-									<FieldError
-										errors={[
-											orgErrors.staffPolicy,
-										]}
-									/>
+									<FieldError errors={[orgErrors.staffPolicy]} />
 								</Field>
 
 								{staffPolicy === 'by_position' && (
 									<Field
-										data-invalid={
-											!!orgErrors.assignedPositions ||
-											undefined
-										}
+										data-invalid={!!orgErrors.assignedPositions || undefined}
 									>
 										<FieldLabel>{t('assignedPositions')}</FieldLabel>
 										{positions.length === 0 ? (
@@ -649,21 +603,12 @@ function ServiceDialog({
 												{positions.map(renderPositionChip)}
 											</div>
 										)}
-										<FieldError
-											errors={[
-												orgErrors.assignedPositions,
-											]}
-										/>
+										<FieldError errors={[orgErrors.assignedPositions]} />
 									</Field>
 								)}
 
 								{staffPolicy === 'specific' && (
-									<Field
-										data-invalid={
-											!!orgErrors.assignedStaff ||
-											undefined
-										}
-									>
+									<Field data-invalid={!!orgErrors.assignedStaff || undefined}>
 										<FieldLabel>{t('assignedStaff')}</FieldLabel>
 										{staff.length === 0 ? (
 											<p className="text-muted-foreground text-sm">
@@ -674,79 +619,17 @@ function ServiceDialog({
 												{staff.map(renderStaffChip)}
 											</div>
 										)}
-										<FieldError
-											errors={[
-												orgErrors.assignedStaff,
-											]}
-										/>
+										<FieldError errors={[orgErrors.assignedStaff]} />
 									</Field>
 								)}
 							</>
 						)}
 
-						{/* Секція: Форма бронювання */}
-						<Separator className="my-4" />
-						<h4 className="font-medium">{t('bookingForm.title')}</h4>
-
-						<div className="grid grid-cols-2 gap-3">
-							<Field>
-								<FieldLabel>
-									{t('bookingForm.phoneOverride')}
-								</FieldLabel>
-								<Controller
-									control={control}
-									name="phoneOverride"
-									render={({ field }) => (
-										<Select
-											value={field.value}
-											onValueChange={field.onChange}
-										>
-											<SelectTrigger>
-												<SelectValue />
-											</SelectTrigger>
-											<SelectContent>
-												{OVERRIDE_OPTIONS.map(
-													renderOverrideOption,
-												)}
-											</SelectContent>
-										</Select>
-									)}
-								/>
-							</Field>
-
-							<Field>
-								<FieldLabel>
-									{t('bookingForm.emailOverride')}
-								</FieldLabel>
-								<Controller
-									control={control}
-									name="emailOverride"
-									render={({ field }) => (
-										<Select
-											value={field.value}
-											onValueChange={field.onChange}
-										>
-											<SelectTrigger>
-												<SelectValue />
-											</SelectTrigger>
-											<SelectContent>
-												{OVERRIDE_OPTIONS.map(
-													renderOverrideOption,
-												)}
-											</SelectContent>
-										</Select>
-									)}
-								/>
-							</Field>
-						</div>
-
 						{/* Секція: Кастомні поля для цієї послуги */}
 						<Separator className="my-4" />
 						<div className="space-y-3">
 							<div className="flex items-center justify-between">
-								<h4 className="font-medium">
-									{t('bookingForm.customFields')}
-								</h4>
+								<h4 className="font-medium">{t('bookingForm.customFields')}</h4>
 								{isEdit && !isAddingField && (
 									<Button
 										type="button"
@@ -775,13 +658,11 @@ function ServiceDialog({
 								/>
 							)}
 
-							{isEdit &&
-								customFields.length === 0 &&
-								!isAddingField && (
-									<p className="text-muted-foreground text-sm">
-										{t('bookingForm.noCustomFields')}
-									</p>
-								)}
+							{isEdit && customFields.length === 0 && !isAddingField && (
+								<p className="text-muted-foreground text-sm">
+									{t('bookingForm.noCustomFields')}
+								</p>
+							)}
 
 							{isEdit && customFields.length > 0 && (
 								<div className="space-y-2">
