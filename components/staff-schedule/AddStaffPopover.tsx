@@ -98,7 +98,8 @@ function AddStaffPopover({ orgId, onStaffAdded }: AddStaffPopoverProps) {
 		}
 	}
 
-	const createUserClickHandler = (userId: string) => () => handleSelectUser(userId)
+	const createUserClickHandler = (userId: string) => () =>
+		handleSelectUser(userId)
 
 	const renderUserOption = (user: UserSearchResult) => (
 		<button
@@ -118,7 +119,11 @@ function AddStaffPopover({ orgId, onStaffAdded }: AddStaffPopoverProps) {
 
 	return (
 		<Popover open={open} onOpenChange={handleOpenChange}>
-			<PopoverTrigger render={<Button variant="outline" size="icon" aria-label={t('addStaff')} />}>
+			<PopoverTrigger
+				render={
+					<Button variant="outline" size="icon" aria-label={t('addStaff')} />
+				}
+			>
 				<Plus className="size-4" />
 			</PopoverTrigger>
 

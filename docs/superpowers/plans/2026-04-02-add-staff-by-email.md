@@ -13,6 +13,7 @@
 ### Task 1: Бэкенд — repository для поиска пользователей по email
 
 **Files:**
+
 - Modify: `/Users/egorzozula/Desktop/BackendTemplate/src/modules/user/repository/userRepository.js`
 - Modify: `/Users/egorzozula/Desktop/BackendTemplate/src/modules/user/services/userServices.js`
 - Modify: `/Users/egorzozula/Desktop/BackendTemplate/src/modules/user/index.js`
@@ -22,52 +23,76 @@
 В конец файла перед `export` добавить:
 
 ```javascript
-const searchUsersByEmail = async (emailQuery, excludeUserIds = [], limit = 10) => {
-  const regex = new RegExp(emailQuery, "i");
-  const docs = await User.find({
-    email: regex,
-    _id: { $nin: excludeUserIds },
-  }).limit(limit);
-  const toDto = (doc) => toUserDto(doc);
-  return docs.map(toDto);
-};
+const searchUsersByEmail = async (
+	emailQuery,
+	excludeUserIds = [],
+	limit = 10,
+) => {
+	const regex = new RegExp(emailQuery, 'i')
+	const docs = await User.find({
+		email: regex,
+		_id: { $nin: excludeUserIds },
+	}).limit(limit)
+	const toDto = (doc) => toUserDto(doc)
+	return docs.map(toDto)
+}
 ```
 
 Обновить экспорт:
 
 ```javascript
-export { createUser, getUserById, getUser, updateUser, deleteUser, searchUsersByEmail };
+export {
+	createUser,
+	getUserById,
+	getUser,
+	updateUser,
+	deleteUser,
+	searchUsersByEmail,
+}
 ```
 
 - [ ] **Step 2: Добавить searchUsersByEmail в userServices.js**
 
 ```javascript
 import {
-  createUser as repoCreateUser,
-  getUserById as repoGetUserById,
-  getUser as repoGetUser,
-  updateUser as repoUpdateUser,
-  deleteUser as repoDeleteUser,
-  searchUsersByEmail as repoSearchUsersByEmail,
-} from "../repository/userRepository.js";
+	createUser as repoCreateUser,
+	getUserById as repoGetUserById,
+	getUser as repoGetUser,
+	updateUser as repoUpdateUser,
+	deleteUser as repoDeleteUser,
+	searchUsersByEmail as repoSearchUsersByEmail,
+} from '../repository/userRepository.js'
 
 const searchUsersByEmail = async (emailQuery, excludeUserIds, limit) => {
-  return await repoSearchUsersByEmail(emailQuery, excludeUserIds, limit);
-};
+	return await repoSearchUsersByEmail(emailQuery, excludeUserIds, limit)
+}
 ```
 
 Обновить экспорт:
 
 ```javascript
-export { createUser, getUserById, getUser, updateUser, deleteUser, searchUsersByEmail };
+export {
+	createUser,
+	getUserById,
+	getUser,
+	updateUser,
+	deleteUser,
+	searchUsersByEmail,
+}
 ```
 
 - [ ] **Step 3: Экспортировать searchUsersByEmail из user/index.js**
 
 ```javascript
-export { getUserById, getUser, createUser, updateUser, searchUsersByEmail } from "./services/userServices.js";
-export { toUserDto } from "./dto/userDto.js";
-export { default as userRouter } from "./routes/userRoutes.js";
+export {
+	getUserById,
+	getUser,
+	createUser,
+	updateUser,
+	searchUsersByEmail,
+} from './services/userServices.js'
+export { toUserDto } from './dto/userDto.js'
+export { default as userRouter } from './routes/userRoutes.js'
 ```
 
 - [ ] **Step 4: Commit**
@@ -82,19 +107,26 @@ git commit -m "feat: добавить searchUsersByEmail в user module"
 ### Task 2: Бэкенд — repository для проверки существующих членств
 
 **Files:**
+
 - Modify: `/Users/egorzozula/Desktop/BackendTemplate/src/repository/membershipRepository.js`
 
 - [ ] **Step 1: Добавить getMemberUserIdsByOrg для получения userId всех членов организации**
 
 ```javascript
 const getMemberUserIdsByOrg = async (orgId) => {
-  const docs = await Membership.find({
-    orgId,
-    status: { $in: [MEMBERSHIP_STATUS.ACTIVE, MEMBERSHIP_STATUS.INVITED, MEMBERSHIP_STATUS.SUSPENDED] },
-  }).select("userId");
-  const toUserId = (doc) => doc.userId;
-  return docs.map(toUserId);
-};
+	const docs = await Membership.find({
+		orgId,
+		status: {
+			$in: [
+				MEMBERSHIP_STATUS.ACTIVE,
+				MEMBERSHIP_STATUS.INVITED,
+				MEMBERSHIP_STATUS.SUSPENDED,
+			],
+		},
+	}).select('userId')
+	const toUserId = (doc) => doc.userId
+	return docs.map(toUserId)
+}
 ```
 
 Обновить экспорт — добавить `getMemberUserIdsByOrg`.
@@ -103,8 +135,8 @@ const getMemberUserIdsByOrg = async (orgId) => {
 
 ```javascript
 const getMembershipByUserAndOrg = async (userId, orgId) => {
-  return Membership.findOne({ userId, orgId });
-};
+	return Membership.findOne({ userId, orgId })
+}
 ```
 
 Обновить экспорт — добавить `getMembershipByUserAndOrg`.
@@ -121,58 +153,62 @@ git commit -m "feat: добавить getMemberUserIdsByOrg и getMembershipByUs
 ### Task 3: Бэкенд — сервис и контроллер для поиска пользователей
 
 **Files:**
+
 - Create: `/Users/egorzozula/Desktop/BackendTemplate/src/services/userSearchServices.js`
 - Create: `/Users/egorzozula/Desktop/BackendTemplate/src/controllers/userSearchController.js`
 
 - [ ] **Step 1: Создать userSearchServices.js**
 
 ```javascript
-import { searchUsersByEmail } from "../modules/user/index.js";
-import { getMemberUserIdsByOrg } from "../repository/membershipRepository.js";
+import { searchUsersByEmail } from '../modules/user/index.js'
+import { getMemberUserIdsByOrg } from '../repository/membershipRepository.js'
 
 const searchUsersExcludingOrgMembers = async (emailQuery, orgId) => {
-  const existingMemberIds = await getMemberUserIdsByOrg(orgId);
-  const users = await searchUsersByEmail(emailQuery, existingMemberIds, 10);
-  const toEmailResult = (user) => ({ id: user.id, email: user.email });
-  return users.map(toEmailResult);
-};
+	const existingMemberIds = await getMemberUserIdsByOrg(orgId)
+	const users = await searchUsersByEmail(emailQuery, existingMemberIds, 10)
+	const toEmailResult = (user) => ({ id: user.id, email: user.email })
+	return users.map(toEmailResult)
+}
 
-export { searchUsersExcludingOrgMembers };
+export { searchUsersExcludingOrgMembers }
 ```
 
 - [ ] **Step 2: Создать userSearchController.js**
 
 ```javascript
-import { searchUsersExcludingOrgMembers } from "../services/userSearchServices.js";
-import { httpResponse, httpResponseError } from "../shared/utils/http/httpResponse.js";
-import { generalStatus, userStatus } from "../shared/utils/http/httpStatus.js";
+import { searchUsersExcludingOrgMembers } from '../services/userSearchServices.js'
+import {
+	httpResponse,
+	httpResponseError,
+} from '../shared/utils/http/httpResponse.js'
+import { generalStatus, userStatus } from '../shared/utils/http/httpStatus.js'
 
 const handleSearchUsers = async (req, res) => {
-  try {
-    const { email, orgId } = req.query;
+	try {
+		const { email, orgId } = req.query
 
-    if (!email || email.length < 3) {
-      return httpResponseError(res, {
-        ...userStatus.VALIDATION_ERROR,
-        data: { email: { error: "email — минимум 3 символа" } },
-      });
-    }
+		if (!email || email.length < 3) {
+			return httpResponseError(res, {
+				...userStatus.VALIDATION_ERROR,
+				data: { email: { error: 'email — минимум 3 символа' } },
+			})
+		}
 
-    if (!orgId) {
-      return httpResponseError(res, {
-        ...userStatus.VALIDATION_ERROR,
-        data: { orgId: { error: "orgId обязателен" } },
-      });
-    }
+		if (!orgId) {
+			return httpResponseError(res, {
+				...userStatus.VALIDATION_ERROR,
+				data: { orgId: { error: 'orgId обязателен' } },
+			})
+		}
 
-    const users = await searchUsersExcludingOrgMembers(email, orgId);
-    return httpResponse(res, generalStatus.SUCCESS, users);
-  } catch (error) {
-    return httpResponseError(res, error);
-  }
-};
+		const users = await searchUsersExcludingOrgMembers(email, orgId)
+		return httpResponse(res, generalStatus.SUCCESS, users)
+	} catch (error) {
+		return httpResponseError(res, error)
+	}
+}
 
-export { handleSearchUsers };
+export { handleSearchUsers }
 ```
 
 - [ ] **Step 3: Commit**
@@ -187,6 +223,7 @@ git commit -m "feat: сервис и контроллер поиска поль�
 ### Task 4: Бэкенд — сервис и контроллер для добавления сотрудника
 
 **Files:**
+
 - Modify: `/Users/egorzozula/Desktop/BackendTemplate/src/services/orgServices.js`
 - Modify: `/Users/egorzozula/Desktop/BackendTemplate/src/controllers/orgController.js`
 
@@ -195,8 +232,8 @@ git commit -m "feat: сервис и контроллер поиска поль�
 Добавить импорт:
 
 ```javascript
-import { getMembershipByUserAndOrg } from "../repository/membershipRepository.js";
-import { getUserById } from "../modules/user/index.js";
+import { getMembershipByUserAndOrg } from '../repository/membershipRepository.js'
+import { getUserById } from '../modules/user/index.js'
 ```
 
 Примечание: `getUserById` уже импортирован. Добавить только `getMembershipByUserAndOrg`.
@@ -205,25 +242,33 @@ import { getUserById } from "../modules/user/index.js";
 
 ```javascript
 const addStaffToOrg = async (orgId, userId, invitedByUserId) => {
-  const org = await getOrgById(orgId);
-  if (!org) return { error: "org_not_found" };
+	const org = await getOrgById(orgId)
+	if (!org) return { error: 'org_not_found' }
 
-  const user = await getUserById(userId);
-  if (!user) return { error: "user_not_found" };
+	const user = await getUserById(userId)
+	if (!user) return { error: 'user_not_found' }
 
-  const existing = await getMembershipByUserAndOrg(userId, orgId);
-  if (existing) return { error: "already_member" };
+	const existing = await getMembershipByUserAndOrg(userId, orgId)
+	if (existing) return { error: 'already_member' }
 
-  const membership = await createMembership({
-    userId,
-    orgId,
-    role: "member",
-    status: MEMBERSHIP_STATUS.INVITED,
-    invitedBy: invitedByUserId,
-  });
+	const membership = await createMembership({
+		userId,
+		orgId,
+		role: 'member',
+		status: MEMBERSHIP_STATUS.INVITED,
+		invitedBy: invitedByUserId,
+	})
 
-  return { staff: { id: user.id, name: user.name, avatar: user.avatar, position: null, bookingCount: 0 } };
-};
+	return {
+		staff: {
+			id: user.id,
+			name: user.name,
+			avatar: user.avatar,
+			position: null,
+			bookingCount: 0,
+		},
+	}
+}
 ```
 
 Обновить экспорт — добавить `addStaffToOrg`.
@@ -233,43 +278,57 @@ const addStaffToOrg = async (orgId, userId, invitedByUserId) => {
 Добавить импорт `addStaffToOrg` из `orgServices.js`.
 
 ```javascript
-import { getOrganizationById, getOrgStaff, createOrganization, getUserOrganizations, addStaffToOrg } from "../services/orgServices.js";
+import {
+	getOrganizationById,
+	getOrgStaff,
+	createOrganization,
+	getUserOrganizations,
+	addStaffToOrg,
+} from '../services/orgServices.js'
 ```
 
 Добавить контроллер:
 
 ```javascript
 const addStaffSchema = {
-  userId: { type: "string", required: true },
-};
+	userId: { type: 'string', required: true },
+}
 
 const handleAddStaff = async (req, res) => {
-  try {
-    const validated = validateSchema(addStaffSchema, req.body);
-    if (validated.errors) {
-      return httpResponseError(res, {
-        ...userStatus.VALIDATION_ERROR,
-        data: validated.errors,
-      });
-    }
+	try {
+		const validated = validateSchema(addStaffSchema, req.body)
+		if (validated.errors) {
+			return httpResponseError(res, {
+				...userStatus.VALIDATION_ERROR,
+				data: validated.errors,
+			})
+		}
 
-    const result = await addStaffToOrg(req.params.id, validated.userId, req.user.id);
+		const result = await addStaffToOrg(
+			req.params.id,
+			validated.userId,
+			req.user.id,
+		)
 
-    if (result.error === "org_not_found") {
-      return httpResponse(res, generalStatus.NOT_FOUND);
-    }
-    if (result.error === "user_not_found") {
-      return httpResponse(res, generalStatus.NOT_FOUND);
-    }
-    if (result.error === "already_member") {
-      return httpResponseError(res, { statusCode: 409, status: "conflict", data: null });
-    }
+		if (result.error === 'org_not_found') {
+			return httpResponse(res, generalStatus.NOT_FOUND)
+		}
+		if (result.error === 'user_not_found') {
+			return httpResponse(res, generalStatus.NOT_FOUND)
+		}
+		if (result.error === 'already_member') {
+			return httpResponseError(res, {
+				statusCode: 409,
+				status: 'conflict',
+				data: null,
+			})
+		}
 
-    return httpResponse(res, generalStatus.CREATED, result.staff);
-  } catch (error) {
-    return httpResponseError(res, error);
-  }
-};
+		return httpResponse(res, generalStatus.CREATED, result.staff)
+	} catch (error) {
+		return httpResponseError(res, error)
+	}
+}
 ```
 
 Обновить экспорт — добавить `handleAddStaff`.
@@ -286,6 +345,7 @@ git commit -m "feat: добавить addStaffToOrg сервис и контро
 ### Task 5: Бэкенд — маршруты
 
 **Files:**
+
 - Modify: `/Users/egorzozula/Desktop/BackendTemplate/src/routes/subroutes/orgRoutes.js`
 - Create: `/Users/egorzozula/Desktop/BackendTemplate/src/routes/subroutes/userSearchRoutes.js`
 - Modify: `/Users/egorzozula/Desktop/BackendTemplate/src/routes/routes.js`
@@ -293,33 +353,39 @@ git commit -m "feat: добавить addStaffToOrg сервис и контро
 - [ ] **Step 1: Добавить POST /:id/staff в orgRoutes.js**
 
 ```javascript
-import express from "express";
-import { handleGetOrg, handleGetOrgStaff, handleCreateOrg, handleGetUserOrgs, handleAddStaff } from "../../controllers/orgController.js";
-import { authMiddleware } from "../../modules/auth/index.js";
+import express from 'express'
+import {
+	handleGetOrg,
+	handleGetOrgStaff,
+	handleCreateOrg,
+	handleGetUserOrgs,
+	handleAddStaff,
+} from '../../controllers/orgController.js'
+import { authMiddleware } from '../../modules/auth/index.js'
 
-const router = express.Router();
+const router = express.Router()
 
-router.get("/user-orgs", authMiddleware, handleGetUserOrgs);
-router.post("/", authMiddleware, handleCreateOrg);
-router.get("/:id", handleGetOrg);
-router.get("/:id/staff", handleGetOrgStaff);
-router.post("/:id/staff", authMiddleware, handleAddStaff);
+router.get('/user-orgs', authMiddleware, handleGetUserOrgs)
+router.post('/', authMiddleware, handleCreateOrg)
+router.get('/:id', handleGetOrg)
+router.get('/:id/staff', handleGetOrgStaff)
+router.post('/:id/staff', authMiddleware, handleAddStaff)
 
-export default router;
+export default router
 ```
 
 - [ ] **Step 2: Создать userSearchRoutes.js**
 
 ```javascript
-import express from "express";
-import { handleSearchUsers } from "../../controllers/userSearchController.js";
-import { authMiddleware } from "../../modules/auth/index.js";
+import express from 'express'
+import { handleSearchUsers } from '../../controllers/userSearchController.js'
+import { authMiddleware } from '../../modules/auth/index.js'
 
-const router = express.Router();
+const router = express.Router()
 
-router.get("/search", authMiddleware, handleSearchUsers);
+router.get('/search', authMiddleware, handleSearchUsers)
 
-export default router;
+export default router
 ```
 
 - [ ] **Step 3: Подключить userSearchRoutes в routes.js**
@@ -327,13 +393,13 @@ export default router;
 Добавить импорт:
 
 ```javascript
-import userSearchRoutes from "./subroutes/userSearchRoutes.js";
+import userSearchRoutes from './subroutes/userSearchRoutes.js'
 ```
 
 Добавить маршрут (после `router.use("/positions", positionRoutes);`):
 
 ```javascript
-router.use("/users", userSearchRoutes);
+router.use('/users', userSearchRoutes)
 ```
 
 - [ ] **Step 4: Commit**
@@ -348,6 +414,7 @@ git commit -m "feat: маршруты для поиска пользовател
 ### Task 6: Фронтенд — типы и API конфиг для поиска пользователей
 
 **Files:**
+
 - Create: `/Users/egorzozula/Desktop/Slotix-fronted/Slotix-fronted/services/configs/user-search.types.ts`
 - Create: `/Users/egorzozula/Desktop/Slotix-fronted/Slotix-fronted/services/configs/user-search.config.ts`
 
@@ -393,6 +460,7 @@ git commit -m "feat: API конфиг для поиска пользовател
 ### Task 7: Фронтенд — API конфиг для добавления сотрудника + экспорт
 
 **Files:**
+
 - Modify: `/Users/egorzozula/Desktop/Slotix-fronted/Slotix-fronted/services/configs/org.types.ts`
 - Modify: `/Users/egorzozula/Desktop/Slotix-fronted/Slotix-fronted/services/configs/org.config.ts`
 - Modify: `/Users/egorzozula/Desktop/Slotix-fronted/Slotix-fronted/services/index.ts`
@@ -506,6 +574,7 @@ git commit -m "feat: API слой для поиска пользователей
 ### Task 8: Фронтенд — i18n ключи
 
 **Files:**
+
 - Modify: `/Users/egorzozula/Desktop/Slotix-fronted/Slotix-fronted/i18n/messages/en.json`
 - Modify: `/Users/egorzozula/Desktop/Slotix-fronted/Slotix-fronted/i18n/messages/uk.json`
 
@@ -547,6 +616,7 @@ git commit -m "feat: i18n ключи для добавления сотрудн�
 ### Task 9: Фронтенд — компонент AddStaffPopover
 
 **Files:**
+
 - Create: `/Users/egorzozula/Desktop/Slotix-fronted/Slotix-fronted/components/staff-schedule/AddStaffPopover.tsx`
 
 - [ ] **Step 1: Создать компонент AddStaffPopover**
@@ -739,6 +809,7 @@ git commit -m "feat: компонент AddStaffPopover с поиском по e
 ### Task 10: Фронтенд — интеграция в страницу Staff Schedule
 
 **Files:**
+
 - Modify: `/Users/egorzozula/Desktop/Slotix-fronted/Slotix-fronted/app/[locale]/(org)/manage/[orgId]/staff-schedule/page.tsx`
 
 - [ ] **Step 1: Добавить AddStaffPopover на страницу**

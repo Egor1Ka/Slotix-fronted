@@ -41,15 +41,15 @@ POST /api/org/:orgId/staff
 ```typescript
 // services/configs/user.types.ts
 interface UserSearchResult {
-  id: string
-  email: string
+	id: string
+	email: string
 }
 ```
 
 ```typescript
 // services/configs/org.types.ts (дополнение)
 interface AddStaffBody {
-  userId: string
+	userId: string
 }
 ```
 
@@ -59,11 +59,11 @@ interface AddStaffBody {
 
 ```typescript
 const userApiConfig = {
-  searchByEmail: endpoint<void, ApiResponse<UserSearchResult[]>>({
-    url: () => `/api/users/search`,
-    method: getData,
-    defaultErrorMessage: 'Failed to search users',
-  }),
+	searchByEmail: endpoint<void, ApiResponse<UserSearchResult[]>>({
+		url: () => `/api/users/search`,
+		method: getData,
+		defaultErrorMessage: 'Failed to search users',
+	}),
 }
 ```
 
@@ -142,24 +142,24 @@ addStaff: endpoint<AddStaffBody, ApiResponse<OrgStaffMember>>({
 
 ```json
 {
-  "addStaff": "Add staff member",
-  "searchByEmail": "Enter staff email",
-  "userNotFound": "User not found",
-  "staffInvited": "Staff member invited",
-  "minCharsHint": "Enter at least 3 characters"
+	"addStaff": "Add staff member",
+	"searchByEmail": "Enter staff email",
+	"userNotFound": "User not found",
+	"staffInvited": "Staff member invited",
+	"minCharsHint": "Enter at least 3 characters"
 }
 ```
 
 ## Обработка ошибок
 
-| Сценарий | Обработка |
-|----------|-----------|
-| email < 3 символов | Dropdown не открывается, подсказка "Введите минимум 3 символа" |
-| Сетевая ошибка поиска | toast.error через interceptor |
-| Пользователь не найден (пустой массив) | Текст "Пользователь не найден" в dropdown |
-| 409 (уже в организации) | toast.error "Сотрудник уже в организации" |
-| 404 (пользователь не найден на бэке) | toast.error через interceptor |
-| Успешное добавление | toast.success, закрытие popover, рефетч списка |
+| Сценарий                               | Обработка                                                      |
+| -------------------------------------- | -------------------------------------------------------------- |
+| email < 3 символов                     | Dropdown не открывается, подсказка "Введите минимум 3 символа" |
+| Сетевая ошибка поиска                  | toast.error через interceptor                                  |
+| Пользователь не найден (пустой массив) | Текст "Пользователь не найден" в dropdown                      |
+| 409 (уже в организации)                | toast.error "Сотрудник уже в организации"                      |
+| 404 (пользователь не найден на бэке)   | toast.error через interceptor                                  |
+| Успешное добавление                    | toast.success, закрытие popover, рефетч списка                 |
 
 ## Вне скоупа
 

@@ -101,7 +101,11 @@ export type {
 	OrgByIdResponse,
 	OrgStaffMember,
 } from './configs/booking.types'
-export type { OrgListItem, CreateOrgBody, AddStaffBody } from './configs/org.types'
+export type {
+	OrgListItem,
+	CreateOrgBody,
+	AddStaffBody,
+} from './configs/org.types'
 export type {
 	Position,
 	CreatePositionBody,
