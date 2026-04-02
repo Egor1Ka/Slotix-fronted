@@ -403,6 +403,12 @@
 		"overrideSaved": "Вихідний збережено",
 		"overrideSaveError": "Не вдалося зберегти вихідний",
 		"overrideDeleted": "Вихідний видалено",
-		"overrideDeleteError": "Не вдалося видалити вихідний"
+		"overrideDeleteError": "Не вдалося видалити вихідний",
+		"addStaff": "Додати співробітника",
+		"searchByEmail": "Введіть email співробітника",
+		"userNotFound": "Користувачів не знайдено",
+		"staffInvited": "Співробітника запрошено",
+		"minCharsHint": "Введіть мінімум 3 символи",
+		"alreadyInOrg": "Вже в організації"
 	}
 }

@@ -403,6 +403,12 @@
 		"overrideSaved": "Day off saved",
 		"overrideSaveError": "Failed to save day off",
 		"overrideDeleted": "Day off deleted",
-		"overrideDeleteError": "Failed to delete day off"
+		"overrideDeleteError": "Failed to delete day off",
+		"addStaff": "Add staff member",
+		"searchByEmail": "Enter staff email",
+		"userNotFound": "No users found",
+		"staffInvited": "Staff member invited",
+		"minCharsHint": "Enter at least 3 characters",
+		"alreadyInOrg": "Already in organization"
 	}
 }
