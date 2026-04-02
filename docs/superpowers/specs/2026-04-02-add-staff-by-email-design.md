@@ -60,12 +60,14 @@ interface AddStaffBody {
 ```typescript
 const userApiConfig = {
   searchByEmail: endpoint<void, ApiResponse<UserSearchResult[]>>({
-    url: ({ email, orgId }) => `/api/users/search?email=${email}&orgId=${orgId}`,
+    url: () => `/api/users/search`,
     method: getData,
     defaultErrorMessage: 'Failed to search users',
   }),
 }
 ```
+
+Вызов: `userApi.searchByEmail({ query: { email, orgId } })`
 
 **Дополнение `services/configs/org.config.ts`:**
 
