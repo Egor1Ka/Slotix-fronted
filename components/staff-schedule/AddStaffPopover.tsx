@@ -43,7 +43,7 @@ function AddStaffPopover({ orgId, onStaffAdded }: AddStaffPopoverProps) {
 			setLoading(true)
 			try {
 				const data = await userSearchApi.searchByEmail({
-					query: { email: searchQuery, orgId },
+					queryParams: { email: searchQuery, orgId },
 				})
 				setResults(data)
 			} catch {
