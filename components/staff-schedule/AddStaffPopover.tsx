@@ -42,10 +42,10 @@ function AddStaffPopover({ orgId, onStaffAdded }: AddStaffPopoverProps) {
 
 			setLoading(true)
 			try {
-				const data = await userSearchApi.searchByEmail({
+				const response = await userSearchApi.searchByEmail({
 					queryParams: { email: searchQuery, orgId },
 				})
-				setResults(data)
+				setResults(response.data)
 			} catch {
 				// обрабатывается интерцептором toast
 			} finally {
