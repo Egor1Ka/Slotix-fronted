@@ -18,6 +18,7 @@ import {
 import { Spinner } from '@/components/ui/spinner'
 import { Separator } from '@/components/ui/separator'
 import { StaffFilter } from '@/components/staff-schedule/StaffFilter'
+import { AddStaffPopover } from '@/components/staff-schedule/AddStaffPopover'
 import { StaffScheduleTabs } from '@/components/staff-schedule/StaffScheduleTabs'
 import { orgApi } from '@/lib/booking-api-client'
 import type { OrgStaffMember } from '@/services/configs/booking.types'
@@ -57,6 +58,15 @@ export default function AdminStaffSchedulePage() {
 		router.replace(`${pathname}?${queryParams.toString()}`)
 	}
 
+	const refetchStaff = async () => {
+		try {
+			const data = await orgApi.getStaff(orgId)
+			setStaffList(data)
+		} catch {
+			// обрабатывается интерцептором toast
+		}
+	}
+
 	if (loading) {
 		return (
 			<div className="flex min-h-[50vh] items-center justify-center">
@@ -69,11 +79,14 @@ export default function AdminStaffSchedulePage() {
 		<div className="max-w-3xl space-y-6 px-4 py-6">
 			<div className="space-y-4">
 				<h1 className="text-lg font-semibold">{t('staffSchedule')}</h1>
-				<StaffFilter
-					staff={staffList}
-					selectedId={staffId}
-					onSelect={handleSelectStaff}
-				/>
+				<div className="flex items-center gap-2">
+					<StaffFilter
+						staff={staffList}
+						selectedId={staffId}
+						onSelect={handleSelectStaff}
+					/>
+					<AddStaffPopover orgId={orgId} onStaffAdded={refetchStaff} />
+				</div>
 			</div>
 
 			<Separator />
