@@ -86,6 +86,7 @@ interface StaffStrategyParams {
 	formConfig?: MergedBookingForm | null
 	onSaveSchedule: (weeklyHours: WeeklyHours[]) => Promise<void>
 	onSaveOverride: (body: CreateScheduleOverrideBody) => Promise<void>
+	onSaveSlotMode: (mode: SlotMode) => Promise<void>
 	onBookingClick?: (bookingId: string) => void
 	selectedBooking?: BookingDetail | null
 	onCloseBooking?: () => void
@@ -121,6 +122,7 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 		formConfig = null,
 		onSaveSchedule,
 		onSaveOverride,
+		onSaveSlotMode,
 		onBookingClick,
 		selectedBooking = null,
 		onCloseBooking,
@@ -183,16 +185,14 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 				? getBreakBookings(overridesList, strategyStaffId, blockDate)
 				: []
 
-			const breakBlocks: CalendarBlock[] = breakBookings.map(
-				(brk, index) => ({
-					id: `break-${blockDate}-${index}`,
-					startMin: brk.startMin,
-					duration: brk.duration,
-					date: blockDate,
-					color: '',
-					blockType: 'locked' as const,
-				}),
-			)
+			const breakBlocks: CalendarBlock[] = breakBookings.map((brk, index) => ({
+				id: `break-${blockDate}-${index}`,
+				startMin: brk.startMin,
+				duration: brk.duration,
+				date: blockDate,
+				color: '',
+				blockType: 'locked' as const,
+			}))
 
 			if (!selectedEventType || confirmedBooking)
 				return [...bookingBlocks, ...breakBlocks]
@@ -263,7 +263,12 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 				]
 			})()
 
-			return [...bookingBlocks, ...breakBlocks, ...dropZoneBlocks, ...pendingBlock]
+			return [
+				...bookingBlocks,
+				...breakBlocks,
+				...dropZoneBlocks,
+				...pendingBlock,
+			]
 		},
 
 		renderSidebar() {
@@ -283,6 +288,7 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 								schedule={schedule}
 								onSaveSchedule={onSaveSchedule}
 								onSaveOverride={onSaveOverride}
+								onSaveSlotMode={onSaveSlotMode}
 							/>
 						</>
 					)}

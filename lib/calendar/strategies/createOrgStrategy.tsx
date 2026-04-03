@@ -25,12 +25,15 @@ import type {
 	EventType,
 	ScheduleTemplate,
 	ScheduleOverride,
+	WeeklyHours,
+	CreateScheduleOverrideBody,
 	CalendarDisplayBooking,
 	OrgStaffMember,
 } from '@/services/configs/booking.types'
 import { ServiceList } from '@/components/booking/ServiceList'
 import { SlotModeSelector } from '@/components/booking/SlotModeSelector'
 import { StaffBookingPanel } from '@/components/booking/StaffBookingPanel'
+import { ScheduleSheetButton } from '@/components/booking/ScheduleSheetButton'
 import { Separator } from '@/components/ui/separator'
 import type { ClientInfoData } from '@/components/booking/ClientInfoForm'
 import type { MergedBookingForm } from '@/services/configs/booking-field.types'
@@ -79,6 +82,9 @@ interface OrgStrategyParams {
 	loading?: boolean
 	staffList?: OrgStaffMember[]
 	overrides?: ScheduleOverride[]
+	onSaveSchedule?: (weeklyHours: WeeklyHours[]) => Promise<void>
+	onSaveOverride?: (body: CreateScheduleOverrideBody) => Promise<void>
+	onSaveSlotMode?: (mode: SlotMode) => Promise<void>
 }
 
 const normalizeDate = (d: string): string =>
@@ -140,6 +146,9 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 		loading = false,
 		staffList = [],
 		overrides = [],
+		onSaveSchedule,
+		onSaveOverride,
+		onSaveSlotMode,
 	} = params
 
 	const calendarLocale = getCalendarLocale(locale)
@@ -201,7 +210,12 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 		)
 			return []
 
-		const workHours = getWorkHoursForDate(schedule.weeklyHours, blockDate, overrides, selectedStaffId ?? undefined)
+		const workHours = getWorkHoursForDate(
+			schedule.weeklyHours,
+			blockDate,
+			overrides,
+			selectedStaffId ?? undefined,
+		)
 		if (!workHours) return []
 
 		const dayBookingsForSlots = getBookingsForDate(bookings, blockDate)
@@ -210,7 +224,11 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 			duration: b.duration,
 		})
 
-		const breakBookings = getBreakBookings(overrides, selectedStaffId, blockDate)
+		const breakBookings = getBreakBookings(
+			overrides,
+			selectedStaffId,
+			blockDate,
+		)
 		const allBookingsForSlots = [
 			...dayBookingsForSlots.map(toSlotEngine),
 			...breakBookings,
@@ -294,7 +312,12 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 			const breakBlocks = buildBreakBlocks(blockDate)
 			const dropZoneBlocks = buildSlotBlocks(blockDate)
 			const pendingBlocks = buildPendingBlock(blockDate)
-			return [...bookingBlocks, ...breakBlocks, ...dropZoneBlocks, ...pendingBlocks]
+			return [
+				...bookingBlocks,
+				...breakBlocks,
+				...dropZoneBlocks,
+				...pendingBlocks,
+			]
 		},
 
 		renderSidebar() {
@@ -325,6 +348,17 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 						value={slotMode}
 						onChange={onModeChange ?? (() => {})}
 					/>
+					{onSaveSchedule && onSaveOverride && onSaveSlotMode && schedule && (
+						<>
+							<Separator className="my-4" />
+							<ScheduleSheetButton
+								schedule={schedule}
+								onSaveSchedule={onSaveSchedule}
+								onSaveOverride={onSaveOverride}
+								onSaveSlotMode={onSaveSlotMode}
+							/>
+						</>
+					)}
 				</>
 			)
 		},
@@ -416,7 +450,12 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 			)
 				return
 
-			const workHours = getWorkHoursForDate(schedule.weeklyHours, clickDate, overrides, selectedStaffId ?? undefined)
+			const workHours = getWorkHoursForDate(
+				schedule.weeklyHours,
+				clickDate,
+				overrides,
+				selectedStaffId ?? undefined,
+			)
 			if (!workHours) return
 
 			const dayBookingsForSlots = getBookingsForDate(bookings, clickDate)
@@ -425,7 +464,11 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 				duration: b.duration,
 			})
 
-			const breakBookings = getBreakBookings(overrides, selectedStaffId, clickDate)
+			const breakBookings = getBreakBookings(
+				overrides,
+				selectedStaffId,
+				clickDate,
+			)
 			const allBookingsForSlots = [
 				...dayBookingsForSlots.map(toSlotEngine),
 				...breakBookings,

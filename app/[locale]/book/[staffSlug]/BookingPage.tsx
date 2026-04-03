@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { type SlotMode } from '@/lib/slot-engine'
+import type { SlotMode } from '@/lib/slot-engine'
 import {
 	type ViewMode,
 	CalendarProvider,
@@ -215,6 +215,28 @@ function BookingPage({ staffSlug, publicUrl }: BookingPageProps) {
 		}
 	}
 
+	// ── Сохранение slotMode ──
+
+	const handleSaveSlotMode = async (mode: SlotMode) => {
+		if (!staff) return
+		const scheduleSource = schedule ?? DEFAULT_SCHEDULE
+		try {
+			await scheduleApi.updateTemplate(
+				staff.id,
+				schedule?.orgId ?? null,
+				scheduleSource.weeklyHours,
+				mode,
+			)
+			reloadSchedule()
+			toast.success(tCalendar('scheduleSaved'))
+		} catch (err) {
+			const message =
+				err instanceof Error ? err.message : tCalendar('scheduleSaveError')
+			toast.error(message)
+			throw err
+		}
+	}
+
 	// ── Client confirm (no client info) ──
 
 	const handleConfirm = async () => {
@@ -280,6 +302,7 @@ function BookingPage({ staffSlug, publicUrl }: BookingPageProps) {
 				formConfig: bookingActions.formConfig,
 				onSaveSchedule: handleSaveSchedule,
 				onSaveOverride: handleSaveOverride,
+				onSaveSlotMode: handleSaveSlotMode,
 				onBookingClick: bookingActions.handleBookingSelect,
 				selectedBooking: bookingActions.selectedBooking,
 				onCloseBooking: bookingActions.handleBookingClose,
