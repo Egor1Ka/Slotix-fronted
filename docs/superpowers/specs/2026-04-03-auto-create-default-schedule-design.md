@@ -1,0 +1,86 @@
+# Автосоздание дефолтного расписания
+
+**Дата:** 2026-04-03
+**Статус:** Утверждён
+
+## Проблема
+
+Новый пользователь после регистрации видит пустую страницу "Мій розклад" — расписание не существует в БД. При этом на публичной странице бронирования фронтенд подставляет `DEFAULT_SCHEDULE` (пн-пт 10:00-18:00), создавая фантомные слоты. Аналогичная ситуация при добавлении в организацию — staff без расписания не виден в календаре.
+
+## Решение
+
+Автоматическое создание дефолтного расписания на бэкенде при двух событиях:
+1. **Регистрация** — персональное расписание (`orgId = null`)
+2. **Принятие приглашения в организацию** — org-расписание (`orgId = orgId`)
+
+## Архитектура
+
+### Константа дефолтного расписания
+
+Новый файл: `src/constants/schedule.js`
+
+```js
+const DEFAULT_WEEKLY_HOURS = [
+  { day: "mon", enabled: true, slots: [{ start: "09:00", end: "18:00" }] },
+  { day: "tue", enabled: true, slots: [{ start: "09:00", end: "18:00" }] },
+  { day: "wed", enabled: true, slots: [{ start: "09:00", end: "18:00" }] },
+  { day: "thu", enabled: true, slots: [{ start: "09:00", end: "18:00" }] },
+  { day: "fri", enabled: true, slots: [{ start: "09:00", end: "18:00" }] },
+  { day: "sat", enabled: true, slots: [{ start: "10:00", end: "15:00" }] },
+  { day: "sun", enabled: false, slots: [] },
+]
+
+const DEFAULT_SCHEDULE_CONFIG = {
+  timezone: "Europe/Kyiv",
+  slotMode: "fixed",
+  slotStepMin: 30,
+}
+```
+
+### Функция `createDefaultSchedule(staffId, orgId?)`
+
+Расположение: `src/services/scheduleServices.js`
+
+Логика:
+1. Проверяет `findCurrentTemplate(staffId, orgId, null)` — если расписание уже есть, ничего не делает (идемпотентность)
+2. Если нет — вызывает `createTemplate()` с дефолтными параметрами
+3. `locationId = null` (расписание для всех локаций)
+4. `validFrom = сегодня (UTC)`, `validTo = null` (бессрочное)
+
+### Точки вызова
+
+| Событие | Файл | Функция | Параметры |
+|---------|------|---------|-----------|
+| Регистрация нового юзера | `src/modules/auth/services/authServices.js` | `findOrCreateUser()` — ветка создания нового юзера | `createDefaultSchedule(newUser._id, null)` |
+| Принятие приглашения в орг | `src/services/orgServices.js` | `acceptInvitation()` — после смены статуса на "active" | `createDefaultSchedule(userId, orgId)` |
+
+### Фронтенд
+
+`DEFAULT_SCHEDULE` в `BookingPage.tsx` остаётся как safety net — на случай если бэкенд не создал расписание (баг, гонка, старые юзеры).
+
+## Что НЕ меняется
+
+- `rotateTemplate()` — без изменений
+- `handlePutTemplate` контроллер — без изменений
+- Фронтенд `ScheduleViewTab` — empty state для старых юзеров без расписания остаётся (отдельный тикет)
+- Создание организации (`createOrganization`) — owner получает расписание не здесь, а при регистрации (персональное) и при `acceptInvitation` не вызывается для owner (он создаётся сразу как active). Для owner org-расписание нужно создать в `createOrganization()` после создания membership.
+
+## Уточнение: создание организации
+
+При `createOrganization()` owner создаётся со статусом "active" напрямую (без invite flow). Значит `acceptInvitation` для него не вызывается. Нужен дополнительный вызов:
+
+| Событие | Файл | Функция | Параметры |
+|---------|------|---------|-----------|
+| Создание организации | `src/services/orgServices.js` | `createOrganization()` — после создания owner membership | `createDefaultSchedule(userId, newOrg._id)` |
+
+Итого **три точки вызова**.
+
+## Обработка ошибок
+
+`createDefaultSchedule` не должна ломать основной флоу. Если создание расписания упало — логируем ошибку, но регистрация / принятие приглашения / создание орг продолжаются успешно. Юзер увидит пустое расписание и сможет создать его вручную.
+
+## Миграция существующих юзеров
+
+Вне скоупа данного дизайна. Существующие юзеры без расписания продолжат видеть пустую страницу. Можно решить:
+- Одноразовым скриптом миграции
+- Lazy-creation на фронте (empty state с кнопкой "Створити розклад")
