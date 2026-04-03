@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { SettingsIcon } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
@@ -38,8 +38,14 @@ function ScheduleSheetButton({
 	const t = useTranslations('booking')
 	const [open, setOpen] = useState(false)
 	const [savingMode, setSavingMode] = useState(false)
+	const [localSlotMode, setLocalSlotMode] = useState(schedule.slotMode)
+
+	useEffect(() => {
+		setLocalSlotMode(schedule.slotMode)
+	}, [schedule.slotMode])
 
 	const handleSlotModeChange = async (mode: SlotMode) => {
+		setLocalSlotMode(mode)
 		setSavingMode(true)
 		try {
 			await onSaveSlotMode(mode)
@@ -75,7 +81,7 @@ function ScheduleSheetButton({
 					<Separator />
 					<div className={savingMode ? 'pointer-events-none opacity-50' : ''}>
 						<SlotModeSelector
-							value={schedule.slotMode}
+							value={localSlotMode}
 							onChange={handleSlotModeChange}
 						/>
 					</div>

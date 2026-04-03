@@ -231,14 +231,11 @@ const createClientStrategy = (
 
 		renderSidebar() {
 			return (
-				<>
-					<ServiceList
-						eventTypes={eventTypes}
-						selectedId={selectedEventTypeId}
-						onSelect={onSelectEventType}
-					/>
-
-				</>
+				<ServiceList
+					eventTypes={eventTypes}
+					selectedId={selectedEventTypeId}
+					onSelect={onSelectEventType}
+				/>
 			)
 		},
 
