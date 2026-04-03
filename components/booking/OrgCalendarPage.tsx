@@ -84,7 +84,6 @@ function OrgCalendarPage({
 	const selectedStaffId = staffIdProp ?? null
 	const selectedEventTypeId = searchParams.get('eventType') ?? null
 	const selectedSlotTime = searchParams.get('slot') ?? null
-	const slotMode = (searchParams.get('mode') as SlotMode) ?? 'fixed'
 
 	// ── Navigation (до данных, т.к. фильтрация использует handleStaffSelect) ──
 
@@ -206,11 +205,6 @@ function OrgCalendarPage({
 
 	const onEventTypeSelect = (eventTypeId: string) => {
 		navigation.handleEventTypeSelect(eventTypeId)
-		resetBookingState()
-	}
-
-	const onModeChange = (mode: SlotMode) => {
-		navigation.handleModeChange(mode)
 		resetBookingState()
 	}
 

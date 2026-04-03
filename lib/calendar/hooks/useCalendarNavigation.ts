@@ -2,8 +2,6 @@
 
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import type { ViewMode } from '../types'
-import type { SlotMode } from '@/lib/slot-engine'
-
 interface UseCalendarNavigationParams {
 	orgSlug?: string
 	dateStr: string
@@ -19,7 +17,6 @@ interface UseCalendarNavigationResult {
 	handleStaffAutoSelect: (id: string) => void
 	handleEventTypeSelect: (eventTypeId: string) => void
 	handleSlotSelect: (time: string, slotDate?: string) => void
-	handleModeChange: (mode: SlotMode) => void
 }
 
 const useCalendarNavigation = (
@@ -93,10 +90,6 @@ const useCalendarNavigation = (
 		setParams(updates)
 	}
 
-	const handleModeChange = (mode: SlotMode) => {
-		setParams({ mode, slot: null })
-	}
-
 	return {
 		setParams,
 		handleViewChange,
@@ -106,7 +99,6 @@ const useCalendarNavigation = (
 		handleStaffAutoSelect,
 		handleEventTypeSelect,
 		handleSlotSelect,
-		handleModeChange,
 	}
 }
 

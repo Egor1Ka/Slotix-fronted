@@ -90,7 +90,6 @@ function BookingPage({ staffSlug, publicUrl }: BookingPageProps) {
 	const view = (searchParams.get('view') as ViewMode) ?? 'day'
 	const selectedEventTypeId = searchParams.get('eventType')
 	const selectedSlotTime = searchParams.get('slot')
-	const slotMode = (searchParams.get('mode') as SlotMode) ?? 'fixed'
 
 	// ── Data ──
 
@@ -171,11 +170,6 @@ function BookingPage({ staffSlug, publicUrl }: BookingPageProps) {
 	const onSlotSelect = (time: string, slotDate?: string) => {
 		navigation.handleSlotSelect(time, slotDate)
 		bookingActions.handleBookingClose()
-	}
-
-	const onModeChange = (mode: SlotMode) => {
-		navigation.handleModeChange(mode)
-		resetBookingState()
 	}
 
 	// ── Schedule editing (staff-specific) ──
