@@ -18,23 +18,26 @@ import {
 	getAvailableSlots,
 	timeToMin,
 	minToTime,
-	type SlotMode,
 	type Slot,
 } from '@/lib/slot-engine'
-import type { EventType, ScheduleTemplate, CalendarDisplayBooking } from '@/services/configs/booking.types'
+import type {
+	EventType,
+	ScheduleTemplate,
+	ScheduleOverride,
+	CalendarDisplayBooking,
+} from '@/services/configs/booking.types'
 import { ServiceList } from '@/components/booking/ServiceList'
-import { SlotModeSelector } from '@/components/booking/SlotModeSelector'
 import { BookingPanel } from '@/components/booking/BookingPanel'
-import { Separator } from '@/components/ui/separator'
 
 interface ClientStrategyParams {
 	eventTypes: EventType[]
 	bookings: CalendarDisplayBooking[]
 	schedule: ScheduleTemplate
+	overrides?: ScheduleOverride[]
+	staffId?: string
 	staffName: string
 	selectedEventTypeId: string | null
 	selectedSlot: string | null
-	slotMode: SlotMode
 	confirmedBooking: ConfirmedBooking | null
 	date: string
 	onSelectEventType: (eventTypeId: string) => void
@@ -42,8 +45,29 @@ interface ClientStrategyParams {
 	onConfirm: () => void
 	onCancel: () => void
 	onResetSlot: () => void
-	onModeChange: (mode: SlotMode) => void
 	locale: string
+}
+
+const normalizeDate = (d: string): string =>
+	d.includes('T') ? d.split('T')[0] : d
+
+const getBreakBookings = (
+	overridesList: ScheduleOverride[],
+	sid: string,
+	blockDate: string,
+): { startMin: number; duration: number }[] => {
+	const dateOnly = normalizeDate(blockDate)
+	const matchesStaffAndDate = (o: ScheduleOverride): boolean =>
+		o.staffId === sid && normalizeDate(o.date) === dateOnly
+	const override = overridesList.find(matchesStaffAndDate)
+	if (!override) return []
+	const isPartialDayOff = !override.enabled && override.slots.length > 0
+	if (!isPartialDayOff) return []
+	const toBreakBooking = (slot: { start: string; end: string }) => ({
+		startMin: timeToMin(slot.start),
+		duration: timeToMin(slot.end) - timeToMin(slot.start),
+	})
+	return override.slots.map(toBreakBooking)
 }
 
 const createClientStrategy = (
@@ -53,10 +77,11 @@ const createClientStrategy = (
 		eventTypes,
 		bookings,
 		schedule,
+		overrides: overridesList = [],
+		staffId: strategyStaffId,
 		staffName,
 		selectedEventTypeId,
 		selectedSlot,
-		slotMode,
 		confirmedBooking,
 		date,
 		onSelectEventType,
@@ -64,7 +89,6 @@ const createClientStrategy = (
 		onConfirm,
 		onCancel,
 		onResetSlot,
-		onModeChange,
 		locale,
 	} = params
 
@@ -115,7 +139,12 @@ const createClientStrategy = (
 
 			if (!selectedEventType || confirmedBooking) return bookingBlocks
 
-			const workHours = getWorkHoursForDate(schedule.weeklyHours,blockDate)
+			const workHours = getWorkHoursForDate(
+				schedule.weeklyHours,
+				blockDate,
+				strategyStaffId ? overridesList : undefined,
+				strategyStaffId,
+			)
 			if (!workHours) return bookingBlocks
 
 			const dayBookingsForSlots = getBookingsForDate(bookings, blockDate)
@@ -123,14 +152,21 @@ const createClientStrategy = (
 				startMin: b.startMin,
 				duration: b.duration,
 			})
+			const breakBookings = strategyStaffId
+				? getBreakBookings(overridesList, strategyStaffId, blockDate)
+				: []
+			const allBookingsForSlots = [
+				...dayBookingsForSlots.map(toSlotEngine),
+				...breakBookings,
+			]
 
 			const slots = getAvailableSlots({
 				workStart: workHours.workStart,
 				workEnd: workHours.workEnd,
 				duration: selectedEventType.durationMin,
 				slotStep: schedule.slotStepMin,
-				slotMode,
-				bookings: dayBookingsForSlots.map(toSlotEngine),
+				slotMode: schedule.slotMode,
+				bookings: allBookingsForSlots,
 				minNotice: 30,
 				nowMin: 0,
 			})
@@ -172,7 +208,25 @@ const createClientStrategy = (
 				]
 			})()
 
-			return [...bookingBlocks, ...dropZoneBlocks, ...pendingBlock]
+			const breakBlocks: CalendarBlock[] = strategyStaffId
+				? getBreakBookings(overridesList, strategyStaffId, blockDate).map(
+						(brk, index) => ({
+							id: `break-${blockDate}-${index}`,
+							startMin: brk.startMin,
+							duration: brk.duration,
+							date: blockDate,
+							color: '',
+							blockType: 'locked' as const,
+						}),
+					)
+				: []
+
+			return [
+				...bookingBlocks,
+				...breakBlocks,
+				...dropZoneBlocks,
+				...pendingBlock,
+			]
 		},
 
 		renderSidebar() {
@@ -183,8 +237,7 @@ const createClientStrategy = (
 						selectedId={selectedEventTypeId}
 						onSelect={onSelectEventType}
 					/>
-					<Separator className="my-4" />
-					<SlotModeSelector value={slotMode} onChange={onModeChange} />
+
 				</>
 			)
 		},
@@ -194,7 +247,6 @@ const createClientStrategy = (
 				<BookingPanel
 					selectedEventType={selectedEventType}
 					selectedSlot={selectedSlot}
-					slotMode={slotMode}
 					confirmedBooking={confirmedBooking}
 					onConfirm={onConfirm}
 					onCancel={onCancel}
@@ -206,7 +258,12 @@ const createClientStrategy = (
 		onCellClick(clickDate: string, startMin: number) {
 			if (!selectedEventType) return
 
-			const workHours = getWorkHoursForDate(schedule.weeklyHours,clickDate)
+			const workHours = getWorkHoursForDate(
+				schedule.weeklyHours,
+				clickDate,
+				strategyStaffId ? overridesList : undefined,
+				strategyStaffId,
+			)
 			if (!workHours) return
 
 			const dayBookingsForSlots = getBookingsForDate(bookings, clickDate)
@@ -214,14 +271,20 @@ const createClientStrategy = (
 				startMin: b.startMin,
 				duration: b.duration,
 			})
+			const clickBreakBookings = strategyStaffId
+				? getBreakBookings(overridesList, strategyStaffId, clickDate)
+				: []
 
 			const slots = getAvailableSlots({
 				workStart: workHours.workStart,
 				workEnd: workHours.workEnd,
 				duration: selectedEventType.durationMin,
 				slotStep: schedule.slotStepMin,
-				slotMode,
-				bookings: dayBookingsForSlots.map(toSlotEngine),
+				slotMode: schedule.slotMode,
+				bookings: [
+					...dayBookingsForSlots.map(toSlotEngine),
+					...clickBreakBookings,
+				],
 				minNotice: 30,
 				nowMin: 0,
 			})
@@ -237,7 +300,8 @@ const createClientStrategy = (
 		getTitle(titleDate: string, view: ViewMode): string {
 			if (view === 'week')
 				return `${staffName} — ${formatWeekRange(getWeekDates(titleDate), calendarLocale)}`
-			if (view === 'month') return `${staffName} — ${formatMonth(titleDate, calendarLocale)}`
+			if (view === 'month')
+				return `${staffName} — ${formatMonth(titleDate, calendarLocale)}`
 			return `${staffName} — ${formatDateLocale(titleDate, calendarLocale)}`
 		},
 	}

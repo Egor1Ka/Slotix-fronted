@@ -2,7 +2,6 @@
 
 import { useTranslations } from 'next-intl'
 import { timeToMin, minToTime } from '@/lib/slot-engine'
-import type { SlotMode } from '@/lib/slot-engine'
 import type { EventType } from '@/services/configs/booking.types'
 import type { ConfirmedBooking } from '@/lib/calendar/types'
 import { Separator } from '@/components/ui/separator'
@@ -13,7 +12,6 @@ import type { MergedBookingForm } from '@/services/configs/booking-field.types'
 interface StaffBookingPanelProps {
 	selectedEventType: EventType | null
 	selectedSlot: string | null
-	slotMode: SlotMode
 	confirmedBooking: ConfirmedBooking | null
 	formConfig: MergedBookingForm | null
 	onConfirmWithClient: (data: ClientInfoData) => void
@@ -88,7 +86,6 @@ function PendingSlotWithClientForm({
 function StaffBookingPanel({
 	selectedEventType,
 	selectedSlot,
-	slotMode,
 	confirmedBooking,
 	formConfig,
 	onConfirmWithClient,
@@ -113,7 +110,7 @@ function StaffBookingPanel({
 	}
 
 	if (!selectedSlot) {
-		return <ServiceInfo eventType={selectedEventType} slotMode={slotMode} />
+		return <ServiceInfo eventType={selectedEventType} />
 	}
 
 	return (

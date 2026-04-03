@@ -1,10 +1,8 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import type { SlotMode } from '@/lib/slot-engine'
 import type { EventType } from '@/services/configs/booking.types'
 import type { ConfirmedBooking } from '@/lib/calendar/types'
-import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { CheckCircle2Icon } from 'lucide-react'
 
@@ -26,13 +24,7 @@ function EmptyState({ message }: { message?: string }) {
 	)
 }
 
-function ServiceInfo({
-	eventType,
-	slotMode,
-}: {
-	eventType: EventType
-	slotMode: SlotMode
-}) {
+function ServiceInfo({ eventType }: { eventType: EventType }) {
 	const t = useTranslations('booking')
 	return (
 		<div className="flex flex-col gap-3">
@@ -44,18 +36,11 @@ function ServiceInfo({
 				<span className="text-sm font-semibold">{eventType.name}</span>
 			</div>
 			<div className="text-muted-foreground text-xs">
-				{eventType.durationMin} {t('min')} · {eventType.price} {eventType.currency}
+				{eventType.durationMin} {t('min')} · {eventType.price}{' '}
+				{eventType.currency}
 			</div>
 			<Separator />
-			<p className="text-muted-foreground text-xs">
-				{t('clickDashedZone')}
-			</p>
-			<Badge variant="secondary" className="w-fit text-xs">
-				{slotMode}
-			</Badge>
-			<p className="text-muted-foreground text-xs">
-				{t(`modeDescriptions.${slotMode}`)}
-			</p>
+			<p className="text-muted-foreground text-xs">{t('clickDashedZone')}</p>
 		</div>
 	)
 }
@@ -97,7 +82,9 @@ function ConfirmedState({
 				<span className="text-muted-foreground">{t('endTime')}</span>
 				<span className="font-medium">{endTime}</span>
 				<span className="text-muted-foreground">{t('duration')}</span>
-				<span className="font-medium">{confirmedBooking.durationMin} {t('min')}</span>
+				<span className="font-medium">
+					{confirmedBooking.durationMin} {t('min')}
+				</span>
 				<span className="text-muted-foreground">{t('price')}</span>
 				<span className="font-medium">
 					{confirmedBooking.price} {confirmedBooking.currency}

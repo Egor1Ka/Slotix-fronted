@@ -30,7 +30,6 @@ import type {
 	CalendarDisplayBooking,
 } from '@/services/configs/booking.types'
 import { ServiceList } from '@/components/booking/ServiceList'
-import { SlotModeSelector } from '@/components/booking/SlotModeSelector'
 import { StaffBookingPanel } from '@/components/booking/StaffBookingPanel'
 import { ScheduleSheetButton } from '@/components/booking/ScheduleSheetButton'
 import { Separator } from '@/components/ui/separator'
@@ -73,7 +72,6 @@ interface StaffStrategyParams {
 	staffId?: string
 	selectedEventTypeId: string | null
 	selectedSlot: string | null
-	slotMode: SlotMode
 	confirmedBooking: ConfirmedBooking | null
 	date: string
 	onSelectEventType: (eventTypeId: string) => void
@@ -81,7 +79,6 @@ interface StaffStrategyParams {
 	onConfirmWithClient: (data: ClientInfoData) => void
 	onCancel: () => void
 	onResetSlot: () => void
-	onModeChange: (mode: SlotMode) => void
 	isSubmitting: boolean
 	formConfig?: MergedBookingForm | null
 	onSaveSchedule: (weeklyHours: WeeklyHours[]) => Promise<void>
@@ -109,7 +106,6 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 		staffId: strategyStaffId,
 		selectedEventTypeId,
 		selectedSlot,
-		slotMode,
 		confirmedBooking,
 		date,
 		onSelectEventType,
@@ -117,7 +113,6 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 		onConfirmWithClient,
 		onCancel,
 		onResetSlot,
-		onModeChange,
 		isSubmitting,
 		formConfig = null,
 		onSaveSchedule,
@@ -220,7 +215,7 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 				workEnd: workHours.workEnd,
 				duration: selectedEventType.durationMin,
 				slotStep: schedule.slotStepMin,
-				slotMode,
+				slotMode: schedule.slotMode,
 				bookings: allBookingsForSlots,
 				minNotice: 0,
 				nowMin: 0,
@@ -279,11 +274,9 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 						selectedId={selectedEventTypeId}
 						onSelect={onSelectEventType}
 					/>
-					<Separator className="my-4" />
-					<SlotModeSelector value={slotMode} onChange={onModeChange} />
 					{showScheduleEditor && (
 						<>
-							<Separator className="my-4" />
+						<Separator className="my-4" />
 							<ScheduleSheetButton
 								schedule={schedule}
 								onSaveSchedule={onSaveSchedule}
@@ -318,7 +311,6 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 				<StaffBookingPanel
 					selectedEventType={selectedEventType}
 					selectedSlot={selectedSlot}
-					slotMode={slotMode}
 					confirmedBooking={confirmedBooking}
 					formConfig={formConfig}
 					onConfirmWithClient={onConfirmWithClient}
@@ -354,7 +346,7 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 				workEnd: workHours.workEnd,
 				duration: selectedEventType.durationMin,
 				slotStep: schedule.slotStepMin,
-				slotMode,
+				slotMode: schedule.slotMode,
 				bookings: [
 					...dayBookingsForSlots.map(toSlotEngine),
 					...clickBreakBookings,

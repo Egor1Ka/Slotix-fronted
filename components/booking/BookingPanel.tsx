@@ -2,7 +2,6 @@
 
 import { useTranslations } from 'next-intl'
 import { timeToMin, minToTime } from '@/lib/slot-engine'
-import type { SlotMode } from '@/lib/slot-engine'
 import type { EventType } from '@/services/configs/booking.types'
 import type { ConfirmedBooking } from '@/lib/calendar/types'
 import { Button } from '@/components/ui/button'
@@ -12,7 +11,6 @@ import { EmptyState, ServiceInfo, ConfirmedState } from './BookingPanelParts'
 interface BookingPanelProps {
 	selectedEventType: EventType | null
 	selectedSlot: string | null
-	slotMode: SlotMode
 	confirmedBooking: ConfirmedBooking | null
 	onConfirm: () => void
 	onCancel: () => void
@@ -51,7 +49,9 @@ function PendingSlot({
 				<span className="text-muted-foreground">{t('endTime')}</span>
 				<span className="font-medium">{endTime}</span>
 				<span className="text-muted-foreground">{t('duration')}</span>
-				<span className="font-medium">{eventType.durationMin} {t('min')}</span>
+				<span className="font-medium">
+					{eventType.durationMin} {t('min')}
+				</span>
 				<span className="text-muted-foreground">{t('price')}</span>
 				<span className="font-medium">
 					{eventType.price} {eventType.currency}
@@ -74,7 +74,6 @@ function PendingSlot({
 function BookingPanel({
 	selectedEventType,
 	selectedSlot,
-	slotMode,
 	confirmedBooking,
 	onConfirm,
 	onCancel,
@@ -82,17 +81,14 @@ function BookingPanel({
 }: BookingPanelProps) {
 	if (confirmedBooking) {
 		return (
-			<ConfirmedState
-				confirmedBooking={confirmedBooking}
-				onCancel={onCancel}
-			/>
+			<ConfirmedState confirmedBooking={confirmedBooking} onCancel={onCancel} />
 		)
 	}
 
 	if (!selectedEventType) return <EmptyState />
 
 	if (!selectedSlot) {
-		return <ServiceInfo eventType={selectedEventType} slotMode={slotMode} />
+		return <ServiceInfo eventType={selectedEventType} />
 	}
 
 	return (

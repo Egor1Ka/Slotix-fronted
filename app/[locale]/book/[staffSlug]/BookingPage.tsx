@@ -289,7 +289,6 @@ function BookingPage({ staffSlug, publicUrl }: BookingPageProps) {
 				staffId: staff?.id,
 				selectedEventTypeId,
 				selectedSlot: selectedSlotTime,
-				slotMode,
 				confirmedBooking: bookingActions.confirmedBooking,
 				date: dateStr,
 				onSelectEventType: onEventTypeSelect,
@@ -297,7 +296,6 @@ function BookingPage({ staffSlug, publicUrl }: BookingPageProps) {
 				onConfirmWithClient: bookingActions.handleConfirmWithClient,
 				onCancel: bookingActions.handleCancel,
 				onResetSlot: bookingActions.handleResetSlot,
-				onModeChange,
 				isSubmitting: bookingActions.isSubmitting,
 				formConfig: bookingActions.formConfig,
 				onSaveSchedule: handleSaveSchedule,
@@ -320,7 +318,6 @@ function BookingPage({ staffSlug, publicUrl }: BookingPageProps) {
 				locale,
 				selectedEventTypeId,
 				selectedSlot: selectedSlotTime,
-				slotMode,
 				confirmedBooking: bookingActions.confirmedBooking,
 				date: dateStr,
 				onSelectEventType: onEventTypeSelect,
@@ -328,7 +325,6 @@ function BookingPage({ staffSlug, publicUrl }: BookingPageProps) {
 				onConfirm: handleConfirm,
 				onCancel: bookingActions.handleCancel,
 				onResetSlot: bookingActions.handleResetSlot,
-				onModeChange,
 			})
 
 	// ── Render ──
