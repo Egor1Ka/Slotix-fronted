@@ -21,6 +21,10 @@ import { toast } from 'sonner'
 import { useTranslations } from 'next-intl'
 import { useLocale } from 'next-intl'
 import { useCalendarStrategy } from './CalendarContext'
+import {
+	ProfileInfoBlock,
+	type ProfileInfoBlockProps,
+} from '@/components/booking/ProfileInfoBlock'
 import { useViewConfig } from './CalendarViewConfigContext'
 import { GreyBlock } from '@/components/booking/GreyBlock'
 import type { ViewMode, CalendarBlock } from './types'
@@ -73,6 +77,9 @@ interface CalendarCoreProps {
 	staffTabsSlot?: React.ReactNode
 	columnHeaderSlot?: (dayDate: string, index: number) => React.ReactNode
 	publicUrl?: string
+	staffAvatarUrl?: string
+	hideSidebar?: boolean
+	profileInfo?: ProfileInfoBlockProps
 }
 
 const navigate = (view: ViewMode, date: string, direction: number): string => {
@@ -129,6 +136,9 @@ function CalendarCore({
 	staffTabsSlot,
 	columnHeaderSlot,
 	publicUrl,
+	staffAvatarUrl,
+	hideSidebar = false,
+	profileInfo,
 }: CalendarCoreProps) {
 	const strategy = useCalendarStrategy()
 	const viewConfig = useSafeViewConfig()
@@ -662,15 +672,24 @@ function CalendarCore({
 
 	return (
 		<div className="flex min-h-screen flex-col md:flex-row">
-			<aside className="hidden w-[220px] shrink-0 flex-col border-r p-4 md:flex">
-				{strategy.renderSidebar()}
-			</aside>
+			{!hideSidebar && (
+				<aside className="hidden w-[220px] shrink-0 flex-col border-r p-4 md:flex">
+					{strategy.renderSidebar()}
+				</aside>
+			)}
 
 			<main className="flex-1 overflow-auto p-4">
 				<div className="flex flex-col gap-4">
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-1">
-							<Button variant="ghost" size="icon-sm" onClick={handlePrev}>
+							{staffAvatarUrl && (
+									<img
+										src={staffAvatarUrl}
+										alt=""
+										className="size-8 rounded-full object-cover"
+									/>
+								)}
+								<Button variant="ghost" size="icon-sm" onClick={handlePrev}>
 								<ChevronLeftIcon />
 							</Button>
 							<h2 className="min-w-[140px] text-center text-lg font-semibold">
@@ -711,26 +730,31 @@ function CalendarCore({
 			</main>
 
 			<aside className="w-full shrink-0 border-t p-4 md:w-[220px] md:border-t-0 md:border-l">
+				{profileInfo && <ProfileInfoBlock {...profileInfo} />}
 				{strategy.renderPanel()}
 			</aside>
 
-			<Button
-				variant="outline"
-				size="icon"
-				className="fixed bottom-4 left-4 z-50 shadow-lg md:hidden"
-				onClick={handleOpenSheet}
-			>
-				<MenuIcon />
-			</Button>
+			{!hideSidebar && (
+				<>
+					<Button
+						variant="outline"
+						size="icon"
+						className="fixed bottom-4 left-4 z-50 shadow-lg md:hidden"
+						onClick={handleOpenSheet}
+					>
+						<MenuIcon />
+					</Button>
 
-			<Sheet open={sheetOpen} onOpenChange={handleSheetChange}>
-				<SheetContent side="bottom">
-					<SheetHeader>
-						<SheetTitle>{t('servicesAndMode')}</SheetTitle>
-					</SheetHeader>
-					<div className="p-4">{sidebarWithSheetClose}</div>
-				</SheetContent>
-			</Sheet>
+					<Sheet open={sheetOpen} onOpenChange={handleSheetChange}>
+						<SheetContent side="bottom">
+							<SheetHeader>
+								<SheetTitle>{t('servicesAndMode')}</SheetTitle>
+							</SheetHeader>
+							<div className="p-4">{sidebarWithSheetClose}</div>
+						</SheetContent>
+					</Sheet>
+				</>
+			)}
 		</div>
 	)
 }

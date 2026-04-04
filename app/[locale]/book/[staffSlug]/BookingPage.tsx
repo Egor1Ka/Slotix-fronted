@@ -17,6 +17,7 @@ import {
 	getWorkHoursForDate,
 	getFirstStaffId,
 } from '@/lib/calendar/utils'
+import type { ProfileInfoBlockProps } from '@/components/booking/ProfileInfoBlock'
 import {
 	useStaffBySlug,
 	useStaffSchedule,
@@ -203,6 +204,19 @@ function BookingPage({ staffSlug, publicUrl, hideSidebar = false }: BookingPageP
 		)
 	}
 
+	// ── Profile info ──
+
+	const profileInfo: ProfileInfoBlockProps = {
+		name: staff.orgName ?? staff.name,
+		logo: staff.orgLogo ?? null,
+		avatar: staff.avatar ?? null,
+		description: staff.description ?? null,
+		address: staff.address ?? null,
+		phone: staff.phone ?? null,
+		website: staff.website ?? null,
+		isOrg: !!staff.orgId,
+	}
+
 	// ── Derived data ──
 
 	const scheduleSource = schedule ?? DEFAULT_SCHEDULE
@@ -278,6 +292,7 @@ function BookingPage({ staffSlug, publicUrl, hideSidebar = false }: BookingPageP
 				publicUrl={publicUrl}
 				staffAvatarUrl={staff?.avatar}
 				hideSidebar={hideSidebar}
+				profileInfo={profileInfo}
 			/>
 		</CalendarProvider>
 	)
