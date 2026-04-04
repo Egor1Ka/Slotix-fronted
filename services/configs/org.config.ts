@@ -52,6 +52,12 @@ const orgApiConfig = {
 		method: deleteData,
 		defaultErrorMessage: 'Failed to decline invitation',
 	}),
+
+	updateStaffBio: endpoint<{ bio: string | null }, ApiResponse<OrgStaffMember>>({
+		url: ({ orgId, staffId }) => `/api/org/${orgId}/staff/${staffId}`,
+		method: patchData,
+		defaultErrorMessage: 'Failed to update bio',
+	}),
 }
 
 export default orgApiConfig

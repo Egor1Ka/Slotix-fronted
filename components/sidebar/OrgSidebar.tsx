@@ -83,6 +83,7 @@ function OrgSidebar() {
 	const servicesHref = buildHref(`/manage/${orgId}/services`)
 	const staffScheduleHref = buildHref(`/manage/${orgId}/staff-schedule`)
 	const myScheduleHref = buildHref(`/org/${orgId}/my-schedule`)
+	const myProfileHref = buildHref(`/org/${orgId}/my-profile`)
 	const orgsHref = buildHref('/organizations')
 
 	const getInitial = (name: string): string => name.charAt(0).toUpperCase()
@@ -183,6 +184,15 @@ function OrgSidebar() {
 								>
 									<CalendarDays className="size-4" />
 									<span>{t('mySchedule')}</span>
+								</SidebarMenuButton>
+							</SidebarMenuItem>
+							<SidebarMenuItem>
+								<SidebarMenuButton
+									render={<Link href={myProfileHref} />}
+									isActive={isActive(myProfileHref)}
+								>
+									<UserCircle className="size-4" />
+									<span>{t('profile')}</span>
 								</SidebarMenuButton>
 							</SidebarMenuItem>
 						</SidebarMenu>
