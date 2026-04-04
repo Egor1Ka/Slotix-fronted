@@ -142,6 +142,10 @@ interface OrgByIdResponse {
 	id: string
 	name: string
 	logo: string | null
+	description: string | null
+	address: string | null
+	phone: string | null
+	website: string | null
 }
 
 interface OrgStaffMember extends StaffMember {

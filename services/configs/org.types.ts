@@ -15,10 +15,24 @@ interface CreateOrgBody {
 	brandColor?: string
 	defaultTimezone?: string
 	defaultCountry?: string
+	description?: string
+	address?: string
+	phone?: string
+	website?: string
+}
+
+interface UpdateOrgBody {
+	name?: string
+	description?: string | null
+	address?: string | null
+	phone?: string | null
+	website?: string | null
+	logoUrl?: string | null
+	brandColor?: string | null
 }
 
 interface AddStaffBody {
 	userId: string
 }
 
-export type { OrgListItem, CreateOrgBody, AddStaffBody }
+export type { OrgListItem, CreateOrgBody, UpdateOrgBody, AddStaffBody }

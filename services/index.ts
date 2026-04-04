@@ -104,6 +104,7 @@ export type {
 export type {
 	OrgListItem,
 	CreateOrgBody,
+	UpdateOrgBody,
 	AddStaffBody,
 } from './configs/org.types'
 export type {
