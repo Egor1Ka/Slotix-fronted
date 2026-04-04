@@ -221,7 +221,6 @@ const getOrgById = async (id: string): Promise<OrgByIdResponse> => {
 		return {
 			id: '807f1f77bcf86cd799439001',
 			name: 'Demo Studio',
-			slug: 'demo-org',
 			logo: null,
 		}
 	}

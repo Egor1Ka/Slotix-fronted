@@ -141,7 +141,6 @@ interface CancelByIdBody {
 interface OrgByIdResponse {
 	id: string
 	name: string
-	slug: string
 	logo: string | null
 }
 
