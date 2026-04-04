@@ -16,6 +16,7 @@ interface StaffMember {
 	name: string
 	avatar: string
 	position: string | null
+	bio: string | null
 }
 
 interface StaffBySlugResponse {
@@ -25,6 +26,13 @@ interface StaffBySlugResponse {
 	position: string | null
 	orgId: string | null
 	locationIds: string[]
+	bio: string | null
+	description: string | null
+	address: string | null
+	phone: string | null
+	website: string | null
+	orgName: string | null
+	orgLogo: string | null
 }
 
 // ── Event Type (Service) ──

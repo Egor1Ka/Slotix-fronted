@@ -6,12 +6,20 @@ interface User {
 	name: string
 	email: string
 	avatar: string
+	description: string | null
+	address: string | null
+	phone: string | null
+	website: string | null
 	createdAt: string
 	updatedAt: string
 }
 
 interface UpdateUserBody {
-	name: string
+	name?: string
+	description?: string | null
+	address?: string | null
+	phone?: string | null
+	website?: string | null
 }
 
 interface ApiResponse<T> {
