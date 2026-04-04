@@ -283,7 +283,8 @@
 		"services": "Послуги",
 		"myScheduleSettings": "Налаштування розкладу",
 		"myServices": "Мої послуги",
-		"profile": "Профіль"
+		"orgProfile": "Профіль організації",
+		"myProfile": "Мій профіль"
 	},
 	"organizations": {
 		"title": "Мої організації",

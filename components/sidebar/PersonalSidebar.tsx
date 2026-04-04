@@ -57,7 +57,7 @@ function PersonalSidebar() {
 									isActive={isActive(profileHref)}
 								>
 									<UserCircle className="size-4" />
-									<span>{t('profile')}</span>
+									<span>{t('myProfile')}</span>
 								</SidebarMenuButton>
 							</SidebarMenuItem>
 							<SidebarMenuItem>

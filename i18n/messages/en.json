@@ -283,7 +283,8 @@
 		"services": "Services",
 		"myScheduleSettings": "Schedule Settings",
 		"myServices": "My Services",
-		"profile": "Profile"
+		"orgProfile": "Organization Profile",
+		"myProfile": "My Profile"
 	},
 	"organizations": {
 		"title": "My organizations",

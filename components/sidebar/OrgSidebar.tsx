@@ -138,7 +138,7 @@ function OrgSidebar() {
 									isActive={isActive(profileHref)}
 								>
 									<UserCircle className="size-4" />
-									<span>{t('profile')}</span>
+									<span>{t('orgProfile')}</span>
 								</SidebarMenuButton>
 							</SidebarMenuItem>
 							<SidebarMenuItem>
@@ -192,7 +192,7 @@ function OrgSidebar() {
 									isActive={isActive(myProfileHref)}
 								>
 									<UserCircle className="size-4" />
-									<span>{t('profile')}</span>
+									<span>{t('myProfile')}</span>
 								</SidebarMenuButton>
 							</SidebarMenuItem>
 						</SidebarMenu>
