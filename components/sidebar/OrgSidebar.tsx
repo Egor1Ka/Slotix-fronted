@@ -12,6 +12,7 @@ import {
 	Settings2,
 	ClipboardList,
 	CalendarDays,
+	UserCircle,
 } from 'lucide-react'
 import {
 	Sidebar,
@@ -76,6 +77,7 @@ function OrgSidebar() {
 	const buildHref = (path: string): string => `/${locale}${path}`
 
 	// Используем /manage/ для админских маршрутов орги (отличается от /org/ для публичных)
+	const profileHref = buildHref(`/manage/${orgId}/profile`)
 	const orgScheduleHref = buildHref(`/manage/${orgId}`)
 	const positionsHref = buildHref(`/manage/${orgId}/positions`)
 	const servicesHref = buildHref(`/manage/${orgId}/services`)
@@ -129,6 +131,15 @@ function OrgSidebar() {
 				<SidebarGroup>
 					<SidebarGroupContent>
 						<SidebarMenu>
+							<SidebarMenuItem>
+								<SidebarMenuButton
+									render={<Link href={profileHref} />}
+									isActive={isActive(profileHref)}
+								>
+									<UserCircle className="size-4" />
+									<span>{t('profile')}</span>
+								</SidebarMenuButton>
+							</SidebarMenuItem>
 							<SidebarMenuItem>
 								<SidebarMenuButton
 									render={<Link href={orgScheduleHref} />}
