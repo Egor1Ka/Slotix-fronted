@@ -18,6 +18,13 @@ export const mockStaff: StaffBySlugResponse = {
 	position: 'Стиліст',
 	orgId: null,
 	locationIds: [],
+	bio: null,
+	description: null,
+	address: null,
+	phone: null,
+	website: null,
+	orgName: null,
+	orgLogo: null,
 }
 
 // ── Event Types (Services) ──
@@ -240,6 +247,13 @@ const mockOrgStaffMember1: StaffBySlugResponse = {
 	position: 'Стиліст',
 	orgId: '807f1f77bcf86cd799439001',
 	locationIds: ['loc-001'],
+	bio: null,
+	description: null,
+	address: null,
+	phone: null,
+	website: null,
+	orgName: null,
+	orgLogo: null,
 }
 
 const mockOrgStaffMember2: StaffBySlugResponse = {
@@ -250,6 +264,13 @@ const mockOrgStaffMember2: StaffBySlugResponse = {
 	position: 'Колорист',
 	orgId: '807f1f77bcf86cd799439001',
 	locationIds: ['loc-001', 'loc-002'],
+	bio: null,
+	description: null,
+	address: null,
+	phone: null,
+	website: null,
+	orgName: null,
+	orgLogo: null,
 }
 
 const mockOrgStaffMember3: StaffBySlugResponse = {
@@ -260,6 +281,13 @@ const mockOrgStaffMember3: StaffBySlugResponse = {
 	position: 'Манікюрист',
 	orgId: '807f1f77bcf86cd799439001',
 	locationIds: ['loc-002'],
+	bio: null,
+	description: null,
+	address: null,
+	phone: null,
+	website: null,
+	orgName: null,
+	orgLogo: null,
 }
 
 export const mockOrgStaff: OrgStaffMember[] = [

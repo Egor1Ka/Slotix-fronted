@@ -2,7 +2,6 @@
 
 import { useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
-import type { SlotMode } from '@/lib/slot-engine'
 import {
 	type ViewMode,
 	CalendarProvider,
@@ -12,14 +11,12 @@ import {
 } from '@/lib/calendar'
 import { useTranslations } from 'next-intl'
 import { useLocale } from 'next-intl'
-import { toast } from 'sonner'
 import { useViewConfig } from '@/lib/calendar/CalendarViewConfigContext'
 import {
 	formatDateISO,
 	getWorkHoursForDate,
 	getFirstStaffId,
 } from '@/lib/calendar/utils'
-import { scheduleApi } from '@/lib/booking-api-client'
 import {
 	useStaffBySlug,
 	useStaffSchedule,
@@ -43,11 +40,15 @@ const toDayOfWeek = (wh: { dayOfWeek: number }): number => wh.dayOfWeek
 const toStaffMember = (staff: {
 	id: string
 	name: string
+	avatar?: string
+	position?: string | null
+	bio?: string | null
 }): OrgStaffMember => ({
 	id: staff.id,
 	name: staff.name,
-	avatar: '',
-	position: null,
+	avatar: staff.avatar ?? '',
+	position: staff.position ?? null,
+	bio: staff.bio ?? null,
 	bookingCount: 0,
 })
 
@@ -74,9 +75,10 @@ const DEFAULT_SCHEDULE: ScheduleTemplate = {
 interface BookingPageProps {
 	staffSlug: string
 	publicUrl?: string
+	hideSidebar?: boolean
 }
 
-function BookingPage({ staffSlug, publicUrl }: BookingPageProps) {
+function BookingPage({ staffSlug, publicUrl, hideSidebar = false }: BookingPageProps) {
 	const searchParams = useSearchParams()
 	const viewConfig = useViewConfig()
 	const canBookForClient = viewConfig.canBookForClient
@@ -172,64 +174,6 @@ function BookingPage({ staffSlug, publicUrl }: BookingPageProps) {
 		bookingActions.handleBookingClose()
 	}
 
-	// ── Schedule editing (staff-specific) ──
-
-	const handleSaveSchedule = async (
-		weeklyHours: ScheduleTemplate['weeklyHours'],
-	) => {
-		if (!staff) return
-		try {
-			await scheduleApi.updateTemplate(
-				staff.id,
-				schedule?.orgId ?? null,
-				weeklyHours,
-			)
-			reloadSchedule()
-			toast.success(tCalendar('scheduleSaved'))
-		} catch (err) {
-			const message =
-				err instanceof Error ? err.message : tCalendar('scheduleSaveError')
-			toast.error(message)
-			throw err
-		}
-	}
-
-	const handleSaveOverride = async (
-		body: Parameters<typeof scheduleApi.createOverride>[0],
-	) => {
-		try {
-			await scheduleApi.createOverride(body)
-			reloadSchedule()
-			toast.success(tCalendar('overrideSaved'))
-		} catch (err) {
-			const message =
-				err instanceof Error ? err.message : tCalendar('overrideSaveError')
-			toast.error(message)
-			throw err
-		}
-	}
-
-	// ── Сохранение slotMode ──
-
-	const handleSaveSlotMode = async (mode: SlotMode) => {
-		if (!staff) return
-		const scheduleSource = schedule ?? DEFAULT_SCHEDULE
-		try {
-			await scheduleApi.updateTemplate(
-				staff.id,
-				schedule?.orgId ?? null,
-				scheduleSource.weeklyHours,
-				mode,
-			)
-			reloadSchedule()
-			toast.success(tCalendar('scheduleSaved'))
-		} catch (err) {
-			const message =
-				err instanceof Error ? err.message : tCalendar('scheduleSaveError')
-			toast.error(message)
-			throw err
-		}
-	}
 
 	// ── Client confirm (no client info) ──
 
@@ -274,7 +218,7 @@ function BookingPage({ staffSlug, publicUrl }: BookingPageProps) {
 
 	const strategy = canBookForClient
 		? createStaffStrategy({
-				staffName: tCalendar('mySchedule'),
+				staffName: staff?.name ?? tCalendar('mySchedule'),
 				locale,
 				eventTypes,
 				bookings,
@@ -292,15 +236,11 @@ function BookingPage({ staffSlug, publicUrl }: BookingPageProps) {
 				onResetSlot: bookingActions.handleResetSlot,
 				isSubmitting: bookingActions.isSubmitting,
 				formConfig: bookingActions.formConfig,
-				onSaveSchedule: handleSaveSchedule,
-				onSaveOverride: handleSaveOverride,
-				onSaveSlotMode: handleSaveSlotMode,
 				onBookingClick: bookingActions.handleBookingSelect,
 				selectedBooking: bookingActions.selectedBooking,
 				onCloseBooking: bookingActions.handleBookingClose,
 				onBookingStatusChange: bookingActions.handleBookingStatusChange,
 				onBookingReschedule: bookingActions.handleBookingReschedule,
-				showScheduleEditor: viewConfig.showScheduleEditor,
 			})
 		: createClientStrategy({
 				eventTypes,
@@ -336,6 +276,8 @@ function BookingPage({ staffSlug, publicUrl }: BookingPageProps) {
 				isDayOff={isDayOff}
 				disabledDays={disabledDays}
 				publicUrl={publicUrl}
+				staffAvatarUrl={staff?.avatar}
+				hideSidebar={hideSidebar}
 			/>
 		</CalendarProvider>
 	)
