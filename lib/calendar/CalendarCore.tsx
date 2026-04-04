@@ -671,7 +671,9 @@ function CalendarCore({
 	)
 
 	return (
-		<div className="flex min-h-screen flex-col md:flex-row">
+		<div className="flex min-h-screen flex-col">
+			{profileInfo && <ProfileInfoBlock {...profileInfo} />}
+			<div className="flex flex-1 flex-col md:flex-row">
 			{!hideSidebar && (
 				<aside className="hidden w-[220px] shrink-0 flex-col border-r p-4 md:flex">
 					{strategy.renderSidebar()}
@@ -730,7 +732,6 @@ function CalendarCore({
 			</main>
 
 			<aside className="w-full shrink-0 border-t p-4 md:w-[220px] md:border-t-0 md:border-l">
-				{profileInfo && <ProfileInfoBlock {...profileInfo} />}
 				{strategy.renderPanel()}
 			</aside>
 
@@ -755,6 +756,7 @@ function CalendarCore({
 					</Sheet>
 				</>
 			)}
+		</div>
 		</div>
 	)
 }

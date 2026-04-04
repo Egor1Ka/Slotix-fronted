@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { MapPin, Phone, Globe } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Separator } from '@/components/ui/separator'
 
 interface ProfileInfoBlockProps {
 	name: string
@@ -16,7 +17,7 @@ interface ProfileInfoBlockProps {
 	isOrg: boolean
 }
 
-const MAX_DESCRIPTION_LENGTH = 150
+const MAX_DESCRIPTION_LENGTH = 200
 
 const getInitial = (name: string): string => name.charAt(0).toUpperCase()
 
@@ -53,67 +54,74 @@ function ProfileInfoBlock({
 	const imageSource = isOrg ? logo : avatar
 
 	return (
-		<div className="flex flex-col gap-3 rounded-lg border p-4">
-			<div className="flex items-center gap-3">
+		<div className="bg-card w-full border-b px-6 py-4">
+			<div className="mx-auto flex max-w-5xl items-start gap-4">
 				{isOrg && imageSource ? (
-					<img src={imageSource} alt={name} className="size-8 rounded" />
+					<img
+						src={imageSource}
+						alt={name}
+						className="size-12 shrink-0 rounded-lg object-cover"
+					/>
 				) : (
-					<Avatar className="size-8">
+					<Avatar className="size-12 shrink-0">
 						<AvatarImage src={imageSource ?? undefined} />
-						<AvatarFallback className="text-xs">
-							{getInitial(name)}
-						</AvatarFallback>
+						<AvatarFallback>{getInitial(name)}</AvatarFallback>
 					</Avatar>
 				)}
-				<span className="text-sm font-semibold">{name}</span>
+
+				<div className="flex min-w-0 flex-1 flex-col gap-1.5">
+					<h2 className="text-base font-semibold">{name}</h2>
+
+					{hasDescription && (
+						<div className="text-muted-foreground text-sm leading-relaxed">
+							<p>{displayedDescription}</p>
+							{isLongDescription && (
+								<button
+									type="button"
+									onClick={toggleExpanded}
+									className="text-primary mt-0.5 text-xs hover:underline"
+								>
+									{expanded ? t('showLess') : t('showMore')}
+								</button>
+							)}
+						</div>
+					)}
+
+					{hasContactInfo && (
+						<>
+							{hasDescription && <Separator className="my-1" />}
+							<div className="text-muted-foreground flex flex-wrap gap-x-4 gap-y-1 text-xs">
+								{address && (
+									<span className="flex items-center gap-1.5">
+										<MapPin className="size-3.5 shrink-0" />
+										{address}
+									</span>
+								)}
+								{phone && (
+									<a
+										href={`tel:${phone}`}
+										className="flex items-center gap-1.5 hover:underline"
+									>
+										<Phone className="size-3.5 shrink-0" />
+										{phone}
+									</a>
+								)}
+								{website && (
+									<a
+										href={website}
+										target="_blank"
+										rel="noopener noreferrer"
+										className="flex items-center gap-1.5 hover:underline"
+									>
+										<Globe className="size-3.5 shrink-0" />
+										{website.replace(/^https?:\/\//, '')}
+									</a>
+								)}
+							</div>
+						</>
+					)}
+				</div>
 			</div>
-
-			{hasDescription && (
-				<div className="text-muted-foreground text-xs">
-					<p>{displayedDescription}</p>
-					{isLongDescription && (
-						<button
-							type="button"
-							onClick={toggleExpanded}
-							className="text-primary mt-1 hover:underline"
-						>
-							{expanded ? t('showLess') : t('showMore')}
-						</button>
-					)}
-				</div>
-			)}
-
-			{hasContactInfo && (
-				<div className="flex flex-col gap-1.5">
-					{address && (
-						<div className="text-muted-foreground flex items-center gap-2 text-xs">
-							<MapPin className="size-3.5 shrink-0" />
-							<span>{address}</span>
-						</div>
-					)}
-					{phone && (
-						<div className="text-muted-foreground flex items-center gap-2 text-xs">
-							<Phone className="size-3.5 shrink-0" />
-							<a href={`tel:${phone}`} className="hover:underline">
-								{phone}
-							</a>
-						</div>
-					)}
-					{website && (
-						<div className="text-muted-foreground flex items-center gap-2 text-xs">
-							<Globe className="size-3.5 shrink-0" />
-							<a
-								href={website}
-								target="_blank"
-								rel="noopener noreferrer"
-								className="hover:underline"
-							>
-								{website}
-							</a>
-						</div>
-					)}
-				</div>
-			)}
 		</div>
 	)
 }
