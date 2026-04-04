@@ -282,7 +282,8 @@
 		"positions": "Positions",
 		"services": "Services",
 		"myScheduleSettings": "Schedule Settings",
-		"myServices": "My Services"
+		"myServices": "My Services",
+		"profile": "Profile"
 	},
 	"organizations": {
 		"title": "My organizations",
@@ -310,7 +311,15 @@
 			"submit": "Create",
 			"cancel": "Cancel"
 		},
-		"created": "Organization created"
+		"created": "Organization created",
+		"invitation": {
+			"title": "Organization Invitation",
+			"description": "You have been invited to join {orgName}. Would you like to accept or decline?",
+			"accept": "Accept",
+			"decline": "Decline",
+			"accepted": "Invitation accepted",
+			"declined": "Invitation declined"
+		}
 	},
 	"positions": {
 		"title": "Positions",
@@ -411,5 +420,25 @@
 		"minCharsHint": "Enter at least 3 characters",
 		"alreadyInOrg": "Already in organization",
 		"invited": "Invited"
+	},
+	"profile": {
+		"title": "Profile",
+		"orgTitle": "Organization Profile",
+		"myTitle": "My Profile",
+		"name": "Name",
+		"description": "Description",
+		"descriptionPlaceholder": "Tell about yourself or your business...",
+		"address": "Address",
+		"addressPlaceholder": "City, street, building",
+		"phone": "Phone",
+		"phonePlaceholder": "+380 XX XXX XX XX",
+		"website": "Website",
+		"websitePlaceholder": "https://example.com",
+		"bio": "About",
+		"bioPlaceholder": "A few words about yourself...",
+		"save": "Save",
+		"saved": "Profile saved",
+		"showMore": "Show more",
+		"showLess": "Show less"
 	}
 }

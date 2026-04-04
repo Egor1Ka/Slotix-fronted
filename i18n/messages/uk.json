@@ -282,7 +282,8 @@
 		"positions": "Позиції",
 		"services": "Послуги",
 		"myScheduleSettings": "Налаштування розкладу",
-		"myServices": "Мої послуги"
+		"myServices": "Мої послуги",
+		"profile": "Профіль"
 	},
 	"organizations": {
 		"title": "Мої організації",
@@ -310,7 +311,15 @@
 			"submit": "Створити",
 			"cancel": "Скасувати"
 		},
-		"created": "Організацію створено"
+		"created": "Організацію створено",
+		"invitation": {
+			"title": "Запрошення до організації",
+			"description": "Вас запросили приєднатися до {orgName}. Бажаєте прийняти чи відхилити?",
+			"accept": "Прийняти",
+			"decline": "Відхилити",
+			"accepted": "Запрошення прийнято",
+			"declined": "Запрошення відхилено"
+		}
 	},
 	"positions": {
 		"title": "Позиції",
@@ -411,5 +420,25 @@
 		"minCharsHint": "Введіть мінімум 3 символи",
 		"alreadyInOrg": "Вже в організації",
 		"invited": "Не прийняв"
+	},
+	"profile": {
+		"title": "Профіль",
+		"orgTitle": "Профіль організації",
+		"myTitle": "Мій профіль",
+		"name": "Ім'я",
+		"description": "Опис",
+		"descriptionPlaceholder": "Розкажіть про себе або свій бізнес...",
+		"address": "Адреса",
+		"addressPlaceholder": "Місто, вулиця, будинок",
+		"phone": "Телефон",
+		"phonePlaceholder": "+380 XX XXX XX XX",
+		"website": "Вебсайт",
+		"websitePlaceholder": "https://example.com",
+		"bio": "Про себе",
+		"bioPlaceholder": "Кілька слів про себе...",
+		"save": "Зберегти",
+		"saved": "Профіль збережено",
+		"showMore": "Показати ще",
+		"showLess": "Сховати"
 	}
 }
