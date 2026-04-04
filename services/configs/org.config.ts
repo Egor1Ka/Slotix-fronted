@@ -1,6 +1,6 @@
-import { getData, postData } from '@/services/api/methods'
+import { getData, postData, putData, patchData, deleteData } from '@/services/api/methods'
 import { endpoint } from '@/services/api/types'
-import type { OrgListItem, CreateOrgBody, AddStaffBody } from './org.types'
+import type { OrgListItem, CreateOrgBody, UpdateOrgBody, AddStaffBody } from './org.types'
 import type { OrgByIdResponse, OrgStaffMember } from './booking.types'
 import type { ApiResponse } from './user.config'
 
@@ -29,10 +29,28 @@ const orgApiConfig = {
 		defaultErrorMessage: 'Failed to create organization',
 	}),
 
+	update: endpoint<UpdateOrgBody, ApiResponse<OrgByIdResponse>>({
+		url: ({ id }) => `/api/org/${id}`,
+		method: putData,
+		defaultErrorMessage: 'Failed to update organization',
+	}),
+
 	addStaff: endpoint<AddStaffBody, ApiResponse<OrgStaffMember>>({
 		url: ({ id }) => `/api/org/${id}/staff`,
 		method: postData,
 		defaultErrorMessage: 'Failed to add staff member',
+	}),
+
+	acceptInvitation: endpoint<Record<string, never>, ApiResponse<{ success: boolean }>>({
+		url: ({ id }) => `/api/org/${id}/membership/accept`,
+		method: patchData,
+		defaultErrorMessage: 'Failed to accept invitation',
+	}),
+
+	declineInvitation: endpoint<void, ApiResponse<{ success: boolean }>>({
+		url: ({ id }) => `/api/org/${id}/membership/decline`,
+		method: deleteData,
+		defaultErrorMessage: 'Failed to decline invitation',
 	}),
 }
 
