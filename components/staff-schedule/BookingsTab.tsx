@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import { ChevronLeft, ChevronRight, CalendarX } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -87,12 +87,11 @@ const toBookingDetail = (booking: StaffBooking): BookingDetail => ({
 	payment: { status: 'unknown', amount: 0, currency: '' },
 })
 
-const renderDateGroup =
-	(
-		onBookingClick: (booking: StaffBooking) => void,
-		grouped: Map<string, StaffBooking[]>,
-	) =>
-	(date: string) => (
+const renderDateGroup = (
+	onBookingClick: (booking: StaffBooking) => void,
+	grouped: Map<string, StaffBooking[]>,
+) => {
+	const DateGroupItem = (date: string) => (
 		<BookingDateGroup
 			key={date}
 			date={date}
@@ -100,6 +99,9 @@ const renderDateGroup =
 			onBookingClick={onBookingClick}
 		/>
 	)
+	DateGroupItem.displayName = 'DateGroupItem'
+	return DateGroupItem
+}
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
@@ -112,34 +114,47 @@ function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
 		null,
 	)
 
+	const eventTypesRef = useRef<EventType[]>([])
+
+	const [eventTypesReady, setEventTypesReady] = useState(false)
+
+	useEffect(() => {
+		const loadEventTypes = async () => {
+			const fetchTypes = orgId
+				? () => eventTypeApi.getByOrg(orgId)
+				: () => eventTypeApi.getByStaff(staffId)
+			const types = await fetchTypes()
+			eventTypesRef.current = types
+			setEventTypes(types)
+			setEventTypesReady(true)
+		}
+		setEventTypesReady(false)
+		loadEventTypes()
+	}, [staffId, orgId])
+
 	const fetchData = useCallback(async () => {
 		setLoading(true)
 		try {
 			const { dateFrom, dateTo } = getWeekRange(weekOffset)
-
-			const fetchEventTypes = orgId
-				? () => eventTypeApi.getByOrg(orgId)
-				: () => eventTypeApi.getByStaff(staffId)
-
-			const types =
-				eventTypes.length > 0 ? eventTypes : await fetchEventTypes()
-
-			if (eventTypes.length === 0) {
-				setEventTypes(types)
-			}
-
-			const data = await bookingApi.getByStaff(staffId, dateFrom, dateTo, types)
+			const data = await bookingApi.getByStaff(
+				staffId,
+				dateFrom,
+				dateTo,
+				eventTypesRef.current,
+			)
 			setBookings(data)
 		} catch {
 			// обрабатывается интерцептором toast
 		} finally {
 			setLoading(false)
 		}
-	}, [staffId, orgId, weekOffset, eventTypes])
+	}, [staffId, weekOffset])
 
 	useEffect(() => {
-		fetchData()
-	}, [fetchData])
+		if (eventTypesReady) {
+			fetchData()
+		}
+	}, [fetchData, eventTypesReady])
 
 	const handlePrevWeek = () => setWeekOffset((prev) => prev - 1)
 	const handleNextWeek = () => setWeekOffset((prev) => prev + 1)

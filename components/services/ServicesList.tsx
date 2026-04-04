@@ -64,7 +64,7 @@ function ServicesList({ ownerId, ownerType, currency }: ServicesListProps) {
 	const fetchByOwnerType =
 		ownerType === 'org'
 			? bookingEventTypeApi.getByOrg
-			: bookingEventTypeApi.getByUser
+			: bookingEventTypeApi.getByStaff
 
 	const fetchServices = useCallback(async () => {
 		try {
@@ -201,7 +201,11 @@ function ServicesList({ ownerId, ownerType, currency }: ServicesListProps) {
 				<Empty className="border">
 					<EmptyHeader>
 						<EmptyTitle>{t('empty')}</EmptyTitle>
-						<EmptyDescription>{t('emptyDescription')}</EmptyDescription>
+						<EmptyDescription>
+							{ownerType === 'org'
+								? t('emptyDescription')
+								: t('emptyDescriptionPersonal')}
+						</EmptyDescription>
 					</EmptyHeader>
 				</Empty>
 			) : (

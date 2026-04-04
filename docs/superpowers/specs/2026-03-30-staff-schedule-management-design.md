@@ -15,10 +15,10 @@
 
 ## Роуты
 
-| Роут | Доступ | Назначение |
-|------|--------|------------|
-| `/(org)/org/[orgId]/my-schedule` | member, admin, owner (как сотрудник) | Своё расписание — 3 таба с редактированием |
-| `/(org)/manage/[orgId]/staff-schedule` | admin, owner | Просмотр расписания любого сотрудника — фильтр + 3 readonly таба |
+| Роут                                   | Доступ                               | Назначение                                                       |
+| -------------------------------------- | ------------------------------------ | ---------------------------------------------------------------- |
+| `/(org)/org/[orgId]/my-schedule`       | member, admin, owner (как сотрудник) | Своё расписание — 3 таба с редактированием                       |
+| `/(org)/manage/[orgId]/staff-schedule` | admin, owner                         | Просмотр расписания любого сотрудника — фильтр + 3 readonly таба |
 
 ### Навигация
 
@@ -41,9 +41,9 @@
 
 ```ts
 interface StaffScheduleTabProps {
-  staffId: string
-  orgId: string
-  readOnly: boolean
+	staffId: string
+	orgId: string
+	readOnly: boolean
 }
 ```
 
@@ -75,6 +75,7 @@ interface StaffScheduleTabProps {
 Плоский список букингов, сгруппированный по датам (заголовки-разделители как в мессенджерах).
 
 Каждый букинг отображает:
+
 - Время (начало — конец)
 - Имя клиента
 - Название услуги
@@ -121,6 +122,7 @@ interface StaffScheduleTabProps {
 ### Табы
 
 Все 3 таба в режиме `readOnly=true`:
+
 1. **Расписание** — просмотр недельного расписания сотрудника
 2. **Выходные** — просмотр всех overrides (будущие + прошедшие)
 3. **Букинги** — просмотр букингов, кликабельные для деталей
@@ -165,24 +167,25 @@ interface StaffScheduleTabProps {
 
 ### Существующие эндпоинты (хватает)
 
-| Эндпоинт | Метод | Назначение |
-|-----------|-------|------------|
-| `/api/schedule/template?staffId={id}` | GET | Получить расписание сотрудника |
-| `/api/schedule/template` | PUT | Обновить расписание |
-| `/api/schedule/override` | POST | Создать выходной/override |
-| `/api/bookings/by-staff?staffId={id}&dateFrom={d}&dateTo={d}` | GET | Букинги сотрудника |
-| `/api/org/{id}/staff` | GET | Список сотрудников организации |
+| Эндпоинт                                                      | Метод | Назначение                     |
+| ------------------------------------------------------------- | ----- | ------------------------------ |
+| `/api/schedule/template?staffId={id}`                         | GET   | Получить расписание сотрудника |
+| `/api/schedule/template`                                      | PUT   | Обновить расписание            |
+| `/api/schedule/override`                                      | POST  | Создать выходной/override      |
+| `/api/bookings/by-staff?staffId={id}&dateFrom={d}&dateTo={d}` | GET   | Букинги сотрудника             |
+| `/api/org/{id}/staff`                                         | GET   | Список сотрудников организации |
 
 ### Нужные эндпоинты (проверить на бэке)
 
-| Эндпоинт | Метод | Назначение |
-|-----------|-------|------------|
-| `/api/schedule/overrides?staffId={id}` | GET | Список всех overrides сотрудника |
-| `/api/schedule/override/{id}` | DELETE | Удалить override |
+| Эндпоинт                               | Метод  | Назначение                       |
+| -------------------------------------- | ------ | -------------------------------- |
+| `/api/schedule/overrides?staffId={id}` | GET    | Список всех overrides сотрудника |
+| `/api/schedule/override/{id}`          | DELETE | Удалить override                 |
 
 ### Маппинг user → staffId
 
 Для страницы сотрудника нужен способ определить staffId текущего пользователя в конкретной организации. Варианты (определится при имплементации в зависимости от того что поддерживает бэкенд):
+
 - Через `orgApi.getUserOrgs()` — если возвращает staffId
 - Через `orgApi.getStaff(orgId)` — найти по userId текущего пользователя
 - Отдельный эндпоинт `GET /api/org/{orgId}/me` — возвращает staff member текущего пользователя
@@ -216,16 +219,16 @@ app/[locale]/(org)/
 
 ## Переиспользование существующих компонентов
 
-| Компонент | Где переиспользуется |
-|-----------|---------------------|
-| `ScheduleEditor` | Внутри `ScheduleViewTab` (readOnly=false) |
-| `ScheduleOverrideForm` | Внутри `OverridesTab` (readOnly=false) |
+| Компонент                                    | Где переиспользуется                               |
+| -------------------------------------------- | -------------------------------------------------- |
+| `ScheduleEditor`                             | Внутри `ScheduleViewTab` (readOnly=false)          |
+| `ScheduleOverrideForm`                       | Внутри `OverridesTab` (readOnly=false)             |
 | `BookingDetailPanel` / `BookingDetailsPanel` | Части переиспользуются в Sheet при клике на букинг |
-| `Tabs` (shadcn) | Обёртка для 3 табов на обеих страницах |
-| `Sheet` (shadcn) | Для деталей букинга |
-| `Select` / `Combobox` (shadcn) | Для фильтра сотрудника на админской странице |
-| `Badge` (shadcn) | Для статуса букинга |
-| `Empty` (shadcn) | Для пустых состояний |
+| `Tabs` (shadcn)                              | Обёртка для 3 табов на обеих страницах             |
+| `Sheet` (shadcn)                             | Для деталей букинга                                |
+| `Select` / `Combobox` (shadcn)               | Для фильтра сотрудника на админской странице       |
+| `Badge` (shadcn)                             | Для статуса букинга                                |
+| `Empty` (shadcn)                             | Для пустых состояний                               |
 
 ---
 

@@ -40,11 +40,13 @@
 Возвращает расписания всех активных сотрудников организации одним запросом.
 
 Логика:
+
 1. Получить все активные memberships для orgId
 2. Для каждого userId найти текущий `ScheduleTemplate` (`validFrom <= now`, `validTo` null или > now)
 3. Вернуть массив расписаний с `staffId`
 
 Ответ:
+
 ```json
 [
   {
@@ -67,36 +69,42 @@
 
 ```typescript
 interface UseOrgSchedulesResult {
-  // Расписание конкретного сотрудника
-  getStaffSchedule: (staffId: string) => ScheduleTemplate | null
+	// Расписание конкретного сотрудника
+	getStaffSchedule: (staffId: string) => ScheduleTemplate | null
 
-  // Объединённые рабочие часы на дату (min start, max end)
-  getOrgWorkHours: (dateStr: string) => { workStart: string; workEnd: string } | null
+	// Объединённые рабочие часы на дату (min start, max end)
+	getOrgWorkHours: (
+		dateStr: string,
+	) => { workStart: string; workEnd: string } | null
 
-  // Сотрудники, которые работают в конкретный день
-  getWorkingStaff: (dateStr: string) => OrgStaffMember[]
+	// Сотрудники, которые работают в конкретный день
+	getWorkingStaff: (dateStr: string) => OrgStaffMember[]
 
-  loading: boolean
-  error: string | null
+	loading: boolean
+	error: string | null
 }
 ```
 
 **`getOrgWorkHours(dateStr)`:**
+
 - Определяет dayOfWeek
 - Проходит по всем расписаниям, собирает enabled слоты для этого дня
 - Возвращает `{ workStart: min(все start), workEnd: max(все end) }`
 - Возвращает `null` если ни у кого нет рабочего дня
 
 **`getWorkingStaff(dateStr)`:**
+
 - Фильтрует staffList: оставляет только тех, у кого этот день enabled
 - Используется для фильтрации StaffTabs и для определения серых блоков
 
 **`getStaffSchedule(staffId)`:**
+
 - Возвращает расписание конкретного сотрудника из загруженного кеша
 
 ### Фронтенд: API-клиент
 
 Новый метод в `lib/booking-api-client.ts`:
+
 ```typescript
 scheduleApi.getByOrg(orgId: string): Promise<OrgScheduleEntry[]>
 ```
@@ -123,16 +131,19 @@ getWorkingStaff(dateStr) → фильтрует displayStaff → StaffTabs
 ## Файлы
 
 ### Новые:
+
 - **Бэкенд:** handler в `scheduleController` + repository метод + route
 - **Фронтенд:** `lib/calendar/hooks/useOrgSchedules.ts`
 - **Фронтенд:** метод `scheduleApi.getByOrg` в `lib/booking-api-client.ts`
 
 ### Изменяемые:
+
 - `components/booking/OrgCalendarPage.tsx` — подключить `useOrgSchedules`, заменить логику workHours, фильтровать staff
 - `lib/calendar/strategies/createOrgStrategy.tsx` — серые блоки для недоступного времени
 - `app/[locale]/staff/org/[orgSlug]/page.tsx` — подключить ту же логику для админской страницы
 
 ### Не меняется:
+
 - `CalendarCore.tsx` — по-прежнему получает `workStart/workEnd` и `disabledDays`
 - `useStaffSchedule` — остаётся для загрузки eventTypes
 - Личные страницы сотрудников — не затрагиваются
@@ -140,6 +151,7 @@ getWorkingStaff(dateStr) → фильтрует displayStaff → StaffTabs
 ## Тестовые данные
 
 Создать в БД расписания для 4 сотрудников:
+
 - Іван Петров: 08:00–16:00 (Пн–Пт)
 - Олексій Коваленко: 10:00–18:00 (Пн–Сб)
 - Дмитро Шевченко: 12:00–20:00 (Вт–Сб)

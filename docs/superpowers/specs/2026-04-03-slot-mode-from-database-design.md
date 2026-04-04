@@ -44,17 +44,17 @@
 
 ## Затрагиваемые файлы
 
-| Файл | Действие |
-|------|----------|
-| `components/booking/ScheduleSheetButton.tsx` | Добавить `SlotModeSelector` + instant-save в API |
-| `lib/calendar/strategies/createStaffStrategy.tsx` | Убрать `SlotModeSelector`, читать `slotMode` из schedule |
-| `lib/calendar/strategies/createOrgStrategy.tsx` | Убрать `SlotModeSelector`, читать `slotMode` из schedule |
+| Файл                                               | Действие                                                  |
+| -------------------------------------------------- | --------------------------------------------------------- |
+| `components/booking/ScheduleSheetButton.tsx`       | Добавить `SlotModeSelector` + instant-save в API          |
+| `lib/calendar/strategies/createStaffStrategy.tsx`  | Убрать `SlotModeSelector`, читать `slotMode` из schedule  |
+| `lib/calendar/strategies/createOrgStrategy.tsx`    | Убрать `SlotModeSelector`, читать `slotMode` из schedule  |
 | `lib/calendar/strategies/createClientStrategy.tsx` | Убрать `SlotModeSelector`, не передавать `slotMode` в API |
-| `app/[locale]/book/[staffSlug]/BookingPage.tsx` | Убрать `slotMode` из URL params |
-| `components/booking/OrgCalendarPage.tsx` | Убрать `slotMode` из URL params, `onModeChange` |
-| `components/booking/BookingPanel.tsx` | Убрать `slotMode` prop |
-| `components/booking/BookingPanelParts.tsx` | Убрать `slotMode` из `ServiceInfo` |
-| `components/booking/StaffBookingPanel.tsx` | Убрать `slotMode` prop |
+| `app/[locale]/book/[staffSlug]/BookingPage.tsx`    | Убрать `slotMode` из URL params                           |
+| `components/booking/OrgCalendarPage.tsx`           | Убрать `slotMode` из URL params, `onModeChange`           |
+| `components/booking/BookingPanel.tsx`              | Убрать `slotMode` prop                                    |
+| `components/booking/BookingPanelParts.tsx`         | Убрать `slotMode` из `ServiceInfo`                        |
+| `components/booking/StaffBookingPanel.tsx`         | Убрать `slotMode` prop                                    |
 
 ## Вне скоупа
 

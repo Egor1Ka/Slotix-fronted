@@ -36,7 +36,11 @@ function BookingFormSettings({ ownerId, ownerType }: BookingFormSettingsProps) {
 	// ── Загрузка данных ──
 
 	const loadData = useCallback(async () => {
-		const bookingFields = await bookingFieldApi.getFields(ownerId, ownerType, null)
+		const bookingFields = await bookingFieldApi.getFields(
+			ownerId,
+			ownerType,
+			null,
+		)
 		setFields(bookingFields)
 	}, [ownerId, ownerType])
 

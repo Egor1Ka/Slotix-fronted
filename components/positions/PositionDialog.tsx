@@ -121,7 +121,7 @@ function PositionDialog({
 			type="button"
 			className={`size-7 rounded-full border-2 transition-transform ${
 				isSelected(color)
-					? 'scale-110 border-foreground'
+					? 'border-foreground scale-110'
 					: 'border-transparent hover:border-gray-400'
 			}`}
 			style={{ backgroundColor: color }}
@@ -137,9 +137,7 @@ function PositionDialog({
 				</DialogHeader>
 				<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 					<Field data-invalid={!!errors.name || undefined}>
-						<FieldLabel htmlFor="position-name">
-							{t('name')}
-						</FieldLabel>
+						<FieldLabel htmlFor="position-name">{t('name')}</FieldLabel>
 						<Input
 							id="position-name"
 							placeholder={t('namePlaceholder')}
@@ -149,9 +147,7 @@ function PositionDialog({
 					</Field>
 
 					<Field data-invalid={!!errors.level || undefined}>
-						<FieldLabel htmlFor="position-level">
-							{t('level')}
-						</FieldLabel>
+						<FieldLabel htmlFor="position-level">{t('level')}</FieldLabel>
 						<Input
 							id="position-level"
 							type="number"

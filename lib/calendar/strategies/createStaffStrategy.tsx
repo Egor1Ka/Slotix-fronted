@@ -18,21 +18,16 @@ import {
 	getAvailableSlots,
 	timeToMin,
 	minToTime,
-	type SlotMode,
 	type Slot,
 } from '@/lib/slot-engine'
 import type {
 	EventType,
 	ScheduleTemplate,
 	ScheduleOverride,
-	WeeklyHours,
-	CreateScheduleOverrideBody,
 	CalendarDisplayBooking,
 } from '@/services/configs/booking.types'
 import { ServiceList } from '@/components/booking/ServiceList'
 import { StaffBookingPanel } from '@/components/booking/StaffBookingPanel'
-import { ScheduleSheetButton } from '@/components/booking/ScheduleSheetButton'
-import { Separator } from '@/components/ui/separator'
 import type { ClientInfoData } from '@/components/booking/ClientInfoForm'
 import type { MergedBookingForm } from '@/services/configs/booking-field.types'
 import {
@@ -81,9 +76,6 @@ interface StaffStrategyParams {
 	onResetSlot: () => void
 	isSubmitting: boolean
 	formConfig?: MergedBookingForm | null
-	onSaveSchedule: (weeklyHours: WeeklyHours[]) => Promise<void>
-	onSaveOverride: (body: CreateScheduleOverrideBody) => Promise<void>
-	onSaveSlotMode: (mode: SlotMode) => Promise<void>
 	onBookingClick?: (bookingId: string) => void
 	selectedBooking?: BookingDetail | null
 	onCloseBooking?: () => void
@@ -93,7 +85,6 @@ interface StaffStrategyParams {
 	) => Promise<void>
 	onBookingReschedule?: (bookingId: string, newStartAt: string) => Promise<void>
 	locale: string
-	showScheduleEditor?: boolean
 }
 
 const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
@@ -115,16 +106,12 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 		onResetSlot,
 		isSubmitting,
 		formConfig = null,
-		onSaveSchedule,
-		onSaveOverride,
-		onSaveSlotMode,
 		onBookingClick,
 		selectedBooking = null,
 		onCloseBooking,
 		onBookingStatusChange,
 		onBookingReschedule,
 		locale,
-		showScheduleEditor = false,
 	} = params
 
 	const calendarLocale = getCalendarLocale(locale)
@@ -268,24 +255,11 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 
 		renderSidebar() {
 			return (
-				<>
-					<ServiceList
-						eventTypes={eventTypes}
-						selectedId={selectedEventTypeId}
-						onSelect={onSelectEventType}
-					/>
-					{showScheduleEditor && (
-						<>
-						<Separator className="my-4" />
-							<ScheduleSheetButton
-								schedule={schedule}
-								onSaveSchedule={onSaveSchedule}
-								onSaveOverride={onSaveOverride}
-								onSaveSlotMode={onSaveSlotMode}
-							/>
-						</>
-					)}
-				</>
+				<ServiceList
+					eventTypes={eventTypes}
+					selectedId={selectedEventTypeId}
+					onSelect={onSelectEventType}
+				/>
 			)
 		},
 

@@ -76,11 +76,10 @@ function BookingFieldEditor({
 		</SelectItem>
 	)
 
+	const handleSave = handleSubmit(onSave)
+
 	return (
-		<form
-			onSubmit={handleSubmit(onSave)}
-			className="space-y-4 rounded-lg border p-4"
-		>
+		<div className="space-y-4 rounded-lg border p-4">
 			<Field data-invalid={!!errors.label || undefined}>
 				<FieldLabel htmlFor="field-label">
 					{t('bookingForm.fieldLabel')}
@@ -102,9 +101,7 @@ function BookingFieldEditor({
 							<SelectTrigger>
 								<SelectValue />
 							</SelectTrigger>
-							<SelectContent>
-								{FIELD_TYPES.map(renderTypeOption)}
-							</SelectContent>
+							<SelectContent>{FIELD_TYPES.map(renderTypeOption)}</SelectContent>
 						</Select>
 					)}
 				/>
@@ -125,14 +122,14 @@ function BookingFieldEditor({
 			</Field>
 
 			<div className="flex gap-2">
-				<Button type="submit" disabled={isSaving}>
+				<Button type="button" disabled={isSaving} onClick={handleSave}>
 					{field ? t('bookingForm.editField') : t('bookingForm.addField')}
 				</Button>
 				<Button type="button" variant="outline" onClick={onCancel}>
 					{t('cancel')}
 				</Button>
 			</div>
-		</form>
+		</div>
 	)
 }
 

@@ -79,7 +79,11 @@ interface BookingPageProps {
 	hideSidebar?: boolean
 }
 
-function BookingPage({ staffSlug, publicUrl, hideSidebar = false }: BookingPageProps) {
+function BookingPage({
+	staffSlug,
+	publicUrl,
+	hideSidebar = false,
+}: BookingPageProps) {
 	const searchParams = useSearchParams()
 	const viewConfig = useViewConfig()
 	const canBookForClient = viewConfig.canBookForClient
@@ -174,7 +178,6 @@ function BookingPage({ staffSlug, publicUrl, hideSidebar = false }: BookingPageP
 		navigation.handleSlotSelect(time, slotDate)
 		bookingActions.handleBookingClose()
 	}
-
 
 	// ── Client confirm (no client info) ──
 

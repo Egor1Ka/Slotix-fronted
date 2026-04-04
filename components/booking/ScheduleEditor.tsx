@@ -10,7 +10,10 @@ import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import type { ScheduleTemplate, WeeklyHours } from '@/services/configs/booking.types'
+import type {
+	ScheduleTemplate,
+	WeeklyHours,
+} from '@/services/configs/booking.types'
 
 const timeRangeSchema = z.object({
 	start: z.string().regex(/^\d{2}:\d{2}$/, 'HH:MM'),
@@ -33,9 +36,10 @@ const toFormData = (schedule: ScheduleTemplate): ScheduleFormData => ({
 	weeklyHours: schedule.weeklyHours.map((day) => ({
 		dayOfWeek: day.dayOfWeek,
 		enabled: day.enabled,
-		slots: day.slots.length > 0
-			? day.slots.map((s) => ({ start: s.start, end: s.end }))
-			: [{ start: '10:00', end: '18:00' }],
+		slots:
+			day.slots.length > 0
+				? day.slots.map((s) => ({ start: s.start, end: s.end }))
+				: [{ start: '10:00', end: '18:00' }],
 	})),
 })
 
@@ -66,10 +70,7 @@ function DayRow({ index, control, register, watch }: DayRowProps) {
 					control={control}
 					name={`weeklyHours.${index}.enabled`}
 					render={({ field }) => (
-						<Switch
-							checked={field.value}
-							onCheckedChange={field.onChange}
-						/>
+						<Switch checked={field.value} onCheckedChange={field.onChange} />
 					)}
 				/>
 			</div>
@@ -106,7 +107,10 @@ function ScheduleEditor({ schedule, onSave }: ScheduleEditorProps) {
 	})
 
 	if (Object.keys(errors).length > 0) {
-		console.error('[ScheduleEditor] form errors:', JSON.stringify(errors, null, 2))
+		console.error(
+			'[ScheduleEditor] form errors:',
+			JSON.stringify(errors, null, 2),
+		)
 	}
 
 	const { fields } = useFieldArray({
@@ -116,7 +120,9 @@ function ScheduleEditor({ schedule, onSave }: ScheduleEditorProps) {
 
 	const handleFormSubmit = async (data: ScheduleFormData) => {
 		console.log('[ScheduleEditor] submitting:', JSON.stringify(data, null, 2))
-		const toWeeklyHours = (day: ScheduleFormData['weeklyHours'][number]): WeeklyHours => ({
+		const toWeeklyHours = (
+			day: ScheduleFormData['weeklyHours'][number],
+		): WeeklyHours => ({
 			dayOfWeek: day.dayOfWeek,
 			enabled: day.enabled,
 			slots: day.enabled ? day.slots : [],
@@ -144,9 +150,7 @@ function ScheduleEditor({ schedule, onSave }: ScheduleEditorProps) {
 			className="flex flex-col gap-4"
 		>
 			<h3 className="text-sm font-semibold">{t('schedule.title')}</h3>
-			<div className="flex flex-col gap-1">
-				{fields.map(renderDay)}
-			</div>
+			<div className="flex flex-col gap-1">{fields.map(renderDay)}</div>
 			<Button type="submit" disabled={isSubmitting} className="w-full">
 				{isSubmitting ? t('saving') : t('schedule.save')}
 			</Button>

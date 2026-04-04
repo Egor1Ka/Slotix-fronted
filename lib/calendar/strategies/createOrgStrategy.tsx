@@ -18,22 +18,17 @@ import {
 	getAvailableSlots,
 	timeToMin,
 	minToTime,
-	type SlotMode,
 	type Slot,
 } from '@/lib/slot-engine'
 import type {
 	EventType,
 	ScheduleTemplate,
 	ScheduleOverride,
-	WeeklyHours,
-	CreateScheduleOverrideBody,
 	CalendarDisplayBooking,
 	OrgStaffMember,
 } from '@/services/configs/booking.types'
 import { ServiceList } from '@/components/booking/ServiceList'
 import { StaffBookingPanel } from '@/components/booking/StaffBookingPanel'
-import { ScheduleSheetButton } from '@/components/booking/ScheduleSheetButton'
-import { Separator } from '@/components/ui/separator'
 import type { ClientInfoData } from '@/components/booking/ClientInfoForm'
 import type { MergedBookingForm } from '@/services/configs/booking-field.types'
 import {
@@ -79,9 +74,6 @@ interface OrgStrategyParams {
 	loading?: boolean
 	staffList?: OrgStaffMember[]
 	overrides?: ScheduleOverride[]
-	onSaveSchedule?: (weeklyHours: WeeklyHours[]) => Promise<void>
-	onSaveOverride?: (body: CreateScheduleOverrideBody) => Promise<void>
-	onSaveSlotMode?: (mode: SlotMode) => Promise<void>
 }
 
 const normalizeDate = (d: string): string =>
@@ -141,9 +133,6 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 		loading = false,
 		staffList = [],
 		overrides = [],
-		onSaveSchedule,
-		onSaveOverride,
-		onSaveSlotMode,
 	} = params
 
 	const calendarLocale = getCalendarLocale(locale)
@@ -331,25 +320,12 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 			}
 
 			return (
-				<>
-					<ServiceList
-						eventTypes={eventTypes}
-						selectedId={selectedEventTypeId}
-						onSelect={onSelectEventType ?? (() => {})}
-						loading={loading}
-					/>
-					{onSaveSchedule && onSaveOverride && onSaveSlotMode && schedule && (
-						<>
-							<Separator className="my-4" />
-							<ScheduleSheetButton
-								schedule={schedule}
-								onSaveSchedule={onSaveSchedule}
-								onSaveOverride={onSaveOverride}
-								onSaveSlotMode={onSaveSlotMode}
-							/>
-						</>
-					)}
-				</>
+				<ServiceList
+					eventTypes={eventTypes}
+					selectedId={selectedEventTypeId}
+					onSelect={onSelectEventType ?? (() => {})}
+					loading={loading}
+				/>
 			)
 		},
 

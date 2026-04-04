@@ -13,6 +13,7 @@
 ### Task 1: Добавить SlotModeSelector в ScheduleSheetButton
 
 **Files:**
+
 - Modify: `components/booking/ScheduleSheetButton.tsx`
 
 - [ ] **Step 1: Добавить props для slotMode save**
@@ -89,6 +90,7 @@ git commit -m "feat: добавить SlotModeSelector в ScheduleSheetButton с
 ### Task 2: Прокинуть onSaveSlotMode в BookingPage (личный кабинет)
 
 **Files:**
+
 - Modify: `app/[locale]/book/[staffSlug]/BookingPage.tsx`
 
 - [ ] **Step 1: Добавить handler для сохранения slotMode**
@@ -129,6 +131,7 @@ git commit -m "feat: прокинуть onSaveSlotMode в BookingPage"
 ### Task 3: Прокинуть onSaveSlotMode в OrgCalendarPage
 
 **Files:**
+
 - Modify: `components/booking/OrgCalendarPage.tsx`
 
 - [ ] **Step 1: Добавить handler для сохранения slotMode**
@@ -170,6 +173,7 @@ git commit -m "feat: прокинуть onSaveSlotMode в OrgCalendarPage"
 ### Task 4: Принять onSaveSlotMode в createStaffStrategy и передать в ScheduleSheetButton
 
 **Files:**
+
 - Modify: `lib/calendar/strategies/createStaffStrategy.tsx`
 
 - [ ] **Step 1: Добавить onSaveSlotMode в StaffStrategyParams**
@@ -214,6 +218,7 @@ git commit -m "feat: прокинуть onSaveSlotMode через createStaffStr
 ### Task 5: Принять onSaveSlotMode в createOrgStrategy и добавить ScheduleSheetButton
 
 **Files:**
+
 - Modify: `lib/calendar/strategies/createOrgStrategy.tsx`
 
 - [ ] **Step 1: Добавить в OrgStrategyParams**
@@ -234,17 +239,19 @@ interface OrgStrategyParams {
 В `renderSidebar()`, после `<ServiceList>`, если `onSaveSlotMode` передан:
 
 ```tsx
-{onSaveSchedule && onSaveOverride && onSaveSlotMode && schedule && (
-	<>
-		<Separator className="my-4" />
-		<ScheduleSheetButton
-			schedule={schedule}
-			onSaveSchedule={onSaveSchedule}
-			onSaveOverride={onSaveOverride}
-			onSaveSlotMode={onSaveSlotMode}
-		/>
-	</>
-)}
+{
+	onSaveSchedule && onSaveOverride && onSaveSlotMode && schedule && (
+		<>
+			<Separator className="my-4" />
+			<ScheduleSheetButton
+				schedule={schedule}
+				onSaveSchedule={onSaveSchedule}
+				onSaveOverride={onSaveOverride}
+				onSaveSlotMode={onSaveSlotMode}
+			/>
+		</>
+	)
+}
 ```
 
 - [ ] **Step 3: Импортировать ScheduleSheetButton**
@@ -265,6 +272,7 @@ git commit -m "feat: прокинуть onSaveSlotMode через createOrgStrat
 ### Task 6: Убрать SlotModeSelector из сайдбаров всех стратегий
 
 **Files:**
+
 - Modify: `lib/calendar/strategies/createStaffStrategy.tsx`
 - Modify: `lib/calendar/strategies/createOrgStrategy.tsx`
 - Modify: `lib/calendar/strategies/createClientStrategy.tsx`
@@ -317,6 +325,7 @@ git commit -m "refactor: убрать SlotModeSelector из сайдбаров �
 ### Task 7: Убрать slotMode и onModeChange из props стратегий
 
 **Files:**
+
 - Modify: `lib/calendar/strategies/createStaffStrategy.tsx`
 - Modify: `lib/calendar/strategies/createOrgStrategy.tsx`
 - Modify: `lib/calendar/strategies/createClientStrategy.tsx`
@@ -376,6 +385,7 @@ git commit -m "refactor: убрать slotMode/onModeChange из props стра�
 ### Task 8: Убрать slotMode prop из BookingPanel, StaffBookingPanel, BookingPanelParts
 
 **Files:**
+
 - Modify: `components/booking/BookingPanelParts.tsx`
 - Modify: `components/booking/BookingPanel.tsx`
 - Modify: `components/booking/StaffBookingPanel.tsx`
@@ -457,6 +467,7 @@ git commit -m "refactor: убрать slotMode prop из BookingPanel, StaffBook
 ### Task 9: Убрать slotMode из URL search params
 
 **Files:**
+
 - Modify: `app/[locale]/book/[staffSlug]/BookingPage.tsx`
 - Modify: `components/booking/OrgCalendarPage.tsx`
 - Modify: `lib/calendar/hooks/useCalendarNavigation.ts`
@@ -524,6 +535,7 @@ git commit -m "refactor: убрать slotMode из URL search params и navigat
 ### Task 10: Убрать передачу slotMode в slotsApi для клиентского вида
 
 **Files:**
+
 - Modify: `lib/calendar/strategies/createClientStrategy.tsx`
 
 - [ ] **Step 1: Найти вызов slotsApi в клиентской стратегии**
@@ -550,6 +562,7 @@ git commit -m "refactor: убрать slotMode из slotsApi в клиентск
 ### Task 11: Проверить компиляцию и финальная очистка
 
 **Files:**
+
 - Possibly: any files with leftover unused imports
 
 - [ ] **Step 1: Проверить TypeScript компиляцию**

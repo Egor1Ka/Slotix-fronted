@@ -1,0 +1,4 @@
+{"type":"server-started","port":54838,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:54838","screen_dir":"/Users/egorzozula/Desktop/Slotix-fronted/Slotix-fronted/.superpowers/brainstorm/39660-1774861928/content","state_dir":"/Users/egorzozula/Desktop/Slotix-fronted/Slotix-fronted/.superpowers/brainstorm/39660-1774861928/state"}
+{"type":"screen-added","file":"/Users/egorzozula/Desktop/Slotix-fronted/Slotix-fronted/.superpowers/brainstorm/39660-1774861928/content/overlap-style.html"}
+{"type":"screen-added","file":"/Users/egorzozula/Desktop/Slotix-fronted/Slotix-fronted/.superpowers/brainstorm/39660-1774861928/content/waiting.html"}
+{"type":"server-stopped","reason":"idle timeout"}

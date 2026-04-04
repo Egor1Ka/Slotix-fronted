@@ -61,8 +61,14 @@ const buildCalendarLocale = (locale: string): CalendarLocale => {
 
 	return {
 		days: Array.from({ length: 7 }, formatDayWith(shortDay, WEEK_START_SUNDAY)),
-		daysLong: Array.from({ length: 7 }, formatDayWith(longDay, WEEK_START_SUNDAY)),
-		daysShort: Array.from({ length: 7 }, formatDayWith(shortDay, WEEK_START_MONDAY)),
+		daysLong: Array.from(
+			{ length: 7 },
+			formatDayWith(longDay, WEEK_START_SUNDAY),
+		),
+		daysShort: Array.from(
+			{ length: 7 },
+			formatDayWith(shortDay, WEEK_START_MONDAY),
+		),
 		months: Array.from({ length: 12 }, buildMonthName(shortMonth)),
 		monthsFull: Array.from({ length: 12 }, buildMonthName(longMonth)),
 	}
@@ -78,8 +84,10 @@ const getCalendarLocale = (locale: string): CalendarLocale => {
 	return built
 }
 
-const minutesToPx = (min: number, displayStart: number = DEFAULT_DISPLAY_START): number =>
-	((min - displayStart) / 60) * PX_PER_HOUR
+const minutesToPx = (
+	min: number,
+	displayStart: number = DEFAULT_DISPLAY_START,
+): number => ((min - displayStart) / 60) * PX_PER_HOUR
 
 const durationToPx = (min: number): number => (min / 60) * PX_PER_HOUR
 
@@ -184,14 +192,39 @@ const findEventType = <T extends { id: string }>(
 	id: string | null,
 ): T | null => eventTypes.find((e) => e.id === id) ?? null
 
+const normalizeDate = (dateStr: string): string =>
+	dateStr.includes('T') ? dateStr.split('T')[0] : dateStr
+
 const getWorkHoursForDate = (
-	weeklyHours: Array<{ dayOfWeek: number; enabled: boolean; slots: Array<{ start: string; end: string }> }>,
+	weeklyHours: Array<{
+		dayOfWeek: number
+		enabled: boolean
+		slots: Array<{ start: string; end: string }>
+	}>,
 	dateStr: string,
+	overrides?: Array<{
+		staffId: string
+		date: string
+		enabled: boolean
+		slots: Array<{ start: string; end: string }>
+	}>,
+	staffId?: string,
 ): { workStart: string; workEnd: string } | null => {
+	if (overrides && staffId) {
+		const dateOnly = normalizeDate(dateStr)
+		const matchesDate = (o: { date: string; staffId: string }): boolean =>
+			normalizeDate(o.date) === dateOnly && o.staffId === staffId
+		const override = overrides.find(matchesDate)
+		if (override) {
+			const isFullDayOff = !override.enabled && override.slots.length === 0
+			if (isFullDayOff) return null
+			// Частичный выходной (enabled=false со слотами перерыва) — показываем базовое расписание
+			// Перерыв обрабатывается slot engine на бэкенде
+		}
+	}
+
 	const dayOfWeek = new Date(dateStr).getDay()
-	const daySchedule = weeklyHours.find(
-		(d) => d.dayOfWeek === dayOfWeek,
-	)
+	const daySchedule = weeklyHours.find((d) => d.dayOfWeek === dayOfWeek)
 	if (!daySchedule || !daySchedule.enabled || daySchedule.slots.length === 0)
 		return null
 	return {
@@ -204,13 +237,17 @@ interface StaffLike {
 	id: string
 }
 
-const getFirstStaffId = <T extends StaffLike>(staffList: T[] | null): string | null => {
+const getFirstStaffId = <T extends StaffLike>(
+	staffList: T[] | null,
+): string | null => {
 	if (!staffList || !staffList[0]) return null
 	return staffList[0].id
 }
 
-const filterByStaffId = <T extends StaffLike>(staffId: string) => (staff: T): boolean =>
-	staff.id === staffId
+const filterByStaffId =
+	<T extends StaffLike>(staffId: string) =>
+	(staff: T): boolean =>
+		staff.id === staffId
 
 const getStaffToLoad = <T extends StaffLike>(
 	staffList: T[],
@@ -223,7 +260,8 @@ const getStaffToLoad = <T extends StaffLike>(
 
 // ── Overlap Detection ──
 
-const isBooking = (block: CalendarBlock): boolean => block.blockType === 'booking'
+const isBooking = (block: CalendarBlock): boolean =>
+	block.blockType === 'booking'
 
 const blocksOverlap = (a: CalendarBlock, b: CalendarBlock): boolean =>
 	a.startMin < b.startMin + b.duration && b.startMin < a.startMin + a.duration
@@ -282,7 +320,8 @@ const assignColumns = (group: CalendarBlock[]): CalendarBlock[] => {
 		const overlapping = sorted.filter(
 			(other) => assignments.has(other.id) && blocksOverlap(block, other),
 		)
-		const getAssignedColumn = (other: CalendarBlock): number => assignments.get(other.id) ?? 0
+		const getAssignedColumn = (other: CalendarBlock): number =>
+			assignments.get(other.id) ?? 0
 		const usedColumns = overlapping.map(getAssignedColumn)
 		assignments.set(block.id, findFirstFreeColumn(usedColumns))
 	})

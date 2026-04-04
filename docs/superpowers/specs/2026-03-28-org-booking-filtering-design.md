@@ -26,6 +26,7 @@
 Ответ: массив `OrgStaffMember[]` (тот же формат что и `GET /org/:id/staff`).
 
 **Файлы для изменения:**
+
 - `src/services/eventTypeServices.js` — новая функция `getStaffForEventType(eventTypeId)`
 - `src/controllers/eventTypeController.js` — новый хендлер `handleGetStaffForEventType`
 - `src/routes/subroutes/eventTypeRoutes.js` — новый роут `GET /:id/staff`
@@ -35,6 +36,7 @@
 #### Двусторонняя фильтрация
 
 **Состояние:**
+
 - `selectedStaffId: string | null` — выбранный сотрудник (первый по умолчанию)
 - `selectedEventTypeId: string | null` — выбранная услуга (null = не выбрана)
 - `filteredStaff: OrgStaffMember[]` — отфильтрованные сотрудники
@@ -61,6 +63,7 @@
 ### API-клиент (фронтенд)
 
 Новый метод в `booking-api-client.ts`:
+
 ```typescript
 eventTypeApi.getStaff(eventTypeId: string): Promise<OrgStaffMember[]>
 ```
@@ -76,12 +79,14 @@ eventTypeApi.getStaff(eventTypeId: string): Promise<OrgStaffMember[]>
 ## Затронутые файлы
 
 ### Бэкенд (`BackendTemplate`)
+
 - `src/services/eventTypeServices.js` — новая функция
 - `src/controllers/eventTypeController.js` — новый хендлер
 - `src/routes/subroutes/eventTypeRoutes.js` — новый роут
 - `src/repository/membershipRepository.js` — возможно новый query (по positionId)
 
 ### Фронтенд (`Slotix-fronted`)
+
 - `lib/booking-api-client.ts` — новый метод API
 - `components/booking/OrgCalendarPage.tsx` — логика фильтрации
 - `lib/calendar/strategies/createOrgStrategy.tsx` — обновление стратегии для публичного контекста

@@ -50,9 +50,4 @@ const extractStaffIds = (staff: OrgStaffMember[]): string[] => {
 }
 
 export type { DateRange, LoadedRange }
-export {
-	computeDateRange,
-	isWithinLoadedRange,
-	buildStaffKey,
-	extractStaffIds,
-}
+export { computeDateRange, isWithinLoadedRange, buildStaffKey, extractStaffIds }

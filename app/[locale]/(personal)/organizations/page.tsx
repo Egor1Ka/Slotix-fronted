@@ -12,7 +12,7 @@ function OrganizationsPage() {
 	const { orgs, isLoading, refetch } = useUserOrgs()
 
 	const renderOrgCard = (org: OrgListItem) => (
-		<OrgCard key={org.id} org={org} />
+		<OrgCard key={org.id} org={org} onInvitationHandled={refetch} />
 	)
 
 	return (

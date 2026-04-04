@@ -24,9 +24,7 @@ function useUserOrgs(): UseUserOrgsResult {
 			setOrgs(response.data)
 		} catch (err) {
 			const message =
-				err instanceof Error
-					? err.message
-					: 'Failed to fetch organizations'
+				err instanceof Error ? err.message : 'Failed to fetch organizations'
 			setError(message)
 		} finally {
 			setIsLoading(false)

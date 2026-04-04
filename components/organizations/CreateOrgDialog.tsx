@@ -148,20 +148,13 @@ function CreateOrgDialog({ onCreated }: CreateOrgDialogProps) {
 							control={control}
 							name="currency"
 							render={({ field }) => (
-								<Select
-									value={field.value}
-									onValueChange={field.onChange}
-								>
+								<Select value={field.value} onValueChange={field.onChange}>
 									<SelectTrigger>
 										<SelectValue />
 									</SelectTrigger>
 									<SelectContent>
-										<SelectItem value="UAH">
-											UAH (&#8372;)
-										</SelectItem>
-										<SelectItem value="USD">
-											USD ($)
-										</SelectItem>
+										<SelectItem value="UAH">UAH (&#8372;)</SelectItem>
+										<SelectItem value="USD">USD ($)</SelectItem>
 									</SelectContent>
 								</Select>
 							)}
@@ -170,9 +163,7 @@ function CreateOrgDialog({ onCreated }: CreateOrgDialogProps) {
 					</Field>
 
 					<Field data-invalid={!!errors.brandColor || undefined}>
-						<FieldLabel htmlFor="brandColor">
-							{t('form.brandColor')}
-						</FieldLabel>
+						<FieldLabel htmlFor="brandColor">{t('form.brandColor')}</FieldLabel>
 						<div className="mb-2 flex flex-wrap gap-2">
 							{PRESET_COLORS.map(renderColorOption)}
 						</div>
@@ -185,9 +176,7 @@ function CreateOrgDialog({ onCreated }: CreateOrgDialogProps) {
 					</Field>
 
 					<Field data-invalid={!!errors.logoUrl || undefined}>
-						<FieldLabel htmlFor="logoUrl">
-							{t('form.logo')}
-						</FieldLabel>
+						<FieldLabel htmlFor="logoUrl">{t('form.logo')}</FieldLabel>
 						<Input
 							id="logoUrl"
 							placeholder={t('form.logoPlaceholder')}

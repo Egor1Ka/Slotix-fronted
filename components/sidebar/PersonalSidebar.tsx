@@ -3,7 +3,13 @@
 import { usePathname } from 'next/navigation'
 import { useLocale, useTranslations } from 'next-intl'
 import Link from 'next/link'
-import { Building2, Calendar, CalendarCog, Settings2, UserCircle } from 'lucide-react'
+import {
+	Building2,
+	Calendar,
+	CalendarCog,
+	Settings2,
+	UserCircle,
+} from 'lucide-react'
 import {
 	Sidebar,
 	SidebarContent,

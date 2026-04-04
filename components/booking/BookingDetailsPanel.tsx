@@ -5,6 +5,12 @@ import { useTranslations } from 'next-intl'
 import { Separator } from '@/components/ui/separator'
 import type { BookingStatus } from '@/services/configs/booking.types'
 
+interface CustomFieldEntry {
+	fieldId: string
+	label: string
+	value: string
+}
+
 interface BookingDetail {
 	id: string
 	eventTypeId: string
@@ -18,6 +24,7 @@ interface BookingDetail {
 	status: BookingStatus
 	inviteeSnapshot: { name: string; email: string | null; phone: string | null }
 	clientNotes: string | null
+	customFieldValues?: CustomFieldEntry[]
 	payment: { status: string; amount: number; currency: string }
 	createdAt: string
 	updatedAt: string
@@ -51,7 +58,8 @@ const STATUS_TRANSITIONS: Record<string, string[]> = {
 const ACTION_BUTTON_CLASS: Record<string, string> = {
 	confirmed: 'bg-primary text-primary-foreground hover:bg-primary/90',
 	completed: 'bg-green-600 text-white hover:bg-green-700',
-	cancelled: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+	cancelled:
+		'bg-destructive text-destructive-foreground hover:bg-destructive/90',
 	no_show: 'bg-muted text-muted-foreground hover:bg-muted/80',
 }
 
@@ -62,10 +70,18 @@ const computeDurationMin = (startAt: string, endAt: string): number => {
 }
 
 const formatTime = (isoString: string): string =>
-	new Date(isoString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+	new Date(isoString).toLocaleTimeString([], {
+		hour: '2-digit',
+		minute: '2-digit',
+	})
 
 const formatDate = (isoString: string): string =>
-	new Date(isoString).toLocaleDateString([], { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })
+	new Date(isoString).toLocaleDateString([], {
+		weekday: 'short',
+		year: 'numeric',
+		month: 'short',
+		day: 'numeric',
+	})
 
 function PanelHeader({
 	eventTypeName,
@@ -115,10 +131,21 @@ function TimeGrid({
 			<span className="text-muted-foreground">{t('endTime')}</span>
 			<span className="font-medium">{formatTime(booking.endAt)}</span>
 			<span className="text-muted-foreground">{t('duration')}</span>
-			<span className="font-medium">{durationMin} {t('min')}</span>
+			<span className="font-medium">
+				{durationMin} {t('min')}
+			</span>
 			<span className="text-muted-foreground">{t('schedule.date')}</span>
 			<span className="font-medium">{formatDate(booking.startAt)}</span>
 		</div>
+	)
+}
+
+function CustomFieldRow({ entry }: { entry: CustomFieldEntry }) {
+	return (
+		<>
+			<span className="text-muted-foreground">{entry.label}</span>
+			<span className="font-medium">{entry.value}</span>
+		</>
 	)
 }
 
@@ -130,6 +157,11 @@ function ClientSection({
 	t: ReturnType<typeof useTranslations<'booking'>>
 }) {
 	const { name, email, phone } = booking.inviteeSnapshot
+	const customFields = booking.customFieldValues ?? []
+
+	const renderCustomField = (entry: CustomFieldEntry) => (
+		<CustomFieldRow key={entry.fieldId} entry={entry} />
+	)
 
 	return (
 		<div className="flex flex-col gap-2">
@@ -148,9 +180,12 @@ function ClientSection({
 						<span className="font-medium">{phone}</span>
 					</>
 				)}
+				{customFields.map(renderCustomField)}
 			</div>
 			{booking.clientNotes && (
-				<p className="text-muted-foreground text-xs italic">{booking.clientNotes}</p>
+				<p className="text-muted-foreground text-xs italic">
+					{booking.clientNotes}
+				</p>
 			)}
 		</div>
 	)
@@ -163,7 +198,10 @@ function StatusAndPayment({
 	booking: BookingDetail
 	t: ReturnType<typeof useTranslations<'booking'>>
 }) {
-	const statusCfg = STATUS_CONFIG[booking.status] ?? { bg: 'bg-gray-100', text: 'text-gray-800' }
+	const statusCfg = STATUS_CONFIG[booking.status] ?? {
+		bg: 'bg-gray-100',
+		text: 'text-gray-800',
+	}
 
 	return (
 		<div className="flex flex-col gap-2">
@@ -207,7 +245,9 @@ function ActionButtons({
 	}
 
 	const renderButton = (nextStatus: string) => {
-		const buttonClass = ACTION_BUTTON_CLASS[nextStatus] ?? 'bg-muted text-muted-foreground hover:bg-muted/80'
+		const buttonClass =
+			ACTION_BUTTON_CLASS[nextStatus] ??
+			'bg-muted text-muted-foreground hover:bg-muted/80'
 		const isLoading = pendingStatus === nextStatus
 
 		return (
@@ -226,9 +266,7 @@ function ActionButtons({
 	}
 
 	return (
-		<div className="flex flex-wrap gap-2">
-			{transitions.map(renderButton)}
-		</div>
+		<div className="flex flex-wrap gap-2">{transitions.map(renderButton)}</div>
 	)
 }
 

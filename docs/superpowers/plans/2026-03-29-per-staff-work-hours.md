@@ -13,10 +13,12 @@
 ## File Structure
 
 ### New files:
+
 - `BackendTemplate/src/controllers/scheduleController.js` — добавить `handleGetTemplatesByOrg`
 - `Slotix-fronted/lib/calendar/hooks/useOrgSchedules.ts` — хук batch-загрузки расписаний
 
 ### Modified files:
+
 - `BackendTemplate/src/repository/scheduleTemplateRepository.js` — добавить `findActiveTemplatesByOrg`
 - `BackendTemplate/src/services/scheduleServices.js` — добавить `getActiveTemplatesByOrg`
 - `BackendTemplate/src/routes/subroutes/scheduleRoutes.js` — добавить route
@@ -29,6 +31,7 @@
 ### Task 1: Backend — Repository метод для batch-загрузки расписаний
 
 **Files:**
+
 - Modify: `BackendTemplate/src/repository/scheduleTemplateRepository.js`
 - Modify: `BackendTemplate/src/repository/membershipRepository.js`
 
@@ -53,11 +56,13 @@ const findActiveTemplatesByOrg = async (orgId, date) => {
 ```
 
 Импорт вверху файла:
+
 ```javascript
 const { getActiveMembersByOrg } = require('./membershipRepository')
 ```
 
 Добавить в `module.exports`:
+
 ```javascript
 module.exports = {
 	// ... existing exports
@@ -83,6 +88,7 @@ git commit -m "feat(schedule): добавить batch-загрузку расп�
 ### Task 2: Backend — Service + Controller + Route
 
 **Files:**
+
 - Modify: `BackendTemplate/src/services/scheduleServices.js`
 - Modify: `BackendTemplate/src/controllers/scheduleController.js`
 - Modify: `BackendTemplate/src/routes/subroutes/scheduleRoutes.js`
@@ -90,8 +96,11 @@ git commit -m "feat(schedule): добавить batch-загрузку расп�
 - [ ] **Step 1: Добавить сервис `getActiveTemplatesByOrg`**
 
 В `scheduleServices.js`:
+
 ```javascript
-const { findActiveTemplatesByOrg } = require('../repository/scheduleTemplateRepository')
+const {
+	findActiveTemplatesByOrg,
+} = require('../repository/scheduleTemplateRepository')
 
 const getActiveTemplatesByOrg = async (orgId) => {
 	const today = new Date()
@@ -108,6 +117,7 @@ module.exports = {
 - [ ] **Step 2: Добавить handler `handleGetTemplatesByOrg`**
 
 В `scheduleController.js`:
+
 ```javascript
 const { getActiveTemplatesByOrg } = require('../services/scheduleServices')
 
@@ -133,8 +143,11 @@ module.exports = {
 - [ ] **Step 3: Добавить route**
 
 В `scheduleRoutes.js`:
+
 ```javascript
-const { handleGetTemplatesByOrg } = require('../../controllers/scheduleController')
+const {
+	handleGetTemplatesByOrg,
+} = require('../../controllers/scheduleController')
 
 // Добавить перед существующими routes
 router.get('/templates/by-org/:orgId', handleGetTemplatesByOrg)
@@ -218,6 +231,7 @@ Expected: `4 templates`
 ### Task 4: Frontend — API-клиент для batch-загрузки
 
 **Files:**
+
 - Modify: `Slotix-fronted/lib/booking-api-client.ts`
 
 - [ ] **Step 1: Добавить `getSchedulesByOrg` в booking-api-client**
@@ -225,7 +239,9 @@ Expected: `4 templates`
 ```typescript
 // Рядом с существующим getScheduleTemplate
 
-const getSchedulesByOrg = async (orgId: string): Promise<ScheduleTemplate[]> => {
+const getSchedulesByOrg = async (
+	orgId: string,
+): Promise<ScheduleTemplate[]> => {
 	const raw = await get<BackendScheduleTemplate[]>(
 		`/schedule/templates/by-org/${orgId}`,
 	)
@@ -234,6 +250,7 @@ const getSchedulesByOrg = async (orgId: string): Promise<ScheduleTemplate[]> => 
 ```
 
 Добавить в `scheduleApi`:
+
 ```typescript
 export const scheduleApi = {
 	getTemplate: getScheduleTemplate,
@@ -256,6 +273,7 @@ git commit -m "feat(schedule): API метод scheduleApi.getByOrg для batch-
 ### Task 5: Frontend — хук `useOrgSchedules`
 
 **Files:**
+
 - Create: `Slotix-fronted/lib/calendar/hooks/useOrgSchedules.ts`
 - Modify: `Slotix-fronted/lib/calendar/hooks/index.ts`
 
@@ -266,13 +284,21 @@ git commit -m "feat(schedule): API метод scheduleApi.getByOrg для batch-
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { scheduleApi } from '@/lib/booking-api-client'
-import type { ScheduleTemplate, WeeklyHours } from '@/services/configs/booking.types'
+import type {
+	ScheduleTemplate,
+	WeeklyHours,
+} from '@/services/configs/booking.types'
 import type { OrgStaffMember } from '@/services/configs/booking.types'
 
 interface UseOrgSchedulesResult {
 	getStaffSchedule: (staffId: string) => ScheduleTemplate | null
-	getOrgWorkHours: (dateStr: string) => { workStart: string; workEnd: string } | null
-	getWorkingStaff: (dateStr: string, allStaff: OrgStaffMember[]) => OrgStaffMember[]
+	getOrgWorkHours: (
+		dateStr: string,
+	) => { workStart: string; workEnd: string } | null
+	getWorkingStaff: (
+		dateStr: string,
+		allStaff: OrgStaffMember[],
+	) => OrgStaffMember[]
 	getDisabledDays: (staffId: string | null) => number[]
 	schedules: ScheduleTemplate[]
 	loading: boolean
@@ -283,13 +309,19 @@ interface UseOrgSchedulesResult {
 const getDayOfWeek = (dateStr: string): number => new Date(dateStr).getDay()
 
 // Проверить, работает ли сотрудник в этот день
-const isDayEnabled = (weeklyHours: WeeklyHours[], dayOfWeek: number): boolean => {
+const isDayEnabled = (
+	weeklyHours: WeeklyHours[],
+	dayOfWeek: number,
+): boolean => {
 	const day = weeklyHours.find((d) => d.dayOfWeek === dayOfWeek)
 	return Boolean(day && day.enabled && day.slots.length > 0)
 }
 
 // Получить рабочие часы за день из расписания
-const getDaySlots = (weeklyHours: WeeklyHours[], dayOfWeek: number): { start: string; end: string }[] => {
+const getDaySlots = (
+	weeklyHours: WeeklyHours[],
+	dayOfWeek: number,
+): { start: string; end: string }[] => {
 	const day = weeklyHours.find((d) => d.dayOfWeek === dayOfWeek)
 	if (!day || !day.enabled) return []
 	return day.slots
@@ -297,11 +329,17 @@ const getDaySlots = (weeklyHours: WeeklyHours[], dayOfWeek: number): { start: st
 
 // Найти самое раннее начало среди всех слотов
 const findEarliestStart = (allSlots: { start: string }[]): string =>
-	allSlots.reduce((min, slot) => (slot.start < min ? slot.start : min), allSlots[0].start)
+	allSlots.reduce(
+		(min, slot) => (slot.start < min ? slot.start : min),
+		allSlots[0].start,
+	)
 
 // Найти самое позднее окончание среди всех слотов
 const findLatestEnd = (allSlots: { end: string }[]): string =>
-	allSlots.reduce((max, slot) => (slot.end > max ? slot.end : max), allSlots[0].end)
+	allSlots.reduce(
+		(max, slot) => (slot.end > max ? slot.end : max),
+		allSlots[0].end,
+	)
 
 const useOrgSchedules = (orgId: string): UseOrgSchedulesResult => {
 	const [schedules, setSchedules] = useState<ScheduleTemplate[]>([])
@@ -324,7 +362,8 @@ const useOrgSchedules = (orgId: string): UseOrgSchedulesResult => {
 				loadedOrgIdRef.current = orgId
 				hasLoadedRef.current = true
 			} catch (err) {
-				const message = err instanceof Error ? err.message : 'Failed to load schedules'
+				const message =
+					err instanceof Error ? err.message : 'Failed to load schedules'
 				setError(message)
 			} finally {
 				setLoading(false)
@@ -337,7 +376,8 @@ const useOrgSchedules = (orgId: string): UseOrgSchedulesResult => {
 	// Расписание конкретного сотрудника
 	const getStaffSchedule = useCallback(
 		(staffId: string): ScheduleTemplate | null => {
-			const matchesStaff = (s: ScheduleTemplate): boolean => s.staffId === staffId
+			const matchesStaff = (s: ScheduleTemplate): boolean =>
+				s.staffId === staffId
 			return schedules.find(matchesStaff) ?? null
 		},
 		[schedules],
@@ -348,7 +388,10 @@ const useOrgSchedules = (orgId: string): UseOrgSchedulesResult => {
 		(dateStr: string): { workStart: string; workEnd: string } | null => {
 			const dayOfWeek = getDayOfWeek(dateStr)
 
-			const collectSlots = (acc: { start: string; end: string }[], schedule: ScheduleTemplate) => {
+			const collectSlots = (
+				acc: { start: string; end: string }[],
+				schedule: ScheduleTemplate,
+			) => {
 				const slots = getDaySlots(schedule.weeklyHours, dayOfWeek)
 				return [...acc, ...slots]
 			}
@@ -417,6 +460,7 @@ export { useOrgSchedules }
 - [ ] **Step 2: Добавить экспорт в index.ts**
 
 В `lib/calendar/hooks/index.ts` добавить:
+
 ```typescript
 export { useOrgSchedules } from './useOrgSchedules'
 export type { UseOrgSchedulesResult } from './useOrgSchedules'
@@ -435,6 +479,7 @@ git commit -m "feat(schedule): хук useOrgSchedules для batch-загруз�
 ### Task 6: Frontend — Интеграция в OrgCalendarPage
 
 **Files:**
+
 - Modify: `Slotix-fronted/components/booking/OrgCalendarPage.tsx`
 
 - [ ] **Step 1: Добавить import**
@@ -468,7 +513,9 @@ const orgSchedules = useOrgSchedules(orgSlug)
 // ── Derived data ──
 
 // Рабочие часы: если выбран сотрудник — его, иначе объединённые
-const staffSchedule = selectedStaffId ? orgSchedules.getStaffSchedule(selectedStaffId) : null
+const staffSchedule = selectedStaffId
+	? orgSchedules.getStaffSchedule(selectedStaffId)
+	: null
 const scheduleSource = staffSchedule ?? schedule ?? DEFAULT_SCHEDULE
 
 const workHoursData = selectedStaffId
@@ -489,16 +536,21 @@ const disabledDays = orgSchedules.getDisabledDays(selectedStaffId)
 ```typescript
 // Фильтрация: рабочий день + фильтрация по услугам (если включена)
 const workingStaff = orgSchedules.getWorkingStaff(dateStr, staffList)
-const staffAfterServiceFilter = viewConfig.filterByStaffCapability ? filtering.filteredStaff : workingStaff
+const staffAfterServiceFilter = viewConfig.filterByStaffCapability
+	? filtering.filteredStaff
+	: workingStaff
 const displayStaff = viewConfig.filterByStaffCapability
-	? staffAfterServiceFilter.filter((s) => workingStaff.some((ws) => ws.id === s.id))
+	? staffAfterServiceFilter.filter((s) =>
+			workingStaff.some((ws) => ws.id === s.id),
+		)
 	: workingStaff
 ```
 
 - [ ] **Step 5: Обновить loading**
 
 ```typescript
-const initialLoading = orgLoading || orgSchedules.loading || (scheduleLoading && !schedule)
+const initialLoading =
+	orgLoading || orgSchedules.loading || (scheduleLoading && !schedule)
 const contentLoading = scheduleLoading || bookingsLoading || filtering.loading
 ```
 
@@ -531,6 +583,7 @@ git commit -m "feat(schedule): интеграция useOrgSchedules в OrgCalend
 
 Открыть: `http://localhost:3000/uk/org/69c5364f7a84add67bb68cfa?date=2026-03-30` (понедельник)
 Expected:
+
 - Все 4 сотрудника в табах (все работают в Пн)
 - Сетка: 08:00–20:00 (Іван 08:00 + Дмитро до 20:00)
 
@@ -538,6 +591,7 @@ Expected:
 
 Открыть: `?date=2026-03-28` (суббота)
 Expected:
+
 - Только Олексій и Дмитро в табах (остальные не работают в Сб)
 - Сетка: 10:00–20:00
 
@@ -545,6 +599,7 @@ Expected:
 
 Открыть: `?date=2026-03-29` (воскресенье)
 Expected:
+
 - Нет сотрудников в табах
 - Серая сетка (никто не работает)
 
@@ -552,6 +607,7 @@ Expected:
 
 Кликнуть на Івана в будний день
 Expected:
+
 - Сетка сужается до 08:00–16:00
 - disabledDays = Сб, Вс
 

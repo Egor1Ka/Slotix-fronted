@@ -3,7 +3,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { bookingApi } from '@/lib/booking-api-client'
 import { toCalendarDisplayBooking } from '@/lib/booking-utils'
-import type { OrgStaffMember, EventType, CalendarDisplayBooking } from '@/services/configs/booking.types'
+import type {
+	OrgStaffMember,
+	EventType,
+	CalendarDisplayBooking,
+} from '@/services/configs/booking.types'
 import type { ViewMode } from '../types'
 import {
 	computeDateRange,
@@ -51,7 +55,8 @@ const useStaffBookings = (
 		const staffKey = buildStaffKey(staffIds)
 		const range = computeDateRange(dateStr, view)
 
-		if (isWithinLoadedRange(loadedRangeRef.current, dateStr, view, staffKey)) return
+		if (isWithinLoadedRange(loadedRangeRef.current, dateStr, view, staffKey))
+			return
 
 		const loadBookings = async () => {
 			if (!hasLoadedRef.current) setLoading(true)
@@ -59,14 +64,20 @@ const useStaffBookings = (
 
 			try {
 				const fetchAndMap = async (staff: OrgStaffMember) => {
-					const staffBookings = await bookingApi.getByStaff(staff.id, range.from, range.to, eventTypes)
-					const mapWithStaff = toCalendarDisplayBooking({ name: staff.name, avatar: staff.avatar })
+					const staffBookings = await bookingApi.getByStaff(
+						staff.id,
+						range.from,
+						range.to,
+						eventTypes,
+					)
+					const mapWithStaff = toCalendarDisplayBooking({
+						name: staff.name,
+						avatar: staff.avatar,
+					})
 					return staffBookings.map(mapWithStaff)
 				}
 
-				const bookingArrays = await Promise.all(
-					staffToLoad.map(fetchAndMap),
-				)
+				const bookingArrays = await Promise.all(staffToLoad.map(fetchAndMap))
 
 				const allBookings = bookingArrays.flat()
 
@@ -74,7 +85,8 @@ const useStaffBookings = (
 				loadedRangeRef.current = { ...range, view, staffKey }
 				hasLoadedRef.current = true
 			} catch (err) {
-				const message = err instanceof Error ? err.message : 'Failed to load bookings'
+				const message =
+					err instanceof Error ? err.message : 'Failed to load bookings'
 				setError(message)
 			} finally {
 				setLoading(false)

@@ -56,11 +56,7 @@ function ProfileInfoBlock({
 		<div className="flex flex-col gap-3 rounded-lg border p-4">
 			<div className="flex items-center gap-3">
 				{isOrg && imageSource ? (
-					<img
-						src={imageSource}
-						alt={name}
-						className="size-8 rounded"
-					/>
+					<img src={imageSource} alt={name} className="size-8 rounded" />
 				) : (
 					<Avatar className="size-8">
 						<AvatarImage src={imageSource ?? undefined} />

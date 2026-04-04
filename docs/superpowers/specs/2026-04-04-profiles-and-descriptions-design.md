@@ -3,6 +3,7 @@
 ## Цель
 
 Добавить возможность заполнять описания/контактную информацию для трёх уровней:
+
 - **Организация** — описание компании, адрес, телефон, вебсайт
 - **Личный пользователь** (работает сам на себя) — описание, адрес, телефон, вебсайт
 - **Сотрудник в организации** — bio (короткое описание)
@@ -21,13 +22,13 @@
 
 ```typescript
 interface OrgByIdResponse {
-  id: string
-  name: string
-  logo: string | null
-  description: string | null
-  address: string | null
-  phone: string | null
-  website: string | null
+	id: string
+	name: string
+	logo: string | null
+	description: string | null
+	address: string | null
+	phone: string | null
+	website: string | null
 }
 ```
 
@@ -37,16 +38,16 @@ interface OrgByIdResponse {
 
 ```typescript
 interface CreateOrgBody {
-  name: string
-  currency: 'UAH' | 'USD'
-  logoUrl?: string
-  brandColor?: string
-  defaultTimezone?: string
-  defaultCountry?: string
-  description?: string
-  address?: string
-  phone?: string
-  website?: string
+	name: string
+	currency: 'UAH' | 'USD'
+	logoUrl?: string
+	brandColor?: string
+	defaultTimezone?: string
+	defaultCountry?: string
+	description?: string
+	address?: string
+	phone?: string
+	website?: string
 }
 ```
 
@@ -54,13 +55,13 @@ interface CreateOrgBody {
 
 ```typescript
 interface UpdateOrgBody {
-  name?: string
-  description?: string | null
-  address?: string | null
-  phone?: string | null
-  website?: string | null
-  logoUrl?: string
-  brandColor?: string
+	name?: string
+	description?: string | null
+	address?: string | null
+	phone?: string | null
+	website?: string | null
+	logoUrl?: string
+	brandColor?: string
 }
 ```
 
@@ -70,16 +71,16 @@ interface UpdateOrgBody {
 
 ```typescript
 interface User {
-  id: string
-  name: string
-  email: string
-  avatar: string
-  description: string | null
-  address: string | null
-  phone: string | null
-  website: string | null
-  createdAt: string
-  updatedAt: string
+	id: string
+	name: string
+	email: string
+	avatar: string
+	description: string | null
+	address: string | null
+	phone: string | null
+	website: string | null
+	createdAt: string
+	updatedAt: string
 }
 ```
 
@@ -87,11 +88,11 @@ interface User {
 
 ```typescript
 interface UpdateUserBody {
-  name?: string
-  description?: string | null
-  address?: string | null
-  phone?: string | null
-  website?: string | null
+	name?: string
+	description?: string | null
+	address?: string | null
+	phone?: string | null
+	website?: string | null
 }
 ```
 
@@ -101,27 +102,27 @@ interface UpdateUserBody {
 
 ```typescript
 interface StaffMember {
-  id: string
-  name: string
-  avatar: string
-  position: string | null
-  bio: string | null
+	id: string
+	name: string
+	avatar: string
+	position: string | null
+	bio: string | null
 }
 
 interface StaffBySlugResponse {
-  id: string
-  name: string
-  avatar: string
-  position: string | null
-  bio: string | null
-  orgId: string | null
-  locationIds: string[]
-  description: string | null
-  address: string | null
-  phone: string | null
-  website: string | null
-  orgName: string | null
-  orgLogo: string | null
+	id: string
+	name: string
+	avatar: string
+	position: string | null
+	bio: string | null
+	orgId: string | null
+	locationIds: string[]
+	description: string | null
+	address: string | null
+	phone: string | null
+	website: string | null
+	orgName: string | null
+	orgLogo: string | null
 }
 ```
 
@@ -141,13 +142,13 @@ interface StaffBySlugResponse {
 
 **Форма (react-hook-form + zod):**
 
-| Поле | Тип | Валидация |
-|------|-----|-----------|
-| `name` | Input | Обязательно, min 2 символа |
+| Поле          | Тип      | Валидация                      |
+| ------------- | -------- | ------------------------------ |
+| `name`        | Input    | Обязательно, min 2 символа     |
 | `description` | Textarea | Опционально, max 1000 символов |
-| `address` | Input | Опционально |
-| `phone` | Input | Опционально, формат телефона |
-| `website` | Input | Опционально, формат URL |
+| `address`     | Input    | Опционально                    |
+| `phone`       | Input    | Опционально, формат телефона   |
+| `website`     | Input    | Опционально, формат URL        |
 
 **API:** `PUT /api/org/{orgId}` с `UpdateOrgBody`.
 
@@ -159,13 +160,13 @@ interface StaffBySlugResponse {
 
 **Форма:**
 
-| Поле | Тип | Валидация |
-|------|-----|-----------|
-| `name` | Input | Обязательно, min 2 символа |
+| Поле          | Тип      | Валидация                      |
+| ------------- | -------- | ------------------------------ |
+| `name`        | Input    | Обязательно, min 2 символа     |
 | `description` | Textarea | Опционально, max 1000 символов |
-| `address` | Input | Опционально |
-| `phone` | Input | Опционально, формат телефона |
-| `website` | Input | Опционально, формат URL |
+| `address`     | Input    | Опционально                    |
+| `phone`       | Input    | Опционально, формат телефона   |
+| `website`     | Input    | Опционально, формат URL        |
 
 **API:** `PUT /api/user/profile` с `UpdateUserBody`.
 
@@ -177,8 +178,8 @@ interface StaffBySlugResponse {
 
 **Форма:**
 
-| Поле | Тип | Валидация |
-|------|-----|-----------|
+| Поле  | Тип      | Валидация                     |
+| ----- | -------- | ----------------------------- |
 | `bio` | Textarea | Опционально, max 500 символов |
 
 **API:** `PATCH /api/org/{orgId}/staff/{staffId}` с `{ bio: string | null }`.
@@ -192,6 +193,7 @@ interface StaffBySlugResponse {
 Показывается над списком услуг / календарём на странице `/book/...`.
 
 **Если букинг через организацию** (staff имеет `orgId`):
+
 - Лого организации + название
 - Описание организации (если есть)
 - Адрес — текст с иконкой `MapPin`
@@ -200,6 +202,7 @@ interface StaffBySlugResponse {
 - При выборе сотрудника — под аватаром/именем/позицией отображается `bio`
 
 **Если букинг личный** (staff без `orgId`):
+
 - Аватар + имя пользователя
 - Описание (если есть)
 - Адрес, телефон, вебсайт (аналогично орге)
@@ -217,6 +220,7 @@ interface StaffBySlugResponse {
 ### 3.3 Данные
 
 Все данные для инфо-блока приходят из одного публичного запроса `GET /api/staff/{slug}` (расширенный `StaffBySlugResponse`):
+
 - `description`, `address`, `phone`, `website` — контактные данные (от орги или от юзера)
 - `orgName`, `orgLogo` — название и лого организации (если есть)
 - `bio` — описание сотрудника
@@ -238,25 +242,30 @@ interface StaffBySlugResponse {
 ## 5. Файлы, затронутые изменениями
 
 ### Типы и API-конфиги
+
 - `services/configs/org.types.ts` — типы организации
 - `services/configs/org.config.ts` — эндпоинты организации (добавить update)
 - `services/configs/booking.types.ts` — типы Staff, User
 - `services/configs/user.config.ts` — эндпоинты пользователя
 
 ### Новые страницы
+
 - `app/[locale]/(org)/manage/[orgId]/profile/page.tsx` — профиль организации
 - `app/[locale]/(personal)/profile/page.tsx` — мой профиль
 
 ### Компоненты
+
 - Новый компонент формы профиля (переиспользуемый для орги и личного)
 - Сайдбар организации — добавить пункт "Профіль"
 - Сайдбар личный — добавить пункт "Мій профіль"
 
 ### Букинг
+
 - `components/booking/BookingPanel.tsx` или новый компонент — инфо-блок
 - `app/[locale]/book/[staffSlug]/BookingPage.tsx` — передача данных
 
 ### Очистка slug
+
 - Все файлы, использующие `org.slug`
 
 ---
@@ -264,6 +273,7 @@ interface StaffBySlugResponse {
 ## 6. i18n
 
 Новые ключи перевода в `i18n/messages/{en,uk}.json`:
+
 - `profile.title` — "Профіль" / "Profile"
 - `profile.description` — "Опис" / "Description"
 - `profile.address` — "Адреса" / "Address"

@@ -16,9 +16,7 @@ export type { UseCalendarNavigationResult } from './useCalendarNavigation'
 export { useBookingActions } from './useBookingActions'
 export type { UseBookingActionsResult } from './useBookingActions'
 
-export {
-	computeDateRange,
-} from './helpers'
+export { computeDateRange } from './helpers'
 
 export { useOrgFiltering } from './useOrgFiltering'
 export type { UseOrgFilteringResult } from './useOrgFiltering'

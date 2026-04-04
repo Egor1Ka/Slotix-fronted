@@ -15,13 +15,15 @@ interface OverrideListItemProps {
 	onDelete: (id: string) => Promise<void>
 }
 
-const formatDate = (dateStr: string): string =>
-	new Date(dateStr + 'T00:00:00').toLocaleDateString(undefined, {
+const formatDate = (dateStr: string): string => {
+	const normalized = dateStr.includes('T') ? dateStr : dateStr + 'T00:00:00'
+	return new Date(normalized).toLocaleDateString(undefined, {
 		weekday: 'short',
 		day: 'numeric',
 		month: 'short',
 		year: 'numeric',
 	})
+}
 
 const formatSlots = (slots: { start: string; end: string }[]): string =>
 	slots.map((s) => `${s.start} — ${s.end}`).join(', ')
@@ -41,8 +43,17 @@ function OverrideListItem({
 		setIsDeleting(false)
 	}
 
-	const label = override.enabled ? t('customHours') : t('dayOff')
-	const variant = override.enabled ? 'secondary' : 'destructive'
+	const isPartialDayOff = !override.enabled && override.slots.length > 0
+	const label = override.enabled
+		? t('customHours')
+		: isPartialDayOff
+			? t('customHours')
+			: t('dayOff')
+	const variant = override.enabled
+		? 'secondary'
+		: isPartialDayOff
+			? 'secondary'
+			: 'destructive'
 	const canDelete = !readOnly && !isPast
 
 	return (
@@ -63,7 +74,7 @@ function OverrideListItem({
 						{label}
 					</Badge>
 				</div>
-				{override.enabled && override.slots.length > 0 && (
+				{override.slots.length > 0 && (
 					<span className="text-muted-foreground text-xs">
 						{formatSlots(override.slots)}
 					</span>

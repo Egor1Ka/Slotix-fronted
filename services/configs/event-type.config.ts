@@ -1,6 +1,9 @@
 import { postData, patchData, deleteData } from '@/services/api/methods'
 import { endpoint } from '@/services/api/types'
-import type { CreateEventTypeBody, UpdateEventTypeBody } from './event-type.types'
+import type {
+	CreateEventTypeBody,
+	UpdateEventTypeBody,
+} from './event-type.types'
 import type { EventType } from './booking.types'
 import type { ApiResponse } from './user.config'
 

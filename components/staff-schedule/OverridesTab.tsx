@@ -142,7 +142,11 @@ function OverridesTab({ staffId, orgId, readOnly }: OverridesTabProps) {
 
 			{!readOnly && showForm && (
 				<div className="rounded-lg border p-4">
-					<ScheduleOverrideForm staffId={staffId} orgId={orgId} onSave={handleSave} />
+					<ScheduleOverrideForm
+						staffId={staffId}
+						orgId={orgId}
+						onSave={handleSave}
+					/>
 				</div>
 			)}
 
@@ -160,7 +164,7 @@ function OverridesTab({ staffId, orgId, readOnly }: OverridesTabProps) {
 
 			{futureOverrides.length > 0 && (
 				<div className="flex flex-col gap-2">
-					<h4 className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
+					<h4 className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
 						{t('futureOverrides')}
 					</h4>
 					<div className="flex flex-col gap-1.5">
@@ -173,7 +177,7 @@ function OverridesTab({ staffId, orgId, readOnly }: OverridesTabProps) {
 
 			{pastOverrides.length > 0 && (
 				<div className="flex flex-col gap-2">
-					<h4 className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
+					<h4 className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
 						{t('pastOverrides')}
 					</h4>
 					<div className="flex flex-col gap-1.5">

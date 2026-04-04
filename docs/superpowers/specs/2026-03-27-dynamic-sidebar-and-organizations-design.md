@@ -58,19 +58,21 @@ Layouts for `(dashboard)`, `(personal)`, `(org)` call `getUser()` server-side. I
 Returns organizations the authenticated user belongs to.
 
 Response:
+
 ```json
 [
-  {
-    "id": "org_abc123",
-    "name": "Барбершоп Чемпіон",
-    "logo": "https://...",
-    "role": "owner",
-    "status": "active"
-  }
+	{
+		"id": "org_abc123",
+		"name": "Барбершоп Чемпіон",
+		"logo": "https://...",
+		"role": "owner",
+		"status": "active"
+	}
 ]
 ```
 
 Implementation:
+
 - Query `Membership` by `userId` from auth token
 - Populate `Organization` data for each membership
 - Return array of `{ id, name, logo, role, status }`
@@ -80,14 +82,15 @@ Implementation:
 Creates a new organization. Authenticated user becomes owner.
 
 Request body:
+
 ```json
 {
-  "name": "Моя організація",
-  "currency": "UAH",
-  "logoUrl": "https://...",
-  "brandColor": "#1a1a2e",
-  "defaultTimezone": "Europe/Kyiv",
-  "defaultCountry": "UA"
+	"name": "Моя організація",
+	"currency": "UAH",
+	"logoUrl": "https://...",
+	"brandColor": "#1a1a2e",
+	"defaultTimezone": "Europe/Kyiv",
+	"defaultCountry": "UA"
 }
 ```
 
@@ -96,6 +99,7 @@ Request body:
 - All other fields optional with sensible defaults
 
 Side effects:
+
 - Creates `Membership` with `role: "owner"`, `status: "active"` for the requesting user
 
 Response: created organization object with `id`.
@@ -103,6 +107,7 @@ Response: created organization object with `id`.
 ### Model Changes
 
 **Organization model** — add field:
+
 ```js
 currency: { type: String, enum: ["UAH", "USD"], default: "UAH" }
 ```
@@ -199,14 +204,14 @@ Route: `(dashboard)/organizations/page.tsx`
 - Opens `Dialog` (modal) with form
 - Form fields:
 
-| Field | Type | Required | Default |
-|-------|------|----------|---------|
-| Назва | Input text | Yes | — |
-| Валюта | Select (UAH / USD) | Yes | UAH |
-| Колір бренду | Color palette picker + HEX input | No | — |
-| Логотип | Input URL | No | — |
-| Таймзона | Select | No | Europe/Kyiv |
-| Країна | Select | No | UA |
+| Field        | Type                             | Required | Default     |
+| ------------ | -------------------------------- | -------- | ----------- |
+| Назва        | Input text                       | Yes      | —           |
+| Валюта       | Select (UAH / USD)               | Yes      | UAH         |
+| Колір бренду | Color palette picker + HEX input | No       | —           |
+| Логотип      | Input URL                        | No       | —           |
+| Таймзона     | Select                           | No       | Europe/Kyiv |
+| Країна       | Select                           | No       | UA          |
 
 - Validation: `zod` + `react-hook-form`
 - On success: `toast.success("Організацію створено")` + refetch org list
@@ -219,6 +224,7 @@ Route: `(dashboard)/organizations/page.tsx`
 `(public)` route group — for non-authenticated visitors.
 
 ### `/org/[orgId]` — Public org booking
+
 - Org header (name, logo)
 - Staff selection (tabs or cards)
 - Calendar with available slots
@@ -226,6 +232,7 @@ Route: `(dashboard)/organizations/page.tsx`
 - No sidebar, no navigation header
 
 ### `/book/[staffSlug]` — Public staff booking
+
 - Staff info (avatar, name, position)
 - Calendar with available slots
 - Booking form
@@ -240,26 +247,28 @@ These pages reuse existing calendar/booking components, just wrapped in the `(pu
 ### New files
 
 **`services/configs/org.types.ts`**
+
 ```ts
 interface OrgListItem {
-  id: string
-  name: string
-  logo: string | null
-  role: "owner" | "admin" | "member"
-  status: "active" | "invited" | "suspended" | "left"
+	id: string
+	name: string
+	logo: string | null
+	role: 'owner' | 'admin' | 'member'
+	status: 'active' | 'invited' | 'suspended' | 'left'
 }
 
 interface CreateOrgBody {
-  name: string
-  currency: "UAH" | "USD"
-  logoUrl?: string
-  brandColor?: string
-  defaultTimezone?: string
-  defaultCountry?: string
+	name: string
+	currency: 'UAH' | 'USD'
+	logoUrl?: string
+	brandColor?: string
+	defaultTimezone?: string
+	defaultCountry?: string
 }
 ```
 
 **`services/configs/org.config.ts`**
+
 ```ts
 - getUserOrgs:  GET  /api/user/organizations  → OrgListItem[]
 - getById:      GET  /api/org/:id             → OrgByIdResponse
@@ -282,6 +291,7 @@ interface CreateOrgBody {
 ## Files Changed/Created
 
 ### Backend (BackendTemplate)
+
 - `src/models/Organization.js` — add `currency` field
 - `src/routes/subroutes/orgRoutes.js` — add `POST /`
 - `src/routes/subroutes/userRoutes.js` — add `GET /organizations`
@@ -294,6 +304,7 @@ interface CreateOrgBody {
 - `src/dto/orgDto.js` — add `toOrgListItemDto`
 
 ### Frontend (Slotix-fronted)
+
 - `app/[locale]/(public)/layout.tsx` — new, no sidebar
 - `app/[locale]/(public)/org/[orgId]/page.tsx` — moved from current location
 - `app/[locale]/(public)/book/[staffSlug]/page.tsx` — moved from current location

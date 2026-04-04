@@ -2,60 +2,93 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { scheduleApi } from '@/lib/booking-api-client'
-import type { ScheduleTemplate, WeeklyHours } from '@/services/configs/booking.types'
+import type {
+	ScheduleTemplate,
+	ScheduleOverride,
+	WeeklyHours,
+} from '@/services/configs/booking.types'
 import type { OrgStaffMember } from '@/services/configs/booking.types'
 
 interface UseOrgSchedulesResult {
 	getStaffSchedule: (staffId: string) => ScheduleTemplate | null
-	getOrgWorkHours: (dateStr: string) => { workStart: string; workEnd: string } | null
-	getWorkingStaff: (dateStr: string, allStaff: OrgStaffMember[]) => OrgStaffMember[]
+	getOrgWorkHours: (
+		dateStr: string,
+	) => { workStart: string; workEnd: string } | null
+	getWorkingStaff: (
+		dateStr: string,
+		allStaff: OrgStaffMember[],
+	) => OrgStaffMember[]
 	getDisabledDays: (staffId: string | null) => number[]
+	reloadSchedules: () => void
 	schedules: ScheduleTemplate[]
+	overrides: ScheduleOverride[]
 	loading: boolean
 	error: string | null
 }
 
 const getDayOfWeek = (dateStr: string): number => new Date(dateStr).getDay()
 
-const isDayEnabled = (weeklyHours: WeeklyHours[], dayOfWeek: number): boolean => {
+const isDayEnabled = (
+	weeklyHours: WeeklyHours[],
+	dayOfWeek: number,
+): boolean => {
 	const day = weeklyHours.find((d) => d.dayOfWeek === dayOfWeek)
 	return Boolean(day && day.enabled && day.slots.length > 0)
 }
 
-const getDaySlots = (weeklyHours: WeeklyHours[], dayOfWeek: number): { start: string; end: string }[] => {
+const getDaySlots = (
+	weeklyHours: WeeklyHours[],
+	dayOfWeek: number,
+): { start: string; end: string }[] => {
 	const day = weeklyHours.find((d) => d.dayOfWeek === dayOfWeek)
 	if (!day || !day.enabled) return []
 	return day.slots
 }
 
 const findEarliestStart = (allSlots: { start: string }[]): string =>
-	allSlots.reduce((min, slot) => (slot.start < min ? slot.start : min), allSlots[0].start)
+	allSlots.reduce(
+		(min, slot) => (slot.start < min ? slot.start : min),
+		allSlots[0].start,
+	)
 
 const findLatestEnd = (allSlots: { end: string }[]): string =>
-	allSlots.reduce((max, slot) => (slot.end > max ? slot.end : max), allSlots[0].end)
+	allSlots.reduce(
+		(max, slot) => (slot.end > max ? slot.end : max),
+		allSlots[0].end,
+	)
 
 const useOrgSchedules = (orgId: string): UseOrgSchedulesResult => {
 	const [schedules, setSchedules] = useState<ScheduleTemplate[]>([])
+	const [overrides, setOverrides] = useState<ScheduleOverride[]>([])
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
-	const loadedOrgIdRef = useRef<string | null>(null)
 	const hasLoadedRef = useRef(false)
+	const [reloadTick, setReloadTick] = useState(0)
+
+	const incrementTick = (n: number): number => n + 1
+
+	const reloadSchedules = useCallback(() => {
+		setReloadTick(incrementTick)
+	}, [])
 
 	useEffect(() => {
 		if (!orgId) return
-		if (loadedOrgIdRef.current === orgId) return
 
 		const loadSchedules = async () => {
 			if (!hasLoadedRef.current) setLoading(true)
 			setError(null)
 
 			try {
-				const data = await scheduleApi.getByOrg(orgId)
-				setSchedules(data)
-				loadedOrgIdRef.current = orgId
+				const [schedulesData, overridesData] = await Promise.all([
+					scheduleApi.getByOrg(orgId),
+					scheduleApi.getOverridesByOrg(orgId),
+				])
+				setSchedules(schedulesData)
+				setOverrides(overridesData)
 				hasLoadedRef.current = true
 			} catch (err) {
-				const message = err instanceof Error ? err.message : 'Failed to load schedules'
+				const message =
+					err instanceof Error ? err.message : 'Failed to load schedules'
 				setError(message)
 			} finally {
 				setLoading(false)
@@ -63,21 +96,40 @@ const useOrgSchedules = (orgId: string): UseOrgSchedulesResult => {
 		}
 
 		loadSchedules()
-	}, [orgId])
+	}, [orgId, reloadTick])
 
 	const getStaffSchedule = useCallback(
 		(staffId: string): ScheduleTemplate | null => {
-			const matchesStaff = (s: ScheduleTemplate): boolean => s.staffId === staffId
+			const matchesStaff = (s: ScheduleTemplate): boolean =>
+				s.staffId === staffId
 			return schedules.find(matchesStaff) ?? null
 		},
 		[schedules],
 	)
 
+	const normalizeDate = (d: string): string =>
+		d.includes('T') ? d.split('T')[0] : d
+
 	const getOrgWorkHours = useCallback(
 		(dateStr: string): { workStart: string; workEnd: string } | null => {
 			const dayOfWeek = getDayOfWeek(dateStr)
+			const dateOnly = normalizeDate(dateStr)
 
-			const collectSlots = (acc: { start: string; end: string }[], schedule: ScheduleTemplate) => {
+			const collectSlots = (
+				acc: { start: string; end: string }[],
+				schedule: ScheduleTemplate,
+			) => {
+				const staffOverride = overrides.find(
+					(o) =>
+						o.staffId === schedule.staffId &&
+						normalizeDate(o.date) === dateOnly,
+				)
+				if (staffOverride) {
+					const isFullDayOff =
+						!staffOverride.enabled && staffOverride.slots.length === 0
+					if (isFullDayOff) return acc
+					// Частичный выходной — используем базовое расписание (перерыв на бэкенде)
+				}
 				const slots = getDaySlots(schedule.weeklyHours, dayOfWeek)
 				return [...acc, ...slots]
 			}
@@ -90,20 +142,30 @@ const useOrgSchedules = (orgId: string): UseOrgSchedulesResult => {
 				workEnd: findLatestEnd(allSlots),
 			}
 		},
-		[schedules],
+		[schedules, overrides],
 	)
 
 	const getWorkingStaff = useCallback(
 		(dateStr: string, allStaff: OrgStaffMember[]): OrgStaffMember[] => {
 			const dayOfWeek = getDayOfWeek(dateStr)
+			const dateOnly = normalizeDate(dateStr)
 			const hasScheduleForDay = (staff: OrgStaffMember): boolean => {
+				const staffOverride = overrides.find(
+					(o) => o.staffId === staff.id && normalizeDate(o.date) === dateOnly,
+				)
+				if (staffOverride) {
+					const isFullDayOff =
+						!staffOverride.enabled && staffOverride.slots.length === 0
+					if (isFullDayOff) return false
+					// Частичный выходной (перерыв) — сотрудник всё равно работает
+				}
 				const schedule = schedules.find((s) => s.staffId === staff.id)
 				if (!schedule) return false
 				return isDayEnabled(schedule.weeklyHours, dayOfWeek)
 			}
 			return allStaff.filter(hasScheduleForDay)
 		},
-		[schedules],
+		[schedules, overrides],
 	)
 
 	const getDisabledDays = useCallback(
@@ -129,7 +191,9 @@ const useOrgSchedules = (orgId: string): UseOrgSchedulesResult => {
 		getOrgWorkHours,
 		getWorkingStaff,
 		getDisabledDays,
+		reloadSchedules,
 		schedules,
+		overrides,
 		loading,
 		error,
 	}

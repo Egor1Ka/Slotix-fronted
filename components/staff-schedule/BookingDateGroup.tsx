@@ -32,7 +32,7 @@ function BookingDateGroup({
 	return (
 		<div data-slot="booking-date-group" className="flex flex-col gap-2">
 			<div className="bg-muted/50 sticky top-0 z-10 -mx-1 rounded-md px-3 py-1.5">
-				<h4 className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
+				<h4 className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
 					{formatDateHeader(date)}
 				</h4>
 			</div>

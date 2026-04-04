@@ -2,7 +2,6 @@
 
 import { useMemo, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { type SlotMode } from '@/lib/slot-engine'
 import {
 	type ViewMode,
 	CalendarProvider,
@@ -11,7 +10,6 @@ import {
 } from '@/lib/calendar'
 import { useTranslations } from 'next-intl'
 import { useLocale } from 'next-intl'
-import { toast } from 'sonner'
 import { useViewConfig } from '@/lib/calendar/CalendarViewConfigContext'
 import {
 	formatDateISO,
@@ -19,7 +17,6 @@ import {
 	getFirstStaffId,
 	getStaffToLoad,
 } from '@/lib/calendar/utils'
-import { scheduleApi } from '@/lib/booking-api-client'
 import { StaffTabs } from '@/components/booking/StaffTabs'
 import {
 	useOrgInfo,
@@ -74,7 +71,6 @@ function OrgCalendarPage({
 	const searchParams = useSearchParams()
 	const viewConfig = useViewConfig()
 	const t = useTranslations('booking')
-	const tCalendar = useTranslations('calendar')
 	const locale = useLocale()
 
 	// ── URL state ──
@@ -115,9 +111,12 @@ function OrgCalendarPage({
 
 	// ID сотрудников, работающих в выбранный день — для фильтрации услуг
 	const toStaffId = (s: OrgStaffMember): string => s.id
+	const getWorkingStaff = orgSchedules.getWorkingStaff
+	const currentDateStr = dateStr
 	const workingStaffIds = useMemo(
-		() => orgSchedules.getWorkingStaff(dateStr, staffList).map(toStaffId),
-		[orgSchedules, dateStr, staffList],
+		() => getWorkingStaff(currentDateStr, staffList).map(toStaffId),
+		// eslint-disable-next-line react-hooks/preserve-manual-memoization
+		[getWorkingStaff, currentDateStr, staffList],
 	)
 
 	const filtering = useOrgFiltering({
@@ -208,64 +207,6 @@ function OrgCalendarPage({
 		resetBookingState()
 	}
 
-	// ── Сохранение расписания сотрудника из org-календаря ──
-
-	const handleSaveSchedule = async (
-		weeklyHours: ScheduleTemplate['weeklyHours'],
-	) => {
-		if (!activeStaffId) return
-		try {
-			await scheduleApi.updateTemplate(
-				activeStaffId,
-				orgSlug,
-				weeklyHours,
-			)
-			orgSchedules.reloadSchedules()
-			toast.success(tCalendar('scheduleSaved'))
-		} catch (err) {
-			const message =
-				err instanceof Error ? err.message : tCalendar('scheduleSaveError')
-			toast.error(message)
-			throw err
-		}
-	}
-
-	const handleSaveOverride = async (
-		body: Parameters<typeof scheduleApi.createOverride>[0],
-	) => {
-		try {
-			await scheduleApi.createOverride(body)
-			orgSchedules.reloadSchedules()
-			toast.success(tCalendar('overrideSaved'))
-		} catch (err) {
-			const message =
-				err instanceof Error ? err.message : tCalendar('overrideSaveError')
-			toast.error(message)
-			throw err
-		}
-	}
-
-	const handleSaveSlotMode = async (mode: SlotMode) => {
-		if (!activeStaffId) return
-		const staffSchedule = orgSchedules.getStaffSchedule(activeStaffId)
-		if (!staffSchedule) return
-		try {
-			await scheduleApi.updateTemplate(
-				activeStaffId,
-				orgSlug,
-				staffSchedule.weeklyHours,
-				mode,
-			)
-			orgSchedules.reloadSchedules()
-			toast.success(tCalendar('scheduleSaved'))
-		} catch (err) {
-			const message =
-				err instanceof Error ? err.message : tCalendar('scheduleSaveError')
-			toast.error(message)
-			throw err
-		}
-	}
-
 	// ── Guards ──
 
 	if (initialLoading) {
@@ -351,9 +292,6 @@ function OrgCalendarPage({
 		loading: contentLoading,
 		staffList,
 		overrides: orgSchedules.overrides,
-		onSaveSchedule: handleSaveSchedule,
-		onSaveOverride: handleSaveOverride,
-		onSaveSlotMode: handleSaveSlotMode,
 	})
 
 	// Фильтрация: рабочий день + фильтрация по услугам

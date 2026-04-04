@@ -7,9 +7,11 @@ import { Spinner } from '@/components/ui/spinner'
 import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import { ScheduleEditor } from '@/components/booking/ScheduleEditor'
+import { SlotModeSelector } from '@/components/booking/SlotModeSelector'
 import { cn } from '@/lib/utils'
 import { getCalendarLocale } from '@/lib/calendar/utils'
 import { scheduleApi } from '@/lib/booking-api-client'
+import type { SlotMode } from '@/lib/slot-engine'
 import type {
 	ScheduleTemplate,
 	WeeklyHours,
@@ -70,9 +72,7 @@ function ReadOnlySchedule({ schedule }: { schedule: ScheduleTemplate }) {
 
 	return (
 		<div data-slot="readonly-schedule" className="rounded-lg border p-4">
-			<div className="flex flex-col">
-				{schedule.weeklyHours.map(renderDay)}
-			</div>
+			<div className="flex flex-col">{schedule.weeklyHours.map(renderDay)}</div>
 		</div>
 	)
 }
@@ -111,6 +111,37 @@ function ScheduleViewTab({ staffId, orgId, readOnly }: ScheduleViewTabProps) {
 		}
 	}
 
+	const [savingMode, setSavingMode] = useState(false)
+	const [localSlotMode, setLocalSlotMode] = useState<SlotMode>(
+		schedule?.slotMode ?? 'fixed',
+	)
+
+	useEffect(() => {
+		if (schedule) setLocalSlotMode(schedule.slotMode)
+	}, [schedule])
+
+	const handleSlotModeChange = async (mode: SlotMode) => {
+		if (!schedule) return
+		setLocalSlotMode(mode)
+		setSavingMode(true)
+		try {
+			await scheduleApi.updateTemplate(
+				staffId,
+				orgId ?? null,
+				schedule.weeklyHours,
+				mode,
+			)
+			await fetchSchedule()
+		} catch (err) {
+			setLocalSlotMode(schedule.slotMode)
+			const message =
+				err instanceof Error ? err.message : t('scheduleSaveError')
+			toast.error(message)
+		} finally {
+			setSavingMode(false)
+		}
+	}
+
 	if (loading) {
 		return (
 			<div className="flex justify-center py-12">
@@ -125,7 +156,18 @@ function ScheduleViewTab({ staffId, orgId, readOnly }: ScheduleViewTabProps) {
 		return <ReadOnlySchedule schedule={schedule} />
 	}
 
-	return <ScheduleEditor schedule={schedule} onSave={handleSave} />
+	return (
+		<div className="flex flex-col gap-6">
+			<ScheduleEditor schedule={schedule} onSave={handleSave} />
+			<Separator />
+			<div className={savingMode ? 'pointer-events-none opacity-50' : ''}>
+				<SlotModeSelector
+					value={localSlotMode}
+					onChange={handleSlotModeChange}
+				/>
+			</div>
+		</div>
+	)
 }
 
 export { ScheduleViewTab }

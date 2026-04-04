@@ -3,7 +3,6 @@
 import { cn } from '@/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import type { OrgStaffMember } from '@/services/configs/booking.types'
 
 interface StaffTabsProps {
@@ -11,6 +10,7 @@ interface StaffTabsProps {
 	selectedId: string | null
 	behavior: 'select-one' | 'show-all'
 	onSelect: (id: string | null) => void
+	loading?: boolean
 }
 
 const getInitials = (name: string): string =>
@@ -21,7 +21,13 @@ const getInitials = (name: string): string =>
 		.toUpperCase()
 		.slice(0, 2)
 
-function StaffTabs({ staff, selectedId, behavior, onSelect }: StaffTabsProps) {
+function StaffTabs({
+	staff,
+	selectedId,
+	behavior,
+	onSelect,
+	loading = false,
+}: StaffTabsProps) {
 	const isSelected = (member: OrgStaffMember): boolean =>
 		selectedId === member.id
 
@@ -40,9 +46,13 @@ function StaffTabs({ staff, selectedId, behavior, onSelect }: StaffTabsProps) {
 			type="button"
 			onClick={handleClick(member)}
 			className={cn(
-				'flex shrink-0 items-center gap-2 rounded-lg border px-3 py-2 transition-opacity',
-				isActive(member) ? 'opacity-100' : 'opacity-40',
-				behavior === 'select-one' && 'cursor-pointer hover:opacity-80',
+				'flex shrink-0 items-center gap-2 rounded-lg border-2 px-3 py-2 transition-all',
+				isSelected(member)
+					? 'border-primary bg-primary/5'
+					: isActive(member)
+						? 'border-transparent'
+						: 'text-muted-foreground border-transparent',
+				behavior === 'select-one' && 'hover:bg-muted cursor-pointer',
 				behavior === 'show-all' && 'cursor-default',
 			)}
 		>
@@ -67,10 +77,14 @@ function StaffTabs({ staff, selectedId, behavior, onSelect }: StaffTabsProps) {
 	)
 
 	return (
-		<ScrollArea className="w-full">
-			<div className="flex gap-2 pb-2">{staff.map(renderTab)}</div>
-			<ScrollBar orientation="horizontal" />
-		</ScrollArea>
+		<div
+			className={cn(
+				'flex gap-2 overflow-x-auto pb-2 transition-opacity',
+				loading && 'pointer-events-none opacity-50',
+			)}
+		>
+			{staff.map(renderTab)}
+		</div>
 	)
 }
 

@@ -2,7 +2,10 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { orgApi } from '@/lib/booking-api-client'
-import type { OrgByIdResponse, OrgStaffMember } from '@/services/configs/booking.types'
+import type {
+	OrgByIdResponse,
+	OrgStaffMember,
+} from '@/services/configs/booking.types'
 
 interface UseOrgInfoResult {
 	org: OrgByIdResponse | null
@@ -36,7 +39,8 @@ const useOrgInfo = (orgSlug: string): UseOrgInfoResult => {
 				loadedSlugRef.current = orgSlug
 				hasLoadedRef.current = true
 			} catch (err) {
-				const message = err instanceof Error ? err.message : 'Failed to load organization'
+				const message =
+					err instanceof Error ? err.message : 'Failed to load organization'
 				setError(message)
 			} finally {
 				setLoading(false)

@@ -2,7 +2,14 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { isSafeRedirectPath } from '@/lib/utils'
 
-const protectedPaths = ['/dashboard', '/billing', '/shadcndemo', '/organizations', '/schedule', '/manage']
+const protectedPaths = [
+	'/dashboard',
+	'/billing',
+	'/shadcndemo',
+	'/organizations',
+	'/schedule',
+	'/manage',
+]
 const authPaths = ['/login', '/signup']
 
 const isProtectedPath = (pathname: string): boolean =>

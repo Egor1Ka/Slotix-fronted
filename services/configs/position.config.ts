@@ -1,4 +1,9 @@
-import { getData, postData, patchData, deleteData } from '@/services/api/methods'
+import {
+	getData,
+	postData,
+	patchData,
+	deleteData,
+} from '@/services/api/methods'
 import { endpoint } from '@/services/api/types'
 import type {
 	Position,

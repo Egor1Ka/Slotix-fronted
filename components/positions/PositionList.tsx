@@ -1,10 +1,12 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
-import { PencilIcon, Plus, Trash2Icon } from 'lucide-react'
+import { PencilIcon, Plus, Trash2Icon, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent } from '@/components/ui/card'
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -23,6 +25,7 @@ import {
 	EmptyTitle,
 } from '@/components/ui/empty'
 import { PositionDialog } from '@/components/positions/PositionDialog'
+import { cn } from '@/lib/utils'
 import { positionApi } from '@/services'
 import type { Position } from '@/services'
 
@@ -35,9 +38,9 @@ function PositionList({ orgId }: PositionListProps) {
 	const [positions, setPositions] = useState<Position[]>([])
 	const [loading, setLoading] = useState(true)
 	const [dialogOpen, setDialogOpen] = useState(false)
-	const [editingPosition, setEditingPosition] = useState<
-		Position | undefined
-	>(undefined)
+	const [editingPosition, setEditingPosition] = useState<Position | undefined>(
+		undefined,
+	)
 	const [deleteTarget, setDeleteTarget] = useState<Position | undefined>(
 		undefined,
 	)
@@ -93,40 +96,51 @@ function PositionList({ orgId }: PositionListProps) {
 	}
 
 	const renderPosition = (position: Position) => (
-		<div
-			key={position.id}
-			className="flex items-center justify-between rounded-lg border p-3"
-		>
-			<div className="flex items-center gap-3">
-				<span
-					className="size-4 shrink-0 rounded-full"
-					style={{ backgroundColor: position.color ?? '#94a3b8' }}
-				/>
-				<div>
-					<div className="text-sm font-medium">{position.name}</div>
-					<div className="text-muted-foreground text-xs">
-						{t('level')}: {position.level} &middot; {t('staffCount')}:{' '}
-						{position.staffCount}
+		<Card key={position.id} className="group transition-shadow hover:shadow-sm">
+			<CardContent className="flex items-center justify-between p-4">
+				<div className="flex items-center gap-4">
+					<span
+						className="size-8 shrink-0 rounded-full ring-2 ring-offset-2"
+						style={
+							{
+								backgroundColor: position.color ?? '#94a3b8',
+								'--tw-ring-color': position.color ?? '#94a3b8',
+							} as React.CSSProperties
+						}
+					/>
+					<div className="flex flex-col gap-1">
+						<span className="text-base leading-none font-medium">
+							{position.name}
+						</span>
+						<div className="flex items-center gap-2">
+							<Badge variant="secondary" className="text-xs">
+								{t('level')} {position.level}
+							</Badge>
+							<Badge variant="outline" className="gap-1 text-xs">
+								<Users className="size-3" />
+								{position.staffCount}
+							</Badge>
+						</div>
 					</div>
 				</div>
-			</div>
-			<div className="flex gap-1">
-				<Button
-					variant="ghost"
-					size="icon-sm"
-					onClick={openEditDialog(position)}
-				>
-					<PencilIcon />
-				</Button>
-				<Button
-					variant="ghost"
-					size="icon-sm"
-					onClick={openDeleteDialog(position)}
-				>
-					<Trash2Icon />
-				</Button>
-			</div>
-		</div>
+				<div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+					<Button
+						variant="ghost"
+						size="icon-sm"
+						onClick={openEditDialog(position)}
+					>
+						<PencilIcon />
+					</Button>
+					<Button
+						variant="ghost"
+						size="icon-sm"
+						onClick={openDeleteDialog(position)}
+					>
+						<Trash2Icon />
+					</Button>
+				</div>
+			</CardContent>
+		</Card>
 	)
 
 	if (loading) {
@@ -138,7 +152,7 @@ function PositionList({ orgId }: PositionListProps) {
 	}
 
 	return (
-		<div className="space-y-4">
+		<div className="mx-auto max-w-2xl space-y-4">
 			<div className="flex items-center justify-between">
 				<h2 className="text-lg font-semibold">{t('title')}</h2>
 				<Button onClick={openCreateDialog}>
@@ -148,18 +162,14 @@ function PositionList({ orgId }: PositionListProps) {
 			</div>
 
 			{positions.length === 0 ? (
-				<Empty className="border">
+				<Empty className="rounded-xl border border-dashed py-12">
 					<EmptyHeader>
 						<EmptyTitle>{t('empty')}</EmptyTitle>
-						<EmptyDescription>
-							{t('emptyDescription')}
-						</EmptyDescription>
+						<EmptyDescription>{t('emptyDescription')}</EmptyDescription>
 					</EmptyHeader>
 				</Empty>
 			) : (
-				<div className="space-y-2">
-					{positions.map(renderPosition)}
-				</div>
+				<div className="space-y-2">{positions.map(renderPosition)}</div>
 			)}
 
 			<PositionDialog
@@ -185,10 +195,7 @@ function PositionList({ orgId }: PositionListProps) {
 					</AlertDialogHeader>
 					<AlertDialogFooter>
 						<AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
-						<AlertDialogAction
-							variant="destructive"
-							onClick={handleDelete}
-						>
+						<AlertDialogAction variant="destructive" onClick={handleDelete}>
 							{t('delete')}
 						</AlertDialogAction>
 					</AlertDialogFooter>

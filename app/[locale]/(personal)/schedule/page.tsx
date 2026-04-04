@@ -24,6 +24,7 @@ export default function PersonalSchedulePage() {
 				<BookingPage
 					staffSlug={user.id}
 					publicUrl={`/${locale}/book/${user.id}`}
+					hideSidebar
 				/>
 			</CalendarViewConfigProvider>
 		</Suspense>

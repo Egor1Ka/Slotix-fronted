@@ -19,9 +19,21 @@ function SlotModeSelector({ value, onChange }: SlotModeSelectorProps) {
 	const t = useTranslations('booking')
 
 	const modeOptions: ModeOption[] = [
-		{ value: 'fixed', label: t('modes.fixed'), description: t('modeDescriptions.fixed') },
-		{ value: 'optimal', label: t('modes.optimal'), description: t('modeDescriptions.optimal') },
-		{ value: 'dynamic', label: t('modes.dynamic'), description: t('modeDescriptions.dynamic') },
+		{
+			value: 'fixed',
+			label: t('modes.fixed'),
+			description: t('modeDescriptions.fixed'),
+		},
+		{
+			value: 'optimal',
+			label: t('modes.optimal'),
+			description: t('modeDescriptions.optimal'),
+		},
+		{
+			value: 'dynamic',
+			label: t('modes.dynamic'),
+			description: t('modeDescriptions.dynamic'),
+		},
 	]
 
 	const handleChange = (newValue: unknown) => onChange(newValue as SlotMode)

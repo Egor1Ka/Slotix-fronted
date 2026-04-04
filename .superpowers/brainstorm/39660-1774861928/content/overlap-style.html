@@ -1,0 +1,343 @@
+<h2>Как должны выглядеть пересекающиеся события?</h2>
+<p class="subtitle">
+	Выбери вариант, который больше подходит для админки Slotix
+</p>
+
+<div class="cards">
+	<!-- Option A: Google Calendar style -->
+	<div class="card" data-choice="a" onclick="toggleSelect(this)">
+		<div class="card-image" style="padding: 16px; background: #f8f9fa">
+			<div
+				style="
+					position: relative;
+					height: 200px;
+					border-left: 2px solid #e0e0e0;
+				"
+			>
+				<!-- Time labels -->
+				<div
+					style="
+						position: absolute;
+						left: -40px;
+						top: 0;
+						font-size: 11px;
+						color: #888;
+					"
+				>
+					09:00
+				</div>
+				<div
+					style="
+						position: absolute;
+						left: -40px;
+						top: 66px;
+						font-size: 11px;
+						color: #888;
+					"
+				>
+					10:00
+				</div>
+				<div
+					style="
+						position: absolute;
+						left: -40px;
+						top: 132px;
+						font-size: 11px;
+						color: #888;
+					"
+				>
+					11:00
+				</div>
+
+				<!-- Event 1: full overlap period, left column -->
+				<div
+					style="
+						position: absolute;
+						left: 8px;
+						top: 0;
+						width: 45%;
+						height: 66px;
+						background: #7c5cbf;
+						border-radius: 6px;
+						padding: 6px 8px;
+						color: white;
+						font-size: 11px;
+						overflow: hidden;
+					"
+				>
+					<strong>Стрижка</strong><br />09:00-10:00
+				</div>
+
+				<!-- Event 2: full overlap period, right column -->
+				<div
+					style="
+						position: absolute;
+						left: calc(45% + 12px);
+						top: 0;
+						width: 45%;
+						height: 100px;
+						background: #e85d8a;
+						border-radius: 6px;
+						padding: 6px 8px;
+						color: white;
+						font-size: 11px;
+						overflow: hidden;
+					"
+				>
+					<strong>Фарбування</strong><br />09:00-10:30
+				</div>
+
+				<!-- Event 3: no overlap, full width -->
+				<div
+					style="
+						position: absolute;
+						left: 8px;
+						top: 132px;
+						width: calc(90% + 4px);
+						height: 50px;
+						background: #4caf50;
+						border-radius: 6px;
+						padding: 6px 8px;
+						color: white;
+						font-size: 11px;
+						overflow: hidden;
+					"
+				>
+					<strong>Манікюр</strong><br />11:00-12:00
+				</div>
+			</div>
+		</div>
+		<div class="card-body">
+			<h3>A. Колонки (Google Calendar)</h3>
+			<p>
+				Пересекающиеся события делят ширину поровну. Каждое событие получает
+				свою колонку. Непересекающиеся — на полную ширину.
+			</p>
+		</div>
+	</div>
+
+	<!-- Option B: Staggered/Cascading style -->
+	<div class="card" data-choice="b" onclick="toggleSelect(this)">
+		<div class="card-image" style="padding: 16px; background: #f8f9fa">
+			<div
+				style="
+					position: relative;
+					height: 200px;
+					border-left: 2px solid #e0e0e0;
+				"
+			>
+				<!-- Time labels -->
+				<div
+					style="
+						position: absolute;
+						left: -40px;
+						top: 0;
+						font-size: 11px;
+						color: #888;
+					"
+				>
+					09:00
+				</div>
+				<div
+					style="
+						position: absolute;
+						left: -40px;
+						top: 66px;
+						font-size: 11px;
+						color: #888;
+					"
+				>
+					10:00
+				</div>
+				<div
+					style="
+						position: absolute;
+						left: -40px;
+						top: 132px;
+						font-size: 11px;
+						color: #888;
+					"
+				>
+					11:00
+				</div>
+
+				<!-- Event 1: behind -->
+				<div
+					style="
+						position: absolute;
+						left: 8px;
+						top: 0;
+						width: 85%;
+						height: 66px;
+						background: #7c5cbf;
+						border-radius: 6px;
+						padding: 6px 8px;
+						color: white;
+						font-size: 11px;
+						overflow: hidden;
+					"
+				>
+					<strong>Стрижка</strong><br />09:00-10:00
+				</div>
+
+				<!-- Event 2: offset right, slightly overlapping -->
+				<div
+					style="
+						position: absolute;
+						left: 40px;
+						top: 4px;
+						width: 85%;
+						height: 100px;
+						background: #e85d8a;
+						border-radius: 6px;
+						padding: 6px 8px;
+						color: white;
+						font-size: 11px;
+						overflow: hidden;
+						box-shadow: -2px 0 6px rgba(0, 0, 0, 0.15);
+					"
+				>
+					<strong>Фарбування</strong><br />09:00-10:30
+				</div>
+
+				<!-- Event 3: no overlap, full width -->
+				<div
+					style="
+						position: absolute;
+						left: 8px;
+						top: 132px;
+						width: 85%;
+						height: 50px;
+						background: #4caf50;
+						border-radius: 6px;
+						padding: 6px 8px;
+						color: white;
+						font-size: 11px;
+						overflow: hidden;
+					"
+				>
+					<strong>Манікюр</strong><br />11:00-12:00
+				</div>
+			</div>
+		</div>
+		<div class="card-body">
+			<h3>B. Каскад (со сдвигом)</h3>
+			<p>
+				События накладываются друг на друга со сдвигом вправо. Видна часть
+				каждого события. Ширина остаётся большой, но часть скрыта.
+			</p>
+		</div>
+	</div>
+
+	<!-- Option C: Slim columns with gap -->
+	<div class="card" data-choice="c" onclick="toggleSelect(this)">
+		<div class="card-image" style="padding: 16px; background: #f8f9fa">
+			<div
+				style="
+					position: relative;
+					height: 200px;
+					border-left: 2px solid #e0e0e0;
+				"
+			>
+				<!-- Time labels -->
+				<div
+					style="
+						position: absolute;
+						left: -40px;
+						top: 0;
+						font-size: 11px;
+						color: #888;
+					"
+				>
+					09:00
+				</div>
+				<div
+					style="
+						position: absolute;
+						left: -40px;
+						top: 66px;
+						font-size: 11px;
+						color: #888;
+					"
+				>
+					10:00
+				</div>
+				<div
+					style="
+						position: absolute;
+						left: -40px;
+						top: 132px;
+						font-size: 11px;
+						color: #888;
+					"
+				>
+					11:00
+				</div>
+
+				<!-- Event 1 -->
+				<div
+					style="
+						position: absolute;
+						left: 8px;
+						top: 0;
+						width: 43%;
+						height: 66px;
+						background: #7c5cbf;
+						border-radius: 6px;
+						padding: 6px 8px;
+						color: white;
+						font-size: 11px;
+						overflow: hidden;
+					"
+				>
+					<strong>Стрижка</strong><br />09:00-10:00
+				</div>
+
+				<!-- Event 2 with gap -->
+				<div
+					style="
+						position: absolute;
+						left: calc(43% + 12px);
+						top: 0;
+						width: 43%;
+						height: 100px;
+						background: #e85d8a;
+						border-radius: 6px;
+						padding: 6px 8px;
+						color: white;
+						font-size: 11px;
+						overflow: hidden;
+					"
+				>
+					<strong>Фарбування</strong><br />09:00-10:30
+				</div>
+
+				<!-- Event 3: full width -->
+				<div
+					style="
+						position: absolute;
+						left: 8px;
+						top: 132px;
+						width: calc(86% + 4px);
+						height: 50px;
+						background: #4caf50;
+						border-radius: 6px;
+						padding: 6px 8px;
+						color: white;
+						font-size: 11px;
+						overflow: hidden;
+					"
+				>
+					<strong>Манікюр</strong><br />11:00-12:00
+				</div>
+			</div>
+		</div>
+		<div class="card-body">
+			<h3>C. Колонки с зазором</h3>
+			<p>
+				Как вариант A, но с явным зазором (gap) между событиями. Чётко видно,
+				что это отдельные события. Похоже на первый скриншот.
+			</p>
+		</div>
+	</div>
+</div>

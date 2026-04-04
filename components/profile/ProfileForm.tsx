@@ -19,11 +19,7 @@ const profileSchema = z.object({
 	description: z.string().max(1000).optional().or(z.literal('')),
 	address: z.string().optional().or(z.literal('')),
 	phone: z.string().optional().or(z.literal('')),
-	website: z
-		.string()
-		.url('Must be a valid URL')
-		.optional()
-		.or(z.literal('')),
+	website: z.string().url('Must be a valid URL').optional().or(z.literal('')),
 })
 
 type ProfileFormData = z.infer<typeof profileSchema>

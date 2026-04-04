@@ -30,8 +30,4 @@ export type { StaffStrategyParams } from './strategies/createStaffStrategy'
 export { createOrgStrategy } from './strategies/createOrgStrategy'
 export type { OrgStrategyParams } from './strategies/createOrgStrategy'
 
-export {
-	useOrgInfo,
-	useStaffSchedule,
-	useStaffBookings,
-} from './hooks'
+export { useOrgInfo, useStaffSchedule, useStaffBookings } from './hooks'

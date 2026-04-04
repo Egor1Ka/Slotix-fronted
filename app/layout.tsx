@@ -1,4 +1,6 @@
+import { ThemeProvider } from 'next-themes'
 import { NewRelicBrowserScript } from '@/lib/monitoring/new-relic-browser-script'
+import { Toaster } from '@/components/ui/sonner'
 import { cn } from '@/lib/utils'
 import type { Metadata } from 'next'
 import { Inter, Cormorant } from 'next/font/google'
@@ -26,7 +28,15 @@ export default function RootLayout({
 			suppressHydrationWarning
 		>
 			<body className="antialiased">
-				{children}
+				<ThemeProvider
+					attribute="class"
+					defaultTheme="system"
+					enableSystem
+					disableTransitionOnChange
+				>
+					{children}
+				</ThemeProvider>
+				<Toaster />
 				<NewRelicBrowserScript />
 			</body>
 		</html>

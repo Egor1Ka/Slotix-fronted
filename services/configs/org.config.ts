@@ -1,6 +1,17 @@
-import { getData, postData, putData, patchData, deleteData } from '@/services/api/methods'
+import {
+	getData,
+	postData,
+	putData,
+	patchData,
+	deleteData,
+} from '@/services/api/methods'
 import { endpoint } from '@/services/api/types'
-import type { OrgListItem, CreateOrgBody, UpdateOrgBody, AddStaffBody } from './org.types'
+import type {
+	OrgListItem,
+	CreateOrgBody,
+	UpdateOrgBody,
+	AddStaffBody,
+} from './org.types'
 import type { OrgByIdResponse, OrgStaffMember } from './booking.types'
 import type { ApiResponse } from './user.config'
 
@@ -41,7 +52,10 @@ const orgApiConfig = {
 		defaultErrorMessage: 'Failed to add staff member',
 	}),
 
-	acceptInvitation: endpoint<Record<string, never>, ApiResponse<{ success: boolean }>>({
+	acceptInvitation: endpoint<
+		Record<string, never>,
+		ApiResponse<{ success: boolean }>
+	>({
 		url: ({ id }) => `/api/org/${id}/membership/accept`,
 		method: patchData,
 		defaultErrorMessage: 'Failed to accept invitation',
@@ -53,11 +67,13 @@ const orgApiConfig = {
 		defaultErrorMessage: 'Failed to decline invitation',
 	}),
 
-	updateStaffBio: endpoint<{ bio: string | null }, ApiResponse<OrgStaffMember>>({
-		url: ({ orgId, staffId }) => `/api/org/${orgId}/staff/${staffId}`,
-		method: patchData,
-		defaultErrorMessage: 'Failed to update bio',
-	}),
+	updateStaffBio: endpoint<{ bio: string | null }, ApiResponse<OrgStaffMember>>(
+		{
+			url: ({ orgId, staffId }) => `/api/org/${orgId}/staff/${staffId}`,
+			method: patchData,
+			defaultErrorMessage: 'Failed to update bio',
+		},
+	),
 }
 
 export default orgApiConfig

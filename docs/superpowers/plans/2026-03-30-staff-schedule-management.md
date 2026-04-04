@@ -40,6 +40,7 @@ i18n/messages/uk.json                  — Добавить переводы д�
 ### Task 1: API — добавить методы для overrides
 
 **Files:**
+
 - Modify: `lib/booking-api-client.ts`
 
 - [ ] **Step 1: Добавить getOverrides в Schedule API**
@@ -58,9 +59,7 @@ const getScheduleOverrides = async (
 В `lib/booking-api-client.ts` после `getScheduleOverrides` добавить:
 
 ```ts
-const deleteScheduleOverride = async (
-	overrideId: string,
-): Promise<void> => {
+const deleteScheduleOverride = async (overrideId: string): Promise<void> => {
 	await del<void>(`/schedule/override/${overrideId}`)
 }
 ```
@@ -97,6 +96,7 @@ git commit -m "feat(schedule): добавить API методы getOverrides и
 ### Task 2: i18n — добавить переводы
 
 **Files:**
+
 - Modify: `i18n/messages/en.json`
 - Modify: `i18n/messages/uk.json`
 
@@ -182,6 +182,7 @@ git commit -m "i18n: добавить переводы для управлени
 ### Task 3: OverrideListItem — элемент списка overrides
 
 **Files:**
+
 - Create: `components/staff-schedule/OverrideListItem.tsx`
 
 - [ ] **Step 1: Создать компонент OverrideListItem**
@@ -214,7 +215,12 @@ const formatDate = (dateStr: string): string =>
 const formatSlots = (slots: { start: string; end: string }[]): string =>
 	slots.map((s) => `${s.start} — ${s.end}`).join(', ')
 
-function OverrideListItem({ override, readOnly, isPast, onDelete }: OverrideListItemProps) {
+function OverrideListItem({
+	override,
+	readOnly,
+	isPast,
+	onDelete,
+}: OverrideListItemProps) {
 	const t = useTranslations('staffSchedule')
 	const [isDeleting, setIsDeleting] = useState(false)
 
@@ -231,7 +237,9 @@ function OverrideListItem({ override, readOnly, isPast, onDelete }: OverrideList
 		<div className="flex items-center justify-between rounded-lg border p-3">
 			<div className="flex flex-col gap-1">
 				<div className="flex items-center gap-2">
-					<span className="text-sm font-medium">{formatDate(override.date)}</span>
+					<span className="text-sm font-medium">
+						{formatDate(override.date)}
+					</span>
 					<Badge variant={variant}>{label}</Badge>
 				</div>
 				{override.enabled && override.slots.length > 0 && (
@@ -279,6 +287,7 @@ git commit -m "feat(staff-schedule): добавить компонент Overrid
 ### Task 4: OverridesTab — таб выходных
 
 **Files:**
+
 - Create: `components/staff-schedule/OverridesTab.tsx`
 
 - [ ] **Step 1: Создать компонент OverridesTab**
@@ -296,7 +305,10 @@ import { Spinner } from '@/components/ui/spinner'
 import { ScheduleOverrideForm } from '@/components/booking/ScheduleOverrideForm'
 import { OverrideListItem } from './OverrideListItem'
 import { scheduleApi } from '@/lib/booking-api-client'
-import type { ScheduleOverride, CreateScheduleOverrideBody } from '@/services/configs/booking.types'
+import type {
+	ScheduleOverride,
+	CreateScheduleOverrideBody,
+} from '@/services/configs/booking.types'
 
 interface OverridesTabProps {
 	staffId: string
@@ -364,17 +376,19 @@ function OverridesTab({ staffId, orgId, readOnly }: OverridesTabProps) {
 		.filter((o) => isDatePast(o.date))
 		.sort(sortByDateDesc)
 
-	const renderOverrideItem = (isPast: boolean) => (override: ScheduleOverride) => (
-		<OverrideListItem
-			key={override.id}
-			override={override}
-			readOnly={readOnly}
-			isPast={isPast}
-			onDelete={handleDelete}
-		/>
-	)
+	const renderOverrideItem =
+		(isPast: boolean) => (override: ScheduleOverride) => (
+			<OverrideListItem
+				key={override.id}
+				override={override}
+				readOnly={readOnly}
+				isPast={isPast}
+				onDelete={handleDelete}
+			/>
+		)
 
-	const hasNoOverrides = futureOverrides.length === 0 && pastOverrides.length === 0
+	const hasNoOverrides =
+		futureOverrides.length === 0 && pastOverrides.length === 0
 
 	return (
 		<div className="flex flex-col gap-4">
@@ -394,9 +408,7 @@ function OverridesTab({ staffId, orgId, readOnly }: OverridesTabProps) {
 				</>
 			)}
 
-			{hasNoOverrides && (
-				<Empty>{t('noOverrides')}</Empty>
-			)}
+			{hasNoOverrides && <Empty>{t('noOverrides')}</Empty>}
 
 			{futureOverrides.length > 0 && (
 				<div className="flex flex-col gap-2">
@@ -439,6 +451,7 @@ git commit -m "feat(staff-schedule): добавить компонент Overrid
 ### Task 5: ScheduleViewTab — таб расписания
 
 **Files:**
+
 - Create: `components/staff-schedule/ScheduleViewTab.tsx`
 
 - [ ] **Step 1: Создать компонент ScheduleViewTab**
@@ -453,7 +466,10 @@ import { Separator } from '@/components/ui/separator'
 import { ScheduleEditor } from '@/components/booking/ScheduleEditor'
 import { getCalendarLocale } from '@/lib/calendar/utils'
 import { scheduleApi } from '@/lib/booking-api-client'
-import type { ScheduleTemplate, WeeklyHours } from '@/services/configs/booking.types'
+import type {
+	ScheduleTemplate,
+	WeeklyHours,
+} from '@/services/configs/booking.types'
 
 interface ScheduleViewTabProps {
 	staffId: string
@@ -472,7 +488,10 @@ function ReadOnlySchedule({ schedule }: { schedule: ScheduleTemplate }) {
 		const dayName = calendarLocale.daysLong[day.dayOfWeek]
 
 		return (
-			<div key={day.dayOfWeek} className="flex items-center justify-between py-2">
+			<div
+				key={day.dayOfWeek}
+				className="flex items-center justify-between py-2"
+			>
 				<span className="text-sm font-medium">{dayName}</span>
 				{day.enabled ? (
 					<span className="text-sm">{formatSlots(day.slots)}</span>
@@ -558,6 +577,7 @@ git commit -m "feat(staff-schedule): добавить компонент Schedul
 ### Task 6: BookingListItem — элемент списка букингов
 
 **Files:**
+
 - Create: `components/staff-schedule/BookingListItem.tsx`
 
 - [ ] **Step 1: Создать компонент BookingListItem**
@@ -566,14 +586,20 @@ git commit -m "feat(staff-schedule): добавить компонент Schedul
 'use client'
 
 import { Badge } from '@/components/ui/badge'
-import type { StaffBooking, BookingStatus } from '@/services/configs/booking.types'
+import type {
+	StaffBooking,
+	BookingStatus,
+} from '@/services/configs/booking.types'
 
 interface BookingListItemProps {
 	booking: StaffBooking
 	onClick: (booking: StaffBooking) => void
 }
 
-const STATUS_VARIANT: Record<BookingStatus, 'default' | 'secondary' | 'destructive' | 'outline'> = {
+const STATUS_VARIANT: Record<
+	BookingStatus,
+	'default' | 'secondary' | 'destructive' | 'outline'
+> = {
 	confirmed: 'default',
 	pending_payment: 'secondary',
 	completed: 'outline',
@@ -582,7 +608,10 @@ const STATUS_VARIANT: Record<BookingStatus, 'default' | 'secondary' | 'destructi
 }
 
 const formatTime = (isoString: string): string =>
-	new Date(isoString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+	new Date(isoString).toLocaleTimeString([], {
+		hour: '2-digit',
+		minute: '2-digit',
+	})
 
 function BookingListItem({ booking, onClick }: BookingListItemProps) {
 	const handleClick = () => onClick(booking)
@@ -632,6 +661,7 @@ git commit -m "feat(staff-schedule): добавить компонент Booking
 ### Task 7: BookingDateGroup — группа букингов за дату
 
 **Files:**
+
 - Create: `components/staff-schedule/BookingDateGroup.tsx`
 
 - [ ] **Step 1: Создать компонент BookingDateGroup**
@@ -655,7 +685,11 @@ const formatDateHeader = (dateStr: string): string =>
 		month: 'long',
 	})
 
-function BookingDateGroup({ date, bookings, onBookingClick }: BookingDateGroupProps) {
+function BookingDateGroup({
+	date,
+	bookings,
+	onBookingClick,
+}: BookingDateGroupProps) {
 	const renderItem = (booking: StaffBooking) => (
 		<BookingListItem
 			key={booking.id}
@@ -666,12 +700,10 @@ function BookingDateGroup({ date, bookings, onBookingClick }: BookingDateGroupPr
 
 	return (
 		<div className="flex flex-col gap-2">
-			<h4 className="text-muted-foreground sticky top-0 bg-background py-1 text-xs font-semibold uppercase">
+			<h4 className="text-muted-foreground bg-background sticky top-0 py-1 text-xs font-semibold uppercase">
 				{formatDateHeader(date)}
 			</h4>
-			<div className="flex flex-col gap-1">
-				{bookings.map(renderItem)}
-			</div>
+			<div className="flex flex-col gap-1">{bookings.map(renderItem)}</div>
 		</div>
 	)
 }
@@ -691,6 +723,7 @@ git commit -m "feat(staff-schedule): добавить компонент Booking
 ### Task 8: BookingsTab — таб букингов
 
 **Files:**
+
 - Create: `components/staff-schedule/BookingsTab.tsx`
 
 - [ ] **Step 1: Создать компонент BookingsTab**
@@ -734,8 +767,7 @@ const getWeekRange = (offset: number): { dateFrom: string; dateTo: string } => {
 	return { dateFrom: toISODate(monday), dateTo: toISODate(sunday) }
 }
 
-const extractDate = (isoString: string): string =>
-	isoString.split('T')[0]
+const extractDate = (isoString: string): string => isoString.split('T')[0]
 
 const groupByDate = (bookings: StaffBooking[]): Map<string, StaffBooking[]> => {
 	const groups = new Map<string, StaffBooking[]>()
@@ -750,8 +782,7 @@ const groupByDate = (bookings: StaffBooking[]): Map<string, StaffBooking[]> => {
 	return groups
 }
 
-const sortDatesAsc = (a: string, b: string): number =>
-	a.localeCompare(b)
+const sortDatesAsc = (a: string, b: string): number => a.localeCompare(b)
 
 function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
 	const t = useTranslations('staffSchedule')
@@ -759,16 +790,17 @@ function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
 	const [eventTypes, setEventTypes] = useState<EventType[]>([])
 	const [loading, setLoading] = useState(true)
 	const [weekOffset, setWeekOffset] = useState(0)
-	const [selectedBooking, setSelectedBooking] = useState<StaffBooking | null>(null)
+	const [selectedBooking, setSelectedBooking] = useState<StaffBooking | null>(
+		null,
+	)
 
 	const fetchData = useCallback(async () => {
 		setLoading(true)
 		try {
 			const { dateFrom, dateTo } = getWeekRange(weekOffset)
 
-			const types = eventTypes.length > 0
-				? eventTypes
-				: await eventTypeApi.getByOrg(orgId)
+			const types =
+				eventTypes.length > 0 ? eventTypes : await eventTypeApi.getByOrg(orgId)
 
 			if (eventTypes.length === 0) {
 				setEventTypes(types)
@@ -790,7 +822,8 @@ function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
 	const handlePrevWeek = () => setWeekOffset((prev) => prev - 1)
 	const handleNextWeek = () => setWeekOffset((prev) => prev + 1)
 
-	const handleBookingClick = (booking: StaffBooking) => setSelectedBooking(booking)
+	const handleBookingClick = (booking: StaffBooking) =>
+		setSelectedBooking(booking)
 	const handleCloseSheet = () => setSelectedBooking(null)
 
 	const { dateFrom, dateTo } = getWeekRange(weekOffset)
@@ -799,7 +832,10 @@ function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
 
 	const formatWeekLabel = (from: string, to: string): string => {
 		const formatShort = (d: string) =>
-			new Date(d + 'T00:00:00').toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
+			new Date(d + 'T00:00:00').toLocaleDateString(undefined, {
+				day: 'numeric',
+				month: 'short',
+			})
 		return `${formatShort(from)} — ${formatShort(to)}`
 	}
 
@@ -810,7 +846,9 @@ function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
 		startAt: booking.startAt,
 		endAt: booking.endAt,
 		durationMin: Math.round(
-			(new Date(booking.endAt).getTime() - new Date(booking.startAt).getTime()) / 60000,
+			(new Date(booking.endAt).getTime() -
+				new Date(booking.startAt).getTime()) /
+				60000,
 		),
 		date: extractDate(booking.startAt),
 		status: booking.status,
@@ -900,6 +938,7 @@ git commit -m "feat(staff-schedule): добавить компонент Booking
 ### Task 9: StaffScheduleTabs — обёртка с 3 табами
 
 **Files:**
+
 - Create: `components/staff-schedule/StaffScheduleTabs.tsx`
 
 - [ ] **Step 1: Создать компонент StaffScheduleTabs**
@@ -926,7 +965,11 @@ type TabValue = (typeof TAB_VALUES)[number]
 const isValidTab = (value: string | null): value is TabValue =>
 	TAB_VALUES.includes(value as TabValue)
 
-function StaffScheduleTabs({ staffId, orgId, readOnly }: StaffScheduleTabsProps) {
+function StaffScheduleTabs({
+	staffId,
+	orgId,
+	readOnly,
+}: StaffScheduleTabsProps) {
 	const t = useTranslations('staffSchedule')
 	const searchParams = useSearchParams()
 	const router = useRouter()
@@ -987,6 +1030,7 @@ git commit -m "feat(staff-schedule): добавить компонент StaffSc
 ### Task 10: StaffFilter — фильтр выбора сотрудника
 
 **Files:**
+
 - Create: `components/staff-schedule/StaffFilter.tsx`
 
 - [ ] **Step 1: Создать компонент StaffFilter**
@@ -1046,9 +1090,7 @@ function StaffFilter({ staff, selectedId, onSelect }: StaffFilterProps) {
 			<SelectTrigger className="w-full max-w-sm">
 				<SelectValue placeholder={t('selectStaff')} />
 			</SelectTrigger>
-			<SelectContent>
-				{staff.map(renderStaffOption)}
-			</SelectContent>
+			<SelectContent>{staff.map(renderStaffOption)}</SelectContent>
 		</Select>
 	)
 }
@@ -1068,6 +1110,7 @@ git commit -m "feat(staff-schedule): добавить компонент StaffFi
 ### Task 11: Админская страница
 
 **Files:**
+
 - Create: `app/[locale]/(org)/manage/[orgId]/staff-schedule/page.tsx`
 
 - [ ] **Step 1: Создать страницу**
@@ -1076,7 +1119,12 @@ git commit -m "feat(staff-schedule): добавить компонент StaffFi
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useParams, useSearchParams, useRouter, usePathname } from 'next/navigation'
+import {
+	useParams,
+	useSearchParams,
+	useRouter,
+	usePathname,
+} from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Empty } from '@/components/ui/empty'
 import { Spinner } from '@/components/ui/spinner'
@@ -1172,6 +1220,7 @@ git commit -m "feat(staff-schedule): добавить админскую стр�
 ### Task 12: Страница сотрудника
 
 **Files:**
+
 - Create: `app/[locale]/(org)/org/[orgId]/my-schedule/page.tsx`
 
 - [ ] **Step 1: Создать страницу**
@@ -1186,7 +1235,10 @@ import { Spinner } from '@/components/ui/spinner'
 import { StaffScheduleTabs } from '@/components/staff-schedule/StaffScheduleTabs'
 import { useUser } from '@/lib/auth/user-provider'
 import { orgApi } from '@/lib/booking-api-client'
-import type { OrgStaffMember, OrgByIdResponse } from '@/services/configs/booking.types'
+import type {
+	OrgStaffMember,
+	OrgByIdResponse,
+} from '@/services/configs/booking.types'
 
 export default function MySchedulePage() {
 	const params = useParams<{ orgId: string }>()
@@ -1243,11 +1295,7 @@ export default function MySchedulePage() {
 				{t('mySchedule')} — {orgName}
 			</h1>
 
-			<StaffScheduleTabs
-				staffId={staffId}
-				orgId={orgId}
-				readOnly={false}
-			/>
+			<StaffScheduleTabs staffId={staffId} orgId={orgId} readOnly={false} />
 		</div>
 	)
 }
@@ -1272,6 +1320,7 @@ git commit -m "feat(staff-schedule): добавить страницу сотр�
 ### Task 13: OrgSidebar — добавить пункт Staff Schedule
 
 **Files:**
+
 - Modify: `components/sidebar/OrgSidebar.tsx`
 
 - [ ] **Step 1: Добавить импорт иконки**
@@ -1279,7 +1328,14 @@ git commit -m "feat(staff-schedule): добавить страницу сотр�
 В секцию импортов добавить `ClipboardList` к существующим lucide-react иконкам:
 
 ```ts
-import { Calendar, ArrowLeft, Users, Briefcase, Settings2, ClipboardList } from 'lucide-react'
+import {
+	Calendar,
+	ArrowLeft,
+	Users,
+	Briefcase,
+	Settings2,
+	ClipboardList,
+} from 'lucide-react'
 ```
 
 - [ ] **Step 2: Добавить href для staff-schedule**
@@ -1328,6 +1384,7 @@ git commit -m "feat(sidebar): добавить пункт Staff Schedule в OrgS
 ### Task 14: Финальная проверка и интеграция
 
 **Files:**
+
 - All created/modified files
 
 - [ ] **Step 1: Проверить TypeScript компиляцию**

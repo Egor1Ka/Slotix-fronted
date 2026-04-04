@@ -8,26 +8,33 @@ import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import {
-	Field,
-	FieldLabel,
-	FieldError,
-} from '@/components/ui/field'
+import { Field, FieldLabel, FieldError } from '@/components/ui/field'
 import type { CreateScheduleOverrideBody } from '@/services/configs/booking.types'
 
 interface ScheduleOverrideFormProps {
 	staffId: string
+	orgId?: string
 	onSave: (body: CreateScheduleOverrideBody) => Promise<void>
 }
 
-function ScheduleOverrideForm({ staffId, onSave }: ScheduleOverrideFormProps) {
+function ScheduleOverrideForm({
+	staffId,
+	orgId,
+	onSave,
+}: ScheduleOverrideFormProps) {
 	const t = useTranslations('booking')
 
 	const overrideSchema = z.object({
 		date: z.string().min(1, t('validation.selectDate')),
-		enabled: z.boolean(),
-		slotStart: z.string().regex(/^\d{2}:\d{2}$/, t('validation.timeFormat')).optional(),
-		slotEnd: z.string().regex(/^\d{2}:\d{2}$/, t('validation.timeFormat')).optional(),
+		fullDay: z.boolean(),
+		breakStart: z
+			.string()
+			.regex(/^\d{2}:\d{2}$/, t('validation.timeFormat'))
+			.optional(),
+		breakEnd: z
+			.string()
+			.regex(/^\d{2}:\d{2}$/, t('validation.timeFormat'))
+			.optional(),
 		reason: z.string().optional(),
 	})
 
@@ -44,25 +51,27 @@ function ScheduleOverrideForm({ staffId, onSave }: ScheduleOverrideFormProps) {
 		resolver: zodResolver(overrideSchema),
 		defaultValues: {
 			date: '',
-			enabled: false,
-			slotStart: '10:00',
-			slotEnd: '18:00',
+			fullDay: true,
+			breakStart: '10:00',
+			breakEnd: '14:00',
 			reason: '',
 		},
 	})
 
-	const enabled = watch('enabled')
+	const fullDay = watch('fullDay')
 
 	const handleFormSubmit = async (data: OverrideFormData) => {
-		const slots = data.enabled && data.slotStart && data.slotEnd
-			? [{ start: data.slotStart, end: data.slotEnd }]
-			: []
+		const breakSlots =
+			!data.fullDay && data.breakStart && data.breakEnd
+				? [{ start: data.breakStart, end: data.breakEnd }]
+				: []
 
 		await onSave({
 			staffId,
+			...(orgId && { orgId }),
 			date: data.date,
-			enabled: data.enabled,
-			slots,
+			enabled: false,
+			slots: breakSlots,
 			reason: data.reason || undefined,
 		})
 
@@ -78,22 +87,20 @@ function ScheduleOverrideForm({ staffId, onSave }: ScheduleOverrideFormProps) {
 
 			<Field data-invalid={!!errors.date || undefined}>
 				<FieldLabel htmlFor="override-date">{t('schedule.date')}</FieldLabel>
-				<Input
-					id="override-date"
-					type="date"
-					{...register('date')}
-				/>
+				<Input id="override-date" type="date" {...register('date')} />
 				<FieldError errors={[errors.date]} />
 			</Field>
 
 			<Field orientation="horizontal">
-				<FieldLabel htmlFor="override-enabled">{t('schedule.workDay')}</FieldLabel>
+				<FieldLabel htmlFor="override-fullday">
+					{t('schedule.fullDayOff')}
+				</FieldLabel>
 				<Controller
 					control={control}
-					name="enabled"
+					name="fullDay"
 					render={({ field }) => (
 						<Switch
-							id="override-enabled"
+							id="override-fullday"
 							checked={field.value}
 							onCheckedChange={field.onChange}
 						/>
@@ -101,26 +108,25 @@ function ScheduleOverrideForm({ staffId, onSave }: ScheduleOverrideFormProps) {
 				/>
 			</Field>
 
-			{enabled && (
-				<div className="flex items-center gap-2">
-					<Input
-						type="time"
-						className="w-28"
-						{...register('slotStart')}
-					/>
-					<span className="text-muted-foreground text-xs">—</span>
-					<Input
-						type="time"
-						className="w-28"
-						{...register('slotEnd')}
-					/>
+			{!fullDay && (
+				<div className="flex flex-col gap-1.5">
+					<span className="text-muted-foreground text-xs">
+						{t('schedule.breakHours')}
+					</span>
+					<div className="flex items-center gap-2">
+						<Input type="time" className="w-28" {...register('breakStart')} />
+						<span className="text-muted-foreground text-xs">—</span>
+						<Input type="time" className="w-28" {...register('breakEnd')} />
+					</div>
 				</div>
 			)}
 
 			<Separator />
 
 			<Field data-invalid={!!errors.reason || undefined}>
-				<FieldLabel htmlFor="override-reason">{t('schedule.reason')}</FieldLabel>
+				<FieldLabel htmlFor="override-reason">
+					{t('schedule.reason')}
+				</FieldLabel>
 				<Input
 					id="override-reason"
 					placeholder={t('schedule.reasonPlaceholder')}

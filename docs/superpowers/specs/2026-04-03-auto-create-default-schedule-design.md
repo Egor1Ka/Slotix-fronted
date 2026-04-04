@@ -10,6 +10,7 @@
 ## Решение
 
 Автоматическое создание дефолтного расписания на бэкенде при двух событиях:
+
 1. **Регистрация** — персональное расписание (`orgId = null`)
 2. **Принятие приглашения в организацию** — org-расписание (`orgId = orgId`)
 
@@ -21,19 +22,19 @@
 
 ```js
 const DEFAULT_WEEKLY_HOURS = [
-  { day: "mon", enabled: true, slots: [{ start: "09:00", end: "18:00" }] },
-  { day: "tue", enabled: true, slots: [{ start: "09:00", end: "18:00" }] },
-  { day: "wed", enabled: true, slots: [{ start: "09:00", end: "18:00" }] },
-  { day: "thu", enabled: true, slots: [{ start: "09:00", end: "18:00" }] },
-  { day: "fri", enabled: true, slots: [{ start: "09:00", end: "18:00" }] },
-  { day: "sat", enabled: true, slots: [{ start: "10:00", end: "15:00" }] },
-  { day: "sun", enabled: false, slots: [] },
+	{ day: 'mon', enabled: true, slots: [{ start: '09:00', end: '18:00' }] },
+	{ day: 'tue', enabled: true, slots: [{ start: '09:00', end: '18:00' }] },
+	{ day: 'wed', enabled: true, slots: [{ start: '09:00', end: '18:00' }] },
+	{ day: 'thu', enabled: true, slots: [{ start: '09:00', end: '18:00' }] },
+	{ day: 'fri', enabled: true, slots: [{ start: '09:00', end: '18:00' }] },
+	{ day: 'sat', enabled: true, slots: [{ start: '10:00', end: '15:00' }] },
+	{ day: 'sun', enabled: false, slots: [] },
 ]
 
 const DEFAULT_SCHEDULE_CONFIG = {
-  timezone: "Europe/Kyiv",
-  slotMode: "fixed",
-  slotStepMin: 30,
+	timezone: 'Europe/Kyiv',
+	slotMode: 'fixed',
+	slotStepMin: 30,
 }
 ```
 
@@ -42,6 +43,7 @@ const DEFAULT_SCHEDULE_CONFIG = {
 Расположение: `src/services/scheduleServices.js`
 
 Логика:
+
 1. Проверяет `findCurrentTemplate(staffId, orgId, null)` — если расписание уже есть, ничего не делает (идемпотентность)
 2. Если нет — вызывает `createTemplate()` с дефолтными параметрами
 3. `locationId = null` (расписание для всех локаций)
@@ -49,10 +51,10 @@ const DEFAULT_SCHEDULE_CONFIG = {
 
 ### Точки вызова
 
-| Событие | Файл | Функция | Параметры |
-|---------|------|---------|-----------|
-| Регистрация нового юзера | `src/modules/auth/services/authServices.js` | `findOrCreateUser()` — ветка создания нового юзера | `createDefaultSchedule(newUser._id, null)` |
-| Принятие приглашения в орг | `src/services/orgServices.js` | `acceptInvitation()` — после смены статуса на "active" | `createDefaultSchedule(userId, orgId)` |
+| Событие                    | Файл                                        | Функция                                                | Параметры                                  |
+| -------------------------- | ------------------------------------------- | ------------------------------------------------------ | ------------------------------------------ |
+| Регистрация нового юзера   | `src/modules/auth/services/authServices.js` | `findOrCreateUser()` — ветка создания нового юзера     | `createDefaultSchedule(newUser._id, null)` |
+| Принятие приглашения в орг | `src/services/orgServices.js`               | `acceptInvitation()` — после смены статуса на "active" | `createDefaultSchedule(userId, orgId)`     |
 
 ### Фронтенд
 
@@ -69,8 +71,8 @@ const DEFAULT_SCHEDULE_CONFIG = {
 
 При `createOrganization()` owner создаётся со статусом "active" напрямую (без invite flow). Значит `acceptInvitation` для него не вызывается. Нужен дополнительный вызов:
 
-| Событие | Файл | Функция | Параметры |
-|---------|------|---------|-----------|
+| Событие              | Файл                          | Функция                                                  | Параметры                                   |
+| -------------------- | ----------------------------- | -------------------------------------------------------- | ------------------------------------------- |
 | Создание организации | `src/services/orgServices.js` | `createOrganization()` — после создания owner membership | `createDefaultSchedule(userId, newOrg._id)` |
 
 Итого **три точки вызова**.
@@ -82,5 +84,6 @@ const DEFAULT_SCHEDULE_CONFIG = {
 ## Миграция существующих юзеров
 
 Вне скоупа данного дизайна. Существующие юзеры без расписания продолжат видеть пустую страницу. Можно решить:
+
 - Одноразовым скриптом миграции
 - Lazy-creation на фронте (empty state с кнопкой "Створити розклад")

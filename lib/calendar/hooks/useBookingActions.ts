@@ -258,9 +258,7 @@ const useBookingActions = (
 
 			if (fieldValues.length > 0) {
 				try {
-					const formCfg = await bookingFormApi.getMergedForm(
-						detail.eventTypeId,
-					)
+					const formCfg = await bookingFormApi.getMergedForm(detail.eventTypeId)
 					const findLabel = (fieldId: string): string => {
 						const match = formCfg.customFields.find((f) => f.id === fieldId)
 						return match ? match.label : fieldId

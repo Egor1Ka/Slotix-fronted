@@ -683,13 +683,13 @@ function CalendarCore({
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-1">
 							{staffAvatarUrl && (
-									<img
-										src={staffAvatarUrl}
-										alt=""
-										className="size-8 rounded-full object-cover"
-									/>
-								)}
-								<Button variant="ghost" size="icon-sm" onClick={handlePrev}>
+								<img
+									src={staffAvatarUrl}
+									alt=""
+									className="size-8 rounded-full object-cover"
+								/>
+							)}
+							<Button variant="ghost" size="icon-sm" onClick={handlePrev}>
 								<ChevronLeftIcon />
 							</Button>
 							<h2 className="min-w-[140px] text-center text-lg font-semibold">

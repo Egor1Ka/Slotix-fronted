@@ -42,7 +42,10 @@ function StaffOptionContent({ member }: { member: OrgStaffMember }) {
 				<span className="text-muted-foreground text-xs">{member.position}</span>
 			)}
 			{member.status === 'invited' && (
-				<Badge variant="outline" className="text-muted-foreground px-1.5 py-0 text-[10px]">
+				<Badge
+					variant="outline"
+					className="text-muted-foreground px-1.5 py-0 text-[10px]"
+				>
 					{t('invited')}
 				</Badge>
 			)}
@@ -74,7 +77,7 @@ function StaffFilter({ staff, selectedId, onSelect }: StaffFilterProps) {
 	return (
 		<div data-slot="staff-filter" className="flex items-center gap-2">
 			<Users className="text-muted-foreground size-4 shrink-0" />
-			<Select value={selectedId ?? undefined} onValueChange={handleValueChange}>
+			<Select value={selectedId ?? ''} onValueChange={handleValueChange}>
 				<SelectTrigger className="w-full max-w-sm">
 					{selectedMember ? (
 						<StaffOptionContent member={selectedMember} />
