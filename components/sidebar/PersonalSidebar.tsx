@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation'
 import { useLocale, useTranslations } from 'next-intl'
 import Link from 'next/link'
-import { Building2, Calendar, CalendarCog, Settings2 } from 'lucide-react'
+import { Building2, Calendar, CalendarCog, Settings2, UserCircle } from 'lucide-react'
 import {
 	Sidebar,
 	SidebarContent,
@@ -31,6 +31,7 @@ function PersonalSidebar() {
 	const scheduleHref = buildHref('/schedule')
 	const myScheduleHref = buildHref('/my-schedule')
 	const myServicesHref = buildHref('/my-services')
+	const profileHref = buildHref('/profile')
 	const orgsHref = buildHref('/organizations')
 
 	return (
@@ -44,6 +45,15 @@ function PersonalSidebar() {
 				<SidebarGroup>
 					<SidebarGroupContent>
 						<SidebarMenu>
+							<SidebarMenuItem>
+								<SidebarMenuButton
+									render={<Link href={profileHref} />}
+									isActive={isActive(profileHref)}
+								>
+									<UserCircle className="size-4" />
+									<span>{t('profile')}</span>
+								</SidebarMenuButton>
+							</SidebarMenuItem>
 							<SidebarMenuItem>
 								<SidebarMenuButton
 									render={<Link href={scheduleHref} />}
