@@ -313,6 +313,19 @@ function OrgCalendarPage({
 		/>
 	) : null
 
+	// ── Profile info ──
+
+	const profileInfo = {
+		name: org.name,
+		logo: org.logo,
+		avatar: null,
+		description: org.description,
+		address: org.address,
+		phone: org.phone,
+		website: org.website,
+		isOrg: true,
+	}
+
 	// ── Render ──
 
 	return (
@@ -329,6 +342,7 @@ function OrgCalendarPage({
 				isDayOff={isOrgDayOff || isStaffDayOff}
 				staffTabsSlot={staffTabsSlot}
 				publicUrl={`/${locale}/org/${orgSlug}`}
+				profileInfo={profileInfo}
 			/>
 		</CalendarProvider>
 	)
