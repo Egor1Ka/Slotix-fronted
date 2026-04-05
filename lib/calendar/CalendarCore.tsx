@@ -723,6 +723,12 @@ function CalendarCore({
 						</div>
 					</div>
 
+					{!hideSidebar && (
+						<div className="md:hidden">
+							{strategy.renderSidebar()}
+						</div>
+					)}
+
 					{staffTabsSlot}
 
 					{view === 'day' && renderDayView()}
