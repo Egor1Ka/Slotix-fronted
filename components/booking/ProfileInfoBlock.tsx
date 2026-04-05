@@ -2,9 +2,10 @@
 
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { MapPin, Phone, Globe } from 'lucide-react'
+import { MapPin, Phone, Globe, ChevronDown, ChevronUp } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
+import { cn } from '@/lib/utils'
 
 interface ProfileInfoBlockProps {
 	name: string
@@ -17,12 +18,7 @@ interface ProfileInfoBlockProps {
 	isOrg: boolean
 }
 
-const MAX_DESCRIPTION_LENGTH = 200
-
 const getInitial = (name: string): string => name.charAt(0).toUpperCase()
-
-const truncateDescription = (text: string): string =>
-	`${text.slice(0, MAX_DESCRIPTION_LENGTH)}...`
 
 function ProfileInfoBlock({
 	name,
@@ -35,62 +31,75 @@ function ProfileInfoBlock({
 	isOrg,
 }: ProfileInfoBlockProps) {
 	const t = useTranslations('profile')
-	const [expanded, setExpanded] = useState(false)
+	const [open, setOpen] = useState(false)
 
 	const hasContactInfo = address || phone || website
 	const hasDescription = description && description.length > 0
-	const isLongDescription =
-		hasDescription && description.length > MAX_DESCRIPTION_LENGTH
+	const hasDetails = hasDescription || hasContactInfo
 
-	if (!hasDescription && !hasContactInfo) return null
+	if (!hasDetails) return null
 
-	const toggleExpanded = () => setExpanded((prev) => !prev)
-
-	const displayedDescription =
-		hasDescription && !expanded && isLongDescription
-			? truncateDescription(description)
-			: description
+	const toggleOpen = () => setOpen((prev) => !prev)
 
 	const imageSource = isOrg ? logo : avatar
+	const toggleLabel = open
+		? t('hide')
+		: isOrg
+			? t('aboutUs')
+			: t('about')
 
 	return (
-		<div className="bg-card w-full border-b px-6 py-4">
-			<div className="mx-auto flex max-w-5xl items-start gap-4">
-				{isOrg && imageSource ? (
-					<img
-						src={imageSource}
-						alt={name}
-						className="size-12 shrink-0 rounded-lg object-cover"
-					/>
-				) : (
-					<Avatar className="size-12 shrink-0">
-						<AvatarImage src={imageSource ?? undefined} />
-						<AvatarFallback>{getInitial(name)}</AvatarFallback>
-					</Avatar>
-				)}
-
-				<div className="flex min-w-0 flex-1 flex-col gap-1.5">
-					<h2 className="text-base font-semibold">{name}</h2>
-
-					{hasDescription && (
-						<div className="text-muted-foreground text-sm leading-relaxed">
-							<p>{displayedDescription}</p>
-							{isLongDescription && (
-								<button
-									type="button"
-									onClick={toggleExpanded}
-									className="text-primary mt-0.5 text-xs hover:underline"
-								>
-									{expanded ? t('showLess') : t('showMore')}
-								</button>
-							)}
-						</div>
+		<div className="bg-card w-full border-b">
+			<div className="mx-auto max-w-5xl px-6">
+				<button
+					type="button"
+					onClick={toggleOpen}
+					className="flex w-full items-center gap-3 py-3 text-left"
+				>
+					{isOrg && imageSource ? (
+						<img
+							src={imageSource}
+							alt={name}
+							className="size-9 shrink-0 rounded-lg object-cover"
+						/>
+					) : (
+						<Avatar className="size-9 shrink-0">
+							<AvatarImage src={imageSource ?? undefined} />
+							<AvatarFallback className="text-sm">
+								{getInitial(name)}
+							</AvatarFallback>
+						</Avatar>
 					)}
 
-					{hasContactInfo && (
-						<>
-							{hasDescription && <Separator className="my-1" />}
-							<div className="text-muted-foreground flex flex-wrap gap-x-4 gap-y-1 text-xs">
+					<span className="flex-1 text-sm font-semibold">{name}</span>
+
+					<span className="text-muted-foreground flex items-center gap-1 text-xs">
+						{toggleLabel}
+						{open ? (
+							<ChevronUp className="size-4" />
+						) : (
+							<ChevronDown className="size-4" />
+						)}
+					</span>
+				</button>
+
+				<div
+					className={cn(
+						'grid transition-all duration-200 ease-in-out',
+						open ? 'grid-rows-[1fr] pb-4' : 'grid-rows-[0fr]',
+					)}
+				>
+					<div className="overflow-hidden">
+						<Separator className="mb-3" />
+
+						{hasDescription && (
+							<p className="text-muted-foreground mb-3 text-sm leading-relaxed">
+								{description}
+							</p>
+						)}
+
+						{hasContactInfo && (
+							<div className="text-muted-foreground flex flex-wrap gap-x-5 gap-y-1.5 text-xs">
 								{address && (
 									<span className="flex items-center gap-1.5">
 										<MapPin className="size-3.5 shrink-0" />
@@ -101,6 +110,7 @@ function ProfileInfoBlock({
 									<a
 										href={`tel:${phone}`}
 										className="flex items-center gap-1.5 hover:underline"
+										onClick={(e) => e.stopPropagation()}
 									>
 										<Phone className="size-3.5 shrink-0" />
 										{phone}
@@ -112,14 +122,15 @@ function ProfileInfoBlock({
 										target="_blank"
 										rel="noopener noreferrer"
 										className="flex items-center gap-1.5 hover:underline"
+										onClick={(e) => e.stopPropagation()}
 									>
 										<Globe className="size-3.5 shrink-0" />
 										{website.replace(/^https?:\/\//, '')}
 									</a>
 								)}
 							</div>
-						</>
-					)}
+						)}
+					</div>
 				</div>
 			</div>
 		</div>
