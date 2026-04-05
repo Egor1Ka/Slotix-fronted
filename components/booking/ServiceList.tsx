@@ -10,6 +10,7 @@ interface ServiceListProps {
 	selectedId: string | null
 	onSelect: (eventTypeId: string) => void
 	loading?: boolean
+	variant?: 'vertical' | 'horizontal'
 }
 
 const SKELETON_ITEMS = [1, 2, 3]
@@ -24,17 +25,49 @@ const renderSkeletonItem = (i: number) => (
 	</div>
 )
 
+const renderSkeletonChip = (i: number) => (
+	<Skeleton key={i} className="h-9 w-28 shrink-0 rounded-full" />
+)
+
 function ServiceList({
 	eventTypes,
 	selectedId,
 	onSelect,
 	loading = false,
+	variant = 'vertical',
 }: ServiceListProps) {
 	const t = useTranslations('booking')
+
+	const isHorizontal = variant === 'horizontal'
 
 	const renderEventType = (eventType: EventType) => {
 		const isActive = eventType.id === selectedId
 		const handleClick = () => onSelect(eventType.id)
+
+		if (isHorizontal) {
+			return (
+				<button
+					key={eventType.id}
+					type="button"
+					onClick={handleClick}
+					className={cn(
+						'flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-xs transition-all',
+						isActive
+							? 'border-primary bg-primary/10 ring-primary/30 shadow-sm ring-1'
+							: 'border-border hover:bg-muted',
+					)}
+				>
+					<div
+						className="size-2 shrink-0 rounded-full"
+						style={{ backgroundColor: eventType.color }}
+					/>
+					<span className="font-medium">{eventType.name}</span>
+					<span className="text-muted-foreground">
+						{eventType.price} {eventType.currency}
+					</span>
+				</button>
+			)
+		}
 
 		return (
 			<button
@@ -63,18 +96,26 @@ function ServiceList({
 		)
 	}
 
+	const skeletonRenderer = isHorizontal ? renderSkeletonChip : renderSkeletonItem
+	const showSkeleton = eventTypes.length === 0 && loading
+
 	return (
 		<div
 			className={cn(
-				'flex flex-col gap-2 transition-opacity',
+				'gap-2 transition-opacity',
 				loading && 'pointer-events-none opacity-50',
+				isHorizontal
+					? 'flex overflow-x-auto pb-2'
+					: 'flex flex-col',
 			)}
 		>
-			<h3 className="text-muted-foreground text-sm font-medium">
-				{t('services')}
-			</h3>
-			{eventTypes.length === 0 && loading
-				? SKELETON_ITEMS.map(renderSkeletonItem)
+			{!isHorizontal && (
+				<h3 className="text-muted-foreground text-sm font-medium">
+					{t('services')}
+				</h3>
+			)}
+			{showSkeleton
+				? SKELETON_ITEMS.map(skeletonRenderer)
 				: eventTypes.map(renderEventType)}
 		</div>
 	)

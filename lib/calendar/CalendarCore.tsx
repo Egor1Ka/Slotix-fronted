@@ -725,7 +725,7 @@ function CalendarCore({
 
 					{!hideSidebar && (
 						<div className="md:hidden">
-							{strategy.renderSidebar()}
+							{strategy.renderMobileSidebar?.() ?? strategy.renderSidebar()}
 						</div>
 					)}
 

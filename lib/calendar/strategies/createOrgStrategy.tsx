@@ -331,6 +331,20 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 			)
 		},
 
+		renderMobileSidebar() {
+			if (isDayOff || eventTypes.length === 0) return null
+
+			return (
+				<ServiceList
+					eventTypes={eventTypes}
+					selectedId={selectedEventTypeId}
+					onSelect={onSelectEventType ?? (() => {})}
+					loading={loading}
+					variant="horizontal"
+				/>
+			)
+		},
+
 		renderPanel() {
 			if (isDayOff || isStaffDayOff) {
 				return (

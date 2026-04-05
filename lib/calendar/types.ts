@@ -44,6 +44,7 @@ interface ConfirmedBooking {
 interface CalendarStrategy {
 	getBlocks(date: string): CalendarBlock[]
 	renderSidebar(): ReactNode
+	renderMobileSidebar?(): ReactNode
 	renderPanel(): ReactNode
 	onCellClick(date: string, startMin: number): void
 	allowRangeSelect: boolean
