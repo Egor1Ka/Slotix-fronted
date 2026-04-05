@@ -169,7 +169,7 @@ const toFrontendEventType = (raw: BackendEventType): EventType => ({
 	price: raw.price ? raw.price.amount : 0,
 	currency: raw.price ? raw.price.currency : 'usd',
 	color: raw.color,
-	description: null,
+	description: raw.description ?? null,
 	staffPolicy: raw.staffPolicy ?? 'any',
 	assignedPositions: raw.assignedPositions ?? [],
 	assignedStaff: raw.assignedStaff ?? [],
