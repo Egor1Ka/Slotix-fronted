@@ -682,7 +682,7 @@ function CalendarCore({
 
 			<main className="flex-1 overflow-auto p-4">
 				<div className="flex flex-col gap-4">
-					<div className="flex items-center justify-between">
+					<div className="flex flex-wrap items-center justify-between gap-2">
 						<div className="flex items-center gap-1">
 							{staffAvatarUrl && (
 								<img
@@ -694,7 +694,7 @@ function CalendarCore({
 							<Button variant="ghost" size="icon-sm" onClick={handlePrev}>
 								<ChevronLeftIcon />
 							</Button>
-							<h2 className="min-w-[140px] text-center text-lg font-semibold">
+							<h2 className="min-w-0 text-center text-sm font-semibold md:min-w-[140px] md:text-lg">
 								{title}
 							</h2>
 							<Button variant="ghost" size="icon-sm" onClick={handleNext}>
@@ -707,7 +707,7 @@ function CalendarCore({
 									variant="outline"
 									size="sm"
 									onClick={handleCopyPublicLink}
-									className="gap-1.5"
+									className="hidden gap-1.5 md:flex"
 								>
 									{linkCopied ? (
 										<CheckIcon className="size-4" />
