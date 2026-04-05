@@ -731,7 +731,7 @@ function CalendarCore({
 				</div>
 			</main>
 
-			<aside className="w-full shrink-0 border-t p-4 md:w-[220px] md:border-t-0 md:border-l">
+			<aside className="w-full shrink-0 border-t p-4 md:w-[280px] md:border-t-0 md:border-l">
 				{strategy.renderPanel()}
 			</aside>
 

@@ -39,6 +39,14 @@ function ServiceInfo({ eventType }: { eventType: EventType }) {
 				{eventType.durationMin} {t('min')} · {eventType.price}{' '}
 				{eventType.currency}
 			</div>
+			{eventType.description && (
+				<>
+					<Separator />
+					<p className="text-muted-foreground text-xs leading-relaxed">
+						{eventType.description}
+					</p>
+				</>
+			)}
 			<Separator />
 			<p className="text-muted-foreground text-xs">{t('clickDashedZone')}</p>
 		</div>

@@ -28,6 +28,7 @@ import type {
 	OrgStaffMember,
 } from '@/services/configs/booking.types'
 import { ServiceList } from '@/components/booking/ServiceList'
+import { StaffInfoCard } from '@/components/booking/StaffInfoCard'
 import { StaffBookingPanel } from '@/components/booking/StaffBookingPanel'
 import type { ClientInfoData } from '@/components/booking/ClientInfoForm'
 import type { MergedBookingForm } from '@/services/configs/booking-field.types'
@@ -385,8 +386,20 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 				)
 			}
 
+			const findSelectedStaff = (s: OrgStaffMember): boolean =>
+				s.id === selectedStaffId
+			const selectedStaff = staffList?.find(findSelectedStaff) ?? null
+
 			return (
 				<>
+					{selectedStaff && (
+						<StaffInfoCard
+							name={selectedStaff.name}
+							avatar={selectedStaff.avatar}
+							position={selectedStaff.position}
+							bio={selectedStaff.bio}
+						/>
+					)}
 					{bookingError && (
 						<div className="text-destructive bg-destructive/10 mb-3 rounded-md p-3 text-sm">
 							{bookingError}
