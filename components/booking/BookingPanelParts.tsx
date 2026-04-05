@@ -28,11 +28,11 @@ function EmptyState({ message }: { message?: string }) {
 function ServiceInfo({ eventType }: { eventType: EventType }) {
 	const t = useTranslations('booking')
 	const tProfile = useTranslations('profile')
-	const [descriptionOpen, setDescriptionOpen] = useState(true)
+	const [expanded, setExpanded] = useState(false)
 
 	const hasDescription = eventType.description && eventType.description.length > 0
 
-	const toggleDescription = () => setDescriptionOpen((prev) => !prev)
+	const toggleExpanded = () => setExpanded((prev) => !prev)
 
 	return (
 		<div className="flex flex-col gap-3">
@@ -50,23 +50,18 @@ function ServiceInfo({ eventType }: { eventType: EventType }) {
 			{hasDescription && (
 				<>
 					<Separator />
-					<button
-						type="button"
-						onClick={toggleDescription}
-						className="text-muted-foreground flex items-center gap-1 text-xs hover:underline"
-					>
-						{descriptionOpen ? tProfile('hide') : tProfile('showMore')}
-						{descriptionOpen ? (
-							<ChevronUp className="size-3" />
-						) : (
-							<ChevronDown className="size-3" />
-						)}
-					</button>
-					{descriptionOpen && (
-						<p className="text-muted-foreground text-xs leading-relaxed">
+					<div className="text-muted-foreground text-xs leading-relaxed">
+						<p className={expanded ? '' : 'line-clamp-3'}>
 							{eventType.description}
 						</p>
-					)}
+						<button
+							type="button"
+							onClick={toggleExpanded}
+							className="text-primary mt-1 text-xs hover:underline"
+						>
+							{expanded ? tProfile('showLess') : tProfile('showMore')}
+						</button>
+					</div>
 				</>
 			)}
 			<Separator />
