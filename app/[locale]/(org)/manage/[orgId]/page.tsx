@@ -7,9 +7,9 @@ import { OrgCalendarPage } from '@/components/booking/OrgCalendarPage'
 export default async function OrgAdminPage({
 	params,
 }: {
-	params: Promise<{ orgId: string }>
+	params: Promise<{ orgId: string; locale: string }>
 }) {
-	const { orgId } = await params
+	const { orgId, locale } = await params
 	const t = await getTranslations('booking')
 
 	return (
@@ -21,7 +21,7 @@ export default async function OrgAdminPage({
 			}
 		>
 			<CalendarViewConfigProvider config={ORG_ADMIN_CONFIG}>
-				<OrgCalendarPage orgSlug={orgId} />
+				<OrgCalendarPage orgSlug={orgId} publicUrl={`/${locale}/org/${orgId}`} />
 			</CalendarViewConfigProvider>
 		</Suspense>
 	)

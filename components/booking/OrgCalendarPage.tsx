@@ -62,11 +62,13 @@ const toDayOfWeek = (wh: { dayOfWeek: number }): number => wh.dayOfWeek
 interface OrgCalendarPageProps {
 	orgSlug: string
 	staffId?: string
+	publicUrl?: string
 }
 
 function OrgCalendarPage({
 	orgSlug,
 	staffId: staffIdProp,
+	publicUrl: publicUrlProp,
 }: OrgCalendarPageProps) {
 	const searchParams = useSearchParams()
 	const viewConfig = useViewConfig()
@@ -341,7 +343,7 @@ function OrgCalendarPage({
 				disabledDays={disabledDays}
 				isDayOff={isOrgDayOff || isStaffDayOff}
 				staffTabsSlot={staffTabsSlot}
-				publicUrl={`/${locale}/org/${orgSlug}`}
+				publicUrl={publicUrlProp}
 				profileInfo={profileInfo}
 			/>
 		</CalendarProvider>
