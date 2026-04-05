@@ -1,10 +1,11 @@
 'use client'
 
+import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import type { EventType } from '@/services/configs/booking.types'
 import type { ConfirmedBooking } from '@/lib/calendar/types'
 import { Separator } from '@/components/ui/separator'
-import { CheckCircle2Icon } from 'lucide-react'
+import { CheckCircle2Icon, ChevronDown, ChevronUp } from 'lucide-react'
 
 const formatLocalTime = (isoString: string): string => {
 	const d = new Date(isoString)
@@ -26,6 +27,13 @@ function EmptyState({ message }: { message?: string }) {
 
 function ServiceInfo({ eventType }: { eventType: EventType }) {
 	const t = useTranslations('booking')
+	const tProfile = useTranslations('profile')
+	const [descriptionOpen, setDescriptionOpen] = useState(true)
+
+	const hasDescription = eventType.description && eventType.description.length > 0
+
+	const toggleDescription = () => setDescriptionOpen((prev) => !prev)
+
 	return (
 		<div className="flex flex-col gap-3">
 			<div className="flex items-center gap-2">
@@ -39,12 +47,26 @@ function ServiceInfo({ eventType }: { eventType: EventType }) {
 				{eventType.durationMin} {t('min')} · {eventType.price}{' '}
 				{eventType.currency}
 			</div>
-			{eventType.description && (
+			{hasDescription && (
 				<>
 					<Separator />
-					<p className="text-muted-foreground text-xs leading-relaxed">
-						{eventType.description}
-					</p>
+					<button
+						type="button"
+						onClick={toggleDescription}
+						className="text-muted-foreground flex items-center gap-1 text-xs hover:underline"
+					>
+						{descriptionOpen ? tProfile('hide') : tProfile('showMore')}
+						{descriptionOpen ? (
+							<ChevronUp className="size-3" />
+						) : (
+							<ChevronDown className="size-3" />
+						)}
+					</button>
+					{descriptionOpen && (
+						<p className="text-muted-foreground text-xs leading-relaxed">
+							{eventType.description}
+						</p>
+					)}
 				</>
 			)}
 			<Separator />

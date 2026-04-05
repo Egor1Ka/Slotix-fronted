@@ -85,6 +85,7 @@ interface BackendEventType {
 	durationMin: number
 	type: string
 	color: string
+	description: string | null
 	price: { amount: number; currency: string } | null
 	bufferAfter: number
 	minNotice: number

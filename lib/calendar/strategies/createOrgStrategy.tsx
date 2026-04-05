@@ -28,6 +28,7 @@ import type {
 	OrgStaffMember,
 } from '@/services/configs/booking.types'
 import { ServiceList } from '@/components/booking/ServiceList'
+import { ServiceInfo } from '@/components/booking/BookingPanelParts'
 import { StaffInfoCard } from '@/components/booking/StaffInfoCard'
 import { StaffBookingPanel } from '@/components/booking/StaffBookingPanel'
 import type { ClientInfoData } from '@/components/booking/ClientInfoForm'
@@ -380,9 +381,12 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 			// Услуга выбрана, но сотрудник — нет
 			if (selectedEventType && !selectedStaffId) {
 				return (
-					<div className="text-muted-foreground p-4 text-sm">
-						{selectStaffToBookLabel}
-					</div>
+					<>
+						<ServiceInfo eventType={selectedEventType} />
+						<div className="text-muted-foreground mt-3 text-sm">
+							{selectStaffToBookLabel}
+						</div>
+					</>
 				)
 			}
 
