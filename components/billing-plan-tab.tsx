@@ -50,21 +50,6 @@ export function BillingPlanTab({
 	const t = useTranslations('billing')
 
 	const currentIndex = catalog.hierarchy.indexOf(plan.key)
-
-	const isProductPurchased = (productKey: string) =>
-		plan.products.includes(productKey)
-
-	const getAvailableProducts = () =>
-		catalog.products.filter((product) => !isProductPurchased(product.key))
-
-	const getProductDisplayName = (productKey: string) => {
-		if (!hasI18nKeys(t, 'products', productKey)) return productKey
-		return t(`products.${productKey}.name`)
-	}
-
-	const availableProducts = getAvailableProducts()
-	const hasPurchasedProducts = plan.products.length > 0
-
 	const handleCancel = async () => {
 		setCancelling(true)
 		try {
@@ -101,16 +86,14 @@ export function BillingPlanTab({
 					</div>
 				</CardHeader>
 				<CardContent>
-					<div className="text-muted-foreground flex gap-6 text-sm">
-						<span>
-							Projects:{' '}
-							{plan.limits.projects === Infinity ? '∞' : plan.limits.projects}
-						</span>
-						<span>Storage: {plan.limits.storage} MB</span>
-					</div>
-					{hasPurchasedProducts && (
-						<div className="text-muted-foreground mt-2 text-sm">
-							Products: {plan.products.map(getProductDisplayName).join(', ')}
+					{plan.limits.organizations !== undefined && (
+						<div className="text-muted-foreground text-sm">
+							<span>
+								Organizations:{' '}
+								{plan.limits.organizations === Infinity
+									? '∞'
+									: plan.limits.organizations}
+							</span>
 						</div>
 					)}
 					{subscription &&
@@ -218,65 +201,6 @@ export function BillingPlanTab({
 				</div>
 			</div>
 
-			{/* ── Products ───────────────────────────────────────────── */}
-			{availableProducts.length > 0 && (
-				<div>
-					<h3 className="mb-4 text-lg font-semibold">Products</h3>
-					<div className="grid gap-6 lg:grid-cols-2">
-						{availableProducts.map((product) => {
-							if (!hasI18nKeys(t, 'products', product.key)) {
-								if (process.env.NODE_ENV === 'development') {
-									console.warn(
-										`Missing i18n keys for billing product: ${product.key}`,
-									)
-								}
-								return null
-							}
-
-							const features: string[] = t.raw(
-								`products.${product.key}.features`,
-							)
-
-							return (
-								<Card key={product.key}>
-									<CardHeader>
-										<div className="flex items-center justify-between">
-											<CardTitle>{t(`products.${product.key}.name`)}</CardTitle>
-											<Badge variant="secondary">One-time</Badge>
-										</div>
-										<div className="flex items-baseline gap-1">
-											<span className="text-3xl font-semibold">
-												{formatPrice(product.price, product.currency)}
-											</span>
-										</div>
-									</CardHeader>
-									<CardContent>
-										<ul className="mb-6 space-y-2">
-											{features.map((feature) => (
-												<li
-													key={feature}
-													className="flex items-center gap-2 text-sm"
-												>
-													<Check className="text-primary h-4 w-4 shrink-0" />
-													{feature}
-												</li>
-											))}
-										</ul>
-										<CreemCheckout
-											productId={product.productId}
-											checkoutPath="/api/checkout"
-										>
-											<Button className="w-full">
-												Buy {t(`products.${product.key}.name`)}
-											</Button>
-										</CreemCheckout>
-									</CardContent>
-								</Card>
-							)
-						})}
-					</div>
-				</div>
-			)}
 		</div>
 	)
 }
