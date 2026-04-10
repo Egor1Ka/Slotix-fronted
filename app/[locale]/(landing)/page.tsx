@@ -334,7 +334,7 @@ export default async function LandingPage() {
 							description={t('pricing.org_creator.description')}
 							features={t.raw('pricing.org_creator.features') as string[]}
 							ctaText={t('pricing.org_creator.cta')}
-							ctaHref={user ? '/dashboard' : GOOGLE_AUTH_URL}
+							ctaHref={businessHref}
 							highlighted
 							badge={t('pricing.popular')}
 						/>
