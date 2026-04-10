@@ -3,6 +3,7 @@ import { getTranslations } from 'next-intl/server'
 import { getUser } from '@/lib/auth/get-user'
 import {
 	ArrowRight,
+	Check,
 	Clock,
 	Users,
 	Zap,
@@ -276,6 +277,50 @@ export default async function LandingPage() {
 				</div>
 			</section>
 
+			{/* Pricing */}
+			<section id="pricing" className="px-4 py-28 sm:px-6 lg:px-8">
+				<div className="mx-auto max-w-5xl">
+					<div className="mb-16 text-center">
+						<span className="mb-4 block font-mono text-xs tracking-widest text-emerald-600 uppercase dark:text-emerald-400">
+							{t('nav.pricing')}
+						</span>
+						<h2 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+							{t('pricing.title')}
+						</h2>
+						<p className="text-muted-foreground mt-4 text-lg">
+							{t('pricing.subtitle')}
+						</p>
+					</div>
+
+					<div className="grid gap-8 md:grid-cols-2">
+						<PricingCard
+							name={t('pricing.free.name')}
+							price={t('pricing.free.price')}
+							period={t('pricing.free.period')}
+							description={t('pricing.free.description')}
+							features={t.raw('pricing.free.features') as string[]}
+							ctaText={t('pricing.free.cta')}
+							ctaHref={authHref}
+						/>
+						<PricingCard
+							name={t('pricing.org_creator.name')}
+							price={t('pricing.org_creator.price')}
+							period={t('pricing.org_creator.period')}
+							description={t('pricing.org_creator.description')}
+							features={t.raw('pricing.org_creator.features') as string[]}
+							ctaText={t('pricing.org_creator.cta')}
+							ctaHref={authHref}
+							highlighted
+							badge={t('pricing.popular')}
+						/>
+					</div>
+				</div>
+			</section>
+
+			<div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+				<div className="bg-border h-px" />
+			</div>
+
 			{/* CTA */}
 			<section className="relative overflow-hidden px-4 py-32 sm:px-6 lg:px-8">
 				<div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-emerald-500/[0.04] to-transparent" />
@@ -458,6 +503,73 @@ function TeamVisual({ preview }: { preview: PreviewTranslations }) {
 			<span className="text-muted-foreground text-xs">
 				{preview.unifiedCalendar}
 			</span>
+		</div>
+	)
+}
+
+function PricingCard({
+	name,
+	price,
+	period,
+	description,
+	features,
+	ctaText,
+	ctaHref,
+	highlighted = false,
+	badge,
+}: {
+	name: string
+	price: string
+	period: string
+	description: string
+	features: string[]
+	ctaText: string
+	ctaHref: string
+	highlighted?: boolean
+	badge?: string
+}) {
+	return (
+		<div
+			className={`relative overflow-hidden rounded-2xl border p-8 transition-all ${
+				highlighted
+					? 'border-emerald-500/50 shadow-xl shadow-emerald-500/10'
+					: 'border-border/60'
+			}`}
+		>
+			{badge && (
+				<div className="absolute top-4 right-4">
+					<span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+						{badge}
+					</span>
+				</div>
+			)}
+			<div className="mb-6">
+				<h3 className="text-xl font-semibold">{name}</h3>
+				<p className="text-muted-foreground mt-1 text-sm">{description}</p>
+			</div>
+			<div className="mb-6 flex items-baseline gap-1">
+				<span className="text-4xl font-bold">{price}</span>
+				<span className="text-muted-foreground text-sm">{period}</span>
+			</div>
+			<ul className="mb-8 space-y-3">
+				{features.map((feature) => (
+					<li key={feature} className="flex items-center gap-2.5 text-sm">
+						<Check className="h-4 w-4 shrink-0 text-emerald-500" />
+						{feature}
+					</li>
+				))}
+			</ul>
+			<Link
+				href={ctaHref}
+				className={`group inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl px-7 text-sm font-semibold transition-all ${
+					highlighted
+						? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/25 hover:bg-emerald-700 hover:shadow-emerald-600/40'
+						: 'border-border hover:bg-muted border'
+				}`}
+			>
+				{ctaText}
+				<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+			</Link>
 		</div>
 	)
 }
