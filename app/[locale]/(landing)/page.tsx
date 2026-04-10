@@ -1,19 +1,32 @@
 import Link from 'next/link'
+import { cookies } from 'next/headers'
 import { getTranslations } from 'next-intl/server'
 import { getUser } from '@/lib/auth/get-user'
-import {
-	ArrowRight,
-	Check,
-	Clock,
-	Users,
-	Zap,
-	CalendarCog,
-} from 'lucide-react'
+import { ArrowRight, Check, Clock, Users, Zap, CalendarCog } from 'lucide-react'
 
 const GOOGLE_AUTH_URL = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`
 const CREEM_PRODUCT_ORG_CREATOR = process.env.CREEM_PRODUCT_ORG_CREATOR || ''
 
 const checkoutHref = `/api/checkout?productId=${CREEM_PRODUCT_ORG_CREATOR}`
+
+async function hasActiveSubscription(): Promise<boolean> {
+	const cookieStore = await cookies()
+	const accessToken = cookieStore.get('accessToken')?.value
+	if (!accessToken) return false
+
+	const backendUrl = process.env.BACKEND_URL ?? ''
+	try {
+		const res = await fetch(`${backendUrl}/api/billing/subscription`, {
+			headers: { Cookie: `accessToken=${accessToken}` },
+			cache: 'no-store',
+		})
+		if (!res.ok) return false
+		const body = await res.json()
+		return !!body.data
+	} catch {
+		return false
+	}
+}
 
 const featureKeys = ['slots', 'booking', 'team', 'schedule'] as const
 
@@ -51,7 +64,10 @@ export default async function LandingPage() {
 	const t = await getTranslations('landing')
 	const user = await getUser()
 	const authHref = user ? '/organizations' : GOOGLE_AUTH_URL
-	const businessHref = user ? checkoutHref : GOOGLE_AUTH_URL
+	const hasSub = user ? await hasActiveSubscription() : false
+	const businessHref = user
+		? hasSub ? '/organizations' : checkoutHref
+		: GOOGLE_AUTH_URL
 
 	const preview: PreviewTranslations = {
 		day: t('preview.day'),
@@ -137,11 +153,15 @@ export default async function LandingPage() {
 								<div className="border-border/60 bg-card overflow-hidden rounded-2xl border shadow-2xl">
 									<div className="border-border/40 flex items-center justify-between border-b px-6 py-4">
 										<div className="text-muted-foreground flex items-center gap-1 text-sm">
-											<span className="hover:bg-muted cursor-pointer rounded p-1">‹</span>
+											<span className="hover:bg-muted cursor-pointer rounded p-1">
+												‹
+											</span>
 											<span className="text-foreground font-semibold">
 												{preview.calendarDate}
 											</span>
-											<span className="hover:bg-muted cursor-pointer rounded p-1">›</span>
+											<span className="hover:bg-muted cursor-pointer rounded p-1">
+												›
+											</span>
 										</div>
 										<div className="border-border flex overflow-hidden rounded-lg border text-xs font-medium">
 											<span className="bg-primary text-primary-foreground px-3 py-1.5">
@@ -153,7 +173,7 @@ export default async function LandingPage() {
 										</div>
 									</div>
 
-									<div className="relative bg-muted/30 px-2 py-2">
+									<div className="bg-muted/30 relative px-2 py-2">
 										<div className="bg-card rounded-lg">
 											<div className="relative">
 												<TimeRow time="09:00" />
@@ -173,7 +193,7 @@ export default async function LandingPage() {
 													height="h-12"
 												/>
 												<TimeRow time="11:00" />
-												<div className="ml-14 mr-2 mt-1 rounded-lg border border-dashed border-emerald-500/30 py-4 text-center">
+												<div className="mt-1 mr-2 ml-14 rounded-lg border border-dashed border-emerald-500/30 py-4 text-center">
 													<span className="text-muted-foreground/40 text-xs">
 														{preview.availableSlot}
 													</span>
@@ -216,18 +236,14 @@ export default async function LandingPage() {
 												{preview.serviceHaircut}
 											</span>
 										</div>
-										<span className="text-muted-foreground text-xs">
-											45m
-										</span>
+										<span className="text-muted-foreground text-xs">45m</span>
 									</div>
 									<div className="border-border mb-3 flex items-center justify-between rounded-lg border px-3 py-2.5 text-sm">
 										<div className="flex items-center gap-2">
 											<span className="h-2.5 w-2.5 rounded-full bg-sky-500" />
 											<span>{preview.serviceBeard}</span>
 										</div>
-										<span className="text-muted-foreground text-xs">
-											20m
-										</span>
+										<span className="text-muted-foreground text-xs">20m</span>
 									</div>
 									<div className="bg-foreground text-background w-full rounded-lg py-2.5 text-center text-sm font-semibold">
 										{preview.bookTime}
@@ -266,14 +282,9 @@ export default async function LandingPage() {
 									key={key}
 									icon={<Icon className="h-5 w-5" />}
 									title={t(`features.items.${key}.title`)}
-									description={t(
-										`features.items.${key}.description`
-									)}
+									description={t(`features.items.${key}.description`)}
 								>
-									<FeatureVisual
-										featureKey={key}
-										preview={preview}
-									/>
+									<FeatureVisual featureKey={key} preview={preview} />
 								</FeatureCard>
 							)
 						})}
@@ -376,7 +387,7 @@ function CalendarBlock({
 }) {
 	return (
 		<div
-			className={`ml-14 mr-2 rounded-lg border p-3 ${height}`}
+			className={`mr-2 ml-14 rounded-lg border p-3 ${height}`}
 			style={{
 				backgroundColor: `${color}20`,
 				borderColor: `${color}40`,
