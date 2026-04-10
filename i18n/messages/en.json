@@ -172,9 +172,10 @@
 		},
 		"orgDeactivated": {
 			"public": "This organization is temporarily unavailable",
-			"owner": "Your subscription has expired. The organization is deactivated.",
+			"owner": "Subscription expired",
 			"member": "This organization is currently inactive.",
-			"renewLink": "Renew subscription"
+			"description": "To manage organizations, go to the pricing plans and subscribe.",
+			"renewLink": "View plans"
 		}
 	},
 	"booking": {
