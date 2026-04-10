@@ -15,7 +15,7 @@ function OrgDeactivatedBanner({ variant }: OrgDeactivatedBannerProps) {
 	const router = useRouter()
 
 	const handleRenew = () => {
-		router.push('/billing')
+		router.push('/dashboard')
 	}
 
 	return (

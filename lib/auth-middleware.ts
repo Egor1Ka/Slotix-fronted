@@ -4,7 +4,6 @@ import { isSafeRedirectPath } from '@/lib/utils'
 
 const protectedPaths = [
 	'/dashboard',
-	'/billing',
 	'/shadcndemo',
 	'/organizations',
 	'/schedule',

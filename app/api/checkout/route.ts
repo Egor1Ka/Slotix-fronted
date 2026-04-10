@@ -7,5 +7,5 @@ if (!creemApiKey)
 export const GET = Checkout({
 	apiKey: creemApiKey,
 	testMode: process.env.NODE_ENV !== 'production',
-	defaultSuccessUrl: '/billing?checkout=success',
+	defaultSuccessUrl: '/dashboard?checkout=success',
 })

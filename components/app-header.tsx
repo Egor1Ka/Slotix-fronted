@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { LogOut, Pencil, CreditCard } from 'lucide-react'
+import { LogOut, Pencil } from 'lucide-react'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import {
 	DropdownMenu,
@@ -66,10 +66,6 @@ export function AppHeader() {
 						<DropdownMenuItem onClick={() => setEditOpen(true)}>
 							<Pencil />
 							Edit name
-						</DropdownMenuItem>
-						<DropdownMenuItem onClick={() => router.push('/billing')}>
-							<CreditCard />
-							Billing
 						</DropdownMenuItem>
 					</DropdownMenuGroup>
 					<DropdownMenuSeparator />
