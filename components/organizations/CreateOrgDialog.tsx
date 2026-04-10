@@ -13,7 +13,6 @@ import {
 	DialogContent,
 	DialogHeader,
 	DialogTitle,
-	DialogTrigger,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import {
@@ -25,6 +24,8 @@ import {
 } from '@/components/ui/select'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { orgApi, setServerErrors } from '@/services'
+import type { Plan, BillingCatalog } from '@/services'
+import { OrgPaywall } from '@/components/organizations/OrgPaywall'
 
 // Предустановленные цвета бренда
 const PRESET_COLORS = [
@@ -58,11 +59,33 @@ type CreateOrgFormData = z.infer<typeof createOrgSchema>
 
 interface CreateOrgDialogProps {
 	onCreated: () => void
+	plan: Plan | null
+	catalog: BillingCatalog | null
+	orgCount: number
 }
 
-function CreateOrgDialog({ onCreated }: CreateOrgDialogProps) {
+function CreateOrgDialog({
+	onCreated,
+	plan,
+	catalog,
+	orgCount,
+}: CreateOrgDialogProps) {
 	const t = useTranslations('organizations')
+	const tb = useTranslations('billing')
 	const [open, setOpen] = useState(false)
+	const [paywallOpen, setPaywallOpen] = useState(false)
+
+	const canCreateOrg = plan && plan.features.createOrg
+	const orgLimit = plan ? plan.limits.organizations || 0 : 0
+	const limitReached = canCreateOrg && orgCount >= orgLimit
+
+	const handleCreateClick = () => {
+		if (!canCreateOrg) {
+			setPaywallOpen(true)
+			return
+		}
+		setOpen(true)
+	}
 
 	const {
 		register,
@@ -118,88 +141,100 @@ function CreateOrgDialog({ onCreated }: CreateOrgDialogProps) {
 	)
 
 	return (
-		<Dialog open={open} onOpenChange={setOpen}>
-			<DialogTrigger
-				render={
-					<Button>
-						<Plus className="mr-2 size-4" />
-						{t('create')}
-					</Button>
-				}
-			/>
-			<DialogContent>
-				<DialogHeader>
-					<DialogTitle>{t('create')}</DialogTitle>
-				</DialogHeader>
-				<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-					<Field data-invalid={!!errors.name || undefined}>
-						<FieldLabel htmlFor="name">{t('form.name')}</FieldLabel>
-						<Input
-							id="name"
-							placeholder={t('form.namePlaceholder')}
-							{...register('name')}
-						/>
-						<FieldError errors={[errors.name]} />
-					</Field>
+		<>
+			<Button onClick={handleCreateClick} disabled={!!limitReached}>
+				<Plus className="mr-2 size-4" />
+				{limitReached
+					? tb('orgCreator.limitReached', {
+							count: String(orgCount),
+							max: String(orgLimit),
+						})
+					: t('create')}
+			</Button>
 
-					<Field data-invalid={!!errors.currency || undefined}>
-						<FieldLabel>{t('form.currency')}</FieldLabel>
-						<Controller
-							control={control}
-							name="currency"
-							render={({ field }) => (
-								<Select value={field.value} onValueChange={field.onChange}>
-									<SelectTrigger>
-										<SelectValue />
-									</SelectTrigger>
-									<SelectContent>
-										<SelectItem value="UAH">UAH (&#8372;)</SelectItem>
-										<SelectItem value="USD">USD ($)</SelectItem>
-									</SelectContent>
-								</Select>
-							)}
-						/>
-						<FieldError errors={[errors.currency]} />
-					</Field>
+			<Dialog open={open} onOpenChange={setOpen}>
+				<DialogContent>
+					<DialogHeader>
+						<DialogTitle>{t('create')}</DialogTitle>
+					</DialogHeader>
+					<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+						<Field data-invalid={!!errors.name || undefined}>
+							<FieldLabel htmlFor="name">{t('form.name')}</FieldLabel>
+							<Input
+								id="name"
+								placeholder={t('form.namePlaceholder')}
+								{...register('name')}
+							/>
+							<FieldError errors={[errors.name]} />
+						</Field>
 
-					<Field data-invalid={!!errors.brandColor || undefined}>
-						<FieldLabel htmlFor="brandColor">{t('form.brandColor')}</FieldLabel>
-						<div className="mb-2 flex flex-wrap gap-2">
-							{PRESET_COLORS.map(renderColorOption)}
+						<Field data-invalid={!!errors.currency || undefined}>
+							<FieldLabel>{t('form.currency')}</FieldLabel>
+							<Controller
+								control={control}
+								name="currency"
+								render={({ field }) => (
+									<Select value={field.value} onValueChange={field.onChange}>
+										<SelectTrigger>
+											<SelectValue />
+										</SelectTrigger>
+										<SelectContent>
+											<SelectItem value="UAH">UAH (&#8372;)</SelectItem>
+											<SelectItem value="USD">USD ($)</SelectItem>
+										</SelectContent>
+									</Select>
+								)}
+							/>
+							<FieldError errors={[errors.currency]} />
+						</Field>
+
+						<Field data-invalid={!!errors.brandColor || undefined}>
+							<FieldLabel htmlFor="brandColor">
+								{t('form.brandColor')}
+							</FieldLabel>
+							<div className="mb-2 flex flex-wrap gap-2">
+								{PRESET_COLORS.map(renderColorOption)}
+							</div>
+							<Input
+								id="brandColor"
+								placeholder="#1a1a2e"
+								{...register('brandColor')}
+							/>
+							<FieldError errors={[errors.brandColor]} />
+						</Field>
+
+						<Field data-invalid={!!errors.logoUrl || undefined}>
+							<FieldLabel htmlFor="logoUrl">{t('form.logo')}</FieldLabel>
+							<Input
+								id="logoUrl"
+								placeholder={t('form.logoPlaceholder')}
+								{...register('logoUrl')}
+							/>
+							<FieldError errors={[errors.logoUrl]} />
+						</Field>
+
+						<div className="flex justify-end gap-2">
+							<Button
+								type="button"
+								variant="outline"
+								onClick={() => setOpen(false)}
+							>
+								{t('form.cancel')}
+							</Button>
+							<Button type="submit" disabled={isSubmitting}>
+								{t('form.submit')}
+							</Button>
 						</div>
-						<Input
-							id="brandColor"
-							placeholder="#1a1a2e"
-							{...register('brandColor')}
-						/>
-						<FieldError errors={[errors.brandColor]} />
-					</Field>
+					</form>
+				</DialogContent>
+			</Dialog>
 
-					<Field data-invalid={!!errors.logoUrl || undefined}>
-						<FieldLabel htmlFor="logoUrl">{t('form.logo')}</FieldLabel>
-						<Input
-							id="logoUrl"
-							placeholder={t('form.logoPlaceholder')}
-							{...register('logoUrl')}
-						/>
-						<FieldError errors={[errors.logoUrl]} />
-					</Field>
-
-					<div className="flex justify-end gap-2">
-						<Button
-							type="button"
-							variant="outline"
-							onClick={() => setOpen(false)}
-						>
-							{t('form.cancel')}
-						</Button>
-						<Button type="submit" disabled={isSubmitting}>
-							{t('form.submit')}
-						</Button>
-					</div>
-				</form>
-			</DialogContent>
-		</Dialog>
+			<OrgPaywall
+				open={paywallOpen}
+				onOpenChange={setPaywallOpen}
+				catalog={catalog}
+			/>
+		</>
 	)
 }
 
