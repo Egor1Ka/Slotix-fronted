@@ -45,7 +45,36 @@
 		"pricing": {
 			"title": "Simple pricing",
 			"subtitle": "Choose the plan that fits your needs.",
-			"popular": "Popular"
+			"popular": "Popular",
+			"free": {
+				"name": "Free",
+				"price": "$0",
+				"period": "/month",
+				"description": "For individuals getting started",
+				"cta": "Get Started",
+				"features": [
+					"Personal booking page",
+					"Smart slot scheduling",
+					"Zero-login booking for clients",
+					"Custom work hours & day-offs",
+					"Unlimited bookings"
+				]
+			},
+			"org_creator": {
+				"name": "Business",
+				"price": "$2",
+				"period": "/month",
+				"description": "For teams and organizations",
+				"cta": "Start Business Plan",
+				"features": [
+					"Everything in Free",
+					"Create up to 3 organizations",
+					"Add team members & staff",
+					"Staff positions & levels",
+					"Organization management",
+					"Public organization booking page"
+				]
+			}
 		},
 		"cta": {
 			"title": "Ready to end scheduling chaos?",
