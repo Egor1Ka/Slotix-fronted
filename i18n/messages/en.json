@@ -112,34 +112,40 @@
 		"plans": {
 			"free": {
 				"name": "Free",
-				"description": "Perfect for side projects",
+				"description": "Basic access",
 				"features": [
-					"Up to 3 projects",
 					"Dashboard access",
 					"Community support"
 				]
 			},
-			"pro": {
-				"name": "Pro",
-				"description": "For professionals",
+			"org_creator": {
+				"name": "Org Creator",
+				"description": "Create and manage organizations",
 				"features": [
-					"Unlimited projects",
-					"Dashboard access",
-					"Export data",
-					"API access",
-					"Priority support"
+					"Create up to 3 organizations",
+					"Full organization management",
+					"Public booking pages",
+					"Staff management"
 				]
 			}
 		},
-		"products": {
-			"export_pack": {
-				"name": "Starter Pack",
-				"features": ["Export data", "5000 MB storage"]
-			}
-		},
+		"products": {},
 		"period": {
 			"month": "/month",
 			"year": "/year"
+		},
+		"orgCreator": {
+			"paywallTitle": "Subscription Required",
+			"paywallDescription": "Subscribe to the Org Creator plan to create and manage organizations.",
+			"paywallPrice": "$2/month",
+			"limitReached": "Organization limit reached ({count}/{max})",
+			"subscribe": "Subscribe — $2/mo"
+		},
+		"orgDeactivated": {
+			"public": "This organization is temporarily unavailable",
+			"owner": "Your subscription has expired. The organization is deactivated.",
+			"member": "This organization is currently inactive.",
+			"renewLink": "Renew subscription"
 		}
 	},
 	"booking": {
