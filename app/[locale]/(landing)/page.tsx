@@ -13,26 +13,7 @@ import {
 const GOOGLE_AUTH_URL = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`
 const CREEM_PRODUCT_ORG_CREATOR = process.env.CREEM_PRODUCT_ORG_CREATOR || ''
 
-async function getBusinessHref(): Promise<string> {
-	const { cookies } = await import('next/headers')
-	const cookieStore = await cookies()
-	const accessToken = cookieStore.get('accessToken')?.value
-	if (!accessToken) return `/api/checkout?productId=${CREEM_PRODUCT_ORG_CREATOR}`
-
-	const backendUrl = process.env.BACKEND_URL ?? ''
-	try {
-		const res = await fetch(`${backendUrl}/api/billing/subscription`, {
-			headers: { Cookie: `accessToken=${accessToken}` },
-			cache: 'no-store',
-		})
-		if (res.ok) {
-			const body = await res.json()
-			if (body.data) return '/organizations'
-		}
-	} catch { /* ignore */ }
-
-	return `/api/checkout?productId=${CREEM_PRODUCT_ORG_CREATOR}`
-}
+const checkoutHref = `/api/checkout?productId=${CREEM_PRODUCT_ORG_CREATOR}`
 
 const featureKeys = ['slots', 'booking', 'team', 'schedule'] as const
 
@@ -70,9 +51,7 @@ export default async function LandingPage() {
 	const t = await getTranslations('landing')
 	const user = await getUser()
 	const authHref = user ? '/organizations' : GOOGLE_AUTH_URL
-	const businessHref = user
-		? await getBusinessHref()
-		: GOOGLE_AUTH_URL
+	const businessHref = user ? checkoutHref : GOOGLE_AUTH_URL
 
 	const preview: PreviewTranslations = {
 		day: t('preview.day'),
