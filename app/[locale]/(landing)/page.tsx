@@ -17,7 +17,7 @@ async function getBusinessHref(): Promise<string> {
 	const { cookies } = await import('next/headers')
 	const cookieStore = await cookies()
 	const accessToken = cookieStore.get('accessToken')?.value
-	if (!accessToken) return `/api/checkout?product_id=${CREEM_PRODUCT_ORG_CREATOR}`
+	if (!accessToken) return `/api/checkout?productId=${CREEM_PRODUCT_ORG_CREATOR}`
 
 	const backendUrl = process.env.BACKEND_URL ?? ''
 	try {
@@ -31,7 +31,7 @@ async function getBusinessHref(): Promise<string> {
 		}
 	} catch { /* ignore */ }
 
-	return `/api/checkout?product_id=${CREEM_PRODUCT_ORG_CREATOR}`
+	return `/api/checkout?productId=${CREEM_PRODUCT_ORG_CREATOR}`
 }
 
 const featureKeys = ['slots', 'booking', 'team', 'schedule'] as const
