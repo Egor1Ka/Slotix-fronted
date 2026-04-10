@@ -226,6 +226,7 @@ const getOrgById = async (id: string): Promise<OrgByIdResponse> => {
 			address: null,
 			phone: null,
 			website: null,
+			active: true,
 		}
 	}
 	throw new Error(`Org not found: ${id}`)
