@@ -11,6 +11,7 @@ import type {
 	CreateOrgBody,
 	UpdateOrgBody,
 	AddStaffBody,
+	OrgMembership,
 } from './org.types'
 import type { OrgByIdResponse, OrgStaffMember } from './booking.types'
 import type { ApiResponse } from './user.config'
@@ -74,6 +75,12 @@ const orgApiConfig = {
 			defaultErrorMessage: 'Failed to update bio',
 		},
 	),
+
+	getMyMembership: endpoint<void, ApiResponse<OrgMembership>>({
+		url: ({ id }) => `/api/org/${id}/my-membership`,
+		method: getData,
+		defaultErrorMessage: 'Failed to check membership',
+	}),
 }
 
 export default orgApiConfig

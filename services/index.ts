@@ -106,6 +106,7 @@ export type {
 	CreateOrgBody,
 	UpdateOrgBody,
 	AddStaffBody,
+	OrgMembership,
 } from './configs/org.types'
 export type {
 	Position,

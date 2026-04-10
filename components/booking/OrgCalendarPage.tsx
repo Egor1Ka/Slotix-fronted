@@ -326,6 +326,7 @@ function OrgCalendarPage({
 		phone: org.phone,
 		website: org.website,
 		isOrg: true,
+		showThemeToggle: !publicUrlProp,
 	}
 
 	// ── Render ──

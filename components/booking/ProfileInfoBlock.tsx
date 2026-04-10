@@ -18,6 +18,7 @@ interface ProfileInfoBlockProps {
 	phone: string | null
 	website: string | null
 	isOrg: boolean
+	showThemeToggle?: boolean
 }
 
 const getInitial = (name: string): string => name.charAt(0).toUpperCase()
@@ -32,6 +33,7 @@ function ProfileInfoBlock({
 	phone,
 	website,
 	isOrg,
+	showThemeToggle = true,
 }: ProfileInfoBlockProps) {
 	const t = useTranslations('profile')
 	const [open, setOpen] = useState(false)
@@ -74,7 +76,7 @@ function ProfileInfoBlock({
 							</span>
 						)}
 					</span>
-					<ThemeToggle />
+					{showThemeToggle && <ThemeToggle />}
 				</div>
 			</div>
 		)
@@ -122,7 +124,7 @@ function ProfileInfoBlock({
 							)}
 						</span>
 					</button>
-					<ThemeToggle />
+					{showThemeToggle && <ThemeToggle />}
 				</div>
 
 				<div

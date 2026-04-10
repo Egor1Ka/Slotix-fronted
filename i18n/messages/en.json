@@ -277,6 +277,9 @@
 		"goHome": "Go to homepage",
 		"notFoundTitle": "Page not found",
 		"notFoundDescription": "The page you're looking for doesn't exist or has been moved.",
+		"orgForbiddenTitle": "Access denied",
+		"orgForbiddenDescription": "You don't have access to this organization.",
+		"orgForbiddenBack": "Go to my organizations",
 		"api": {
 			"network": "No internet connection. Check your network and try again.",
 			"timeout": "Request timed out. Please try again.",

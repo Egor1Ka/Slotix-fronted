@@ -7,7 +7,6 @@ import {
 	SidebarTrigger,
 } from '@/components/ui/sidebar'
 import { OrgSidebar } from '@/components/sidebar/OrgSidebar'
-import { ThemeToggle } from '@/components/theme-toggle'
 import { LanguageSwitcher } from '@/components/language-switcher'
 
 export default async function OrgLayout({
@@ -27,7 +26,6 @@ export default async function OrgLayout({
 						<SidebarTrigger className="-ml-1" />
 						<div className="flex items-center gap-1">
 							<LanguageSwitcher />
-							<ThemeToggle />
 						</div>
 					</header>
 					<main className="flex-1">{children}</main>

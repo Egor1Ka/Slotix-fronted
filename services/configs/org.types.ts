@@ -35,4 +35,9 @@ interface AddStaffBody {
 	userId: string
 }
 
-export type { OrgListItem, CreateOrgBody, UpdateOrgBody, AddStaffBody }
+interface OrgMembership {
+	role: 'owner' | 'admin' | 'member'
+	status: 'active' | 'invited' | 'suspended' | 'left'
+}
+
+export type { OrgListItem, CreateOrgBody, UpdateOrgBody, AddStaffBody, OrgMembership }
