@@ -6,6 +6,7 @@ interface OrgListItem {
 	logo: string | null
 	role: 'owner' | 'admin' | 'member'
 	status: 'active' | 'invited' | 'suspended' | 'left'
+	active: boolean
 }
 
 interface CreateOrgBody {

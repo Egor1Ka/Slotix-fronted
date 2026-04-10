@@ -154,6 +154,7 @@ interface OrgByIdResponse {
 	address: string | null
 	phone: string | null
 	website: string | null
+	active: boolean
 }
 
 interface OrgStaffMember extends StaffMember {
