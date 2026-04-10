@@ -4,8 +4,8 @@ import type { ApiResponse } from './user.config'
 
 interface Plan {
 	key: string
-	features: { dashboard: boolean; export: boolean; apiAccess: boolean }
-	limits: { projects: number; storage: number }
+	features: Record<string, boolean>
+	limits: Record<string, number>
 	products: string[]
 }
 
