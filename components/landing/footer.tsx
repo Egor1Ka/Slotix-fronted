@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 
 async function Footer() {
@@ -6,32 +5,30 @@ async function Footer() {
 
 	return (
 		<footer data-slot="landing-footer" className="border-border/40 border-t">
-			<div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-				<div className="flex flex-col gap-12 sm:flex-row sm:items-end sm:justify-between">
-					<div>
-						<span className="font-display text-3xl font-semibold tracking-tight italic">
-							{t('nav.logo')}
+			<div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+				<div className="flex flex-col gap-8 sm:flex-row sm:items-center sm:justify-between">
+					<span className="flex items-center gap-2 text-lg font-bold tracking-tight">
+						<span className="bg-primary text-primary-foreground inline-flex h-6 w-6 items-center justify-center rounded-md text-xs font-black">
+							S
 						</span>
-						<p className="text-muted-foreground mt-2 max-w-sm text-sm">
-							{t('hero.subtitle')}
-						</p>
-					</div>
-					<nav className="flex gap-6">
-						<Link
-							href="/demo"
-							className="text-muted-foreground hover:text-foreground text-sm transition-colors"
-						>
-							{t('footer.demo')}
-						</Link>
-						<Link
-							href="/shadcndemo"
-							className="text-muted-foreground hover:text-foreground text-sm transition-colors"
-						>
-							{t('footer.components')}
-						</Link>
+						{t('nav.logo')}
+					</span>
+					<nav className="flex flex-wrap gap-6">
+						<span className="text-muted-foreground text-sm">
+							{t('footer.docs')}
+						</span>
+						<span className="text-muted-foreground text-sm">
+							{t('footer.api')}
+						</span>
+						<span className="text-muted-foreground text-sm">
+							{t('footer.privacy')}
+						</span>
+						<span className="text-muted-foreground text-sm">
+							{t('footer.terms')}
+						</span>
 					</nav>
 				</div>
-				<div className="border-border/40 mt-12 border-t pt-8">
+				<div className="border-border/40 mt-8 border-t pt-8">
 					<p className="text-muted-foreground text-xs">
 						{t('footer.copyright')}
 					</p>

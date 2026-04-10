@@ -6,6 +6,8 @@ import { userApi } from '@/services'
 import type { User } from '@/services'
 import { ProfileForm } from '@/components/profile/ProfileForm'
 import type { ProfileFormData } from '@/components/profile/ProfileForm'
+import { TelegramConnect } from '@/components/profile/TelegramConnect'
+import { Spinner } from '@/components/ui/spinner'
 
 function PersonalProfilePage() {
 	const t = useTranslations('profile')
@@ -30,7 +32,7 @@ function PersonalProfilePage() {
 	if (loading) {
 		return (
 			<div className="flex items-center justify-center py-20">
-				<p className="text-muted-foreground text-sm">Loading...</p>
+				<Spinner />
 			</div>
 		)
 	}
@@ -43,6 +45,12 @@ function PersonalProfilePage() {
 		address: user.address ?? '',
 		phone: user.phone ?? '',
 		website: user.website ?? '',
+	}
+
+	const handleTelegramStatusChange = (connected: boolean) => {
+		setUser((prev) =>
+			prev ? { ...prev, telegramConnected: connected } : prev,
+		)
 	}
 
 	const handleSubmit = async (data: ProfileFormData) => {
@@ -71,9 +79,13 @@ function PersonalProfilePage() {
 	}
 
 	return (
-		<div className="mx-auto max-w-2xl p-6">
-			<h1 className="mb-6 text-2xl font-bold">{t('myTitle')}</h1>
+		<div className="mx-auto max-w-2xl space-y-6 p-6">
+			<h1 className="text-2xl font-bold">{t('myTitle')}</h1>
 			<ProfileForm defaultValues={defaultValues} onSubmit={handleSubmit} />
+			<TelegramConnect
+				connected={user.telegramConnected}
+				onStatusChange={handleTelegramStatusChange}
+			/>
 		</div>
 	)
 }

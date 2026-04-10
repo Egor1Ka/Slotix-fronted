@@ -1,4 +1,4 @@
-import { getData, putData } from '@/services/api/methods'
+import { getData, putData, postData, deleteData } from '@/services/api/methods'
 import { endpoint } from '@/services/api/types'
 
 interface User {
@@ -10,8 +10,14 @@ interface User {
 	address: string | null
 	phone: string | null
 	website: string | null
+	telegramConnected: boolean
 	createdAt: string
 	updatedAt: string
+}
+
+interface TelegramLinkResponse {
+	url: string
+	token: string
 }
 
 interface UpdateUserBody {
@@ -40,7 +46,17 @@ const userApiConfig = {
 		method: putData,
 		defaultErrorMessage: 'Failed to update profile',
 	}),
+
+	connectTelegram: endpoint<void, ApiResponse<TelegramLinkResponse>>({
+		url: () => `/api/user/telegram/connect`,
+		method: postData,
+	}),
+
+	disconnectTelegram: endpoint<void, ApiResponse<void>>({
+		url: () => `/api/user/telegram/disconnect`,
+		method: deleteData,
+	}),
 }
 
 export default userApiConfig
-export type { User, UpdateUserBody, ApiResponse }
+export type { User, UpdateUserBody, ApiResponse, TelegramLinkResponse }

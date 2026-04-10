@@ -13,6 +13,7 @@ import {
 	findEventType,
 	getWorkHoursForDate,
 	getCalendarLocale,
+	getNowMinForDate,
 } from '../utils'
 import {
 	getAvailableSlots,
@@ -228,7 +229,7 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 			slotMode: schedule?.slotMode ?? 'fixed',
 			bookings: allBookingsForSlots,
 			minNotice: 0,
-			nowMin: 0,
+			nowMin: getNowMinForDate(blockDate),
 		})
 
 		const toDropZoneBlock = (slot: Slot): CalendarBlock | null => {
@@ -256,7 +257,8 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 			!canBookForClient ||
 			!selectedEventType ||
 			!selectedSlot ||
-			blockDate !== date
+			blockDate !== date ||
+			confirmedBooking
 		)
 			return []
 		const slotMin = timeToMin(selectedSlot)
@@ -478,7 +480,7 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 				slotMode: schedule?.slotMode ?? 'fixed',
 				bookings: allBookingsForSlots,
 				minNotice: 0,
-				nowMin: 0,
+				nowMin: getNowMinForDate(clickDate),
 			})
 
 			const isAfterClick = (slot: { startMin: number }): boolean =>

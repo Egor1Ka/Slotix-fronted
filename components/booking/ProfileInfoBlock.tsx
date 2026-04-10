@@ -5,10 +5,12 @@ import { useTranslations } from 'next-intl'
 import { MapPin, Phone, Globe, ChevronDown, ChevronUp } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
+import { ThemeToggle } from '@/components/theme-toggle'
 import { cn } from '@/lib/utils'
 
 interface ProfileInfoBlockProps {
 	name: string
+	orgName?: string | null
 	logo: string | null
 	avatar: string | null
 	description: string | null
@@ -22,6 +24,7 @@ const getInitial = (name: string): string => name.charAt(0).toUpperCase()
 
 function ProfileInfoBlock({
 	name,
+	orgName,
 	logo,
 	avatar,
 	description,
@@ -37,10 +40,7 @@ function ProfileInfoBlock({
 	const hasDescription = description && description.length > 0
 	const hasDetails = hasDescription || hasContactInfo
 
-	if (!hasDetails) return null
-
 	const toggleOpen = () => setOpen((prev) => !prev)
-
 	const imageSource = isOrg ? logo : avatar
 	const toggleLabel = open
 		? t('hide')
@@ -48,14 +48,10 @@ function ProfileInfoBlock({
 			? t('aboutUs')
 			: t('about')
 
-	return (
-		<div className="bg-card w-full border-b">
-			<div className="mx-auto max-w-5xl px-6">
-				<button
-					type="button"
-					onClick={toggleOpen}
-					className="flex w-full items-center gap-3 py-3 text-left"
-				>
+	if (!hasDetails) {
+		return (
+			<div className="bg-card w-full border-b">
+				<div className="mx-auto flex max-w-5xl items-center gap-3 px-6 py-3">
 					{isOrg && imageSource ? (
 						<img
 							src={imageSource}
@@ -70,18 +66,64 @@ function ProfileInfoBlock({
 							</AvatarFallback>
 						</Avatar>
 					)}
-
-					<span className="flex-1 text-sm font-semibold">{name}</span>
-
-					<span className="text-muted-foreground flex items-center gap-1 text-xs">
-						{toggleLabel}
-						{open ? (
-							<ChevronUp className="size-4" />
-						) : (
-							<ChevronDown className="size-4" />
+					<span className="flex-1">
+						<span className="block text-sm font-semibold">{name}</span>
+						{orgName && (
+							<span className="text-muted-foreground block text-xs">
+								{orgName}
+							</span>
 						)}
 					</span>
-				</button>
+					<ThemeToggle />
+				</div>
+			</div>
+		)
+	}
+
+	return (
+		<div className="bg-card w-full border-b">
+			<div className="mx-auto max-w-5xl px-6">
+				<div className="flex w-full items-center gap-3 py-3">
+					<button
+						type="button"
+						onClick={toggleOpen}
+						className="flex flex-1 items-center gap-3 text-left"
+					>
+						{isOrg && imageSource ? (
+							<img
+								src={imageSource}
+								alt={name}
+								className="size-9 shrink-0 rounded-lg object-cover"
+							/>
+						) : (
+							<Avatar className="size-9 shrink-0">
+								<AvatarImage src={imageSource ?? undefined} />
+								<AvatarFallback className="text-sm">
+									{getInitial(name)}
+								</AvatarFallback>
+							</Avatar>
+						)}
+
+						<span className="flex-1">
+							<span className="block text-sm font-semibold">{name}</span>
+							{orgName && (
+								<span className="text-muted-foreground block text-xs">
+									{orgName}
+								</span>
+							)}
+						</span>
+
+						<span className="text-muted-foreground flex items-center gap-1 text-xs">
+							{toggleLabel}
+							{open ? (
+								<ChevronUp className="size-4" />
+							) : (
+								<ChevronDown className="size-4" />
+							)}
+						</span>
+					</button>
+					<ThemeToggle />
+				</div>
 
 				<div
 					className={cn(

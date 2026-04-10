@@ -1,49 +1,44 @@
 {
 	"metadata": {
-		"title": "Frontend Template",
-		"description": "Next.js frontend template"
+		"title": "Slotix — Intelligent Booking Platform",
+		"description": "End scheduling chaos. Automate growth with the intelligent booking layer for modern service businesses."
 	},
 	"landing": {
 		"nav": {
-			"logo": "Template",
+			"logo": "Slotix",
 			"features": "Features",
 			"pricing": "Pricing",
-			"login": "Sign in",
+			"login": "Login",
 			"signup": "Get started"
 		},
 		"hero": {
-			"badge": "Production-ready template",
-			"title": "Build your next project faster",
-			"subtitle": "A production-ready frontend template with everything you need to ship modern web applications.",
-			"cta": "Get started"
+			"badge": "SLOTIX ENGINE V2.0 LIVE",
+			"title": "End scheduling chaos.",
+			"titleAccent": "Automate growth.",
+			"subtitle": "The intelligent booking layer for modern service businesses. Solo or team, fixed or dynamic — Slotix aligns client demand with your optimal availability, entirely frictionless.",
+			"cta": "Start Free Trial",
+			"demo": "View Live Demo",
+			"noCard": "NO CREDIT CARD REQUIRED • PUBLIC BOOKING PAGE INCLUDED"
 		},
 		"features": {
-			"title": "Everything you need",
-			"subtitle": "Built with modern tools and best practices out of the box.",
+			"title": "Built for how you actually work",
+			"subtitle": "Every feature designed to eliminate friction between your availability and client demand.",
 			"items": {
-				"performance": {
-					"title": "Blazing Fast",
-					"description": "Optimized for speed with Next.js App Router and React Server Components."
+				"slots": {
+					"title": "Intelligent Slot Algorithms",
+					"description": "Choose between strict fixed intervals or let our dynamic engine optimize gaps to maximize your daily yield and prevent fragmented schedules."
 				},
-				"secure": {
-					"title": "Secure by Default",
-					"description": "Built-in authentication layout and route protection patterns."
+				"booking": {
+					"title": "Zero-Login Booking",
+					"description": "Conversion drops when clients have to create accounts. Slotix public pages require zero registration. Select, confirm, done."
 				},
-				"responsive": {
-					"title": "Fully Responsive",
-					"description": "Looks great on any device with Tailwind CSS responsive utilities."
+				"team": {
+					"title": "Solo or Team Scaling",
+					"description": "Operate as a lone wolf or manage a multi-staff studio. Route bookings based on individual specialist availability and skill set."
 				},
-				"i18n": {
-					"title": "Internationalized",
-					"description": "Multi-language support with next-intl, ready for global audiences."
-				},
-				"components": {
-					"title": "54+ Components",
-					"description": "Complete shadcn/ui component library with examples for every component."
-				},
-				"dx": {
-					"title": "Great DX",
-					"description": "TypeScript, ESLint, Prettier, and CI/CD configured out of the box."
+				"schedule": {
+					"title": "Flexible Schedule Control",
+					"description": "Set custom work hours for each day, add day-off overrides for vacations or sick days, and let Slotix automatically block unavailable time across all booking pages."
 				}
 			}
 		},
@@ -53,14 +48,38 @@
 			"popular": "Popular"
 		},
 		"cta": {
-			"title": "Ready to get started?",
-			"subtitle": "Start building your application today with our production-ready template.",
-			"button": "Start for free"
+			"title": "Ready to end scheduling chaos?",
+			"subtitle": "Join thousands of service businesses that automate their bookings with Slotix. Set up in under 5 minutes.",
+			"button": "Start Free Trial"
+		},
+		"preview": {
+			"day": "Day",
+			"week": "Week",
+			"calendarDate": "Thursday, Oct 24",
+			"availableSlot": "+ available slot",
+			"gapFinder": "OPTIMIZED GAP FINDER ACTIVE",
+			"studioName": "Alex Studio",
+			"accepting": "Accepting new bookings",
+			"selectService": "Select a service",
+			"serviceHaircut": "Men's Haircut",
+			"serviceBeard": "Beard Trim",
+			"bookTime": "Book 10:15 AM",
+			"optimalPacking": "Optimal Packing",
+			"scheduleMonFri": "Mon — Fri",
+			"scheduleHours": "09:00 – 18:00",
+			"scheduleSat": "Saturday",
+			"scheduleSatHours": "10:00 – 15:00",
+			"scheduleSun": "Sunday",
+			"dayOff": "Day off",
+			"unifiedCalendar": "+ Unified Calendar",
+			"bookNow": "Book Now"
 		},
 		"footer": {
-			"copyright": "© 2026 Template. All rights reserved.",
-			"demo": "Demo",
-			"components": "Components"
+			"copyright": "© 2026 SLOTIX INC.",
+			"docs": "Documentation",
+			"api": "API",
+			"privacy": "Privacy",
+			"terms": "Terms"
 		}
 	},
 	"login": {
@@ -443,6 +462,26 @@
 		"showLess": "Show less",
 		"aboutUs": "About us",
 		"about": "About",
-		"hide": "Hide"
+		"hide": "Hide",
+		"telegram": {
+			"title": "Telegram Notifications",
+			"description": "Receive instant notifications about new bookings and cancellations",
+			"connected": "Connected",
+			"notConnected": "Not connected",
+			"connect": "Connect Telegram",
+			"connecting": "Connecting...",
+			"disconnect": "Disconnect",
+			"disconnecting": "Disconnecting...",
+			"disconnected": "Telegram disconnected",
+			"checkStatus": "Check status",
+			"checking": "Checking...",
+			"confirmDisconnectTitle": "Disconnect Telegram?",
+			"confirmDisconnectDescription": "You will stop receiving notifications about bookings. You can reconnect at any time.",
+			"confirmDisconnectCancel": "Cancel",
+			"confirmDisconnectAction": "Disconnect",
+			"linkOpened": "Link opened in new tab. Complete the setup in Telegram, then click \"Check status\".",
+			"popupBlocked": "Could not open the link. Copy and open it manually:",
+			"nowConnected": "Telegram connected successfully!"
+		}
 	}
 }

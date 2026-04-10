@@ -103,6 +103,17 @@ const formatDateISO = (d: Date): string => {
 
 const getTodayStr = (): string => formatDateISO(new Date())
 
+// Возвращает «не раньше чем» в минутах для конкретной даты.
+// Прошлые дни — Infinity (все слоты отфильтровываются движком),
+// сегодня — текущая минута, будущие дни — 0.
+const getNowMinForDate = (dateStr: string): number => {
+	const today = getTodayStr()
+	if (dateStr < today) return Number.POSITIVE_INFINITY
+	if (dateStr > today) return 0
+	const now = new Date()
+	return now.getHours() * 60 + now.getMinutes()
+}
+
 const formatDateLocale = (dateStr: string, locale: CalendarLocale): string => {
 	const d = new Date(dateStr + 'T00:00:00')
 	return `${locale.days[d.getDay()]}, ${d.getDate()} ${locale.months[d.getMonth()]}`
@@ -362,6 +373,7 @@ export {
 	formatHour,
 	formatDateISO,
 	getTodayStr,
+	getNowMinForDate,
 	formatDateLocale,
 	formatWeekRange,
 	formatMonth,

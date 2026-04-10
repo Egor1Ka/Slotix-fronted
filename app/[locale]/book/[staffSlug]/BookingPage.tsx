@@ -210,14 +210,14 @@ function BookingPage({
 	// ── Profile info ──
 
 	const profileInfo: ProfileInfoBlockProps = {
-		name: staff.orgName ?? staff.name,
-		logo: staff.orgLogo ?? null,
+		name: staff.name,
+		logo: null,
 		avatar: staff.avatar ?? null,
 		description: staff.description ?? null,
 		address: staff.address ?? null,
 		phone: staff.phone ?? null,
 		website: staff.website ?? null,
-		isOrg: !!staff.orgId,
+		isOrg: false,
 	}
 
 	// ── Derived data ──

@@ -96,6 +96,25 @@ const useSafeViewConfig = (): CalendarViewConfig => {
 	}
 }
 
+const getCurrentMinuteOfDay = (): number => {
+	const now = new Date()
+	return now.getHours() * 60 + now.getMinutes()
+}
+
+// Обрезает рабочий интервал: если сейчас уже внутри рабочего дня,
+// сдвигает «начало рабочей зоны» к текущей минуте, чтобы прошедшее время
+// визуально слилось с нерабочим временем (bg-muted).
+const getEffectiveWorkStartMin = (
+	workStartMin: number,
+	workEndMin: number,
+	isToday: boolean,
+): number => {
+	if (!isToday) return workStartMin
+	const nowMin = getCurrentMinuteOfDay()
+	if (nowMin <= workStartMin) return workStartMin
+	return Math.min(nowMin, workEndMin)
+}
+
 const OVERLAP_GAP_PX = 2
 const DAY_HOUR_LABEL_WIDTH_PX = 48
 const WEEK_BLOCK_INSET_PX = 2
@@ -315,8 +334,15 @@ function CalendarCore({
 	const renderDayView = () => {
 		const workStartMin = timeToMin(workStart)
 		const workEndMin = timeToMin(workEnd)
-		const workTopPx = minutesToPx(workStartMin, grid.displayStart)
-		const workHeightPx = durationToPx(workEndMin - workStartMin)
+		const isTodayDate = date === getTodayStr()
+		const effectiveWorkStartMin = getEffectiveWorkStartMin(
+			workStartMin,
+			workEndMin,
+			isTodayDate,
+		)
+		const workTopPx = minutesToPx(effectiveWorkStartMin, grid.displayStart)
+		const workHeightPx = durationToPx(workEndMin - effectiveWorkStartMin)
+		const hasWorkArea = workHeightPx > 0
 		const isInGridRange = (block: CalendarBlock): boolean =>
 			block.startMin + block.duration > grid.displayStart
 		const blocks = resolveOverlaps(strategy.getBlocks(date)).filter(
@@ -340,7 +366,7 @@ function CalendarCore({
 				onClick={handleGridClick}
 			>
 				<div className="bg-muted/30 absolute inset-0 left-12 rounded-md" />
-				{!isDayOff && (
+				{!isDayOff && hasWorkArea && (
 					<div
 						className="bg-card absolute right-0 left-12 rounded-md"
 						style={{ top: workTopPx, height: workHeightPx }}
@@ -357,8 +383,6 @@ function CalendarCore({
 		const today = getTodayStr()
 		const workStartMin = timeToMin(workStart)
 		const workEndMin = timeToMin(workEnd)
-		const workTopPx = minutesToPx(workStartMin, grid.displayStart)
-		const workHeightPx = durationToPx(workEndMin - workStartMin)
 		const gridHeight = grid.totalHours * PX_PER_HOUR
 
 		const renderHourLabel = (hour: number) => (
@@ -517,6 +541,19 @@ function CalendarCore({
 				? []
 				: resolveOverlaps(strategy.getBlocks(dayDate))
 			const isToday = dayDate === today
+			const columnEffectiveStartMin = getEffectiveWorkStartMin(
+				workStartMin,
+				workEndMin,
+				isToday,
+			)
+			const columnWorkTopPx = minutesToPx(
+				columnEffectiveStartMin,
+				grid.displayStart,
+			)
+			const columnWorkHeightPx = durationToPx(
+				workEndMin - columnEffectiveStartMin,
+			)
+			const columnHasWorkArea = columnWorkHeightPx > 0
 			const handleClick = () => {
 				if (isDisabled) return
 				if (onDayClick) {
@@ -545,10 +582,15 @@ function CalendarCore({
 					{!isDisabled && (
 						<>
 							<div className="bg-muted/30 absolute inset-0" />
-							<div
-								className="bg-card absolute inset-x-0"
-								style={{ top: workTopPx, height: workHeightPx }}
-							/>
+							{columnHasWorkArea && (
+								<div
+									className="bg-card absolute inset-x-0"
+									style={{
+										top: columnWorkTopPx,
+										height: columnWorkHeightPx,
+									}}
+								/>
+							)}
 						</>
 					)}
 					{blocks.map(renderWeekBlock)}

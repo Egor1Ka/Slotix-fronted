@@ -7,7 +7,6 @@ import { useState, useEffect } from 'react'
 import {
 	Calendar,
 	ArrowLeft,
-	Users,
 	Briefcase,
 	Settings2,
 	ClipboardList,
@@ -20,16 +19,14 @@ import {
 	SidebarFooter,
 	SidebarGroup,
 	SidebarGroupContent,
-	SidebarGroupLabel,
 	SidebarHeader,
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from '@/components/ui/sidebar'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { LogoutButton } from './LogoutButton'
 import { orgApi } from '@/services'
-import type { OrgByIdResponse, OrgStaffMember } from '@/services'
+import type { OrgByIdResponse } from '@/services'
 
 function OrgSidebar() {
 	const pathname = usePathname()
@@ -37,7 +34,6 @@ function OrgSidebar() {
 	const params = useParams<{ orgId: string }>()
 	const t = useTranslations('sidebar')
 	const [org, setOrg] = useState<OrgByIdResponse | null>(null)
-	const [staffList, setStaffList] = useState<OrgStaffMember[]>([])
 
 	const orgId = params.orgId
 
@@ -56,20 +52,7 @@ function OrgSidebar() {
 			}
 		}
 
-		// Загрузка списка персонала
-		const fetchStaffData = async () => {
-			try {
-				const staffResponse = await orgApi.getStaff({
-					pathParams: { id: orgId },
-				})
-				setStaffList(staffResponse.data)
-			} catch {
-				// обрабатывается интерцептором toast
-			}
-		}
-
 		fetchOrgData()
-		fetchStaffData()
 	}, [orgId])
 
 	const isActive = (href: string): boolean => pathname === href
@@ -87,26 +70,6 @@ function OrgSidebar() {
 	const orgsHref = buildHref('/organizations')
 
 	const getInitial = (name: string): string => name.charAt(0).toUpperCase()
-
-	const renderStaffItem = (staff: OrgStaffMember) => {
-		const href = buildHref(`/manage/${orgId}/${staff.id}`)
-		return (
-			<SidebarMenuItem key={staff.id}>
-				<SidebarMenuButton
-					render={<Link href={href} />}
-					isActive={isActive(href)}
-				>
-					<Avatar className="size-5">
-						<AvatarImage src={staff.avatar} />
-						<AvatarFallback className="text-xs">
-							{getInitial(staff.name)}
-						</AvatarFallback>
-					</Avatar>
-					<span>{staff.name}</span>
-				</SidebarMenuButton>
-			</SidebarMenuItem>
-		)
-	}
 
 	return (
 		<Sidebar>
@@ -198,18 +161,6 @@ function OrgSidebar() {
 						</SidebarMenu>
 					</SidebarGroupContent>
 				</SidebarGroup>
-
-				{staffList.length > 0 && (
-					<SidebarGroup>
-						<SidebarGroupLabel>
-							<Users className="mr-1 inline size-3" />
-							{t('staff')}
-						</SidebarGroupLabel>
-						<SidebarGroupContent>
-							<SidebarMenu>{staffList.map(renderStaffItem)}</SidebarMenu>
-						</SidebarGroupContent>
-					</SidebarGroup>
-				)}
 			</SidebarContent>
 			<SidebarFooter className="border-t p-2">
 				<SidebarMenu>

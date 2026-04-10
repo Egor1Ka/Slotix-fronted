@@ -38,3 +38,23 @@
 		transform: translate(20px, 20px) scale(0.95);
 	}
 }
+
+@keyframes landing-float {
+	0%,
+	100% {
+		transform: translateY(0);
+	}
+	50% {
+		transform: translateY(-12px);
+	}
+}
+
+@keyframes landing-pulse-dot {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.4;
+	}
+}

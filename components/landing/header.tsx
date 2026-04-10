@@ -1,9 +1,15 @@
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
+import { getUser } from '@/lib/auth/get-user'
 import { LanguageSwitcher } from '@/components/language-switcher'
+import { ThemeToggle } from '@/components/theme-toggle'
+
+const GOOGLE_AUTH_URL = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`
 
 async function Header() {
 	const t = await getTranslations('landing')
+	const user = await getUser()
+	const authHref = user ? '/organizations' : GOOGLE_AUTH_URL
 
 	return (
 		<header
@@ -11,41 +17,30 @@ async function Header() {
 			className="border-border/40 bg-background/80 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur-xl"
 		>
 			<div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-				<Link
-					href="/"
-					className="font-display text-xl font-semibold tracking-tight italic"
-				>
+				<span className="flex items-center gap-2 text-xl font-bold tracking-tight">
+					<span className="bg-primary text-primary-foreground inline-flex h-7 w-7 items-center justify-center rounded-md text-sm font-black">
+						S
+					</span>
 					{t('nav.logo')}
-				</Link>
+				</span>
 
 				<nav className="hidden items-center gap-8 md:flex">
-					<Link
+					<a
 						href="#features"
-						className="text-muted-foreground hover:text-foreground font-mono text-xs tracking-wider uppercase transition-colors"
+						className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
 					>
 						{t('nav.features')}
-					</Link>
-					<Link
-						href="#pricing"
-						className="text-muted-foreground hover:text-foreground font-mono text-xs tracking-wider uppercase transition-colors"
-					>
-						{t('nav.pricing')}
-					</Link>
+					</a>
 				</nav>
 
 				<div className="flex items-center gap-3">
+					<ThemeToggle />
 					<LanguageSwitcher />
 					<Link
-						href="/login"
-						className="text-muted-foreground hover:text-foreground inline-flex h-8 items-center justify-center rounded-lg px-3 text-sm font-medium transition-all"
+						href={authHref}
+						className="bg-foreground text-background inline-flex h-9 items-center justify-center rounded-lg px-4 text-sm font-medium transition-all hover:opacity-90"
 					>
-						{t('nav.login')}
-					</Link>
-					<Link
-						href="/signup"
-						className="bg-foreground text-background inline-flex h-8 items-center justify-center rounded-lg px-4 text-sm font-medium transition-all hover:opacity-90"
-					>
-						{t('nav.signup')}
+						{user ? t('nav.signup') : t('nav.login')}
 					</Link>
 				</div>
 			</div>
