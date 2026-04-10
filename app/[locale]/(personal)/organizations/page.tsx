@@ -6,24 +6,19 @@ import { useUserOrgs } from '@/lib/hooks/useUserOrgs'
 import { OrgCard } from '@/components/organizations/OrgCard'
 import { CreateOrgDialog } from '@/components/organizations/CreateOrgDialog'
 import { Spinner } from '@/components/ui/spinner'
-import type { OrgListItem, Plan, BillingCatalog } from '@/services'
+import type { OrgListItem, Plan } from '@/services'
 import { billingApi } from '@/services'
 
 function OrganizationsPage() {
 	const t = useTranslations('organizations')
 	const { orgs, isLoading, refetch } = useUserOrgs()
 	const [plan, setPlan] = useState<Plan | null>(null)
-	const [catalog, setCatalog] = useState<BillingCatalog | null>(null)
 
 	useEffect(() => {
 		const fetchBilling = async () => {
 			try {
-				const [planRes, catalogRes] = await Promise.all([
-					billingApi.plan(),
-					billingApi.catalog(),
-				])
+				const planRes = await billingApi.plan()
 				setPlan(planRes.data)
-				setCatalog(catalogRes.data)
 			} catch {
 				// toast interceptor handles errors
 			}
@@ -45,7 +40,6 @@ function OrganizationsPage() {
 				<CreateOrgDialog
 					onCreated={refetch}
 					plan={plan}
-					catalog={catalog}
 					orgCount={ownerOrgCount}
 				/>
 			</div>

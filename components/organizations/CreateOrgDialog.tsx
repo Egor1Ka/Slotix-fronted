@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -24,8 +25,7 @@ import {
 } from '@/components/ui/select'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { orgApi, setServerErrors } from '@/services'
-import type { Plan, BillingCatalog } from '@/services'
-import { OrgPaywall } from '@/components/organizations/OrgPaywall'
+import type { Plan } from '@/services'
 
 // Предустановленные цвета бренда
 const PRESET_COLORS = [
@@ -60,20 +60,18 @@ type CreateOrgFormData = z.infer<typeof createOrgSchema>
 interface CreateOrgDialogProps {
 	onCreated: () => void
 	plan: Plan | null
-	catalog: BillingCatalog | null
 	orgCount: number
 }
 
 function CreateOrgDialog({
 	onCreated,
 	plan,
-	catalog,
 	orgCount,
 }: CreateOrgDialogProps) {
 	const t = useTranslations('organizations')
 	const tb = useTranslations('billing')
+	const router = useRouter()
 	const [open, setOpen] = useState(false)
-	const [paywallOpen, setPaywallOpen] = useState(false)
 
 	const canCreateOrg = plan && plan.features.createOrg
 	const orgLimit = plan ? plan.limits.organizations || 0 : 0
@@ -81,7 +79,7 @@ function CreateOrgDialog({
 
 	const handleCreateClick = () => {
 		if (!canCreateOrg) {
-			setPaywallOpen(true)
+			router.push('/#pricing')
 			return
 		}
 		setOpen(true)
@@ -228,12 +226,6 @@ function CreateOrgDialog({
 					</form>
 				</DialogContent>
 			</Dialog>
-
-			<OrgPaywall
-				open={paywallOpen}
-				onOpenChange={setPaywallOpen}
-				catalog={catalog}
-			/>
 		</>
 	)
 }
