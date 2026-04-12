@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import type { BookingStatus, Invitee } from '@/services/configs/booking.types'
 
-type ViewMode = 'day' | 'week' | 'month'
+type ViewMode = 'day' | 'week' | 'month' | 'list'
 
 type BlockType = 'booking' | 'dropzone' | 'pending' | 'locked' | 'workHours'
 

@@ -8,6 +8,7 @@ interface CalendarViewConfig {
 	canBookForClient: boolean
 	filterByStaffCapability: boolean
 	showScheduleEditor: boolean
+	allowListView: boolean
 }
 
 const ORG_PUBLIC_CONFIG: CalendarViewConfig = {
@@ -20,6 +21,7 @@ const ORG_PUBLIC_CONFIG: CalendarViewConfig = {
 	canBookForClient: true,
 	filterByStaffCapability: true,
 	showScheduleEditor: false,
+	allowListView: true,
 }
 
 const ORG_ADMIN_CONFIG: CalendarViewConfig = {
@@ -32,6 +34,7 @@ const ORG_ADMIN_CONFIG: CalendarViewConfig = {
 	canBookForClient: true,
 	filterByStaffCapability: true,
 	showScheduleEditor: true,
+	allowListView: true,
 }
 
 const STAFF_PUBLIC_CONFIG: CalendarViewConfig = {
@@ -44,6 +47,7 @@ const STAFF_PUBLIC_CONFIG: CalendarViewConfig = {
 	canBookForClient: true,
 	filterByStaffCapability: false,
 	showScheduleEditor: false,
+	allowListView: true,
 }
 
 const STAFF_SELF_CONFIG: CalendarViewConfig = {
@@ -56,6 +60,7 @@ const STAFF_SELF_CONFIG: CalendarViewConfig = {
 	canBookForClient: true,
 	filterByStaffCapability: false,
 	showScheduleEditor: false,
+	allowListView: true,
 }
 
 export {
