@@ -38,7 +38,10 @@ interface SlotListViewProps {
 	getStaffBookings?: (staffId: string) => StaffBooking[]
 	// Booking
 	formConfig: MergedBookingForm | null
-	onConfirmWithClient: (data: ClientInfoData) => Promise<void>
+	onConfirmWithClient: (
+		data: ClientInfoData,
+		overrides?: { slotTime?: string; date?: string; staffId?: string },
+	) => Promise<void>
 	isSubmitting: boolean
 }
 
@@ -232,7 +235,11 @@ function SlotListView({
 	}
 
 	const handleConfirm = async (data: ClientInfoData) => {
-		await onConfirmWithClient(data)
+		await onConfirmWithClient(data, {
+			slotTime: selectedSlot ?? undefined,
+			date: startDate,
+			staffId: selectedStaffId ?? staffId ?? undefined,
+		})
 		setSheetOpen(false)
 		setSelectedSlot(null)
 		setSelectedStaffId(null)

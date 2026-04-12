@@ -33,7 +33,10 @@ interface UseBookingActionsResult {
 	formConfig: MergedBookingForm | null
 	setBookingError: (error: string | null) => void
 	setConfirmedBooking: (booking: ConfirmedBooking | null) => void
-	handleConfirmWithClient: (data: ClientInfoData) => Promise<void>
+	handleConfirmWithClient: (
+		data: ClientInfoData,
+		overrides?: { slotTime?: string; date?: string; staffId?: string },
+	) => Promise<void>
 	handleCancel: () => Promise<void>
 	handleResetSlot: () => void
 	handleBookingSelect: (bookingId: string) => Promise<void>
@@ -161,16 +164,22 @@ const useBookingActions = (
 			.map(toCustomFieldValue(data))
 			.filter(hasValue)
 
-	const handleConfirmWithClient = async (data: ClientInfoData) => {
-		if (!selectedEventTypeId || !selectedSlotTime) return
+	const handleConfirmWithClient = async (
+		data: ClientInfoData,
+		overrides?: { slotTime?: string; date?: string; staffId?: string },
+	) => {
+		const resolvedSlotTime = overrides?.slotTime ?? selectedSlotTime
+		const resolvedDate = overrides?.date ?? dateStr
+		const resolvedStaffId =
+			overrides?.staffId ?? staffId ?? getFirstStaffId(staffList)
 
-		const resolvedStaffId = staffId ?? getFirstStaffId(staffList)
+		if (!selectedEventTypeId || !resolvedSlotTime) return
 		if (!resolvedStaffId) return
 
 		const eventType = findEventTypeById(selectedEventTypeId)
 		if (!eventType) return
 
-		const startAt = `${dateStr}T${selectedSlotTime}:00.000Z`
+		const startAt = `${resolvedDate}T${resolvedSlotTime}:00.000Z`
 
 		const dataRecord = data as Record<string, unknown>
 		const inviteeFields = extractInviteeFromCustomFields(dataRecord)
