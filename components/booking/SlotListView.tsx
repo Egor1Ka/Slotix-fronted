@@ -58,6 +58,7 @@ interface PersonalSlotViewProps {
 	staffId?: string
 	selectedSlot: string | null
 	onSlotSelect: (time: string) => void
+	disabled?: boolean
 }
 
 interface OrgStaffSlotItemProps {
@@ -85,6 +86,7 @@ function PersonalSlotView({
 	staffId,
 	selectedSlot,
 	onSlotSelect,
+	disabled = false,
 }: PersonalSlotViewProps) {
 	const { slots } = useFindNearestSlots({
 		schedule,
@@ -105,6 +107,7 @@ function PersonalSlotView({
 			slots={slots}
 			selectedSlot={selectedSlot}
 			onSelect={handleSelect}
+			disabled={disabled}
 		/>
 	)
 }
@@ -290,39 +293,44 @@ function SlotListView({
 			/>
 
 			{/* Date picker + slots — side by side on desktop */}
-			{selectedEventTypeId && (
-				<div className="flex flex-col gap-4 md:flex-row md:items-start">
-					<Calendar
-						mode="single"
-						selected={new Date(dateStr + 'T00:00:00')}
-						onSelect={handleCalendarSelect}
-						disabled={{ before: new Date() }}
-						className="shrink-0 rounded-lg border p-2"
-					/>
+			<div className="flex flex-col gap-4 md:flex-row md:items-start">
+				<Calendar
+					mode="single"
+					selected={new Date(dateStr + 'T00:00:00')}
+					onSelect={handleCalendarSelect}
+					disabled={{ before: new Date() }}
+					className="shrink-0 rounded-lg border p-2"
+				/>
 
-					<div className="flex flex-1 flex-col gap-3">
-						{variant === 'personal' && (
-							<PersonalSlotView
-								schedule={schedule ?? null}
-								overrides={overrides}
-								bookings={bookings}
-								duration={duration}
-								startDate={startDate}
-								fixedDate={fixedDate}
-								staffId={staffId}
-								selectedSlot={selectedSlot}
-								onSlotSelect={handlePersonalSlotSelect}
-							/>
-						)}
+				<div className="flex flex-1 flex-col gap-3">
+					{!selectedEventTypeId && (
+						<p className="text-muted-foreground text-center text-xs">
+							{t('selectServiceFirst')}
+						</p>
+					)}
 
-						{variant === 'org' && (
-							<div className="flex flex-col gap-3">
-								{staff.map(renderOrgStaffItem)}
-							</div>
-						)}
-					</div>
+					{variant === 'personal' && (
+						<PersonalSlotView
+							schedule={schedule ?? null}
+							overrides={overrides}
+							bookings={bookings}
+							duration={duration}
+							startDate={startDate}
+							fixedDate={fixedDate}
+							staffId={staffId}
+							selectedSlot={selectedSlot}
+							onSlotSelect={handlePersonalSlotSelect}
+							disabled={!selectedEventTypeId}
+						/>
+					)}
+
+					{variant === 'org' && selectedEventTypeId && (
+						<div className="flex flex-col gap-3">
+							{staff.map(renderOrgStaffItem)}
+						</div>
+					)}
 				</div>
-			)}
+			</div>
 
 			{/* Booking confirm sheet */}
 			<BookingConfirmSheet

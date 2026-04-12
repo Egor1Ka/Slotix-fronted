@@ -10,6 +10,7 @@ interface TimeSlotGridProps {
 	selectedSlot: string | null
 	onSelect: (time: string) => void
 	loading?: boolean
+	disabled?: boolean
 }
 
 const SKELETON_ITEMS = [1, 2, 3, 4, 5, 6]
@@ -23,6 +24,7 @@ function TimeSlotGrid({
 	selectedSlot,
 	onSelect,
 	loading = false,
+	disabled = false,
 }: TimeSlotGridProps) {
 	const t = useTranslations('booking')
 
@@ -43,16 +45,20 @@ function TimeSlotGrid({
 	}
 
 	const renderSlot = (slot: Slot) => {
-		const isActive = slot.startTime === selectedSlot
-		const handleClick = () => onSelect(slot.startTime)
+		const isActive = !disabled && slot.startTime === selectedSlot
+		const handleClick = () => {
+			if (!disabled) onSelect(slot.startTime)
+		}
 
 		return (
 			<button
 				key={slot.startTime}
 				type="button"
 				onClick={handleClick}
+				disabled={disabled}
 				className={cn(
 					'rounded-full border px-4 py-2.5 text-sm font-medium transition-all',
+					disabled && 'cursor-default opacity-60',
 					isActive
 						? 'border-primary bg-primary text-primary-foreground shadow-sm'
 						: 'border-border bg-muted/50 hover:bg-muted',
