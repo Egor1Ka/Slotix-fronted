@@ -7,7 +7,15 @@ interface DateRange {
 	to: string
 }
 
+const LIST_VIEW_DAYS = 14
+
 const computeDateRange = (dateStr: string, view: ViewMode): DateRange => {
+	if (view === 'list') {
+		const from = new Date(dateStr + 'T00:00:00')
+		const to = new Date(from)
+		to.setDate(to.getDate() + LIST_VIEW_DAYS)
+		return { from: dateStr, to: formatDateISO(to) }
+	}
 	if (view === 'week') {
 		const weekDates = getWeekDates(dateStr)
 		return { from: weekDates[0], to: weekDates[6] }
