@@ -62,11 +62,13 @@ function StaffInfoSheet({
 
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>
-			<SheetTrigger asChild>
-				<Button variant="ghost" size="icon-sm" className="shrink-0">
-					<InfoIcon className="size-4" />
-				</Button>
-			</SheetTrigger>
+			<SheetTrigger
+				render={
+					<Button variant="ghost" size="icon-sm" className="shrink-0">
+						<InfoIcon className="size-4" />
+					</Button>
+				}
+			/>
 			<SheetContent>
 				<SheetHeader>
 					<SheetTitle>{t('aboutStaff')}</SheetTitle>
