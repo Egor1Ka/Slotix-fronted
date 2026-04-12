@@ -25,9 +25,7 @@ function OrgDeactivatedBanner({ variant }: OrgDeactivatedBannerProps) {
 						<AlertTriangle className="text-destructive size-10" />
 					</div>
 					<h1 className="text-2xl font-bold">{t(variant)}</h1>
-					<p className="text-muted-foreground text-lg">
-						{t('description')}
-					</p>
+					<p className="text-muted-foreground text-lg">{t('description')}</p>
 					<Link
 						href="/#pricing"
 						className="group mt-2 inline-flex h-12 items-center gap-2 rounded-xl bg-emerald-600 px-8 text-sm font-semibold text-white shadow-lg shadow-emerald-600/25 transition-all hover:bg-emerald-700 hover:shadow-emerald-600/40"

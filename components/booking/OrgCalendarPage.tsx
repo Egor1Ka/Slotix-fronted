@@ -314,8 +314,10 @@ function OrgCalendarPage({
 	const getStaffScheduleById = (staffId: string): ScheduleTemplate | null =>
 		orgSchedules.getStaffSchedule(staffId)
 
-	const isStaffOverride = (staffId: string) => (o: ScheduleOverride): boolean =>
-		o.staffId === staffId
+	const isStaffOverride =
+		(staffId: string) =>
+		(o: ScheduleOverride): boolean =>
+			o.staffId === staffId
 
 	const getStaffOverridesById = (staffId: string): ScheduleOverride[] =>
 		orgSchedules.overrides.filter(isStaffOverride(staffId))
@@ -340,15 +342,16 @@ function OrgCalendarPage({
 		/>
 	)
 
-	const staffTabsSlot = viewConfig.showStaffTabs && view !== 'list' ? (
-		<StaffTabs
-			staff={displayStaff}
-			selectedId={selectedStaffId}
-			behavior={viewConfig.staffTabBehavior}
-			onSelect={onStaffSelect}
-			loading={contentLoading}
-		/>
-	) : null
+	const staffTabsSlot =
+		viewConfig.showStaffTabs && view !== 'list' ? (
+			<StaffTabs
+				staff={displayStaff}
+				selectedId={selectedStaffId}
+				behavior={viewConfig.staffTabBehavior}
+				onSelect={onStaffSelect}
+				loading={contentLoading}
+			/>
+		) : null
 
 	// ── Profile info ──
 

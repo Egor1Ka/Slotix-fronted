@@ -66,7 +66,9 @@ export default async function LandingPage() {
 	const authHref = user ? '/organizations' : GOOGLE_AUTH_URL
 	const hasSub = user ? await hasActiveSubscription() : false
 	const businessHref = user
-		? hasSub ? '/organizations' : checkoutHref
+		? hasSub
+			? '/organizations'
+			: checkoutHref
 		: GOOGLE_AUTH_URL
 
 	const preview: PreviewTranslations = {

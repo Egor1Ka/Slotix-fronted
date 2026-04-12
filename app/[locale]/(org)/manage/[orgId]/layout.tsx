@@ -32,7 +32,11 @@ export default async function ManageOrgLayout({
 	const { orgId, locale } = await params
 	const membership = await checkOrgAccess(orgId)
 
-	if (!membership || membership.status !== 'active' || !ADMIN_ROLES.includes(membership.role)) {
+	if (
+		!membership ||
+		membership.status !== 'active' ||
+		!ADMIN_ROLES.includes(membership.role)
+	) {
 		redirect(`/${locale}/forbidden`)
 	}
 

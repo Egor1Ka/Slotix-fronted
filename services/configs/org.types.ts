@@ -41,4 +41,10 @@ interface OrgMembership {
 	status: 'active' | 'invited' | 'suspended' | 'left'
 }
 
-export type { OrgListItem, CreateOrgBody, UpdateOrgBody, AddStaffBody, OrgMembership }
+export type {
+	OrgListItem,
+	CreateOrgBody,
+	UpdateOrgBody,
+	AddStaffBody,
+	OrgMembership,
+}

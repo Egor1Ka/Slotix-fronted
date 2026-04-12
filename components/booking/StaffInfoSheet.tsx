@@ -39,7 +39,9 @@ function StaffInfoSheet({
 	bio,
 }: StaffInfoSheetProps) {
 	const t = useTranslations('booking')
-	const [fullProfile, setFullProfile] = useState<StaffBySlugResponse | null>(null)
+	const [fullProfile, setFullProfile] = useState<StaffBySlugResponse | null>(
+		null,
+	)
 	const [open, setOpen] = useState(false)
 
 	useEffect(() => {
@@ -82,17 +84,24 @@ function StaffInfoSheet({
 						<div className="flex flex-col">
 							<span className="text-base font-semibold">{name}</span>
 							{position && (
-								<span className="text-muted-foreground text-sm">{position}</span>
+								<span className="text-muted-foreground text-sm">
+									{position}
+								</span>
 							)}
 						</div>
 					</div>
 
 					{displayBio && (
-						<p className="text-muted-foreground text-sm leading-relaxed">{displayBio}</p>
+						<p className="text-muted-foreground text-sm leading-relaxed">
+							{displayBio}
+						</p>
 					)}
 
 					{displayPhone && (
-						<a href={`tel:${displayPhone}`} className="text-primary text-sm hover:underline">
+						<a
+							href={`tel:${displayPhone}`}
+							className="text-primary text-sm hover:underline"
+						>
 							{displayPhone}
 						</a>
 					)}

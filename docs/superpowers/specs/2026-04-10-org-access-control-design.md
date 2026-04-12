@@ -18,16 +18,18 @@
 **Маршрут:** `GET /api/org/:id/my-membership`
 **Middleware:** `authMiddleware`
 **Ответ (200):**
+
 ```json
 {
-  "statusCode": 200,
-  "status": "success",
-  "data": {
-    "role": "owner",
-    "status": "active"
-  }
+	"statusCode": 200,
+	"status": "success",
+	"data": {
+		"role": "owner",
+		"status": "active"
+	}
 }
 ```
+
 **Ответ (404):** если пользователь не является членом организации.
 
 #### 2. Новый middleware `requireOrgMember`
@@ -36,51 +38,54 @@
 
 ```js
 const requireOrgMember = (getOrgId) => async (req, res, next) => {
-  const orgId = getOrgId(req)
-  const membership = await Membership.findOne({
-    userId: req.user.id,
-    orgId,
-    status: "active",
-  })
-  if (!membership) {
-    return httpResponse(res, generalStatus.UNAUTHORIZED)
-  }
-  req.membership = membership
-  next()
+	const orgId = getOrgId(req)
+	const membership = await Membership.findOne({
+		userId: req.user.id,
+		orgId,
+		status: 'active',
+	})
+	if (!membership) {
+		return httpResponse(res, generalStatus.UNAUTHORIZED)
+	}
+	req.membership = membership
+	next()
 }
 ```
 
 #### 3. Защита эндпоинтов
 
-| Эндпоинт | Сейчас | После |
-|-----------|--------|-------|
-| `GET /org/:id` | публичный | публичный (для бронирования) |
-| `GET /org/:id/staff` | публичный | публичный (для бронирования) |
-| `GET /org/:id/my-membership` | — | `authMiddleware` (новый) |
-| `PUT /org/:id` | `requireOrgAdmin` | без изменений |
-| `POST /org/:id/staff` | `authMiddleware` | `authMiddleware` + `requireOrgAdmin` |
+| Эндпоинт                     | Сейчас            | После                                |
+| ---------------------------- | ----------------- | ------------------------------------ |
+| `GET /org/:id`               | публичный         | публичный (для бронирования)         |
+| `GET /org/:id/staff`         | публичный         | публичный (для бронирования)         |
+| `GET /org/:id/my-membership` | —                 | `authMiddleware` (новый)             |
+| `PUT /org/:id`               | `requireOrgAdmin` | без изменений                        |
+| `POST /org/:id/staff`        | `authMiddleware`  | `authMiddleware` + `requireOrgAdmin` |
 
 ### Фронтенд
 
 #### 1. Новый API эндпоинт в конфиге
 
 Добавить `getMyMembership` в `org.config.ts`:
+
 ```ts
 getMyMembership: endpoint<void, ApiResponse<{ role: string; status: string }>>({
-  url: ({ id }) => `/api/org/${id}/my-membership`,
-  method: getData,
-  defaultErrorMessage: 'Failed to check membership',
+	url: ({ id }) => `/api/org/${id}/my-membership`,
+	method: getData,
+	defaultErrorMessage: 'Failed to check membership',
 })
 ```
 
 #### 2. Два layout с проверкой доступа
 
 **`app/[locale]/(org)/manage/[orgId]/layout.tsx`** — layout для админских страниц:
+
 - Fetch `GET /org/:id/my-membership`
 - Проверить `role` in `['owner', 'admin']` и `status === 'active'`
 - Если нет доступа → redirect на страницу 403
 
 **`app/[locale]/(org)/org/[orgId]/layout.tsx`** — layout для страниц сотрудников:
+
 - Fetch `GET /org/:id/my-membership`
 - Проверить `status === 'active'` (любая роль)
 - Если нет доступа → redirect на страницу 403
@@ -90,6 +95,7 @@ getMyMembership: endpoint<void, ApiResponse<{ role: string; status: string }>>({
 #### 3. Страница 403 Forbidden
 
 **`app/[locale]/(org)/forbidden/page.tsx`** — серверный компонент:
+
 - Заголовок: "Доступ заборонено"
 - Описание: "У вас немає доступу до цієї організації"
 - Кнопка: "До моїх організацій" → `/organizations`
@@ -98,6 +104,7 @@ getMyMembership: endpoint<void, ApiResponse<{ role: string; status: string }>>({
 #### 4. Утилита проверки доступа
 
 Серверная функция `checkOrgAccess(orgId, requiredRoles?)`:
+
 - Используется из layout для fetch membership
 - Вызывает `orgApi.getMyMembership` с серверными cookies
 - Возвращает membership или `null`
@@ -124,13 +131,13 @@ getMyMembership: endpoint<void, ApiResponse<{ role: string; status: string }>>({
 
 ```json
 {
-  "errors": {
-    "forbidden": {
-      "title": "Доступ заборонено",
-      "description": "У вас немає доступу до цієї організації",
-      "backToOrgs": "До моїх організацій"
-    }
-  }
+	"errors": {
+		"forbidden": {
+			"title": "Доступ заборонено",
+			"description": "У вас немає доступу до цієї організації",
+			"backToOrgs": "До моїх організацій"
+		}
+	}
 }
 ```
 

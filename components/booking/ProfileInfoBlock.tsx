@@ -44,11 +44,7 @@ function ProfileInfoBlock({
 
 	const toggleOpen = () => setOpen((prev) => !prev)
 	const imageSource = isOrg ? logo : avatar
-	const toggleLabel = open
-		? t('hide')
-		: isOrg
-			? t('aboutUs')
-			: t('about')
+	const toggleLabel = open ? t('hide') : isOrg ? t('aboutUs') : t('about')
 
 	if (!hasDetails) {
 		return (

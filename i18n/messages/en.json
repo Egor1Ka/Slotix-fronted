@@ -142,10 +142,7 @@
 			"free": {
 				"name": "Free",
 				"description": "Basic access",
-				"features": [
-					"Dashboard access",
-					"Community support"
-				]
+				"features": ["Dashboard access", "Community support"]
 			},
 			"org_creator": {
 				"name": "Org Creator",

@@ -33,7 +33,9 @@ const useStaffBookings = (
 	eventTypes: EventType[],
 ): UseStaffBookingsResult => {
 	const [bookings, setBookings] = useState<CalendarDisplayBooking[]>([])
-	const [staffBookingsMap, setStaffBookingsMap] = useState<Record<string, StaffBooking[]>>({})
+	const [staffBookingsMap, setStaffBookingsMap] = useState<
+		Record<string, StaffBooking[]>
+	>({})
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
 	const loadedRangeRef = useRef<LoadedRange | null>(null)

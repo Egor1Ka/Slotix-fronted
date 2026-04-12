@@ -30,7 +30,8 @@ function ServiceInfo({ eventType }: { eventType: EventType }) {
 	const tProfile = useTranslations('profile')
 	const [expanded, setExpanded] = useState(false)
 
-	const hasDescription = eventType.description && eventType.description.length > 0
+	const hasDescription =
+		eventType.description && eventType.description.length > 0
 
 	const toggleExpanded = () => setExpanded((prev) => !prev)
 

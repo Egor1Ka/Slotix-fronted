@@ -96,7 +96,9 @@ function ServiceList({
 		)
 	}
 
-	const skeletonRenderer = isHorizontal ? renderSkeletonChip : renderSkeletonItem
+	const skeletonRenderer = isHorizontal
+		? renderSkeletonChip
+		: renderSkeletonItem
 	const showSkeleton = eventTypes.length === 0 && loading
 
 	return (
@@ -104,9 +106,7 @@ function ServiceList({
 			className={cn(
 				'gap-2 transition-opacity',
 				loading && 'pointer-events-none opacity-50',
-				isHorizontal
-					? 'flex overflow-x-auto pb-2'
-					: 'flex flex-col',
+				isHorizontal ? 'flex overflow-x-auto pb-2' : 'flex flex-col',
 			)}
 		>
 			{!isHorizontal && (

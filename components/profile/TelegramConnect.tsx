@@ -113,9 +113,7 @@ function TelegramConnect({ connected, onStatusChange }: TelegramConnectProps) {
 					) : (
 						<>
 							<Button onClick={handleConnect} disabled={loading}>
-								{loading && !showCheckStatus
-									? t('connecting')
-									: t('connect')}
+								{loading && !showCheckStatus ? t('connecting') : t('connect')}
 							</Button>
 							{showCheckStatus && (
 								<Button
@@ -137,9 +135,7 @@ function TelegramConnect({ connected, onStatusChange }: TelegramConnectProps) {
 			>
 				<AlertDialogContent>
 					<AlertDialogHeader>
-						<AlertDialogTitle>
-							{t('confirmDisconnectTitle')}
-						</AlertDialogTitle>
+						<AlertDialogTitle>{t('confirmDisconnectTitle')}</AlertDialogTitle>
 						<AlertDialogDescription>
 							{t('confirmDisconnectDescription')}
 						</AlertDialogDescription>
@@ -148,10 +144,7 @@ function TelegramConnect({ connected, onStatusChange }: TelegramConnectProps) {
 						<AlertDialogCancel>
 							{t('confirmDisconnectCancel')}
 						</AlertDialogCancel>
-						<AlertDialogAction
-							variant="destructive"
-							onClick={handleDisconnect}
-						>
+						<AlertDialogAction variant="destructive" onClick={handleDisconnect}>
 							{t('confirmDisconnectAction')}
 						</AlertDialogAction>
 					</AlertDialogFooter>

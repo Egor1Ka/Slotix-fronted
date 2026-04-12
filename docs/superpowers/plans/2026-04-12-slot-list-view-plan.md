@@ -13,6 +13,7 @@
 ### Task 1: Extend ViewMode type and CalendarViewConfig
 
 **Files:**
+
 - Modify: `lib/calendar/types.ts:4`
 - Modify: `lib/calendar/view-config.ts:1-67`
 
@@ -118,6 +119,7 @@ EOF
 ### Task 2: Add i18n keys for list view
 
 **Files:**
+
 - Modify: `i18n/messages/en.json` (booking section)
 - Modify: `i18n/messages/uk.json` (booking section)
 
@@ -166,6 +168,7 @@ EOF
 ### Task 3: Update CalendarCore — add list/calendar toggle and handle `view === 'list'`
 
 **Files:**
+
 - Modify: `lib/calendar/CalendarCore.tsx:59-65` (VIEW_OPTIONS)
 - Modify: `lib/calendar/CalendarCore.tsx:85-89` (navigate function)
 - Modify: `lib/calendar/CalendarCore.tsx:746-778` (header render)
@@ -186,6 +189,7 @@ const navigate = (view: ViewMode, date: string, direction: number): string => {
 - [ ] **Step 2: Add list view toggle to header**
 
 Replace the view options rendering section (around lines 746-764). The key changes:
+
 1. Add a "Calendar | List" toggle before the day/week/month buttons
 2. Hide day/week/month when view is 'list'
 3. Use `allowListView` from viewConfig
@@ -209,9 +213,7 @@ Find this block in the render:
 			{t('copyPublicLink')}
 		</Button>
 	)}
-	<div className="flex gap-1">
-		{VIEW_OPTIONS.map(renderViewOption)}
-	</div>
+	<div className="flex gap-1">{VIEW_OPTIONS.map(renderViewOption)}</div>
 </div>
 ```
 
@@ -239,7 +241,9 @@ Replace with:
 			<Button
 				variant={view !== 'list' ? 'default' : 'ghost'}
 				size="xs"
-				onClick={() => onViewChange(lastCalendarView === 'list' ? 'day' : lastCalendarView)}
+				onClick={() =>
+					onViewChange(lastCalendarView === 'list' ? 'day' : lastCalendarView)
+				}
 			>
 				{t('calendarView')}
 			</Button>
@@ -253,9 +257,7 @@ Replace with:
 		</div>
 	)}
 	{view !== 'list' && (
-		<div className="flex gap-1">
-			{VIEW_OPTIONS.map(renderViewOption)}
-		</div>
+		<div className="flex gap-1">{VIEW_OPTIONS.map(renderViewOption)}</div>
 	)}
 </div>
 ```
@@ -298,12 +300,22 @@ interface CalendarCoreProps {
 Update the render section (around lines 776-778) — add list view rendering:
 
 ```tsx
-{staffTabsSlot}
+{
+	staffTabsSlot
+}
 
-{view === 'list' && listViewSlot}
-{view === 'day' && renderDayView()}
-{view === 'week' && renderWeekView()}
-{view === 'month' && renderMonthView()}
+{
+	view === 'list' && listViewSlot
+}
+{
+	view === 'day' && renderDayView()
+}
+{
+	view === 'week' && renderWeekView()
+}
+{
+	view === 'month' && renderMonthView()
+}
 ```
 
 When `view === 'list'`, the sidebar is hidden (list view has its own layout):
@@ -311,21 +323,25 @@ When `view === 'list'`, the sidebar is hidden (list view has its own layout):
 Update the sidebar condition (around line 718-722):
 
 ```tsx
-{!hideSidebar && view !== 'list' && (
-	<aside className="hidden w-[220px] shrink-0 flex-col border-r p-4 md:flex">
-		{strategy.renderSidebar()}
-	</aside>
-)}
+{
+	!hideSidebar && view !== 'list' && (
+		<aside className="hidden w-[220px] shrink-0 flex-col border-r p-4 md:flex">
+			{strategy.renderSidebar()}
+		</aside>
+	)
+}
 ```
 
 And mobile sidebar (around line 768-771):
 
 ```tsx
-{!hideSidebar && view !== 'list' && (
-	<div className="md:hidden">
-		{strategy.renderMobileSidebar?.() ?? strategy.renderSidebar()}
-	</div>
-)}
+{
+	!hideSidebar && view !== 'list' && (
+		<div className="md:hidden">
+			{strategy.renderMobileSidebar?.() ?? strategy.renderSidebar()}
+		</div>
+	)
+}
 ```
 
 - [ ] **Step 4: Verify build**
@@ -350,6 +366,7 @@ EOF
 ### Task 4: Create `TimeSlotGrid` component
 
 **Files:**
+
 - Create: `components/booking/TimeSlotGrid.tsx`
 
 - [ ] **Step 1: Create the component**
@@ -457,6 +474,7 @@ EOF
 ### Task 5: Create `StaffInfoSheet` component
 
 **Files:**
+
 - Create: `components/booking/StaffInfoSheet.tsx`
 
 - [ ] **Step 1: Create the component**
@@ -619,6 +637,7 @@ EOF
 ### Task 6: Create `useFindNearestSlots` hook
 
 **Files:**
+
 - Create: `lib/calendar/hooks/useFindNearestSlots.ts`
 - Modify: `lib/calendar/hooks/index.ts`
 
@@ -707,13 +726,30 @@ const getSlotsForDate = (
 	})
 }
 
-const findNearestSlots = (params: FindNearestSlotsParams): FindNearestSlotsResult => {
-	const { schedule, overrides, bookings, duration, startDate, fixedDate, staffId } = params
+const findNearestSlots = (
+	params: FindNearestSlotsParams,
+): FindNearestSlotsResult => {
+	const {
+		schedule,
+		overrides,
+		bookings,
+		duration,
+		startDate,
+		fixedDate,
+		staffId,
+	} = params
 
 	if (!schedule) return { date: startDate, slots: [] }
 
 	if (fixedDate) {
-		const slots = getSlotsForDate(startDate, schedule, overrides, bookings, duration, staffId)
+		const slots = getSlotsForDate(
+			startDate,
+			schedule,
+			overrides,
+			bookings,
+			duration,
+			staffId,
+		)
 		return { date: startDate, slots }
 	}
 
@@ -727,11 +763,20 @@ const findNearestSlots = (params: FindNearestSlotsParams): FindNearestSlotsResul
 		dateStr: string,
 	): FindNearestSlotsResult | null => {
 		if (result) return result
-		const slots = getSlotsForDate(dateStr, schedule, overrides, bookings, duration, staffId)
+		const slots = getSlotsForDate(
+			dateStr,
+			schedule,
+			overrides,
+			bookings,
+			duration,
+			staffId,
+		)
 		return slots.length > 0 ? { date: dateStr, slots } : null
 	}
 
-	return dates.reduce(findFirstWithSlots, null) ?? { date: startDate, slots: [] }
+	return (
+		dates.reduce(findFirstWithSlots, null) ?? { date: startDate, slots: [] }
+	)
 }
 
 const addDaysToDate = (dateStr: string, days: number): Date => {
@@ -740,11 +785,30 @@ const addDaysToDate = (dateStr: string, days: number): Date => {
 	return date
 }
 
-const useFindNearestSlots = (params: FindNearestSlotsParams): FindNearestSlotsResult => {
-	const { schedule, overrides, bookings, duration, startDate, fixedDate, staffId } = params
+const useFindNearestSlots = (
+	params: FindNearestSlotsParams,
+): FindNearestSlotsResult => {
+	const {
+		schedule,
+		overrides,
+		bookings,
+		duration,
+		startDate,
+		fixedDate,
+		staffId,
+	} = params
 
 	return useMemo(
-		() => findNearestSlots({ schedule, overrides, bookings, duration, startDate, fixedDate, staffId }),
+		() =>
+			findNearestSlots({
+				schedule,
+				overrides,
+				bookings,
+				duration,
+				startDate,
+				fixedDate,
+				staffId,
+			}),
 		[schedule, overrides, bookings, duration, startDate, fixedDate, staffId],
 	)
 }
@@ -785,6 +849,7 @@ EOF
 ### Task 7: Create `StaffSlotCard` component
 
 **Files:**
+
 - Create: `components/booking/StaffSlotCard.tsx`
 
 - [ ] **Step 1: Create the component**
@@ -928,6 +993,7 @@ EOF
 ### Task 8: Create `BookingConfirmSheet` component
 
 **Files:**
+
 - Create: `components/booking/BookingConfirmSheet.tsx`
 
 - [ ] **Step 1: Create the component**
@@ -1066,6 +1132,7 @@ EOF
 ### Task 9: Create `SlotListView` component
 
 **Files:**
+
 - Create: `components/booking/SlotListView.tsx`
 
 - [ ] **Step 1: Create the component**
@@ -1339,7 +1406,9 @@ function SlotListView({
 					<div className="flex justify-center">
 						<Calendar
 							mode="single"
-							selected={selectedDate ? new Date(selectedDate + 'T00:00:00') : undefined}
+							selected={
+								selectedDate ? new Date(selectedDate + 'T00:00:00') : undefined
+							}
 							onSelect={handleDateSelect}
 							className="rounded-md border"
 						/>
@@ -1408,6 +1477,7 @@ EOF
 ### Task 10: Integrate SlotListView into BookingPage (personal/staff pages)
 
 **Files:**
+
 - Modify: `app/[locale]/book/[staffSlug]/BookingPage.tsx`
 
 - [ ] **Step 1: Import SlotListView**
@@ -1471,6 +1541,7 @@ Expected: Compiles successfully
 
 Run: `npm run dev`
 Navigate to a staff booking page, verify:
+
 1. "Calendar | List" toggle appears in header
 2. Clicking "List" shows ServiceList + time slot grid
 3. Clicking a slot opens the confirmation Sheet
@@ -1493,6 +1564,7 @@ EOF
 ### Task 11: Integrate SlotListView into OrgCalendarPage
 
 **Files:**
+
 - Modify: `components/booking/OrgCalendarPage.tsx`
 
 - [ ] **Step 1: Import SlotListView**
@@ -1599,6 +1671,7 @@ Run: `npm run build 2>&1 | head -30`
 
 Run: `npm run dev`
 Navigate to an org booking page, verify:
+
 1. "Calendar | List" toggle appears
 2. List mode shows ServiceList → Staff cards with time slots
 3. Clicking "i" on a staff card opens info sheet

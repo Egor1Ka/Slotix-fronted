@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 import { timeToMin } from '@/lib/slot-engine'
 import { Button } from '@/components/ui/button'
@@ -166,7 +166,9 @@ function CalendarCore({
 	const strategy = useCalendarStrategy()
 	const viewConfig = useSafeViewConfig()
 	const lastCalendarViewRef = useRef<ViewMode>(view === 'list' ? 'day' : view)
-	if (view !== 'list') lastCalendarViewRef.current = view
+	useEffect(() => {
+		if (view !== 'list') lastCalendarViewRef.current = view
+	}, [view])
 	const lastCalendarView = lastCalendarViewRef.current
 	const [sheetOpen, setSheetOpen] = useState(false)
 	const t = useTranslations('calendar')
@@ -723,116 +725,116 @@ function CalendarCore({
 		<div className="flex min-h-screen flex-col">
 			{profileInfo && <ProfileInfoBlock {...profileInfo} />}
 			<div className="flex flex-1 flex-col md:flex-row">
-			{!hideSidebar && view !== 'list' && (
-				<aside className="hidden w-[220px] shrink-0 flex-col border-r p-4 md:flex">
-					{strategy.renderSidebar()}
-				</aside>
-			)}
+				{!hideSidebar && view !== 'list' && (
+					<aside className="hidden w-[220px] shrink-0 flex-col border-r p-4 md:flex">
+						{strategy.renderSidebar()}
+					</aside>
+				)}
 
-			<main className="flex-1 overflow-auto p-4">
-				<div className="flex flex-col gap-4">
-					<div className="flex flex-wrap items-center justify-between gap-2">
-						<div className="flex items-center gap-1">
-							{staffAvatarUrl && (
-								<img
-									src={staffAvatarUrl}
-									alt=""
-									className="size-8 rounded-full object-cover"
-								/>
-							)}
-							<Button variant="ghost" size="icon-sm" onClick={handlePrev}>
-								<ChevronLeftIcon />
-							</Button>
-							<h2 className="min-w-0 text-center text-sm font-semibold md:min-w-[140px] md:text-lg">
-								{title}
-							</h2>
-							<Button variant="ghost" size="icon-sm" onClick={handleNext}>
-								<ChevronRightIcon />
-							</Button>
-						</div>
-						<div className="flex items-center gap-2">
-							{publicUrl && (
-								<Button
-									variant="outline"
-									size="sm"
-									onClick={handleCopyPublicLink}
-									className="hidden gap-1.5 md:flex"
-								>
-									{linkCopied ? (
-										<CheckIcon className="size-4" />
-									) : (
-										<LinkIcon className="size-4" />
-									)}
-									{t('copyPublicLink')}
+				<main className="flex-1 overflow-auto p-4">
+					<div className="flex flex-col gap-4">
+						<div className="flex flex-wrap items-center justify-between gap-2">
+							<div className="flex items-center gap-1">
+								{staffAvatarUrl && (
+									<img
+										src={staffAvatarUrl}
+										alt=""
+										className="size-8 rounded-full object-cover"
+									/>
+								)}
+								<Button variant="ghost" size="icon-sm" onClick={handlePrev}>
+									<ChevronLeftIcon />
 								</Button>
-							)}
-							{viewConfig.allowListView && (
-								<div className="flex gap-1 rounded-md border p-0.5">
+								<h2 className="min-w-0 text-center text-sm font-semibold md:min-w-[140px] md:text-lg">
+									{title}
+								</h2>
+								<Button variant="ghost" size="icon-sm" onClick={handleNext}>
+									<ChevronRightIcon />
+								</Button>
+							</div>
+							<div className="flex items-center gap-2">
+								{publicUrl && (
 									<Button
-										variant={view !== 'list' ? 'default' : 'ghost'}
-										size="xs"
-										onClick={() => onViewChange(lastCalendarView)}
+										variant="outline"
+										size="sm"
+										onClick={handleCopyPublicLink}
+										className="hidden gap-1.5 md:flex"
 									>
-										{t('calendarView')}
+										{linkCopied ? (
+											<CheckIcon className="size-4" />
+										) : (
+											<LinkIcon className="size-4" />
+										)}
+										{t('copyPublicLink')}
 									</Button>
-									<Button
-										variant={view === 'list' ? 'default' : 'ghost'}
-										size="xs"
-										onClick={() => onViewChange('list')}
-									>
-										{t('listView')}
-									</Button>
-								</div>
-							)}
-							{view !== 'list' && (
-								<div className="flex gap-1">
-									{VIEW_OPTIONS.map(renderViewOption)}
-								</div>
-							)}
+								)}
+								{viewConfig.allowListView && (
+									<div className="flex gap-1 rounded-md border p-0.5">
+										<Button
+											variant={view !== 'list' ? 'default' : 'ghost'}
+											size="xs"
+											onClick={() => onViewChange(lastCalendarView)}
+										>
+											{t('calendarView')}
+										</Button>
+										<Button
+											variant={view === 'list' ? 'default' : 'ghost'}
+											size="xs"
+											onClick={() => onViewChange('list')}
+										>
+											{t('listView')}
+										</Button>
+									</div>
+								)}
+								{view !== 'list' && (
+									<div className="flex gap-1">
+										{VIEW_OPTIONS.map(renderViewOption)}
+									</div>
+								)}
+							</div>
 						</div>
+
+						{!hideSidebar && view !== 'list' && (
+							<div className="md:hidden">
+								{strategy.renderMobileSidebar?.() ?? strategy.renderSidebar()}
+							</div>
+						)}
+
+						{staffTabsSlot}
+
+						{view === 'list' && listViewSlot}
+						{view === 'day' && renderDayView()}
+						{view === 'week' && renderWeekView()}
+						{view === 'month' && renderMonthView()}
 					</div>
+				</main>
 
-					{!hideSidebar && view !== 'list' && (
-						<div className="md:hidden">
-							{strategy.renderMobileSidebar?.() ?? strategy.renderSidebar()}
-						</div>
-					)}
+				<aside className="w-full shrink-0 border-t p-4 md:w-[280px] md:border-t-0 md:border-l">
+					{strategy.renderPanel()}
+				</aside>
 
-					{staffTabsSlot}
+				{!hideSidebar && (
+					<>
+						<Button
+							variant="outline"
+							size="icon"
+							className="fixed bottom-4 left-4 z-50 shadow-lg md:hidden"
+							onClick={handleOpenSheet}
+						>
+							<MenuIcon />
+						</Button>
 
-					{view === 'list' && listViewSlot}
-					{view === 'day' && renderDayView()}
-					{view === 'week' && renderWeekView()}
-					{view === 'month' && renderMonthView()}
-				</div>
-			</main>
-
-			<aside className="w-full shrink-0 border-t p-4 md:w-[280px] md:border-t-0 md:border-l">
-				{strategy.renderPanel()}
-			</aside>
-
-			{!hideSidebar && (
-				<>
-					<Button
-						variant="outline"
-						size="icon"
-						className="fixed bottom-4 left-4 z-50 shadow-lg md:hidden"
-						onClick={handleOpenSheet}
-					>
-						<MenuIcon />
-					</Button>
-
-					<Sheet open={sheetOpen} onOpenChange={handleSheetChange}>
-						<SheetContent side="bottom">
-							<SheetHeader>
-								<SheetTitle>{t('servicesAndMode')}</SheetTitle>
-							</SheetHeader>
-							<div className="p-4">{sidebarWithSheetClose}</div>
-						</SheetContent>
-					</Sheet>
-				</>
-			)}
-		</div>
+						<Sheet open={sheetOpen} onOpenChange={handleSheetChange}>
+							<SheetContent side="bottom">
+								<SheetHeader>
+									<SheetTitle>{t('servicesAndMode')}</SheetTitle>
+								</SheetHeader>
+								<div className="p-4">{sidebarWithSheetClose}</div>
+							</SheetContent>
+						</Sheet>
+					</>
+				)}
+			</div>
 		</div>
 	)
 }

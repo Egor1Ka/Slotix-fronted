@@ -17,6 +17,7 @@
 ### 1.4 Добавить маршрут и защитить `addStaff`
 
 В `src/routes/subroutes/orgRoutes.js`:
+
 - Добавить `GET /:id/my-membership` с `authMiddleware`
 - Добавить `requireOrgAdmin` на `POST /:id/staff`
 
@@ -30,8 +31,8 @@
 
 ```ts
 interface OrgMembership {
-  role: 'owner' | 'admin' | 'member'
-  status: 'active' | 'invited' | 'suspended' | 'left'
+	role: 'owner' | 'admin' | 'member'
+	status: 'active' | 'invited' | 'suspended' | 'left'
 }
 ```
 
@@ -48,6 +49,7 @@ interface OrgMembership {
 ### 3.1 Добавить ключи в `i18n/messages/en.json` и `uk.json`
 
 Под `errors`:
+
 ```json
 "orgForbiddenTitle": "Access denied",
 "orgForbiddenDescription": "You don't have access to this organization.",

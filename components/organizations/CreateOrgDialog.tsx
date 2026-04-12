@@ -63,11 +63,7 @@ interface CreateOrgDialogProps {
 	orgCount: number
 }
 
-function CreateOrgDialog({
-	onCreated,
-	plan,
-	orgCount,
-}: CreateOrgDialogProps) {
+function CreateOrgDialog({ onCreated, plan, orgCount }: CreateOrgDialogProps) {
 	const t = useTranslations('organizations')
 	const tb = useTranslations('billing')
 	const router = useRouter()

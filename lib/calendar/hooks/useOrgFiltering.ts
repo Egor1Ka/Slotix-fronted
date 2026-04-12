@@ -213,8 +213,11 @@ const useOrgFiltering = ({
 
 	// Фильтрация услуг: если выбран сотрудник — его org-услуги,
 	// иначе — только те org-услуги, которые может выполнить хотя бы один работающий сотрудник
+	// Услуги с staffPolicy === 'any' доступны всем сотрудникам — не фильтруем их
 	const isAvailableToday = (et: EventType): boolean =>
-		workingStaffEventTypeIds ? workingStaffEventTypeIds.has(et.id) : true
+		et.staffPolicy === 'any' ||
+		!workingStaffEventTypeIds ||
+		workingStaffEventTypeIds.has(et.id)
 
 	const filteredEventTypes = useMemo(
 		() =>

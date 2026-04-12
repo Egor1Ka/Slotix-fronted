@@ -21,7 +21,11 @@ export default async function OrgStaffAdminPage({
 			}
 		>
 			<CalendarViewConfigProvider config={ORG_ADMIN_CONFIG}>
-				<OrgCalendarPage orgSlug={orgId} staffId={staffId} publicUrl={`/${locale}/org/${orgId}`} />
+				<OrgCalendarPage
+					orgSlug={orgId}
+					staffId={staffId}
+					publicUrl={`/${locale}/org/${orgId}`}
+				/>
 			</CalendarViewConfigProvider>
 		</Suspense>
 	)

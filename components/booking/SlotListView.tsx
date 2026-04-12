@@ -197,7 +197,10 @@ function SlotListView({
 	const [selectedStaffId, setSelectedStaffId] = useState<string | null>(null)
 	const [sheetOpen, setSheetOpen] = useState(false)
 
-	const selectedEventType = getSelectedEventType(eventTypes, selectedEventTypeId)
+	const selectedEventType = getSelectedEventType(
+		eventTypes,
+		selectedEventTypeId,
+	)
 	const duration = selectedEventType ? selectedEventType.durationMin : 30
 	const startDate = selectedDate ?? getTodayISO()
 	const fixedDate = selectedDate !== null
@@ -239,12 +242,21 @@ function SlotListView({
 		variant === 'org' ? getStaffById(staff, selectedStaffId) : null
 
 	const sheetStaffName =
-		variant === 'personal' ? null : selectedOrgStaff ? selectedOrgStaff.name : null
+		variant === 'personal'
+			? null
+			: selectedOrgStaff
+				? selectedOrgStaff.name
+				: null
 	const sheetStaffAvatar =
-		variant === 'personal' ? null : selectedOrgStaff ? selectedOrgStaff.avatar : null
+		variant === 'personal'
+			? null
+			: selectedOrgStaff
+				? selectedOrgStaff.avatar
+				: null
 
 	const renderOrgStaffItem = (member: OrgStaffMember) => {
-		if (!getStaffSchedule || !getStaffOverrides || !getStaffBookings) return null
+		if (!getStaffSchedule || !getStaffOverrides || !getStaffBookings)
+			return null
 
 		return (
 			<OrgStaffSlotItem
@@ -282,7 +294,9 @@ function SlotListView({
 					</h3>
 					<Calendar
 						mode="single"
-						selected={selectedDate ? new Date(selectedDate + 'T00:00:00') : undefined}
+						selected={
+							selectedDate ? new Date(selectedDate + 'T00:00:00') : undefined
+						}
 						onSelect={handleCalendarSelect}
 						disabled={{ before: new Date() }}
 						className="rounded-lg border p-2"

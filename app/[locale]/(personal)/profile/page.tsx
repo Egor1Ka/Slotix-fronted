@@ -48,9 +48,7 @@ function PersonalProfilePage() {
 	}
 
 	const handleTelegramStatusChange = (connected: boolean) => {
-		setUser((prev) =>
-			prev ? { ...prev, telegramConnected: connected } : prev,
-		)
+		setUser((prev) => (prev ? { ...prev, telegramConnected: connected } : prev))
 	}
 
 	const handleSubmit = async (data: ProfileFormData) => {
