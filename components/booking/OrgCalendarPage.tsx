@@ -18,6 +18,7 @@ import {
 	getStaffToLoad,
 } from '@/lib/calendar/utils'
 import { StaffTabs } from '@/components/booking/StaffTabs'
+import { SlotListView } from '@/components/booking/SlotListView'
 import {
 	useOrgInfo,
 	useOrgFiltering,
@@ -29,6 +30,8 @@ import {
 } from '@/lib/calendar/hooks'
 import type {
 	ScheduleTemplate,
+	ScheduleOverride,
+	StaffBooking,
 	OrgStaffMember,
 } from '@/services/configs/booking.types'
 
@@ -152,6 +155,7 @@ function OrgCalendarPage({
 
 	const {
 		bookings,
+		staffBookingsMap,
 		reloadBookings,
 		loading: bookingsLoading,
 		error: bookingsError,
@@ -305,7 +309,38 @@ function OrgCalendarPage({
 		? filtering.filteredStaff.filter(isWorkingStaff)
 		: workingStaff
 
-	const staffTabsSlot = viewConfig.showStaffTabs ? (
+	// ── List view helpers ──
+
+	const getStaffScheduleById = (staffId: string): ScheduleTemplate | null =>
+		orgSchedules.getStaffSchedule(staffId)
+
+	const isStaffOverride = (staffId: string) => (o: ScheduleOverride): boolean =>
+		o.staffId === staffId
+
+	const getStaffOverridesById = (staffId: string): ScheduleOverride[] =>
+		orgSchedules.overrides.filter(isStaffOverride(staffId))
+
+	const getStaffBookingsById = (staffId: string): StaffBooking[] =>
+		staffBookingsMap[staffId] ?? []
+
+	const listViewSlot = (
+		<SlotListView
+			variant="org"
+			eventTypes={eventTypes}
+			selectedEventTypeId={selectedEventTypeId}
+			onEventTypeSelect={onEventTypeSelect}
+			loading={contentLoading}
+			staff={displayStaff}
+			getStaffSchedule={getStaffScheduleById}
+			getStaffOverrides={getStaffOverridesById}
+			getStaffBookings={getStaffBookingsById}
+			formConfig={bookingActions.formConfig}
+			onConfirmWithClient={bookingActions.handleConfirmWithClient}
+			isSubmitting={bookingActions.isSubmitting}
+		/>
+	)
+
+	const staffTabsSlot = viewConfig.showStaffTabs && view !== 'list' ? (
 		<StaffTabs
 			staff={displayStaff}
 			selectedId={selectedStaffId}
@@ -344,6 +379,7 @@ function OrgCalendarPage({
 				disabledDays={disabledDays}
 				isDayOff={isOrgDayOff || isStaffDayOff}
 				staffTabsSlot={staffTabsSlot}
+				listViewSlot={listViewSlot}
 				publicUrl={publicUrlProp}
 				profileInfo={profileInfo}
 			/>
