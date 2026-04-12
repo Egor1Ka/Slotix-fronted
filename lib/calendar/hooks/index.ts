@@ -23,3 +23,6 @@ export type { UseOrgFilteringResult } from './useOrgFiltering'
 
 export { useOrgSchedules } from './useOrgSchedules'
 export type { UseOrgSchedulesResult } from './useOrgSchedules'
+
+export { useFindNearestSlots } from './useFindNearestSlots'
+export type { FindNearestSlotsResult } from './useFindNearestSlots'
