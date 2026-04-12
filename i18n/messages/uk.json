@@ -311,7 +311,9 @@
 		"scheduleSaved": "Розклад збережено",
 		"scheduleSaveError": "Не вдалося зберегти розклад",
 		"overrideSaved": "Вихідний збережено",
-		"overrideSaveError": "Не вдалося зберегти вихідний"
+		"overrideSaveError": "Не вдалося зберегти вихідний",
+		"calendarView": "Календар",
+		"listView": "Список"
 	},
 	"errors": {
 		"title": "Щось пішло не так",

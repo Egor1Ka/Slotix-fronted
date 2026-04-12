@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { cn } from '@/lib/utils'
 import { timeToMin } from '@/lib/slot-engine'
 import { Button } from '@/components/ui/button'
@@ -54,6 +54,7 @@ const DEFAULT_VIEW_CONFIG: CalendarViewConfig = {
 	canBookForClient: false,
 	filterByStaffCapability: false,
 	showScheduleEditor: false,
+	allowListView: false,
 }
 
 type ViewOption = { value: ViewMode; labelKey: string }
@@ -80,9 +81,11 @@ interface CalendarCoreProps {
 	staffAvatarUrl?: string
 	hideSidebar?: boolean
 	profileInfo?: ProfileInfoBlockProps
+	listViewSlot?: React.ReactNode
 }
 
 const navigate = (view: ViewMode, date: string, direction: number): string => {
+	if (view === 'list') return addDays(date, direction)
 	if (view === 'month') return addMonths(date, direction)
 	if (view === 'week') return addDays(date, direction * 7)
 	return addDays(date, direction)
@@ -158,9 +161,13 @@ function CalendarCore({
 	staffAvatarUrl,
 	hideSidebar = false,
 	profileInfo,
+	listViewSlot,
 }: CalendarCoreProps) {
 	const strategy = useCalendarStrategy()
 	const viewConfig = useSafeViewConfig()
+	const lastCalendarViewRef = useRef<ViewMode>(view === 'list' ? 'day' : view)
+	if (view !== 'list') lastCalendarViewRef.current = view
+	const lastCalendarView = lastCalendarViewRef.current
 	const [sheetOpen, setSheetOpen] = useState(false)
 	const t = useTranslations('calendar')
 	const locale = useLocale()
@@ -716,7 +723,7 @@ function CalendarCore({
 		<div className="flex min-h-screen flex-col">
 			{profileInfo && <ProfileInfoBlock {...profileInfo} />}
 			<div className="flex flex-1 flex-col md:flex-row">
-			{!hideSidebar && (
+			{!hideSidebar && view !== 'list' && (
 				<aside className="hidden w-[220px] shrink-0 flex-col border-r p-4 md:flex">
 					{strategy.renderSidebar()}
 				</aside>
@@ -759,13 +766,33 @@ function CalendarCore({
 									{t('copyPublicLink')}
 								</Button>
 							)}
-							<div className="flex gap-1">
-								{VIEW_OPTIONS.map(renderViewOption)}
-							</div>
+							{viewConfig.allowListView && (
+								<div className="flex gap-1 rounded-md border p-0.5">
+									<Button
+										variant={view !== 'list' ? 'default' : 'ghost'}
+										size="xs"
+										onClick={() => onViewChange(lastCalendarView)}
+									>
+										{t('calendarView')}
+									</Button>
+									<Button
+										variant={view === 'list' ? 'default' : 'ghost'}
+										size="xs"
+										onClick={() => onViewChange('list')}
+									>
+										{t('listView')}
+									</Button>
+								</div>
+							)}
+							{view !== 'list' && (
+								<div className="flex gap-1">
+									{VIEW_OPTIONS.map(renderViewOption)}
+								</div>
+							)}
 						</div>
 					</div>
 
-					{!hideSidebar && (
+					{!hideSidebar && view !== 'list' && (
 						<div className="md:hidden">
 							{strategy.renderMobileSidebar?.() ?? strategy.renderSidebar()}
 						</div>
@@ -773,6 +800,7 @@ function CalendarCore({
 
 					{staffTabsSlot}
 
+					{view === 'list' && listViewSlot}
 					{view === 'day' && renderDayView()}
 					{view === 'week' && renderWeekView()}
 					{view === 'month' && renderMonthView()}

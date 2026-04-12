@@ -311,7 +311,9 @@
 		"scheduleSaved": "Schedule saved",
 		"scheduleSaveError": "Failed to save schedule",
 		"overrideSaved": "Day off saved",
-		"overrideSaveError": "Failed to save day off"
+		"overrideSaveError": "Failed to save day off",
+		"calendarView": "Calendar",
+		"listView": "List"
 	},
 	"errors": {
 		"title": "Something went wrong",
