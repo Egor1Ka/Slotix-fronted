@@ -7,6 +7,7 @@ import type {
 	OrgStaffMember,
 	EventType,
 	CalendarDisplayBooking,
+	StaffBooking,
 } from '@/services/configs/booking.types'
 import type { ViewMode } from '../types'
 import {
@@ -19,6 +20,7 @@ import {
 
 interface UseStaffBookingsResult {
 	bookings: CalendarDisplayBooking[]
+	staffBookingsMap: Record<string, StaffBooking[]>
 	reloadBookings: () => void
 	loading: boolean
 	error: string | null
@@ -31,6 +33,7 @@ const useStaffBookings = (
 	eventTypes: EventType[],
 ): UseStaffBookingsResult => {
 	const [bookings, setBookings] = useState<CalendarDisplayBooking[]>([])
+	const [staffBookingsMap, setStaffBookingsMap] = useState<Record<string, StaffBooking[]>>({})
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
 	const loadedRangeRef = useRef<LoadedRange | null>(null)
@@ -47,6 +50,7 @@ const useStaffBookings = (
 	useEffect(() => {
 		if (staffToLoad.length === 0 || eventTypes.length === 0) {
 			setBookings([])
+			setStaffBookingsMap({})
 			setLoading(false)
 			return
 		}
@@ -63,7 +67,7 @@ const useStaffBookings = (
 			setError(null)
 
 			try {
-				const fetchAndMap = async (staff: OrgStaffMember) => {
+				const fetchForStaff = async (staff: OrgStaffMember) => {
 					const staffBookings = await bookingApi.getByStaff(
 						staff.id,
 						range.from,
@@ -74,14 +78,28 @@ const useStaffBookings = (
 						name: staff.name,
 						avatar: staff.avatar,
 					})
-					return staffBookings.map(mapWithStaff)
+					return {
+						staffId: staff.id,
+						raw: staffBookings,
+						display: staffBookings.map(mapWithStaff),
+					}
 				}
 
-				const bookingArrays = await Promise.all(staffToLoad.map(fetchAndMap))
+				const bookingResults = await Promise.all(staffToLoad.map(fetchForStaff))
 
-				const allBookings = bookingArrays.flat()
+				const allBookings = bookingResults.flatMap((result) => result.display)
+
+				const buildMap = (
+					acc: Record<string, StaffBooking[]>,
+					result: { staffId: string; raw: StaffBooking[] },
+				): Record<string, StaffBooking[]> => ({
+					...acc,
+					[result.staffId]: result.raw,
+				})
+				const newStaffBookingsMap = bookingResults.reduce(buildMap, {})
 
 				setBookings(allBookings)
+				setStaffBookingsMap(newStaffBookingsMap)
 				loadedRangeRef.current = { ...range, view, staffKey }
 				hasLoadedRef.current = true
 			} catch (err) {
@@ -96,7 +114,7 @@ const useStaffBookings = (
 		loadBookings()
 	}, [staffToLoad, dateStr, view, eventTypes, reloadTick])
 
-	return { bookings, reloadBookings, loading, error }
+	return { bookings, staffBookingsMap, reloadBookings, loading, error }
 }
 
 export type { UseStaffBookingsResult }

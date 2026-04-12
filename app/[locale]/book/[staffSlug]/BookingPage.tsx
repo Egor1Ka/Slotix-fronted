@@ -17,6 +17,7 @@ import {
 	getWorkHoursForDate,
 	getFirstStaffId,
 } from '@/lib/calendar/utils'
+import { SlotListView } from '@/components/booking/SlotListView'
 import type { ProfileInfoBlockProps } from '@/components/booking/ProfileInfoBlock'
 import {
 	useStaffBySlug,
@@ -122,6 +123,7 @@ function BookingPage({
 
 	const {
 		bookings,
+		staffBookingsMap,
 		reloadBookings,
 		loading: bookingsLoading,
 		error: bookingsError,
@@ -278,6 +280,27 @@ function BookingPage({
 				onResetSlot: bookingActions.handleResetSlot,
 			})
 
+	// ── List view slot ──
+
+	const staffRawBookings = staff ? (staffBookingsMap[staff.id] ?? []) : []
+
+	const listViewSlot = (
+		<SlotListView
+			variant="personal"
+			eventTypes={eventTypes}
+			selectedEventTypeId={selectedEventTypeId}
+			onEventTypeSelect={onEventTypeSelect}
+			loading={loading}
+			schedule={scheduleSource}
+			overrides={staffOverrides}
+			bookings={staffRawBookings}
+			staffId={staff?.id}
+			formConfig={bookingActions.formConfig}
+			onConfirmWithClient={bookingActions.handleConfirmWithClient}
+			isSubmitting={bookingActions.isSubmitting}
+		/>
+	)
+
 	// ── Render ──
 
 	return (
@@ -296,6 +319,7 @@ function BookingPage({
 				staffAvatarUrl={staff?.avatar}
 				hideSidebar={hideSidebar}
 				profileInfo={profileInfo}
+				listViewSlot={listViewSlot}
 			/>
 		</CalendarProvider>
 	)
