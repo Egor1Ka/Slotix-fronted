@@ -201,6 +201,7 @@ const useBookingActions = (
 				...(customFieldValues.length > 0 && { customFieldValues }),
 			}
 			const response = await bookingApi.create(body)
+			reloadBookings()
 
 			setConfirmedBooking({
 				bookingId: response.id,
