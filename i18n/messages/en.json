@@ -291,7 +291,14 @@
 			"configUpdated": "Form settings updated",
 			"overrides": "Override for this service",
 			"noCustomFields": "No custom fields yet"
-		}
+		},
+		"listView": "List",
+		"calendarView": "Calendar",
+		"nearestTimeFor": "Nearest available time:",
+		"noSlotsAvailable": "No available time",
+		"selectServiceFirst": "Select a service to see available staff",
+		"aboutStaff": "About specialist",
+		"confirmBookingTitle": "Confirm booking"
 	},
 	"calendar": {
 		"day": "Day",

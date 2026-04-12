@@ -291,7 +291,14 @@
 			"configUpdated": "Налаштування форми оновлено",
 			"overrides": "Перевизначення для цієї послуги",
 			"noCustomFields": "Додаткових полів поки немає"
-		}
+		},
+		"listView": "Список",
+		"calendarView": "Календар",
+		"nearestTimeFor": "Найближчий час для запису:",
+		"noSlotsAvailable": "Немає вільного часу",
+		"selectServiceFirst": "Оберіть послугу, щоб побачити спеціалістів",
+		"aboutStaff": "Про спеціаліста",
+		"confirmBookingTitle": "Підтвердження запису"
 	},
 	"calendar": {
 		"day": "День",
