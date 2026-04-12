@@ -295,6 +295,8 @@ function BookingPage({
 			overrides={staffOverrides}
 			bookings={staffRawBookings}
 			staffId={staff?.id}
+			dateStr={dateStr}
+			onDateChange={onDateChange}
 			formConfig={bookingActions.formConfig}
 			onConfirmWithClient={bookingActions.handleConfirmWithClient}
 			isSubmitting={bookingActions.isSubmitting}

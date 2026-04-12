@@ -336,6 +336,8 @@ function OrgCalendarPage({
 			getStaffSchedule={getStaffScheduleById}
 			getStaffOverrides={getStaffOverridesById}
 			getStaffBookings={getStaffBookingsById}
+			dateStr={dateStr}
+			onDateChange={onDateChange}
 			formConfig={bookingActions.formConfig}
 			onConfirmWithClient={bookingActions.handleConfirmWithClient}
 			isSubmitting={bookingActions.isSubmitting}

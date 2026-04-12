@@ -36,6 +36,9 @@ interface SlotListViewProps {
 	getStaffSchedule?: (staffId: string) => ScheduleTemplate | null
 	getStaffOverrides?: (staffId: string) => ScheduleOverride[]
 	getStaffBookings?: (staffId: string) => StaffBooking[]
+	// Date (source of truth from URL)
+	dateStr: string
+	onDateChange: (date: string) => void
 	// Booking
 	formConfig: MergedBookingForm | null
 	onConfirmWithClient: (
@@ -142,14 +145,6 @@ function OrgStaffSlotItem({
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-const getTodayISO = (): string => {
-	const today = new Date()
-	const year = today.getFullYear()
-	const month = String(today.getMonth() + 1).padStart(2, '0')
-	const day = String(today.getDate()).padStart(2, '0')
-	return `${year}-${month}-${day}`
-}
-
 const dateToISO = (date: Date): string => {
 	const year = date.getFullYear()
 	const month = String(date.getMonth() + 1).padStart(2, '0')
@@ -189,13 +184,14 @@ function SlotListView({
 	getStaffSchedule,
 	getStaffOverrides,
 	getStaffBookings,
+	dateStr,
+	onDateChange,
 	formConfig,
 	onConfirmWithClient,
 	isSubmitting,
 }: SlotListViewProps) {
 	const t = useTranslations('booking')
 
-	const [selectedDate, setSelectedDate] = useState<string | null>(null)
 	const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
 	const [selectedStaffId, setSelectedStaffId] = useState<string | null>(null)
 	const [sheetOpen, setSheetOpen] = useState(false)
@@ -205,12 +201,12 @@ function SlotListView({
 		selectedEventTypeId,
 	)
 	const duration = selectedEventType ? selectedEventType.durationMin : 30
-	const startDate = selectedDate ?? getTodayISO()
-	const fixedDate = selectedDate !== null
+	const startDate = dateStr
+	const fixedDate = true
 
 	const handleCalendarSelect = (date: Date | undefined) => {
 		if (!date) return
-		setSelectedDate(dateToISO(date))
+		onDateChange(dateToISO(date))
 		setSelectedSlot(null)
 	}
 
@@ -298,9 +294,7 @@ function SlotListView({
 				<div className="flex flex-col gap-4 md:flex-row md:items-start">
 					<Calendar
 						mode="single"
-						selected={
-							selectedDate ? new Date(selectedDate + 'T00:00:00') : undefined
-						}
+						selected={new Date(dateStr + 'T00:00:00')}
 						onSelect={handleCalendarSelect}
 						disabled={{ before: new Date() }}
 						className="shrink-0 rounded-lg border p-2"
@@ -338,7 +332,7 @@ function SlotListView({
 				staffName={sheetStaffName}
 				staffAvatar={sheetStaffAvatar}
 				slotTime={selectedSlot}
-				slotDate={selectedDate}
+				slotDate={dateStr}
 				formConfig={formConfig}
 				onConfirm={handleConfirm}
 				isSubmitting={isSubmitting}
