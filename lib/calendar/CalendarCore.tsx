@@ -734,24 +734,26 @@ function CalendarCore({
 				<main className="flex-1 overflow-auto p-4">
 					<div className="flex flex-col gap-4">
 						<div className="flex flex-wrap items-center justify-between gap-2">
-							<div className="flex items-center gap-1">
-								{staffAvatarUrl && (
-									<img
-										src={staffAvatarUrl}
-										alt=""
-										className="size-8 rounded-full object-cover"
-									/>
-								)}
-								<Button variant="ghost" size="icon-sm" onClick={handlePrev}>
-									<ChevronLeftIcon />
-								</Button>
-								<h2 className="min-w-0 text-center text-sm font-semibold md:min-w-[140px] md:text-lg">
-									{title}
-								</h2>
-								<Button variant="ghost" size="icon-sm" onClick={handleNext}>
-									<ChevronRightIcon />
-								</Button>
-							</div>
+							{view !== 'list' && (
+								<div className="flex items-center gap-1">
+									{staffAvatarUrl && (
+										<img
+											src={staffAvatarUrl}
+											alt=""
+											className="size-8 rounded-full object-cover"
+										/>
+									)}
+									<Button variant="ghost" size="icon-sm" onClick={handlePrev}>
+										<ChevronLeftIcon />
+									</Button>
+									<h2 className="min-w-0 text-center text-sm font-semibold md:min-w-[140px] md:text-lg">
+										{title}
+									</h2>
+									<Button variant="ghost" size="icon-sm" onClick={handleNext}>
+										<ChevronRightIcon />
+									</Button>
+								</div>
+							)}
 							<div className="flex items-center gap-2">
 								{publicUrl && (
 									<Button

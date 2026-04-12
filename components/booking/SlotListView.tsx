@@ -286,12 +286,9 @@ function SlotListView({
 				variant="horizontal"
 			/>
 
-			{/* Date picker — only shown when service is selected */}
+			{/* Date picker + slots — side by side on desktop */}
 			{selectedEventTypeId && (
-				<div className="flex flex-col gap-3">
-					<h3 className="text-muted-foreground text-sm font-medium">
-						{t('selectDate')}
-					</h3>
+				<div className="flex flex-col gap-4 md:flex-row md:items-start">
 					<Calendar
 						mode="single"
 						selected={
@@ -299,33 +296,30 @@ function SlotListView({
 						}
 						onSelect={handleCalendarSelect}
 						disabled={{ before: new Date() }}
-						className="rounded-lg border p-2"
+						className="shrink-0 rounded-lg border p-2"
 					/>
-				</div>
-			)}
 
-			{/* Slots section */}
-			{selectedEventTypeId && (
-				<div className="flex flex-col gap-3">
-					{variant === 'personal' && (
-						<PersonalSlotView
-							schedule={schedule ?? null}
-							overrides={overrides}
-							bookings={bookings}
-							duration={duration}
-							startDate={startDate}
-							fixedDate={fixedDate}
-							staffId={staffId}
-							selectedSlot={selectedSlot}
-							onSlotSelect={handlePersonalSlotSelect}
-						/>
-					)}
+					<div className="flex flex-1 flex-col gap-3">
+						{variant === 'personal' && (
+							<PersonalSlotView
+								schedule={schedule ?? null}
+								overrides={overrides}
+								bookings={bookings}
+								duration={duration}
+								startDate={startDate}
+								fixedDate={fixedDate}
+								staffId={staffId}
+								selectedSlot={selectedSlot}
+								onSlotSelect={handlePersonalSlotSelect}
+							/>
+						)}
 
-					{variant === 'org' && (
-						<div className="flex flex-col gap-3">
-							{staff.map(renderOrgStaffItem)}
-						</div>
-					)}
+						{variant === 'org' && (
+							<div className="flex flex-col gap-3">
+								{staff.map(renderOrgStaffItem)}
+							</div>
+						)}
+					</div>
 				</div>
 			)}
 
