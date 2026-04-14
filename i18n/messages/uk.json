@@ -294,8 +294,10 @@
 		"nearestTimeFor": "Найближчий час для запису:",
 		"noSlotsAvailable": "Немає вільного часу",
 		"selectServiceFirst": "Оберіть послугу, щоб побачити спеціалістів",
+		"selectServiceFirstPersonal": "Оберіть послугу, щоб побачити вільний час",
 		"pickServiceTitle": "Оберіть послугу:",
 		"noServicesForSlot": "Немає доступних послуг на цей час",
+		"noServicesForStaff": "Немає доступних послуг для цього спеціаліста",
 		"allStaff": "Всі",
 		"aboutStaff": "Про спеціаліста",
 		"confirmBookingTitle": "Підтвердження запису"

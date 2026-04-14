@@ -11,6 +11,7 @@ interface ServiceListProps {
 	onSelect: (eventTypeId: string) => void
 	loading?: boolean
 	variant?: 'vertical' | 'horizontal'
+	allowedIds?: Set<string>
 }
 
 const SKELETON_ITEMS = [1, 2, 3]
@@ -35,6 +36,7 @@ function ServiceList({
 	onSelect,
 	loading = false,
 	variant = 'vertical',
+	allowedIds,
 }: ServiceListProps) {
 	const t = useTranslations('booking')
 
@@ -42,6 +44,7 @@ function ServiceList({
 
 	const renderEventType = (eventType: EventType) => {
 		const isActive = eventType.id === selectedId
+		const isDisabled = allowedIds ? !allowedIds.has(eventType.id) : false
 		const handleClick = () => onSelect(eventType.id)
 
 		if (isHorizontal) {
@@ -50,11 +53,13 @@ function ServiceList({
 					key={eventType.id}
 					type="button"
 					onClick={handleClick}
+					disabled={isDisabled}
 					className={cn(
 						'flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-xs transition-all',
 						isActive
 							? 'border-primary bg-primary/10 ring-primary/30 shadow-sm ring-1'
 							: 'border-border hover:bg-muted',
+						isDisabled && 'cursor-not-allowed opacity-40 hover:bg-transparent',
 					)}
 				>
 					<div
@@ -74,11 +79,13 @@ function ServiceList({
 				key={eventType.id}
 				type="button"
 				onClick={handleClick}
+				disabled={isDisabled}
 				className={cn(
 					'flex items-center gap-3 rounded-lg border p-3 text-left transition-all',
 					isActive
 						? 'border-primary bg-primary/10 ring-primary/30 shadow-sm ring-2'
 						: 'border-border hover:bg-muted',
+					isDisabled && 'cursor-not-allowed opacity-40 hover:bg-transparent',
 				)}
 			>
 				<div
