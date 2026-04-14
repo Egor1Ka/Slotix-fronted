@@ -296,6 +296,7 @@
 		"selectServiceFirst": "Оберіть послугу, щоб побачити спеціалістів",
 		"pickServiceTitle": "Оберіть послугу:",
 		"noServicesForSlot": "Немає доступних послуг на цей час",
+		"allStaff": "Всі",
 		"aboutStaff": "Про спеціаліста",
 		"confirmBookingTitle": "Підтвердження запису"
 	},

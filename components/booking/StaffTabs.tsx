@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
@@ -9,6 +10,7 @@ interface StaffTabsProps {
 	staff: OrgStaffMember[]
 	selectedId: string | null
 	behavior: 'select-one' | 'show-all'
+	allowAll?: boolean
 	onSelect: (id: string | null) => void
 	loading?: boolean
 }
@@ -25,9 +27,12 @@ function StaffTabs({
 	staff,
 	selectedId,
 	behavior,
+	allowAll = false,
 	onSelect,
 	loading = false,
 }: StaffTabsProps) {
+	const t = useTranslations('booking')
+
 	const isSelected = (member: OrgStaffMember): boolean =>
 		selectedId === member.id
 
@@ -39,6 +44,10 @@ function StaffTabs({
 		const nextId = isSelected(member) ? null : member.id
 		onSelect(nextId)
 	}
+
+	const handleAllClick = () => onSelect(null)
+	const showAllTab = allowAll && behavior === 'select-one'
+	const allActive = selectedId === null
 
 	const renderTab = (member: OrgStaffMember) => (
 		<button
@@ -83,6 +92,20 @@ function StaffTabs({
 				loading && 'pointer-events-none opacity-50',
 			)}
 		>
+			{showAllTab && (
+				<button
+					type="button"
+					onClick={handleAllClick}
+					className={cn(
+						'flex shrink-0 items-center gap-2 rounded-lg border-2 px-3 py-2 transition-all hover:bg-muted cursor-pointer',
+						allActive
+							? 'border-primary bg-primary/5'
+							: 'text-muted-foreground border-transparent',
+					)}
+				>
+					<span className="text-sm font-medium">{t('allStaff')}</span>
+				</button>
+			)}
 			{staff.map(renderTab)}
 		</div>
 	)

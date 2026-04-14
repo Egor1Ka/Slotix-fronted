@@ -296,6 +296,7 @@
 		"selectServiceFirst": "Select a service to see available staff",
 		"pickServiceTitle": "Pick a service:",
 		"noServicesForSlot": "No services fit this slot",
+		"allStaff": "All",
 		"aboutStaff": "About specialist",
 		"confirmBookingTitle": "Confirm booking"
 	},

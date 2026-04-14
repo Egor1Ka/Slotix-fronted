@@ -352,6 +352,7 @@ function OrgCalendarPage({
 				staff={displayStaff}
 				selectedId={selectedStaffId}
 				behavior={viewConfig.staffTabBehavior}
+				allowAll
 				onSelect={onStaffSelect}
 				loading={contentLoading}
 			/>
