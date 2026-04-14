@@ -159,7 +159,7 @@ function OrgCalendarPage({
 		reloadBookings,
 		loading: bookingsLoading,
 		error: bookingsError,
-	} = useStaffBookings(staffToLoad, dateStr, view, eventTypes)
+	} = useStaffBookings(staffToLoad, dateStr, view, eventTypes, org?.id)
 
 	// Начальная загрузка — блокирует рендер полностью
 	const initialLoading =
@@ -188,6 +188,7 @@ function OrgCalendarPage({
 	// ── Navigation wrappers (reset booking state on navigation) ──
 
 	const resetBookingState = () => {
+		if (bookingActions.confirmedBooking) reloadBookings()
 		bookingActions.setConfirmedBooking(null)
 		bookingActions.setBookingError(null)
 		bookingActions.handleBookingClose()
@@ -333,6 +334,7 @@ function OrgCalendarPage({
 			onEventTypeSelect={onEventTypeSelect}
 			loading={contentLoading}
 			staff={displayStaff}
+			filterStaffId={selectedStaffId}
 			getStaffSchedule={getStaffScheduleById}
 			getStaffOverrides={getStaffOverridesById}
 			getStaffBookings={getStaffBookingsById}
@@ -345,7 +347,7 @@ function OrgCalendarPage({
 	)
 
 	const staffTabsSlot =
-		viewConfig.showStaffTabs && view !== 'list' ? (
+		viewConfig.showStaffTabs ? (
 			<StaffTabs
 				staff={displayStaff}
 				selectedId={selectedStaffId}

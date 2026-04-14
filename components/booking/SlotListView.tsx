@@ -33,6 +33,7 @@ interface SlotListViewProps {
 	staffId?: string
 	// Org mode
 	staff?: OrgStaffMember[]
+	filterStaffId?: string | null
 	getStaffSchedule?: (staffId: string) => ScheduleTemplate | null
 	getStaffOverrides?: (staffId: string) => ScheduleOverride[]
 	getStaffBookings?: (staffId: string) => StaffBooking[]
@@ -184,6 +185,7 @@ function SlotListView({
 	bookings = [],
 	staffId,
 	staff = [],
+	filterStaffId = null,
 	getStaffSchedule,
 	getStaffOverrides,
 	getStaffBookings,
@@ -198,6 +200,13 @@ function SlotListView({
 	const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
 	const [selectedStaffId, setSelectedStaffId] = useState<string | null>(null)
 	const [sheetOpen, setSheetOpen] = useState(false)
+	const [servicePicker, setServicePicker] = useState<
+		{ staffId: string; time: string } | null
+	>(null)
+
+	const displayStaff = filterStaffId
+		? staff.filter((member) => member.id === filterStaffId)
+		: staff
 
 	const selectedEventType = getSelectedEventType(
 		eventTypes,
@@ -220,9 +229,54 @@ function SlotListView({
 	}
 
 	const handleOrgSlotSelect = (staffMemberId: string, time: string) => {
+		if (!selectedEventTypeId) {
+			setServicePicker({ staffId: staffMemberId, time })
+			return
+		}
 		setSelectedSlot(time)
 		setSelectedStaffId(staffMemberId)
 		setSheetOpen(true)
+	}
+
+	const handleServicePick = (serviceId: string) => {
+		if (!servicePicker) return
+		onEventTypeSelect(serviceId)
+		setSelectedSlot(servicePicker.time)
+		setSelectedStaffId(servicePicker.staffId)
+		setSheetOpen(true)
+		setServicePicker(null)
+	}
+
+	const handleServicePickerCancel = () => setServicePicker(null)
+
+	const isServiceForStaff =
+		(currentStaffId: string) =>
+		(et: EventType): boolean =>
+			et.assignedStaff.includes(currentStaffId)
+
+	const servicesForPicker: EventType[] = servicePicker
+		? eventTypes.filter(isServiceForStaff(servicePicker.staffId))
+		: []
+
+	const renderPickableService = (service: EventType) => {
+		const handleClick = () => handleServicePick(service.id)
+		return (
+			<button
+				key={service.id}
+				type="button"
+				onClick={handleClick}
+				className="hover:bg-muted flex items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm"
+			>
+				<span
+					className="size-2.5 rounded-full"
+					style={{ backgroundColor: service.color }}
+				/>
+				<span className="flex-1 font-medium">{service.name}</span>
+				<span className="text-muted-foreground text-xs">
+					{service.durationMin} {t('min')}
+				</span>
+			</button>
+		)
 	}
 
 	const handleSheetOpenChange = (open: boolean) => {
@@ -324,9 +378,32 @@ function SlotListView({
 						/>
 					)}
 
-					{variant === 'org' && selectedEventTypeId && (
+					{variant === 'org' && (
 						<div className="flex flex-col gap-3">
-							{staff.map(renderOrgStaffItem)}
+							{servicePicker && (
+								<div className="rounded-lg border p-3">
+									<div className="text-muted-foreground mb-2 text-xs font-semibold">
+										{t('pickServiceTitle')}
+									</div>
+									{servicesForPicker.length === 0 ? (
+										<div className="text-muted-foreground text-xs">
+											{t('noServicesForSlot')}
+										</div>
+									) : (
+										<div className="flex flex-col gap-1">
+											{servicesForPicker.map(renderPickableService)}
+										</div>
+									)}
+									<button
+										type="button"
+										onClick={handleServicePickerCancel}
+										className="text-muted-foreground hover:text-foreground mt-2 text-xs"
+									>
+										{t('cancel')}
+									</button>
+								</div>
+							)}
+							{displayStaff.map(renderOrgStaffItem)}
 						</div>
 					)}
 				</div>
