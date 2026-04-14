@@ -282,19 +282,12 @@ function SlotListView({
 			block: 'start',
 		})
 		triggerServiceListHighlight()
+		toast.info(t('pickServiceThenTime', { time }))
 	}
 
 	const handleEventTypeSelectWrapped = (serviceId: string) => {
 		onEventTypeSelect(serviceId)
-
-		if (!pendingSlot) return
-		if (allowedIdsForPendingSlot && !allowedIdsForPendingSlot.has(serviceId))
-			return
-
-		setSelectedSlot(pendingSlot.time)
-		setSelectedStaffId(pendingSlot.staffId)
-		setSheetOpen(true)
-		setPendingSlot(null)
+		if (pendingSlot) setPendingSlot(null)
 	}
 
 	const handleSheetOpenChange = (open: boolean) => {
@@ -384,9 +377,9 @@ function SlotListView({
 				/>
 
 				<div className="flex flex-1 flex-col gap-3">
-					{!selectedEventTypeId && (
+					{!selectedEventTypeId && variant === 'personal' && (
 						<p className="text-muted-foreground text-center text-xs">
-							{t(variant === 'personal' ? 'selectServiceFirstPersonal' : 'selectServiceFirst')}
+							{t('selectServiceFirstPersonal')}
 						</p>
 					)}
 

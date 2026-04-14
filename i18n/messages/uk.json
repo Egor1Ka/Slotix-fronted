@@ -298,6 +298,7 @@
 		"pickServiceTitle": "Оберіть послугу:",
 		"noServicesForSlot": "Немає доступних послуг на цей час",
 		"noServicesForStaff": "Немає доступних послуг для цього спеціаліста",
+		"pickServiceThenTime": "Оберіть послугу, потім натисніть {time} ще раз",
 		"allStaff": "Всі",
 		"aboutStaff": "Про спеціаліста",
 		"confirmBookingTitle": "Підтвердження запису"

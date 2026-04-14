@@ -78,8 +78,9 @@ const useBookingActions = (
 		null,
 	)
 	const [formConfig, setFormConfig] = useState<MergedBookingForm | null>(null)
+	const [formReloadTick, setFormReloadTick] = useState(0)
 
-	// Загрузка конфигурации формы бронирования при смене услуги
+	// Загрузка конфигурации формы бронирования при смене услуги или после букинга
 	useEffect(() => {
 		if (!selectedEventTypeId) {
 			setFormConfig(null)
@@ -95,7 +96,7 @@ const useBookingActions = (
 			}
 		}
 		loadFormConfig()
-	}, [selectedEventTypeId])
+	}, [selectedEventTypeId, formReloadTick])
 
 	const findEventTypeById = (id: string | null): EventType | undefined =>
 		eventTypes.find((e) => e.id === id)
@@ -202,6 +203,7 @@ const useBookingActions = (
 			}
 			const response = await bookingApi.create(body)
 			reloadBookings()
+			setFormReloadTick((n) => n + 1)
 
 			setConfirmedBooking({
 				bookingId: response.id,
@@ -237,6 +239,7 @@ const useBookingActions = (
 			})
 			setConfirmedBooking(null)
 			setParams({ slot: null })
+			reloadBookings()
 		} catch (err) {
 			const message = err instanceof Error ? err.message : t('cancelFailed')
 			setBookingError(message)
@@ -244,6 +247,8 @@ const useBookingActions = (
 	}
 
 	const handleResetSlot = () => {
+		if (confirmedBooking) reloadBookings()
+		setConfirmedBooking(null)
 		setParams({ slot: null })
 	}
 

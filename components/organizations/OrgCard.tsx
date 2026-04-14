@@ -48,13 +48,16 @@ function OrgCard({ org, onInvitationHandled }: OrgCardProps) {
 	const [processing, setProcessing] = useState(false)
 
 	const isInvited = org.status === 'invited'
+	const ADMIN_ROLES = ['owner', 'admin']
+	const isAdmin = ADMIN_ROLES.includes(org.role)
+	const orgPath = isAdmin ? `/${locale}/manage/${org.id}` : `/${locale}/org/${org.id}/my-schedule`
 
 	const handleClick = () => {
 		if (isInvited) {
 			setDialogOpen(true)
 			return
 		}
-		router.push(`/${locale}/manage/${org.id}`)
+		router.push(orgPath)
 	}
 
 	const handleAccept = async () => {
@@ -64,7 +67,7 @@ function OrgCard({ org, onInvitationHandled }: OrgCardProps) {
 			toast.success(tInvite('accepted'))
 			setDialogOpen(false)
 			onInvitationHandled()
-			router.push(`/${locale}/manage/${org.id}`)
+			router.push(orgPath)
 		} catch {
 			// обрабатывается интерцептором toast
 		} finally {

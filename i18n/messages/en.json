@@ -298,6 +298,7 @@
 		"pickServiceTitle": "Pick a service:",
 		"noServicesForSlot": "No services fit this slot",
 		"noServicesForStaff": "No services available for this staff member",
+		"pickServiceThenTime": "Pick a service, then tap {time} again",
 		"allStaff": "All",
 		"aboutStaff": "About specialist",
 		"confirmBookingTitle": "Confirm booking"

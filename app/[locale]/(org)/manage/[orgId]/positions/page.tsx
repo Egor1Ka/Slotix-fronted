@@ -1,4 +1,4 @@
-import { PositionList } from '@/components/positions/PositionList'
+import { PositionsTabs } from '@/components/positions/PositionsTabs'
 
 export default async function PositionsPage({
 	params,
@@ -9,7 +9,7 @@ export default async function PositionsPage({
 
 	return (
 		<div className="container max-w-3xl py-6">
-			<PositionList orgId={orgId} />
+			<PositionsTabs orgId={orgId} />
 		</div>
 	)
 }

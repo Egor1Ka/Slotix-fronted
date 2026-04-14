@@ -8,6 +8,14 @@ import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import { ScheduleEditor } from '@/components/booking/ScheduleEditor'
 import { SlotModeSelector } from '@/components/booking/SlotModeSelector'
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select'
+import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
 import { getCalendarLocale } from '@/lib/calendar/utils'
 import { scheduleApi } from '@/lib/booking-api-client'
@@ -98,9 +106,24 @@ function ScheduleViewTab({ staffId, orgId, readOnly }: ScheduleViewTabProps) {
 		fetchSchedule()
 	}, [fetchSchedule])
 
+	const [savingMode, setSavingMode] = useState(false)
+	const [localSlotMode, setLocalSlotMode] = useState<SlotMode>(
+		schedule?.slotMode ?? 'fixed',
+	)
+	const [localSlotStep, setLocalSlotStep] = useState<number>(
+		schedule?.slotStepMin ?? 30,
+	)
+
+	useEffect(() => {
+		if (schedule) {
+			setLocalSlotMode(schedule.slotMode)
+			setLocalSlotStep(schedule.slotStepMin ?? 30)
+		}
+	}, [schedule])
+
 	const handleSave = async (weeklyHours: WeeklyHours[]) => {
 		try {
-			await scheduleApi.updateTemplate(staffId, orgId ?? null, weeklyHours)
+			await scheduleApi.updateTemplate(staffId, orgId ?? null, weeklyHours, localSlotMode, localSlotStep)
 			await fetchSchedule()
 			toast.success(t('scheduleSaved'))
 		} catch (err) {
@@ -110,15 +133,6 @@ function ScheduleViewTab({ staffId, orgId, readOnly }: ScheduleViewTabProps) {
 			throw err
 		}
 	}
-
-	const [savingMode, setSavingMode] = useState(false)
-	const [localSlotMode, setLocalSlotMode] = useState<SlotMode>(
-		schedule?.slotMode ?? 'fixed',
-	)
-
-	useEffect(() => {
-		if (schedule) setLocalSlotMode(schedule.slotMode)
-	}, [schedule])
 
 	const handleSlotModeChange = async (mode: SlotMode) => {
 		if (!schedule) return
@@ -134,6 +148,30 @@ function ScheduleViewTab({ staffId, orgId, readOnly }: ScheduleViewTabProps) {
 			await fetchSchedule()
 		} catch (err) {
 			setLocalSlotMode(schedule.slotMode)
+			const message =
+				err instanceof Error ? err.message : t('scheduleSaveError')
+			toast.error(message)
+		} finally {
+			setSavingMode(false)
+		}
+	}
+
+	const handleSlotStepChange = async (value: string) => {
+		if (!schedule) return
+		const step = Number(value)
+		setLocalSlotStep(step)
+		setSavingMode(true)
+		try {
+			await scheduleApi.updateTemplate(
+				staffId,
+				orgId ?? null,
+				schedule.weeklyHours,
+				undefined,
+				step,
+			)
+			await fetchSchedule()
+		} catch (err) {
+			setLocalSlotStep(schedule.slotStepMin ?? 30)
 			const message =
 				err instanceof Error ? err.message : t('scheduleSaveError')
 			toast.error(message)
@@ -165,6 +203,21 @@ function ScheduleViewTab({ staffId, orgId, readOnly }: ScheduleViewTabProps) {
 					value={localSlotMode}
 					onChange={handleSlotModeChange}
 				/>
+			</div>
+			<div className={cn('flex flex-col gap-2', savingMode && 'pointer-events-none opacity-50')}>
+				<Label>{t('slotStep')}</Label>
+				<Select value={String(localSlotStep)} onValueChange={handleSlotStepChange}>
+					<SelectTrigger className="w-32">
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+						{Array.from({ length: 12 }, (_, i) => (i + 1) * 5).map((min) => (
+							<SelectItem key={min} value={String(min)}>
+								{min} {t('minutes')}
+							</SelectItem>
+						))}
+					</SelectContent>
+				</Select>
 			</div>
 		</div>
 	)

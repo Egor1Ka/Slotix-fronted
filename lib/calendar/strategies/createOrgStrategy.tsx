@@ -141,27 +141,7 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 	const calendarLocale = getCalendarLocale(locale)
 	const selectedEventType = findEventType(eventTypes, selectedEventTypeId)
 
-	const allBookings = (() => {
-		if (!confirmedBooking || !selectedEventType) return bookings
-		const startDate = new Date(confirmedBooking.startAt)
-		const confirmedStartMin =
-			startDate.getUTCHours() * 60 + startDate.getUTCMinutes()
-		const confirmedDate = confirmedBooking.startAt.split('T')[0]
-		return [
-			...bookings,
-			{
-				startMin: confirmedStartMin,
-				duration: confirmedBooking.durationMin,
-				label: confirmedBooking.eventTypeName,
-				color: confirmedBooking.color,
-				date: confirmedDate,
-				bookingId: confirmedBooking.bookingId,
-				status: confirmedBooking.status,
-				staffName: '',
-				staffAvatar: '',
-			},
-		]
-	})()
+	const allBookings = bookings
 
 	const buildBookingBlocks = (blockDate: string): CalendarBlock[] => {
 		const dayBookings = getBookingsForDate(allBookings, blockDate)

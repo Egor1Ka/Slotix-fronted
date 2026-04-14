@@ -34,19 +34,21 @@ function OrgSidebar() {
 	const params = useParams<{ orgId: string }>()
 	const t = useTranslations('sidebar')
 	const [org, setOrg] = useState<OrgByIdResponse | null>(null)
+	const [role, setRole] = useState<string | null>(null)
 
 	const orgId = params.orgId
 
 	useEffect(() => {
 		if (!orgId) return
 
-		// Загрузка данных организации
 		const fetchOrgData = async () => {
 			try {
-				const orgResponse = await orgApi.getById({
-					pathParams: { id: orgId },
-				})
+				const [orgResponse, membershipResponse] = await Promise.all([
+					orgApi.getById({ pathParams: { id: orgId } }),
+					orgApi.getMyMembership({ pathParams: { id: orgId } }),
+				])
 				setOrg(orgResponse.data)
+				setRole(membershipResponse.data.role)
 			} catch {
 				// обрабатывается интерцептором toast
 			}
@@ -54,6 +56,9 @@ function OrgSidebar() {
 
 		fetchOrgData()
 	}, [orgId])
+
+	const ADMIN_ROLES = ['owner', 'admin']
+	const isAdmin = role !== null && ADMIN_ROLES.includes(role)
 
 	const isActive = (href: string): boolean => pathname === href
 
@@ -95,51 +100,55 @@ function OrgSidebar() {
 				<SidebarGroup>
 					<SidebarGroupContent>
 						<SidebarMenu>
-							<SidebarMenuItem>
-								<SidebarMenuButton
-									render={<Link href={profileHref} />}
-									isActive={isActive(profileHref)}
-								>
-									<UserCircle className="size-4" />
-									<span>{t('orgProfile')}</span>
-								</SidebarMenuButton>
-							</SidebarMenuItem>
-							<SidebarMenuItem>
-								<SidebarMenuButton
-									render={<Link href={orgScheduleHref} />}
-									isActive={isActive(orgScheduleHref)}
-								>
-									<Calendar className="size-4" />
-									<span>{t('generalSchedule')}</span>
-								</SidebarMenuButton>
-							</SidebarMenuItem>
-							<SidebarMenuItem>
-								<SidebarMenuButton
-									render={<Link href={positionsHref} />}
-									isActive={isActive(positionsHref)}
-								>
-									<Briefcase className="size-4" />
-									<span>{t('positions')}</span>
-								</SidebarMenuButton>
-							</SidebarMenuItem>
-							<SidebarMenuItem>
-								<SidebarMenuButton
-									render={<Link href={servicesHref} />}
-									isActive={isActive(servicesHref)}
-								>
-									<Settings2 className="size-4" />
-									<span>{t('services')}</span>
-								</SidebarMenuButton>
-							</SidebarMenuItem>
-							<SidebarMenuItem>
-								<SidebarMenuButton
-									render={<Link href={staffScheduleHref} />}
-									isActive={isActive(staffScheduleHref)}
-								>
-									<ClipboardList className="size-4" />
-									<span>{t('staffSchedule')}</span>
-								</SidebarMenuButton>
-							</SidebarMenuItem>
+							{isAdmin && (
+								<>
+									<SidebarMenuItem>
+										<SidebarMenuButton
+											render={<Link href={profileHref} />}
+											isActive={isActive(profileHref)}
+										>
+											<UserCircle className="size-4" />
+											<span>{t('orgProfile')}</span>
+										</SidebarMenuButton>
+									</SidebarMenuItem>
+									<SidebarMenuItem>
+										<SidebarMenuButton
+											render={<Link href={orgScheduleHref} />}
+											isActive={isActive(orgScheduleHref)}
+										>
+											<Calendar className="size-4" />
+											<span>{t('generalSchedule')}</span>
+										</SidebarMenuButton>
+									</SidebarMenuItem>
+									<SidebarMenuItem>
+										<SidebarMenuButton
+											render={<Link href={positionsHref} />}
+											isActive={isActive(positionsHref)}
+										>
+											<Briefcase className="size-4" />
+											<span>{t('positions')}</span>
+										</SidebarMenuButton>
+									</SidebarMenuItem>
+									<SidebarMenuItem>
+										<SidebarMenuButton
+											render={<Link href={servicesHref} />}
+											isActive={isActive(servicesHref)}
+										>
+											<Settings2 className="size-4" />
+											<span>{t('services')}</span>
+										</SidebarMenuButton>
+									</SidebarMenuItem>
+									<SidebarMenuItem>
+										<SidebarMenuButton
+											render={<Link href={staffScheduleHref} />}
+											isActive={isActive(staffScheduleHref)}
+										>
+											<ClipboardList className="size-4" />
+											<span>{t('staffSchedule')}</span>
+										</SidebarMenuButton>
+									</SidebarMenuItem>
+								</>
+							)}
 							<SidebarMenuItem>
 								<SidebarMenuButton
 									render={<Link href={myScheduleHref} />}

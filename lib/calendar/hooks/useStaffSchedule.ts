@@ -49,7 +49,7 @@ const useStaffSchedule = (
 
 			try {
 				const [et, sc, ov] = await Promise.all([
-					eventTypeApi.getByStaff(staffId),
+					eventTypeApi.getByStaff(staffId, orgId),
 					scheduleApi.getTemplate(staffId, orgId).catch(() => null),
 					scheduleApi
 						.getOverrides(staffId, orgId)

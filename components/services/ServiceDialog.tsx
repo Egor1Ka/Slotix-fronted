@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { useForm, Controller, type FieldErrors } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -23,8 +23,12 @@ import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
 import { BookingFieldEditor } from '@/components/booking/BookingFieldEditor'
+import {
+	PositionPricingSection,
+	type PositionPricingHandle,
+} from './PositionPricingSection'
 import { eventTypeApi, positionApi, orgApi, setServerErrors } from '@/services'
-import { bookingFieldApi } from '@/lib/mock-api'
+import { bookingFieldApi } from '@/lib/booking-api-client'
 import type { EventType, Position, OrgStaffMember } from '@/services'
 import type {
 	BookingField,
@@ -115,6 +119,9 @@ function ServiceDialog({
 	const [editingField, setEditingField] = useState<BookingField | null>(null)
 	const [isAddingField, setIsAddingField] = useState(false)
 	const [isSavingField, setIsSavingField] = useState(false)
+
+	// ── Position pricing ──
+	const pricingRef = useRef<PositionPricingHandle>(null)
 
 	const {
 		register,
@@ -240,6 +247,10 @@ function ServiceDialog({
 					},
 				})
 
+				if (isOrg) {
+					await pricingRef.current?.save(eventType.id)
+				}
+
 				// Сохранить кастомные поля per-service
 				const existingFields = await bookingFieldApi.getFields(
 					ownerId,
@@ -283,7 +294,7 @@ function ServiceDialog({
 
 				toast.success(t('updated'))
 			} else {
-				await eventTypeApi.create({
+				const created = await eventTypeApi.create({
 					body: {
 						...ownerField,
 						name: data.name,
@@ -295,6 +306,9 @@ function ServiceDialog({
 						...staffFields,
 					},
 				})
+				if (isOrg && created.data?.id) {
+					await pricingRef.current?.save(created.data.id)
+				}
 				toast.success(t('created'))
 			}
 			reset()
@@ -536,6 +550,15 @@ function ServiceDialog({
 								<FieldError errors={[errors.price]} />
 							</Field>
 						</div>
+
+						{isOrg && (
+							<PositionPricingSection
+								ref={pricingRef}
+								eventTypeId={eventType?.id ?? null}
+								orgId={ownerId}
+								basePrice={watch('price') || 0}
+							/>
+						)}
 
 						<Field data-invalid={!!errors.color || undefined}>
 							<FieldLabel>{t('color')}</FieldLabel>

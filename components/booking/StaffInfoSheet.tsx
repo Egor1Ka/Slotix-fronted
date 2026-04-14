@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import {
 	Sheet,
@@ -39,6 +40,7 @@ function StaffInfoSheet({
 	bio,
 }: StaffInfoSheetProps) {
 	const t = useTranslations('booking')
+	const params = useParams<{ orgId?: string }>()
 	const [fullProfile, setFullProfile] = useState<StaffBySlugResponse | null>(
 		null,
 	)
@@ -48,7 +50,7 @@ function StaffInfoSheet({
 		if (!open || fullProfile) return
 		const loadProfile = async () => {
 			try {
-				const profile = await staffApi.getById(staffId)
+				const profile = await staffApi.getById(staffId, params.orgId)
 				setFullProfile(profile)
 			} catch {
 				// Если загрузка не удалась — показываем то, что есть

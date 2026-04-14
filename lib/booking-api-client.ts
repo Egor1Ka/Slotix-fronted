@@ -15,7 +15,12 @@ import type {
 	WeeklyHours,
 } from '@/services/configs/booking.types'
 import type { Slot } from './slot-engine'
-import type { MergedBookingForm } from '@/services/configs/booking-field.types'
+import type {
+	MergedBookingForm,
+	BookingField,
+	CreateBookingFieldBody,
+	UpdateBookingFieldBody,
+} from '@/services/configs/booking-field.types'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:9000'
 
@@ -241,13 +246,16 @@ const toFrontendStaffBooking = (
 
 // ── Staff API ──
 
-const getStaffById = async (id: string): Promise<StaffBySlugResponse> =>
-	get<StaffBySlugResponse>(`/staff/${id}`)
+const getStaffById = async (id: string, orgId?: string): Promise<StaffBySlugResponse> => {
+	const query = orgId ? `?orgId=${orgId}` : ''
+	return get<StaffBySlugResponse>(`/staff/${id}${query}`)
+}
 
 // ── Event Types API ──
 
-const getEventTypesByStaff = async (staffId: string): Promise<EventType[]> => {
-	const raw = await get<BackendEventType[]>(`/event-types?staffId=${staffId}`)
+const getEventTypesByStaff = async (staffId: string, orgId?: string): Promise<EventType[]> => {
+	const orgParam = orgId ? `&orgId=${orgId}` : ''
+	const raw = await get<BackendEventType[]>(`/event-types?staffId=${staffId}${orgParam}`)
 	return raw.map(toFrontendEventType)
 }
 
@@ -265,6 +273,26 @@ const getStaffForEventType = async (
 	eventTypeId: string,
 ): Promise<OrgStaffMember[]> =>
 	get<OrgStaffMember[]>(`/event-types/${eventTypeId}/staff`)
+
+interface PositionPricing {
+	id: string
+	eventTypeId: string
+	positionId: string
+	price: { amount: number; currency: string }
+}
+
+const getPositionPricing = async (
+	eventTypeId: string,
+): Promise<PositionPricing[]> =>
+	get<PositionPricing[]>(`/event-types/${eventTypeId}/position-pricing`)
+
+const syncPositionPricing = async (
+	eventTypeId: string,
+	overrides: { positionId: string; amount: number | null }[],
+): Promise<PositionPricing[]> =>
+	put<PositionPricing[]>(`/event-types/${eventTypeId}/position-pricing`, {
+		overrides,
+	})
 
 // ── Schedule API ──
 
@@ -362,6 +390,7 @@ const getStaffBookings = async (
 	eventTypes: EventType[],
 	status?: BookingStatus[],
 	locationId?: string,
+	orgId?: string,
 ): Promise<StaffBooking[]> => {
 	const params = new URLSearchParams({
 		staffId,
@@ -370,6 +399,7 @@ const getStaffBookings = async (
 	})
 	if (status && status.length > 0) params.set('status', status.join(','))
 	if (locationId) params.set('locationId', locationId)
+	if (orgId) params.set('orgId', orgId)
 
 	const raw = await get<BackendBookingDto[]>(`/bookings/by-staff?${params}`)
 	const enrichBooking = (b: BackendBookingDto): StaffBooking =>
@@ -428,6 +458,16 @@ const getOrgStaff = async (
 	return get<OrgStaffMember[]>(`/org/${id}/staff${params}`)
 }
 
+const updateStaffPosition = async (
+	orgId: string,
+	staffId: string,
+	positionId: string | null,
+): Promise<{ positionId: string | null }> =>
+	patch<{ positionId: string | null }>(
+		`/org/${orgId}/staff/${staffId}/position`,
+		{ positionId },
+	)
+
 // ── Exports ──
 
 export const staffApi = {
@@ -439,7 +479,11 @@ export const eventTypeApi = {
 	getByOrg: getEventTypesByOrg,
 	getByUser: getEventTypesByUser,
 	getStaffForEventType,
+	getPositionPricing,
+	syncPositionPricing,
 }
+
+export type { PositionPricing }
 
 export const scheduleApi = {
 	getTemplate: getScheduleTemplate,
@@ -467,18 +511,46 @@ export const slotsApi = {
 export const orgApi = {
 	getById: getOrgById,
 	getStaff: getOrgStaff,
+	updateStaffPosition,
 }
 
 // ── Booking Form API ──
 
 const getMergedBookingForm = async (
 	eventTypeId: string,
-): Promise<MergedBookingForm> => {
-	// TODO: заменить на реальный API когда бэкенд будет готов
-	const { mergedBookingFormApi } = await import('@/lib/mock-api')
-	return mergedBookingFormApi.get(eventTypeId)
+): Promise<MergedBookingForm> =>
+	get<MergedBookingForm>(`/booking-form/${eventTypeId}`)
+
+const getBookingFields = async (
+	ownerId: string,
+	ownerType: 'org' | 'user',
+	eventTypeId?: string | null,
+): Promise<BookingField[]> => {
+	const params = new URLSearchParams({ ownerId, ownerType })
+	if (eventTypeId) params.set('eventTypeId', eventTypeId)
+	return get<BookingField[]>(`/booking-fields?${params}`)
+}
+
+const createBookingField = async (
+	body: CreateBookingFieldBody,
+): Promise<BookingField> => post<BookingField>('/booking-fields', body)
+
+const updateBookingField = async (
+	id: string,
+	body: UpdateBookingFieldBody,
+): Promise<BookingField> => patch<BookingField>(`/booking-fields/${id}`, body)
+
+const removeBookingField = async (id: string): Promise<void> => {
+	await del<void>(`/booking-fields/${id}`)
 }
 
 export const bookingFormApi = {
 	getMergedForm: getMergedBookingForm,
+}
+
+export const bookingFieldApi = {
+	getFields: getBookingFields,
+	create: createBookingField,
+	update: updateBookingField,
+	remove: removeBookingField,
 }

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Trash2, Pencil, Plus } from 'lucide-react'
 import { BookingFieldEditor } from './BookingFieldEditor'
-import { bookingFieldApi } from '@/lib/mock-api'
+import { bookingFieldApi } from '@/lib/booking-api-client'
 import type {
 	BookingField,
 	BookingFieldType,

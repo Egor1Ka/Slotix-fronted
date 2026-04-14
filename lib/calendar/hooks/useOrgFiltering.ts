@@ -108,7 +108,7 @@ const useOrgFiltering = ({
 
 		const loadEventTypes = async () => {
 			try {
-				const types = await eventTypeApi.getByStaff(selectedStaffId)
+				const types = await eventTypeApi.getByStaff(selectedStaffId, orgId)
 				// Пересечение с org-услугами — убираем solo-услуги сотрудника
 				const orgIds = new Set(allOrgEventTypes.map((et) => et.id))
 				const orgOnly = types.filter(isInOrgSet(orgIds))
@@ -174,7 +174,7 @@ const useOrgFiltering = ({
 		const loadWorkingStaffEventTypes = async () => {
 			try {
 				const fetchStaffEventTypes = (staffId: string) =>
-					eventTypeApi.getByStaff(staffId)
+					eventTypeApi.getByStaff(staffId, orgId)
 
 				const allTypesArrays = await Promise.all(
 					workingStaffIds.map(fetchStaffEventTypes),

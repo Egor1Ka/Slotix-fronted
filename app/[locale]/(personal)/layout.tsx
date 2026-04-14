@@ -7,6 +7,8 @@ import {
 	SidebarTrigger,
 } from '@/components/ui/sidebar'
 import { PersonalSidebar } from '@/components/sidebar/PersonalSidebar'
+import { LanguageSwitcher } from '@/components/language-switcher'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 export default async function PersonalLayout({
 	children,
@@ -21,8 +23,12 @@ export default async function PersonalLayout({
 			<SidebarProvider>
 				<PersonalSidebar />
 				<SidebarInset>
-					<header className="bg-background sticky top-0 z-10 flex h-12 items-center gap-2 border-b px-4">
+					<header className="bg-background sticky top-0 z-10 flex h-12 items-center justify-between border-b px-4">
 						<SidebarTrigger className="-ml-1" />
+						<div className="flex items-center gap-2">
+							<ThemeToggle />
+							<LanguageSwitcher />
+						</div>
 					</header>
 					<main className="flex-1">{children}</main>
 				</SidebarInset>

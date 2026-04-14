@@ -122,7 +122,7 @@ function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
 		const loadEventTypes = async () => {
 			const fetchTypes = orgId
 				? () => eventTypeApi.getByOrg(orgId)
-				: () => eventTypeApi.getByStaff(staffId)
+				: () => eventTypeApi.getByStaff(staffId, orgId)
 			const types = await fetchTypes()
 			eventTypesRef.current = types
 			setEventTypes(types)
@@ -141,6 +141,9 @@ function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
 				dateFrom,
 				dateTo,
 				eventTypesRef.current,
+				undefined,
+				undefined,
+				orgId,
 			)
 			setBookings(data)
 		} catch {

@@ -31,6 +31,7 @@ const useStaffBookings = (
 	dateStr: string,
 	view: ViewMode,
 	eventTypes: EventType[],
+	orgId?: string,
 ): UseStaffBookingsResult => {
 	const [bookings, setBookings] = useState<CalendarDisplayBooking[]>([])
 	const [staffBookingsMap, setStaffBookingsMap] = useState<
@@ -75,6 +76,9 @@ const useStaffBookings = (
 						range.from,
 						range.to,
 						eventTypes,
+						undefined,
+						undefined,
+						orgId,
 					)
 					const mapWithStaff = toCalendarDisplayBooking({
 						name: staff.name,
@@ -114,7 +118,7 @@ const useStaffBookings = (
 		}
 
 		loadBookings()
-	}, [staffToLoad, dateStr, view, eventTypes, reloadTick])
+	}, [staffToLoad, dateStr, view, eventTypes, reloadTick, orgId])
 
 	return { bookings, staffBookingsMap, reloadBookings, loading, error }
 }
