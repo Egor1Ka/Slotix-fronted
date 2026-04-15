@@ -25,7 +25,8 @@ const timeToMinFromISO = (iso: string, timezone?: string): number => {
 	return hour * 60 + minute
 }
 
-const dateFromISO = (iso: string): string => iso.split('T')[0]
+const dateFromISO = (iso: string, timezone: string): string =>
+	new Intl.DateTimeFormat('en-CA', { timeZone: timezone }).format(new Date(iso))
 
 const diffMinutes = (startISO: string, endISO: string): number => {
 	const start = new Date(startISO).getTime()
@@ -39,18 +40,18 @@ interface StaffInfo {
 }
 
 const toCalendarDisplayBooking =
-	(staff: StaffInfo) =>
+	(staff: StaffInfo, scheduleTimezone: string) =>
 	(b: StaffBooking): CalendarDisplayBooking => ({
-		startMin: timeToMinFromISO(b.startAt, b.timezone),
+		startMin: timeToMinFromISO(b.startAt, scheduleTimezone),
 		duration: diffMinutes(b.startAt, b.endAt),
 		label: `${b.eventTypeName} — ${staff.name}`,
 		color: b.color,
-		date: dateFromISO(b.startAt),
+		date: dateFromISO(b.startAt, scheduleTimezone),
 		bookingId: b.id,
 		status: b.status,
 		staffName: staff.name,
 		staffAvatar: staff.avatar,
-		timezone: b.timezone,
+		timezone: scheduleTimezone,
 	})
 
 export type { StaffInfo }

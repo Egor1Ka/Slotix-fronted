@@ -82,10 +82,10 @@ const useStaffBookings = (
 						undefined,
 						orgId,
 					)
-					const mapWithStaff = toCalendarDisplayBooking({
-						name: staff.name,
-						avatar: staff.avatar,
-					})
+					const mapWithStaff = toCalendarDisplayBooking(
+						{ name: staff.name, avatar: staff.avatar },
+						timezone,
+					)
 					return {
 						staffId: staff.id,
 						raw: staffBookings,
