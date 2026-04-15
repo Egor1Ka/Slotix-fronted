@@ -8,7 +8,7 @@ import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import { ScheduleEditor } from '@/components/booking/ScheduleEditor'
 import { SlotModeSelector } from '@/components/booking/SlotModeSelector'
-import { TimezoneSelector } from './TimezoneSelector'
+import { TimezoneSelector } from '@/components/shared/TimezoneSelector'
 import {
 	Select,
 	SelectContent,
