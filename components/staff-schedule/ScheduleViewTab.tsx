@@ -115,7 +115,7 @@ function ScheduleViewTab({ staffId, orgId, readOnly }: ScheduleViewTabProps) {
 		schedule?.slotStepMin ?? 30,
 	)
 	const [localTimezone, setLocalTimezone] = useState<string>(
-		schedule?.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone,
+		schedule?.timezone ?? '',
 	)
 
 	useEffect(() => {

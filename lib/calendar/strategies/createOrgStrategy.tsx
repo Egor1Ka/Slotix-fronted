@@ -207,10 +207,10 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 			workEnd: workHours.workEnd,
 			duration: selectedEventType.durationMin,
 			slotStep: schedule.slotStepMin,
-			slotMode: schedule?.slotMode ?? 'fixed',
+			slotMode: schedule.slotMode ?? 'fixed',
 			bookings: allBookingsForSlots,
 			minNotice: 0,
-			nowMin: getNowMinForDate(blockDate, schedule?.timezone ?? 'UTC'),
+			nowMin: getNowMinForDate(blockDate, schedule.timezone),
 		})
 
 		const toDropZoneBlock = (slot: Slot): CalendarBlock | null => {
@@ -459,10 +459,10 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 				workEnd: workHours.workEnd,
 				duration: selectedEventType.durationMin,
 				slotStep: schedule.slotStepMin,
-				slotMode: schedule?.slotMode ?? 'fixed',
+				slotMode: schedule.slotMode ?? 'fixed',
 				bookings: allBookingsForSlots,
 				minNotice: 0,
-				nowMin: getNowMinForDate(clickDate, schedule?.timezone ?? 'UTC'),
+				nowMin: getNowMinForDate(clickDate, schedule.timezone),
 			})
 
 			const isAfterClick = (slot: { startMin: number }): boolean =>
@@ -474,7 +474,8 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 		allowRangeSelect: false,
 
 		getTitle(titleDate: string, view: ViewMode): string {
-			const titleTimezone = schedule?.timezone ?? 'UTC'
+			if (!schedule) return orgName
+			const titleTimezone = schedule.timezone
 			if (view === 'week')
 				return `${orgName} — ${formatWeekRange(getWeekDates(titleDate, titleTimezone), calendarLocale)}`
 			if (view === 'month')

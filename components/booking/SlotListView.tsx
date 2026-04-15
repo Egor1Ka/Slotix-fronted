@@ -10,6 +10,7 @@ import { TimeSlotGrid } from './TimeSlotGrid'
 import { StaffSlotCard } from './StaffSlotCard'
 import { BookingConfirmSheet } from './BookingConfirmSheet'
 import { useFindNearestSlots } from '@/lib/calendar/hooks/useFindNearestSlots'
+import { formatYMD } from '@/lib/calendar/utils'
 import type { ClientInfoData } from './ClientInfoForm'
 import type {
 	EventType,
@@ -154,12 +155,8 @@ function OrgStaffSlotItem({
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-const dateToISO = (date: Date): string => {
-	const year = date.getFullYear()
-	const month = String(date.getMonth() + 1).padStart(2, '0')
-	const day = String(date.getDate()).padStart(2, '0')
-	return `${year}-${month}-${day}`
-}
+const dateToISO = (date: Date): string =>
+	formatYMD(date.getFullYear(), date.getMonth() + 1, date.getDate())
 
 const getSelectedEventType = (
 	eventTypes: EventType[],
@@ -333,7 +330,7 @@ function SlotListView({
 			return null
 
 		const memberSchedule = getStaffSchedule(member.id)
-		const memberTimezone = memberSchedule?.timezone ?? 'UTC'
+		if (!memberSchedule) return null
 
 		return (
 			<OrgStaffSlotItem
@@ -348,7 +345,7 @@ function SlotListView({
 				selectedSlot={selectedSlot}
 				selectedStaffId={selectedStaffId}
 				onSlotSelect={handleOrgSlotSelect}
-				scheduleTimezone={memberTimezone}
+				scheduleTimezone={memberSchedule.timezone}
 			/>
 		)
 	}

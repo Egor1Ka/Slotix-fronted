@@ -161,6 +161,7 @@ function OrgCalendarPage({
 			selectedEventTypeId,
 			selectedSlotTime,
 			dateStr,
+			timezone: schedule?.timezone ?? '',
 			reloadBookings,
 			getFirstStaffId,
 			t,

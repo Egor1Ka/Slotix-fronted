@@ -20,6 +20,7 @@ interface UseBookingActionsParams {
 	selectedEventTypeId: string | null
 	selectedSlotTime: string | null
 	dateStr: string
+	timezone: string
 	reloadBookings: () => void
 	getFirstStaffId: (list: { id: string }[] | null) => string | null
 	t: (key: string) => string
@@ -51,9 +52,6 @@ interface UseBookingActionsResult {
 	handleBookingClose: () => void
 }
 
-const browserTimezone = (): string =>
-	Intl.DateTimeFormat().resolvedOptions().timeZone
-
 const useBookingActions = (
 	params: UseBookingActionsParams,
 	setParams: (updates: Record<string, string | null>) => void,
@@ -65,6 +63,7 @@ const useBookingActions = (
 		selectedEventTypeId,
 		selectedSlotTime,
 		dateStr,
+		timezone,
 		reloadBookings,
 		getFirstStaffId,
 		t,
@@ -192,7 +191,7 @@ const useBookingActions = (
 				eventTypeId: selectedEventTypeId,
 				staffId: resolvedStaffId,
 				startAt,
-				timezone: browserTimezone(),
+				timezone,
 				invitee: {
 					name: data.name,
 					email: inviteeFields.email,

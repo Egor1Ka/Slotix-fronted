@@ -183,7 +183,16 @@ function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
 		fetchData()
 	}
 
-	const { dateFrom, dateTo } = computeWeekRange(weekOffset, timezoneRef.current ?? 'UTC')
+	const timezone = timezoneRef.current
+	if (!timezone) {
+		return (
+			<div className="flex justify-center py-12">
+				<Spinner className="size-6" />
+			</div>
+		)
+	}
+
+	const { dateFrom, dateTo } = computeWeekRange(weekOffset, timezone)
 	const grouped = groupByDate(bookings)
 	const sortedDates = [...grouped.keys()].sort(sortDatesAsc)
 
@@ -195,7 +204,7 @@ function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
 					{t('prevWeek')}
 				</Button>
 				<span className="text-sm font-medium">
-					{formatWeekLabel(dateFrom, dateTo, timezoneRef.current ?? 'UTC')}
+					{formatWeekLabel(dateFrom, dateTo, timezone)}
 				</span>
 				<Button variant="ghost" size="sm" onClick={handleNextWeek}>
 					{t('nextWeek')}
@@ -217,7 +226,7 @@ function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
 				</Empty>
 			) : (
 				<div className="flex flex-col gap-4">
-					{sortedDates.map(renderDateGroup(handleBookingClick, grouped, timezoneRef.current ?? ''))}
+					{sortedDates.map(renderDateGroup(handleBookingClick, grouped, timezone))}
 				</div>
 			)}
 
