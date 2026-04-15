@@ -244,6 +244,7 @@ function OrgCalendarPage({
 		? getWorkHoursForDate(
 				scheduleSource.weeklyHours,
 				dateStr,
+				scheduleSource.timezone,
 				orgSchedules.overrides,
 				selectedStaffId,
 			)
@@ -390,6 +391,7 @@ function OrgCalendarPage({
 				listViewSlot={listViewSlot}
 				publicUrl={publicUrlProp}
 				profileInfo={profileInfo}
+				scheduleTimezone={scheduleSource.timezone}
 			/>
 		</CalendarProvider>
 	)

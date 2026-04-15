@@ -74,6 +74,7 @@ const getSlotsForDate = (
 	const workHours = getWorkHoursForDate(
 		schedule.weeklyHours,
 		dateStr,
+		schedule.timezone,
 		overrides,
 		staffId,
 	)

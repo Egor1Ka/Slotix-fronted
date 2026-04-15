@@ -1,4 +1,5 @@
 import type { CalendarBlock } from './types'
+import { getDayOfWeekInTz } from './tz'
 
 interface DateFilterable {
 	date: string
@@ -114,9 +115,14 @@ const getNowMinForDate = (dateStr: string): number => {
 	return now.getHours() * 60 + now.getMinutes()
 }
 
-const formatDateLocale = (dateStr: string, locale: CalendarLocale): string => {
+const formatDateLocale = (
+	dateStr: string,
+	locale: CalendarLocale,
+	timezone: string,
+): string => {
 	const d = new Date(dateStr + 'T00:00:00')
-	return `${locale.days[d.getDay()]}, ${d.getDate()} ${locale.months[d.getMonth()]}`
+	const dayOfWeek = getDayOfWeekInTz(dateStr, timezone)
+	return `${locale.days[dayOfWeek]}, ${d.getDate()} ${locale.months[d.getMonth()]}`
 }
 
 const formatWeekRange = (dates: string[], locale: CalendarLocale): string => {
@@ -141,9 +147,9 @@ const getBookingsForDate = <T extends DateFilterable>(
 	return bookings.filter(matchesDate)
 }
 
-const getWeekStart = (dateStr: string): Date => {
+const getWeekStart = (dateStr: string, timezone: string): Date => {
 	const d = new Date(dateStr + 'T00:00:00')
-	const dayOfWeek = d.getDay()
+	const dayOfWeek = getDayOfWeekInTz(dateStr, timezone)
 	const diff = (dayOfWeek + 6) % 7
 	const monday = new Date(d)
 	monday.setDate(d.getDate() - diff)
@@ -158,16 +164,21 @@ const createWeekDate =
 		return formatDateISO(day)
 	}
 
-const getWeekDates = (dateStr: string): string[] => {
-	const monday = getWeekStart(dateStr)
+const getWeekDates = (dateStr: string, timezone: string): string[] => {
+	const monday = getWeekStart(dateStr, timezone)
 	return Array.from({ length: 7 }, createWeekDate(monday))
 }
 
-const getMonthGrid = (dateStr: string): (string | null)[][] => {
+const getMonthGrid = (
+	dateStr: string,
+	timezone: string,
+): (string | null)[][] => {
 	const d = new Date(dateStr + 'T00:00:00')
 	const year = d.getFullYear()
 	const month = d.getMonth()
-	const firstDayWeekday = (new Date(year, month, 1).getDay() + 6) % 7
+	const firstOfMonthStr = `${year}-${String(month + 1).padStart(2, '0')}-01`
+	const firstDayWeekday =
+		(getDayOfWeekInTz(firstOfMonthStr, timezone) + 6) % 7
 	const totalDays = new Date(year, month + 1, 0).getDate()
 	const totalCells = firstDayWeekday + totalDays
 	const rowCount = Math.ceil(totalCells / 7)
@@ -213,6 +224,7 @@ const getWorkHoursForDate = (
 		slots: Array<{ start: string; end: string }>
 	}>,
 	dateStr: string,
+	timezone: string,
 	overrides?: Array<{
 		staffId: string
 		date: string
@@ -234,7 +246,7 @@ const getWorkHoursForDate = (
 		}
 	}
 
-	const dayOfWeek = new Date(dateStr).getDay()
+	const dayOfWeek = getDayOfWeekInTz(normalizeDate(dateStr), timezone)
 	const daySchedule = weeklyHours.find((d) => d.dayOfWeek === dayOfWeek)
 	if (!daySchedule || !daySchedule.enabled || daySchedule.slots.length === 0)
 		return null

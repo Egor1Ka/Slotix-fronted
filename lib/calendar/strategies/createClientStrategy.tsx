@@ -125,6 +125,7 @@ const createClientStrategy = (
 			const workHours = getWorkHoursForDate(
 				schedule.weeklyHours,
 				blockDate,
+				schedule.timezone,
 				strategyStaffId ? overridesList : undefined,
 				strategyStaffId,
 			)
@@ -241,6 +242,7 @@ const createClientStrategy = (
 			const workHours = getWorkHoursForDate(
 				schedule.weeklyHours,
 				clickDate,
+				schedule.timezone,
 				strategyStaffId ? overridesList : undefined,
 				strategyStaffId,
 			)
@@ -279,10 +281,10 @@ const createClientStrategy = (
 
 		getTitle(titleDate: string, view: ViewMode): string {
 			if (view === 'week')
-				return `${staffName} — ${formatWeekRange(getWeekDates(titleDate), calendarLocale)}`
+				return `${staffName} — ${formatWeekRange(getWeekDates(titleDate, schedule.timezone), calendarLocale)}`
 			if (view === 'month')
 				return `${staffName} — ${formatMonth(titleDate, calendarLocale)}`
-			return `${staffName} — ${formatDateLocale(titleDate, calendarLocale)}`
+			return `${staffName} — ${formatDateLocale(titleDate, calendarLocale, schedule.timezone)}`
 		},
 	}
 }

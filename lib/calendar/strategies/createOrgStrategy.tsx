@@ -180,6 +180,7 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 		const workHours = getWorkHoursForDate(
 			schedule.weeklyHours,
 			blockDate,
+			schedule.timezone,
 			overrides,
 			selectedStaffId ?? undefined,
 		)
@@ -431,6 +432,7 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 			const workHours = getWorkHoursForDate(
 				schedule.weeklyHours,
 				clickDate,
+				schedule.timezone,
 				overrides,
 				selectedStaffId ?? undefined,
 			)
@@ -472,11 +474,13 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 		allowRangeSelect: false,
 
 		getTitle(titleDate: string, view: ViewMode): string {
+			const titleTimezone =
+				schedule?.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone
 			if (view === 'week')
-				return `${orgName} — ${formatWeekRange(getWeekDates(titleDate), calendarLocale)}`
+				return `${orgName} — ${formatWeekRange(getWeekDates(titleDate, titleTimezone), calendarLocale)}`
 			if (view === 'month')
 				return `${orgName} — ${formatMonth(titleDate, calendarLocale)}`
-			return `${orgName} — ${formatDateLocale(titleDate, calendarLocale)}`
+			return `${orgName} — ${formatDateLocale(titleDate, calendarLocale, titleTimezone)}`
 		},
 	}
 }

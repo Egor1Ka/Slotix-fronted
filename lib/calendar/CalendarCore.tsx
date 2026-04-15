@@ -43,6 +43,7 @@ import {
 	addMonths,
 	resolveOverlaps,
 } from './utils'
+import { getDayOfWeekInTz } from './tz'
 
 const DEFAULT_VIEW_CONFIG: CalendarViewConfig = {
 	blockedTimeVisibility: 'full',
@@ -83,6 +84,7 @@ interface CalendarCoreProps {
 	hideSidebar?: boolean
 	profileInfo?: ProfileInfoBlockProps
 	listViewSlot?: React.ReactNode
+	scheduleTimezone: string
 }
 
 const navigate = (view: ViewMode, date: string, direction: number): string => {
@@ -163,6 +165,7 @@ function CalendarCore({
 	hideSidebar = false,
 	profileInfo,
 	listViewSlot,
+	scheduleTimezone,
 }: CalendarCoreProps) {
 	const strategy = useCalendarStrategy()
 	const viewConfig = useSafeViewConfig()
@@ -389,7 +392,7 @@ function CalendarCore({
 	}
 
 	const renderWeekView = () => {
-		const weekDates = getWeekDates(date)
+		const weekDates = getWeekDates(date, scheduleTimezone)
 		const today = getTodayStr()
 		const workStartMin = timeToMin(workStart)
 		const workEndMin = timeToMin(workEnd)
@@ -506,7 +509,7 @@ function CalendarCore({
 		}
 
 		const isDayDisabled = (dayDate: string): boolean => {
-			const dayOfWeek = new Date(dayDate + 'T00:00:00').getDay()
+			const dayOfWeek = getDayOfWeekInTz(dayDate, scheduleTimezone)
 			return disabledDays.includes(dayOfWeek)
 		}
 
@@ -631,7 +634,7 @@ function CalendarCore({
 	}
 
 	const renderMonthView = () => {
-		const grid = getMonthGrid(date)
+		const grid = getMonthGrid(date, scheduleTimezone)
 		const today = getTodayStr()
 
 		const renderWeekdayHeader = (day: string) => (

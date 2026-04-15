@@ -61,7 +61,7 @@ const useStaffBookings = (
 
 		const staffIds = extractStaffIds(staffToLoad)
 		const staffKey = buildStaffKey(staffIds)
-		const range = computeDateRange(dateStr, view)
+		const range = computeDateRange(dateStr, view, timezone)
 
 		if (isWithinLoadedRange(loadedRangeRef.current, dateStr, view, staffKey))
 			return

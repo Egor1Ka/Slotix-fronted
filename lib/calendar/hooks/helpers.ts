@@ -9,7 +9,11 @@ interface DateRange {
 
 const LIST_VIEW_DAYS = 14
 
-const computeDateRange = (dateStr: string, view: ViewMode): DateRange => {
+const computeDateRange = (
+	dateStr: string,
+	view: ViewMode,
+	timezone: string,
+): DateRange => {
 	if (view === 'list') {
 		const from = new Date(dateStr + 'T00:00:00')
 		const to = new Date(from)
@@ -17,7 +21,7 @@ const computeDateRange = (dateStr: string, view: ViewMode): DateRange => {
 		return { from: dateStr, to: formatDateISO(to) }
 	}
 	if (view === 'week') {
-		const weekDates = getWeekDates(dateStr)
+		const weekDates = getWeekDates(dateStr, timezone)
 		return { from: weekDates[0], to: weekDates[6] }
 	}
 	if (view === 'month') {

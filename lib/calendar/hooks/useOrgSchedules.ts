@@ -8,6 +8,7 @@ import type {
 	WeeklyHours,
 } from '@/services/configs/booking.types'
 import type { OrgStaffMember } from '@/services/configs/booking.types'
+import { getDayOfWeekInTz } from '../tz'
 
 interface UseOrgSchedulesResult {
 	getStaffSchedule: (staffId: string) => ScheduleTemplate | null
@@ -26,7 +27,11 @@ interface UseOrgSchedulesResult {
 	error: string | null
 }
 
-const getDayOfWeek = (dateStr: string): number => new Date(dateStr).getDay()
+const normalizeDateStr = (d: string): string =>
+	d.includes('T') ? d.split('T')[0] : d
+
+const getDayOfWeek = (dateStr: string, timezone: string): number =>
+	getDayOfWeekInTz(normalizeDateStr(dateStr), timezone)
 
 const isDayEnabled = (
 	weeklyHours: WeeklyHours[],
@@ -112,7 +117,6 @@ const useOrgSchedules = (orgId: string): UseOrgSchedulesResult => {
 
 	const getOrgWorkHours = useCallback(
 		(dateStr: string): { workStart: string; workEnd: string } | null => {
-			const dayOfWeek = getDayOfWeek(dateStr)
 			const dateOnly = normalizeDate(dateStr)
 
 			const collectSlots = (
@@ -130,6 +134,7 @@ const useOrgSchedules = (orgId: string): UseOrgSchedulesResult => {
 					if (isFullDayOff) return acc
 					// Частичный выходной — используем базовое расписание (перерыв на бэкенде)
 				}
+				const dayOfWeek = getDayOfWeek(dateStr, schedule.timezone)
 				const slots = getDaySlots(schedule.weeklyHours, dayOfWeek)
 				return [...acc, ...slots]
 			}
@@ -147,7 +152,6 @@ const useOrgSchedules = (orgId: string): UseOrgSchedulesResult => {
 
 	const getWorkingStaff = useCallback(
 		(dateStr: string, allStaff: OrgStaffMember[]): OrgStaffMember[] => {
-			const dayOfWeek = getDayOfWeek(dateStr)
 			const dateOnly = normalizeDate(dateStr)
 			const hasScheduleForDay = (staff: OrgStaffMember): boolean => {
 				const staffOverride = overrides.find(
@@ -161,6 +165,7 @@ const useOrgSchedules = (orgId: string): UseOrgSchedulesResult => {
 				}
 				const schedule = schedules.find((s) => s.staffId === staff.id)
 				if (!schedule) return false
+				const dayOfWeek = getDayOfWeek(dateStr, schedule.timezone)
 				return isDayEnabled(schedule.weeklyHours, dayOfWeek)
 			}
 			return allStaff.filter(hasScheduleForDay)

@@ -225,7 +225,11 @@ function BookingPage({
 	// ── Derived data ──
 
 	const scheduleSource = schedule ?? DEFAULT_SCHEDULE
-	const workHours = getWorkHoursForDate(scheduleSource.weeklyHours, dateStr)
+	const workHours = getWorkHoursForDate(
+		scheduleSource.weeklyHours,
+		dateStr,
+		scheduleSource.timezone,
+	)
 	const isDayOff = workHours === null
 	const workStart = workHours?.workStart ?? '10:00'
 	const workEnd = workHours?.workEnd ?? '18:00'
@@ -322,6 +326,7 @@ function BookingPage({
 				hideSidebar={hideSidebar}
 				profileInfo={profileInfo}
 				listViewSlot={listViewSlot}
+				scheduleTimezone={scheduleSource.timezone}
 			/>
 		</CalendarProvider>
 	)
