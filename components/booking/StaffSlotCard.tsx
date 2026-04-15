@@ -5,6 +5,7 @@ import { useLocale } from 'next-intl'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { TimeSlotGrid } from './TimeSlotGrid'
 import { StaffInfoSheet } from './StaffInfoSheet'
+import { todayInTz } from '@/lib/calendar/tz'
 import type { Slot } from '@/lib/slot-engine'
 import type { OrgStaffMember } from '@/services/configs/booking.types'
 
@@ -16,6 +17,7 @@ interface StaffSlotCardProps {
 	selectedStaffId: string | null
 	onSlotSelect: (staffId: string, time: string) => void
 	loading?: boolean
+	scheduleTimezone: string
 }
 
 const getInitials = (name: string): string =>
@@ -26,21 +28,28 @@ const getInitials = (name: string): string =>
 		.toUpperCase()
 		.slice(0, 2)
 
-const formatSlotDate = (dateStr: string, locale: string): string => {
-	const date = new Date(dateStr + 'T00:00:00')
-	const today = new Date()
-	today.setHours(0, 0, 0, 0)
+const addDays = (dateStr: string, days: number): string => {
+	const date = new Date(dateStr + 'T00:00:00Z')
+	date.setUTCDate(date.getUTCDate() + days)
+	return date.toISOString().slice(0, 10)
+}
 
-	const tomorrow = new Date(today)
-	tomorrow.setDate(tomorrow.getDate() + 1)
+const formatSlotDate = (
+	dateStr: string,
+	locale: string,
+	scheduleTimezone: string,
+): string => {
+	const todayStr = todayInTz(scheduleTimezone)
+	const tomorrowStr = addDays(todayStr, 1)
 
-	if (date.getTime() === today.getTime()) {
+	if (dateStr === todayStr) {
 		return locale === 'uk' ? 'сьогодні' : 'today'
 	}
-	if (date.getTime() === tomorrow.getTime()) {
+	if (dateStr === tomorrowStr) {
 		return locale === 'uk' ? 'завтра' : 'tomorrow'
 	}
 
+	const date = new Date(dateStr + 'T00:00:00')
 	return date.toLocaleDateString(locale, {
 		day: 'numeric',
 		month: 'long',
@@ -56,6 +65,7 @@ function StaffSlotCard({
 	selectedStaffId,
 	onSlotSelect,
 	loading = false,
+	scheduleTimezone,
 }: StaffSlotCardProps) {
 	const t = useTranslations('booking')
 	const locale = useLocale()
@@ -98,7 +108,7 @@ function StaffSlotCard({
 			<p className="text-muted-foreground text-sm">
 				{t('nearestTimeFor')}{' '}
 				<span className="text-foreground font-medium">
-					{formatSlotDate(date, locale)}
+					{formatSlotDate(date, locale, scheduleTimezone)}
 				</span>
 			</p>
 

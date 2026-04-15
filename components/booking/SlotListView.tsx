@@ -75,6 +75,7 @@ interface OrgStaffSlotItemProps {
 	selectedSlot: string | null
 	selectedStaffId: string | null
 	onSlotSelect: (staffId: string, time: string) => void
+	scheduleTimezone: string
 }
 
 // ── Sub-components ────────────────────────────────────────────────────────────
@@ -126,6 +127,7 @@ function OrgStaffSlotItem({
 	selectedSlot,
 	selectedStaffId,
 	onSlotSelect,
+	scheduleTimezone,
 }: OrgStaffSlotItemProps) {
 	const { date, slots } = useFindNearestSlots({
 		schedule,
@@ -145,6 +147,7 @@ function OrgStaffSlotItem({
 			selectedSlot={selectedSlot}
 			selectedStaffId={selectedStaffId}
 			onSlotSelect={onSlotSelect}
+			scheduleTimezone={scheduleTimezone}
 		/>
 	)
 }
@@ -329,11 +332,14 @@ function SlotListView({
 		if (!getStaffSchedule || !getStaffOverrides || !getStaffBookings)
 			return null
 
+		const memberSchedule = getStaffSchedule(member.id)
+		const memberTimezone = memberSchedule?.timezone ?? 'UTC'
+
 		return (
 			<OrgStaffSlotItem
 				key={member.id}
 				member={member}
-				schedule={getStaffSchedule(member.id)}
+				schedule={memberSchedule}
 				overrides={getStaffOverrides(member.id)}
 				bookings={getStaffBookings(member.id)}
 				duration={duration}
@@ -342,6 +348,7 @@ function SlotListView({
 				selectedSlot={selectedSlot}
 				selectedStaffId={selectedStaffId}
 				onSlotSelect={handleOrgSlotSelect}
+				scheduleTimezone={memberTimezone}
 			/>
 		)
 	}
