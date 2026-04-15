@@ -95,7 +95,7 @@ function BookingPage({
 	// ── URL state ──
 
 	const dateStr = searchParams.get('date') ?? todayStr()
-	const view = (searchParams.get('view') as ViewMode) ?? 'day'
+	const view = (searchParams.get('view') as ViewMode) ?? viewConfig.defaultView
 	const selectedEventTypeId = searchParams.get('eventType')
 	const selectedSlotTime = searchParams.get('slot')
 
