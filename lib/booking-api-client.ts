@@ -330,6 +330,7 @@ const updateScheduleTemplate = async (
 	weeklyHours: WeeklyHours[],
 	slotMode?: SlotMode,
 	slotStepMin?: number,
+	timezone?: string,
 ): Promise<ScheduleTemplate> => {
 	const body = {
 		staffId,
@@ -337,6 +338,7 @@ const updateScheduleTemplate = async (
 		weeklyHours: weeklyHours.map(toBackendWeeklyHours),
 		...(slotMode !== undefined && { slotMode }),
 		...(slotStepMin !== undefined && { slotStepMin }),
+		...(timezone !== undefined && { timezone }),
 	}
 	const raw = await put<BackendScheduleTemplate>('/schedule/template', body)
 	return toFrontendSchedule(raw)

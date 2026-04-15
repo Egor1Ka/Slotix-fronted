@@ -8,6 +8,7 @@ import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import { ScheduleEditor } from '@/components/booking/ScheduleEditor'
 import { SlotModeSelector } from '@/components/booking/SlotModeSelector'
+import { TimezoneSelector } from './TimezoneSelector'
 import {
 	Select,
 	SelectContent,
@@ -113,17 +114,28 @@ function ScheduleViewTab({ staffId, orgId, readOnly }: ScheduleViewTabProps) {
 	const [localSlotStep, setLocalSlotStep] = useState<number>(
 		schedule?.slotStepMin ?? 30,
 	)
+	const [localTimezone, setLocalTimezone] = useState<string>(
+		schedule?.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone,
+	)
 
 	useEffect(() => {
 		if (schedule) {
 			setLocalSlotMode(schedule.slotMode)
 			setLocalSlotStep(schedule.slotStepMin ?? 30)
+			setLocalTimezone(schedule.timezone)
 		}
 	}, [schedule])
 
 	const handleSave = async (weeklyHours: WeeklyHours[]) => {
 		try {
-			await scheduleApi.updateTemplate(staffId, orgId ?? null, weeklyHours, localSlotMode, localSlotStep)
+			await scheduleApi.updateTemplate(
+				staffId,
+				orgId ?? null,
+				weeklyHours,
+				localSlotMode,
+				localSlotStep,
+				localTimezone,
+			)
 			await fetchSchedule()
 			toast.success(t('scheduleSaved'))
 		} catch (err) {
@@ -144,6 +156,8 @@ function ScheduleViewTab({ staffId, orgId, readOnly }: ScheduleViewTabProps) {
 				orgId ?? null,
 				schedule.weeklyHours,
 				mode,
+				localSlotStep,
+				localTimezone,
 			)
 			await fetchSchedule()
 		} catch (err) {
@@ -166,12 +180,37 @@ function ScheduleViewTab({ staffId, orgId, readOnly }: ScheduleViewTabProps) {
 				staffId,
 				orgId ?? null,
 				schedule.weeklyHours,
-				undefined,
+				localSlotMode,
 				step,
+				localTimezone,
 			)
 			await fetchSchedule()
 		} catch (err) {
 			setLocalSlotStep(schedule.slotStepMin ?? 30)
+			const message =
+				err instanceof Error ? err.message : t('scheduleSaveError')
+			toast.error(message)
+		} finally {
+			setSavingMode(false)
+		}
+	}
+
+	const handleTimezoneChange = async (tz: string) => {
+		if (!schedule) return
+		setLocalTimezone(tz)
+		setSavingMode(true)
+		try {
+			await scheduleApi.updateTemplate(
+				staffId,
+				orgId ?? null,
+				schedule.weeklyHours,
+				localSlotMode,
+				localSlotStep,
+				tz,
+			)
+			await fetchSchedule()
+		} catch (err) {
+			setLocalTimezone(schedule.timezone)
 			const message =
 				err instanceof Error ? err.message : t('scheduleSaveError')
 			toast.error(message)
@@ -198,6 +237,13 @@ function ScheduleViewTab({ staffId, orgId, readOnly }: ScheduleViewTabProps) {
 		<div className="flex flex-col gap-6">
 			<ScheduleEditor schedule={schedule} onSave={handleSave} />
 			<Separator />
+			<div className={cn(savingMode && 'pointer-events-none opacity-50')}>
+				<TimezoneSelector
+					value={localTimezone}
+					onChange={handleTimezoneChange}
+					label={t('timezone')}
+				/>
+			</div>
 			<div className={savingMode ? 'pointer-events-none opacity-50' : ''}>
 				<SlotModeSelector
 					value={localSlotMode}
