@@ -30,6 +30,7 @@ interface UpdateOrgBody {
 	website?: string | null
 	logoUrl?: string | null
 	brandColor?: string | null
+	timezone?: string
 }
 
 interface AddStaffBody {

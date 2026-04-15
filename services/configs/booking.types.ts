@@ -156,6 +156,7 @@ interface OrgByIdResponse {
 	phone: string | null
 	website: string | null
 	active: boolean
+	timezone?: string
 }
 
 interface OrgStaffMember extends StaffMember {
