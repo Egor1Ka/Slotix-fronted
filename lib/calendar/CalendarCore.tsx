@@ -55,6 +55,7 @@ const DEFAULT_VIEW_CONFIG: CalendarViewConfig = {
 	filterByStaffCapability: false,
 	showScheduleEditor: false,
 	allowListView: false,
+	defaultView: 'day',
 }
 
 type ViewOption = { value: ViewMode; labelKey: string }

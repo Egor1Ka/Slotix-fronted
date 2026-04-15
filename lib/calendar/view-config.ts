@@ -1,3 +1,5 @@
+import type { ViewMode } from './types'
+
 interface CalendarViewConfig {
 	blockedTimeVisibility: 'hidden' | 'grey' | 'full'
 	columnHeader: 'date' | 'staff'
@@ -9,6 +11,7 @@ interface CalendarViewConfig {
 	filterByStaffCapability: boolean
 	showScheduleEditor: boolean
 	allowListView: boolean
+	defaultView: ViewMode
 }
 
 const ORG_PUBLIC_CONFIG: CalendarViewConfig = {
@@ -22,6 +25,7 @@ const ORG_PUBLIC_CONFIG: CalendarViewConfig = {
 	filterByStaffCapability: true,
 	showScheduleEditor: false,
 	allowListView: true,
+	defaultView: 'list',
 }
 
 const ORG_ADMIN_CONFIG: CalendarViewConfig = {
@@ -35,6 +39,7 @@ const ORG_ADMIN_CONFIG: CalendarViewConfig = {
 	filterByStaffCapability: true,
 	showScheduleEditor: true,
 	allowListView: true,
+	defaultView: 'day',
 }
 
 const STAFF_PUBLIC_CONFIG: CalendarViewConfig = {
@@ -48,6 +53,7 @@ const STAFF_PUBLIC_CONFIG: CalendarViewConfig = {
 	filterByStaffCapability: false,
 	showScheduleEditor: false,
 	allowListView: true,
+	defaultView: 'list',
 }
 
 const STAFF_SELF_CONFIG: CalendarViewConfig = {
@@ -61,6 +67,7 @@ const STAFF_SELF_CONFIG: CalendarViewConfig = {
 	filterByStaffCapability: false,
 	showScheduleEditor: false,
 	allowListView: true,
+	defaultView: 'day',
 }
 
 export {
