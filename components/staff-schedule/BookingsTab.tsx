@@ -91,11 +91,13 @@ const toBookingDetail = (booking: StaffBooking): BookingDetail => ({
 const renderDateGroup = (
 	onBookingClick: (booking: StaffBooking) => void,
 	grouped: Map<string, StaffBooking[]>,
+	timezone: string,
 ) => {
 	const DateGroupItem = (date: string) => (
 		<BookingDateGroup
 			key={date}
 			date={date}
+			timezone={timezone}
 			bookings={grouped.get(date) ?? []}
 			onBookingClick={onBookingClick}
 		/>
@@ -214,7 +216,7 @@ function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
 				</Empty>
 			) : (
 				<div className="flex flex-col gap-4">
-					{sortedDates.map(renderDateGroup(handleBookingClick, grouped))}
+					{sortedDates.map(renderDateGroup(handleBookingClick, grouped, timezoneRef.current ?? ''))}
 				</div>
 			)}
 

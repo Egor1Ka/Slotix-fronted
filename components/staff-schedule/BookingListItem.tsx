@@ -9,6 +9,7 @@ import type {
 
 interface BookingListItemProps {
 	booking: StaffBooking
+	timezone: string
 	onClick: (booking: StaffBooking) => void
 }
 
@@ -23,13 +24,15 @@ const STATUS_VARIANT: Record<
 	cancelled: 'destructive',
 }
 
-const formatTime = (isoString: string): string =>
-	new Date(isoString).toLocaleTimeString([], {
+const formatTime = (isoString: string, timezone: string): string =>
+	new Date(isoString).toLocaleTimeString('uk-UA', {
+		timeZone: timezone,
 		hour: '2-digit',
 		minute: '2-digit',
+		hour12: false,
 	})
 
-function BookingListItem({ booking, onClick }: BookingListItemProps) {
+function BookingListItem({ booking, timezone, onClick }: BookingListItemProps) {
 	const handleClick = () => onClick(booking)
 
 	return (
@@ -49,7 +52,7 @@ function BookingListItem({ booking, onClick }: BookingListItemProps) {
 			<div className="flex min-w-0 flex-1 items-center justify-between gap-2 pl-1">
 				<div className="flex min-w-0 flex-col">
 					<span className="text-sm font-medium">
-						{formatTime(booking.startAt)} — {formatTime(booking.endAt)}
+						{formatTime(booking.startAt, timezone)} — {formatTime(booking.endAt, timezone)}
 					</span>
 					<span className="text-muted-foreground truncate text-xs">
 						{booking.eventTypeName}
