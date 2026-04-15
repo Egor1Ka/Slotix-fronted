@@ -19,7 +19,8 @@ export function LoginForm({
 		if (callbackUrl && isSafeRedirectPath(callbackUrl)) {
 			document.cookie = `callbackUrl=${encodeURIComponent(callbackUrl)};path=/;max-age=600;samesite=lax`
 		}
-		window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`
+		const tz = Intl.DateTimeFormat().resolvedOptions().timeZone // tz-ok: capturing user's browser tz for OAuth registration
+		window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google?timezone=${encodeURIComponent(tz)}`
 	}
 
 	return (
