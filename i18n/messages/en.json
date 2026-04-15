@@ -142,7 +142,10 @@
 			"free": {
 				"name": "Free",
 				"description": "Basic access",
-				"features": ["Dashboard access", "Community support"]
+				"features": [
+					"Dashboard access",
+					"Community support"
+				]
 			},
 			"org_creator": {
 				"name": "Org Creator",
@@ -380,7 +383,8 @@
 			"timezone": "Timezone",
 			"country": "Country",
 			"submit": "Create",
-			"cancel": "Cancel"
+			"cancel": "Cancel",
+			"timezoneHint": "Detected from your browser. Change if the company operates in a different timezone."
 		},
 		"created": "Organization created",
 		"invitation": {
@@ -390,7 +394,15 @@
 			"decline": "Decline",
 			"accepted": "Invitation accepted",
 			"declined": "Invitation declined"
-		}
+		},
+		"timezoneSection": "Organization Timezone",
+		"timezoneHint": "New schedules will be created in this timezone. Existing ones will not change.",
+		"timezoneSaved": "Organization timezone updated",
+		"timezoneSave": "Save",
+		"timezoneWarningTitle": "Change timezone?",
+		"timezoneWarningDesc": "New schedules will be created in the new timezone. Existing schedules will not change. Continue?",
+		"timezoneWarningConfirm": "Continue",
+		"timezoneWarningCancel": "Cancel"
 	},
 	"positions": {
 		"title": "Positions",
@@ -551,6 +563,10 @@
 			"linkOpened": "Link opened in new tab. Complete the setup in Telegram, then click \"Check status\".",
 			"popupBlocked": "Could not open the link. Copy and open it manually:",
 			"nowConnected": "Telegram connected successfully!"
-		}
+		},
+		"timezone": "My Timezone",
+		"timezoneHint": "Defines your personal schedule. Change if you work in a different timezone.",
+		"timezoneSaved": "Timezone updated",
+		"timezoneSave": "Save"
 	}
 }

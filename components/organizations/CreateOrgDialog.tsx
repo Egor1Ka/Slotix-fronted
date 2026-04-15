@@ -24,6 +24,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
+import { TimezoneSelector } from '@/components/shared/TimezoneSelector'
 import { orgApi, setServerErrors } from '@/services'
 import type { Plan } from '@/services'
 
@@ -93,7 +94,7 @@ function CreateOrgDialog({ onCreated, plan, orgCount }: CreateOrgDialogProps) {
 		resolver: zodResolver(createOrgSchema),
 		defaultValues: {
 			currency: 'UAH',
-			defaultTimezone: 'Europe/Kyiv',
+			defaultTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone, // tz-ok: default from browser for new org
 			defaultCountry: 'UA',
 		},
 	})
@@ -205,6 +206,22 @@ function CreateOrgDialog({ onCreated, plan, orgCount }: CreateOrgDialogProps) {
 								{...register('logoUrl')}
 							/>
 							<FieldError errors={[errors.logoUrl]} />
+						</Field>
+
+						<Field>
+							<Controller
+								control={control}
+								name="defaultTimezone"
+								render={({ field }) => (
+									<TimezoneSelector
+										id="defaultTimezone"
+										label={t('form.timezone')}
+										hint={t('form.timezoneHint')}
+										value={field.value ?? ''}
+										onChange={field.onChange}
+									/>
+								)}
+							/>
 						</Field>
 
 						<div className="flex justify-end gap-2">
