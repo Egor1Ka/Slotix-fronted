@@ -2,27 +2,11 @@ import type {
 	StaffBooking,
 	CalendarDisplayBooking,
 } from '@/services/configs/booking.types'
+import { wallClockInTz } from '@/lib/calendar/tz'
 
-const getTimePart = (parts: Intl.DateTimeFormatPart[], type: string): number => {
-	const part = parts.find((p) => p.type === type)
-	return part ? parseInt(part.value, 10) : 0
-}
-
-const timeToMinFromISO = (iso: string, timezone?: string): number => {
-	const date = new Date(iso)
-	if (!timezone) {
-		return date.getUTCHours() * 60 + date.getUTCMinutes()
-	}
-	const formatter = new Intl.DateTimeFormat('en-US', {
-		timeZone: timezone,
-		hour: '2-digit',
-		minute: '2-digit',
-		hour12: false,
-	})
-	const parts = formatter.formatToParts(date)
-	const hour = getTimePart(parts, 'hour')
-	const minute = getTimePart(parts, 'minute')
-	return hour * 60 + minute
+const timeToMinFromISO = (iso: string, timezone: string): number => {
+	const wc = wallClockInTz(iso, timezone)
+	return wc.hour * 60 + wc.minute
 }
 
 const dateFromISO = (iso: string, timezone: string): string =>
