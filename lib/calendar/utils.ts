@@ -95,12 +95,16 @@ const durationToPx = (min: number): number => (min / 60) * PX_PER_HOUR
 const formatHour = (hour: number): string =>
 	`${String(hour).padStart(2, '0')}:00`
 
-const formatDateISO = (d: Date): string => {
-	const year = d.getFullYear()
-	const month = String(d.getMonth() + 1).padStart(2, '0')
-	const day = String(d.getDate()).padStart(2, '0')
-	return `${year}-${month}-${day}`
+const parseYMD = (str: string): { year: number; month: number; day: number } => {
+	const [y, m, d] = str.split('-').map(Number)
+	return { year: y, month: m, day: d }
 }
+
+const formatYMD = (year: number, month: number, day: number): string =>
+	`${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+
+const formatDateISO = (d: Date): string =>
+	formatYMD(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate())
 
 const getTodayStrInTz = (timezone: string): string => {
 	const wc = wallClockInTz(new Date().toISOString(), timezone)
@@ -123,23 +127,23 @@ const formatDateLocale = (
 	locale: CalendarLocale,
 	timezone: string,
 ): string => {
-	const d = new Date(dateStr + 'T00:00:00')
-	const dayOfWeek = getDayOfWeekInTz(dateStr, timezone)
-	return `${locale.days[dayOfWeek]}, ${d.getDate()} ${locale.months[d.getMonth()]}`
+	const { month, day } = parseYMD(dateStr)
+	const dow = getDayOfWeekInTz(dateStr, timezone)
+	return `${locale.days[dow]}, ${day} ${locale.months[month - 1]}`
 }
 
 const formatWeekRange = (dates: string[], locale: CalendarLocale): string => {
-	const first = new Date(dates[0] + 'T00:00:00')
-	const last = new Date(dates[6] + 'T00:00:00')
-	if (first.getMonth() === last.getMonth()) {
-		return `${first.getDate()} – ${last.getDate()} ${locale.months[first.getMonth()]} ${first.getFullYear()}`
+	const first = parseYMD(dates[0])
+	const last = parseYMD(dates[6])
+	if (first.month === last.month) {
+		return `${first.day} – ${last.day} ${locale.months[first.month - 1]} ${first.year}`
 	}
-	return `${first.getDate()} ${locale.months[first.getMonth()]} – ${last.getDate()} ${locale.months[last.getMonth()]} ${last.getFullYear()}`
+	return `${first.day} ${locale.months[first.month - 1]} – ${last.day} ${locale.months[last.month - 1]} ${last.year}`
 }
 
 const formatMonth = (dateStr: string, locale: CalendarLocale): string => {
-	const d = new Date(dateStr + 'T00:00:00')
-	return `${locale.monthsFull[d.getMonth()]} ${d.getFullYear()}`
+	const { year, month } = parseYMD(dateStr)
+	return `${locale.monthsFull[month - 1]} ${year}`
 }
 
 const getBookingsForDate = <T extends DateFilterable>(
@@ -150,22 +154,28 @@ const getBookingsForDate = <T extends DateFilterable>(
 	return bookings.filter(matchesDate)
 }
 
-const getWeekStart = (dateStr: string, timezone: string): Date => {
-	const d = new Date(dateStr + 'T00:00:00')
-	const dayOfWeek = getDayOfWeekInTz(dateStr, timezone)
-	const diff = (dayOfWeek + 6) % 7
-	const monday = new Date(d)
-	monday.setDate(d.getDate() - diff)
-	return monday
+const addDays = (dateStr: string, days: number): string => {
+	const { year, month, day } = parseYMD(dateStr)
+	const utc = new Date(Date.UTC(year, month - 1, day + days))
+	return formatYMD(utc.getUTCFullYear(), utc.getUTCMonth() + 1, utc.getUTCDate())
+}
+
+const addMonths = (dateStr: string, months: number): string => {
+	const { year, month, day } = parseYMD(dateStr)
+	const utc = new Date(Date.UTC(year, month - 1 + months, day))
+	return formatYMD(utc.getUTCFullYear(), utc.getUTCMonth() + 1, utc.getUTCDate())
+}
+
+const getWeekStart = (dateStr: string, timezone: string): string => {
+	const dow = getDayOfWeekInTz(dateStr, timezone)
+	const diff = (dow + 6) % 7
+	return addDays(dateStr, -diff)
 }
 
 const createWeekDate =
-	(monday: Date) =>
-	(_: unknown, i: number): string => {
-		const day = new Date(monday)
-		day.setDate(monday.getDate() + i)
-		return formatDateISO(day)
-	}
+	(mondayStr: string) =>
+	(_: unknown, i: number): string =>
+		addDays(mondayStr, i)
 
 const getWeekDates = (dateStr: string, timezone: string): string[] => {
 	const monday = getWeekStart(dateStr, timezone)
@@ -176,20 +186,17 @@ const getMonthGrid = (
 	dateStr: string,
 	timezone: string,
 ): (string | null)[][] => {
-	const d = new Date(dateStr + 'T00:00:00')
-	const year = d.getFullYear()
-	const month = d.getMonth()
-	const firstOfMonthStr = `${year}-${String(month + 1).padStart(2, '0')}-01`
-	const firstDayWeekday =
-		(getDayOfWeekInTz(firstOfMonthStr, timezone) + 6) % 7
-	const totalDays = new Date(year, month + 1, 0).getDate()
+	const { year, month } = parseYMD(dateStr)
+	const firstOfMonthStr = formatYMD(year, month, 1)
+	const firstDayWeekday = (getDayOfWeekInTz(firstOfMonthStr, timezone) + 6) % 7
+	const totalDays = new Date(Date.UTC(year, month, 0)).getUTCDate()
 	const totalCells = firstDayWeekday + totalDays
 	const rowCount = Math.ceil(totalCells / 7)
 
 	const cellToDate = (_: unknown, i: number): string | null => {
 		const dayNum = i - firstDayWeekday + 1
 		if (dayNum < 1 || dayNum > totalDays) return null
-		return `${year}-${String(month + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`
+		return formatYMD(year, month, dayNum)
 	}
 
 	const allCells = Array.from({ length: rowCount * 7 }, cellToDate)
@@ -198,18 +205,6 @@ const getMonthGrid = (
 		allCells.slice(rowIdx * 7, rowIdx * 7 + 7)
 
 	return Array.from({ length: rowCount }, toRow)
-}
-
-const addDays = (dateStr: string, days: number): string => {
-	const date = new Date(dateStr + 'T00:00:00')
-	date.setDate(date.getDate() + days)
-	return formatDateISO(date)
-}
-
-const addMonths = (dateStr: string, months: number): string => {
-	const date = new Date(dateStr + 'T00:00:00')
-	date.setMonth(date.getMonth() + months)
-	return formatDateISO(date)
 }
 
 const findEventType = <T extends { id: string }>(

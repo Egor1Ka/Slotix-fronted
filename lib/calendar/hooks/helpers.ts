@@ -1,6 +1,6 @@
 import type { OrgStaffMember } from '@/services/configs/booking.types'
 import type { ViewMode } from '../types'
-import { formatDateISO, getWeekDates } from '../utils'
+import { addDays, getWeekDates } from '../utils'
 
 interface DateRange {
 	from: string
@@ -9,28 +9,30 @@ interface DateRange {
 
 const LIST_VIEW_DAYS = 14
 
+const getMonthBounds = (dateStr: string): DateRange => {
+	const [yearStr, monthStr] = dateStr.split('-')
+	const year = Number(yearStr)
+	const month = Number(monthStr)
+	const firstDay = `${yearStr}-${monthStr}-01`
+	const lastDayNum = new Date(Date.UTC(year, month, 0)).getUTCDate()
+	const lastDay = `${yearStr}-${monthStr}-${String(lastDayNum).padStart(2, '0')}`
+	return { from: firstDay, to: lastDay }
+}
+
 const computeDateRange = (
 	dateStr: string,
 	view: ViewMode,
 	timezone: string,
 ): DateRange => {
 	if (view === 'list') {
-		const from = new Date(dateStr + 'T00:00:00')
-		const to = new Date(from)
-		to.setDate(to.getDate() + LIST_VIEW_DAYS)
-		return { from: dateStr, to: formatDateISO(to) }
+		return { from: dateStr, to: addDays(dateStr, LIST_VIEW_DAYS) }
 	}
 	if (view === 'week') {
 		const weekDates = getWeekDates(dateStr, timezone)
 		return { from: weekDates[0], to: weekDates[6] }
 	}
 	if (view === 'month') {
-		const d = new Date(dateStr + 'T00:00:00')
-		const year = d.getFullYear()
-		const month = d.getMonth()
-		const firstDay = formatDateISO(new Date(year, month, 1))
-		const lastDay = formatDateISO(new Date(year, month + 1, 0))
-		return { from: firstDay, to: lastDay }
+		return getMonthBounds(dateStr)
 	}
 	return { from: dateStr, to: dateStr }
 }
