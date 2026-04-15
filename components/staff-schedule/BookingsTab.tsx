@@ -151,7 +151,7 @@ function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
 		} finally {
 			setLoading(false)
 		}
-	}, [staffId, weekOffset])
+	}, [staffId, weekOffset, orgId])
 
 	useEffect(() => {
 		if (eventTypesReady) {
