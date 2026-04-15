@@ -4,7 +4,6 @@ import { getTranslations } from 'next-intl/server'
 import { getUser } from '@/lib/auth/get-user'
 import { ArrowRight, Check, Clock, Users, Zap, CalendarCog } from 'lucide-react'
 
-const GOOGLE_AUTH_URL = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`
 const CREEM_PRODUCT_ORG_CREATOR = process.env.CREEM_PRODUCT_ORG_CREATOR || ''
 
 const checkoutHref = `/api/checkout?productId=${CREEM_PRODUCT_ORG_CREATOR}`
@@ -63,13 +62,13 @@ type PreviewTranslations = {
 export default async function LandingPage() {
 	const t = await getTranslations('landing')
 	const user = await getUser()
-	const authHref = user ? '/organizations' : GOOGLE_AUTH_URL
+	const authHref = user ? '/organizations' : '/login'
 	const hasSub = user ? await hasActiveSubscription() : false
 	const businessHref = user
 		? hasSub
 			? '/organizations'
 			: checkoutHref
-		: GOOGLE_AUTH_URL
+		: '/login'
 
 	const preview: PreviewTranslations = {
 		day: t('preview.day'),

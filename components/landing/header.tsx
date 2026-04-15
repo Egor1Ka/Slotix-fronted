@@ -4,12 +4,10 @@ import { getUser } from '@/lib/auth/get-user'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeToggle } from '@/components/theme-toggle'
 
-const GOOGLE_AUTH_URL = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`
-
 async function Header() {
 	const t = await getTranslations('landing')
 	const user = await getUser()
-	const authHref = user ? '/organizations' : GOOGLE_AUTH_URL
+	const authHref = user ? '/organizations' : '/login'
 
 	return (
 		<header
