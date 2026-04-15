@@ -474,8 +474,7 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 		allowRangeSelect: false,
 
 		getTitle(titleDate: string, view: ViewMode): string {
-			const titleTimezone =
-				schedule?.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone
+			const titleTimezone = schedule?.timezone ?? 'UTC'
 			if (view === 'week')
 				return `${orgName} — ${formatWeekRange(getWeekDates(titleDate, titleTimezone), calendarLocale)}`
 			if (view === 'month')

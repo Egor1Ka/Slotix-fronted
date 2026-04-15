@@ -26,10 +26,7 @@ import {
 	useCalendarNavigation,
 	useBookingActions,
 } from '@/lib/calendar/hooks'
-import type {
-	OrgStaffMember,
-	ScheduleTemplate,
-} from '@/services/configs/booking.types'
+import type { OrgStaffMember } from '@/services/configs/booking.types'
 
 // ── Module-level constants ──
 
@@ -53,24 +50,6 @@ const toStaffMember = (staff: {
 	bio: staff.bio ?? null,
 	bookingCount: 0,
 })
-
-const DEFAULT_WEEKLY_HOURS = Array.from(
-	{ length: 7 },
-	(_: unknown, i: number) => ({
-		dayOfWeek: i,
-		enabled: i >= 1 && i <= 5,
-		slots: i >= 1 && i <= 5 ? [{ start: '10:00', end: '18:00' }] : [],
-	}),
-)
-
-const DEFAULT_SCHEDULE: ScheduleTemplate = {
-	staffId: '',
-	orgId: null,
-	weeklyHours: DEFAULT_WEEKLY_HOURS,
-	slotStepMin: 30,
-	slotMode: 'fixed',
-	timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-}
 
 // ── Component ──
 
@@ -209,6 +188,14 @@ function BookingPage({
 		)
 	}
 
+	if (!schedule) {
+		return (
+			<div className="flex items-center justify-center py-20">
+				<p className="text-muted-foreground text-sm">{t('loading')}</p>
+			</div>
+		)
+	}
+
 	// ── Profile info ──
 
 	const profileInfo: ProfileInfoBlockProps = {
@@ -224,16 +211,15 @@ function BookingPage({
 
 	// ── Derived data ──
 
-	const scheduleSource = schedule ?? DEFAULT_SCHEDULE
 	const workHours = getWorkHoursForDate(
-		scheduleSource.weeklyHours,
+		schedule.weeklyHours,
 		dateStr,
-		scheduleSource.timezone,
+		schedule.timezone,
 	)
 	const isDayOff = workHours === null
 	const workStart = workHours?.workStart ?? '10:00'
 	const workEnd = workHours?.workEnd ?? '18:00'
-	const disabledDays = scheduleSource.weeklyHours
+	const disabledDays = schedule.weeklyHours
 		.filter(isDisabledDay)
 		.map(toDayOfWeek)
 
@@ -245,7 +231,7 @@ function BookingPage({
 				locale,
 				eventTypes,
 				bookings,
-				schedule: scheduleSource,
+				schedule: schedule,
 				overrides: staffOverrides,
 				staffId: staff?.id,
 				selectedEventTypeId,
@@ -268,7 +254,7 @@ function BookingPage({
 		: createClientStrategy({
 				eventTypes,
 				bookings,
-				schedule: scheduleSource,
+				schedule: schedule,
 				overrides: staffOverrides,
 				staffId: staff.id,
 				staffName: staff.name,
@@ -295,7 +281,7 @@ function BookingPage({
 			selectedEventTypeId={selectedEventTypeId}
 			onEventTypeSelect={onEventTypeSelect}
 			loading={loading}
-			schedule={scheduleSource}
+			schedule={schedule}
 			overrides={staffOverrides}
 			bookings={staffRawBookings}
 			staffId={staff?.id}
@@ -326,7 +312,7 @@ function BookingPage({
 				hideSidebar={hideSidebar}
 				profileInfo={profileInfo}
 				listViewSlot={listViewSlot}
-				scheduleTimezone={scheduleSource.timezone}
+				scheduleTimezone={schedule.timezone}
 			/>
 		</CalendarProvider>
 	)

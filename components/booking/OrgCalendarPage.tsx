@@ -39,23 +39,6 @@ import type {
 
 const todayStr = (): string => formatDateISO(new Date())
 
-const createDefaultDayHours = (_: unknown, i: number) => ({
-	dayOfWeek: i,
-	enabled: i >= 1 && i <= 5,
-	slots: i >= 1 && i <= 5 ? [{ start: '10:00', end: '18:00' }] : [],
-})
-
-const DEFAULT_WEEKLY_HOURS = Array.from({ length: 7 }, createDefaultDayHours)
-
-const DEFAULT_SCHEDULE: ScheduleTemplate = {
-	staffId: '',
-	orgId: null,
-	weeklyHours: DEFAULT_WEEKLY_HOURS,
-	slotStepMin: 30,
-	slotMode: 'fixed',
-	timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-}
-
 const isDisabledDay = (wh: { dayOfWeek: number; enabled: boolean }): boolean =>
 	!wh.enabled
 const toDayOfWeek = (wh: { dayOfWeek: number }): number => wh.dayOfWeek
@@ -238,7 +221,15 @@ function OrgCalendarPage({
 	const staffSchedule = selectedStaffId
 		? orgSchedules.getStaffSchedule(selectedStaffId)
 		: null
-	const scheduleSource = staffSchedule ?? schedule ?? DEFAULT_SCHEDULE
+	const scheduleSource = staffSchedule ?? schedule
+
+	if (!scheduleSource) {
+		return (
+			<div className="flex items-center justify-center py-20">
+				<p className="text-muted-foreground text-sm">{t('loading')}</p>
+			</div>
+		)
+	}
 
 	const workHoursData = selectedStaffId
 		? getWorkHoursForDate(
