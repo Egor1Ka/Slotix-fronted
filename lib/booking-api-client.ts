@@ -241,6 +241,7 @@ const toFrontendStaffBooking = (
 		color: eventType ? eventType.color : '#888888',
 		locationId: raw.locationId,
 		orgId: raw.orgId,
+		timezone: raw.timezone,
 	}
 }
 

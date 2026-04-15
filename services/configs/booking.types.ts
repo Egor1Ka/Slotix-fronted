@@ -132,6 +132,7 @@ interface StaffBooking {
 	eventTypeName: string
 	startAt: string
 	endAt: string
+	timezone: string
 	status: BookingStatus
 	invitee: Invitee
 	color: string
@@ -175,6 +176,7 @@ interface CalendarDisplayBooking {
 	status: BookingStatus
 	staffName: string
 	staffAvatar: string
+	timezone: string
 }
 
 export type {

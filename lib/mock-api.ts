@@ -149,6 +149,7 @@ const createBooking = async (
 		eventTypeName: eventType.name,
 		startAt: body.startAt,
 		endAt: endDate.toISOString(),
+		timezone: body.timezone,
 		status: 'confirmed',
 		invitee: body.invitee,
 		color: eventType.color,

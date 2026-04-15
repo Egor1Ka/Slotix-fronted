@@ -139,6 +139,7 @@ export const mockStaffBookings: StaffBooking[] = [
 		eventTypeName: 'Стрижка',
 		startAt: toISODateTime(today, '10:00'),
 		endAt: toISODateTime(today, '11:00'),
+		timezone: 'Europe/Kiev',
 		status: 'confirmed' as BookingStatus,
 		invitee: { name: 'Марія', email: null, phone: null, phoneCountry: null },
 		color: '#8B5CF6',
@@ -151,6 +152,7 @@ export const mockStaffBookings: StaffBooking[] = [
 		eventTypeName: 'Фарбування',
 		startAt: toISODateTime(today, '14:00'),
 		endAt: toISODateTime(today, '15:30'),
+		timezone: 'Europe/Kiev',
 		status: 'confirmed' as BookingStatus,
 		invitee: { name: 'Олена', email: null, phone: null, phoneCountry: null },
 		color: '#EC4899',
@@ -163,6 +165,7 @@ export const mockStaffBookings: StaffBooking[] = [
 		eventTypeName: 'Укладка',
 		startAt: toISODateTime(tomorrow, '12:00'),
 		endAt: toISODateTime(tomorrow, '13:00'),
+		timezone: 'Europe/Kiev',
 		status: 'confirmed' as BookingStatus,
 		invitee: { name: 'Ірина', email: null, phone: null, phoneCountry: null },
 		color: '#06B6D4',
@@ -175,6 +178,7 @@ export const mockStaffBookings: StaffBooking[] = [
 		eventTypeName: 'Манікюр',
 		startAt: toISODateTime(dayAfterTomorrow, '13:00'),
 		endAt: toISODateTime(dayAfterTomorrow, '13:45'),
+		timezone: 'Europe/Kiev',
 		status: 'confirmed' as BookingStatus,
 		invitee: { name: 'Софія', email: null, phone: null, phoneCountry: null },
 		color: '#F59E0B',
@@ -187,6 +191,7 @@ export const mockStaffBookings: StaffBooking[] = [
 		eventTypeName: 'Фарбування',
 		startAt: toISODateTime(yesterday, '11:00'),
 		endAt: toISODateTime(yesterday, '13:00'),
+		timezone: 'Europe/Kiev',
 		status: 'completed' as BookingStatus,
 		invitee: {
 			name: 'Катерина',
@@ -210,11 +215,29 @@ export interface CalendarDisplayBooking {
 	date: string
 	bookingId: string
 	status: BookingStatus
+	timezone: string
 }
 
-const timeToMinFromISO = (iso: string): number => {
-	const d = new Date(iso)
-	return d.getUTCHours() * 60 + d.getUTCMinutes()
+const getTimePart = (parts: Intl.DateTimeFormatPart[], type: string): number => {
+	const part = parts.find((p) => p.type === type)
+	return part ? parseInt(part.value, 10) : 0
+}
+
+const timeToMinFromISO = (iso: string, timezone?: string): number => {
+	const date = new Date(iso)
+	if (!timezone) {
+		return date.getUTCHours() * 60 + date.getUTCMinutes()
+	}
+	const formatter = new Intl.DateTimeFormat('en-US', {
+		timeZone: timezone,
+		hour: '2-digit',
+		minute: '2-digit',
+		hour12: false,
+	})
+	const parts = formatter.formatToParts(date)
+	const hour = getTimePart(parts, 'hour')
+	const minute = getTimePart(parts, 'minute')
+	return hour * 60 + minute
 }
 
 const dateFromISO = (iso: string): string => iso.split('T')[0]
@@ -228,13 +251,14 @@ const diffMinutes = (startISO: string, endISO: string): number => {
 export const toCalendarDisplayBooking = (
 	b: StaffBooking,
 ): CalendarDisplayBooking => ({
-	startMin: timeToMinFromISO(b.startAt),
+	startMin: timeToMinFromISO(b.startAt, b.timezone),
 	duration: diffMinutes(b.startAt, b.endAt),
 	label: `${b.eventTypeName} — ${b.invitee.name}`,
 	color: b.color,
 	date: dateFromISO(b.startAt),
 	bookingId: b.id,
 	status: b.status,
+	timezone: b.timezone,
 })
 
 // ── Org Mock Data ──
@@ -303,6 +327,7 @@ const mockOrgBookings: StaffBooking[] = [
 		eventTypeName: 'Стрижка',
 		startAt: toISODateTime(today, '10:00'),
 		endAt: toISODateTime(today, '11:00'),
+		timezone: 'Europe/Kiev',
 		status: 'confirmed' as BookingStatus,
 		invitee: { name: 'Марія', email: null, phone: null, phoneCountry: null },
 		color: '#8B5CF6',
@@ -315,6 +340,7 @@ const mockOrgBookings: StaffBooking[] = [
 		eventTypeName: 'Фарбування',
 		startAt: toISODateTime(today, '14:00'),
 		endAt: toISODateTime(today, '16:00'),
+		timezone: 'Europe/Kiev',
 		status: 'confirmed' as BookingStatus,
 		invitee: { name: 'Софія', email: null, phone: null, phoneCountry: null },
 		color: '#EC4899',
@@ -327,6 +353,7 @@ const mockOrgBookings: StaffBooking[] = [
 		eventTypeName: 'Фарбування',
 		startAt: toISODateTime(today, '11:00'),
 		endAt: toISODateTime(today, '13:00'),
+		timezone: 'Europe/Kiev',
 		status: 'confirmed' as BookingStatus,
 		invitee: { name: 'Катерина', email: null, phone: null, phoneCountry: null },
 		color: '#EC4899',
@@ -339,6 +366,7 @@ const mockOrgBookings: StaffBooking[] = [
 		eventTypeName: 'Манікюр',
 		startAt: toISODateTime(today, '10:00'),
 		endAt: toISODateTime(today, '10:30'),
+		timezone: 'Europe/Kiev',
 		status: 'confirmed' as BookingStatus,
 		invitee: { name: 'Олена', email: null, phone: null, phoneCountry: null },
 		color: '#F59E0B',
@@ -351,6 +379,7 @@ const mockOrgBookings: StaffBooking[] = [
 		eventTypeName: 'Манікюр',
 		startAt: toISODateTime(tomorrow, '13:00'),
 		endAt: toISODateTime(tomorrow, '13:30'),
+		timezone: 'Europe/Kiev',
 		status: 'confirmed' as BookingStatus,
 		invitee: { name: 'Тетяна', email: null, phone: null, phoneCountry: null },
 		color: '#F59E0B',
