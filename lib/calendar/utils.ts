@@ -56,7 +56,7 @@ const buildCalendarLocale = (locale: string): CalendarLocale => {
 		(formatter: Intl.DateTimeFormat, base: Date) =>
 		(_: unknown, i: number): string => {
 			const d = new Date(base)
-			d.setDate(base.getDate() + i)
+			d.setDate(base.getDate() + i) // tz-ok: iterating fixed Jan-2024 reference Dates to build locale day-name strings, tz irrelevant
 			return formatter.format(d)
 		}
 

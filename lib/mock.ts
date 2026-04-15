@@ -113,15 +113,15 @@ export const mockSchedule: ScheduleTemplate = {
 // ── Existing Bookings (as StaffBooking[]) ──
 
 const formatDateISO = (d: Date): string => {
-	const year = d.getFullYear()
-	const month = String(d.getMonth() + 1).padStart(2, '0')
-	const day = String(d.getDate()).padStart(2, '0')
+	const year = d.getFullYear() // tz-ok: mock fixture data, approximate local date for test display only
+	const month = String(d.getMonth() + 1).padStart(2, '0') // tz-ok: mock fixture data
+	const day = String(d.getDate()).padStart(2, '0') // tz-ok: mock fixture data
 	return `${year}-${month}-${day}`
 }
 
 const relativeDate = (daysOffset: number): string => {
 	const d = new Date()
-	d.setDate(d.getDate() + daysOffset)
+	d.setDate(d.getDate() + daysOffset) // tz-ok: mock fixture data, approximate local date offset for test display only
 	return formatDateISO(d)
 }
 

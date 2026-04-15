@@ -90,7 +90,7 @@ function BookingDetailPanel({
 
 	const formatDate = (isoString: string): string => {
 		const d = new Date(isoString)
-		return d.toLocaleDateString(undefined, {
+		return d.toLocaleDateString(undefined, { // tz-ok: BookingDetail has no timezone field; browser tz acceptable for admin panel date display
 			weekday: 'short',
 			day: 'numeric',
 			month: 'short',

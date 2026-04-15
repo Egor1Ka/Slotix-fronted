@@ -25,7 +25,7 @@ const STATUS_VARIANT: Record<
 }
 
 const formatTime = (isoString: string, timezone: string): string =>
-	new Date(isoString).toLocaleTimeString('uk-UA', {
+	new Date(isoString).toLocaleTimeString('uk-UA', { // tz-ok: timeZone: timezone passed in options on next line
 		timeZone: timezone,
 		hour: '2-digit',
 		minute: '2-digit',

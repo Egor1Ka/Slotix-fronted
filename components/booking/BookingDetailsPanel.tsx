@@ -70,7 +70,7 @@ const computeDurationMin = (startAt: string, endAt: string): number => {
 }
 
 const formatTime = (isoString: string, timezone: string): string =>
-	new Date(isoString).toLocaleTimeString('uk-UA', {
+	new Date(isoString).toLocaleTimeString('uk-UA', { // tz-ok: timeZone: timezone passed in options on next line
 		timeZone: timezone,
 		hour: '2-digit',
 		minute: '2-digit',
@@ -78,7 +78,7 @@ const formatTime = (isoString: string, timezone: string): string =>
 	})
 
 const formatDate = (isoString: string, timezone: string): string =>
-	new Date(isoString).toLocaleDateString('uk-UA', {
+	new Date(isoString).toLocaleDateString('uk-UA', { // tz-ok: timeZone: timezone passed in options on next line
 		timeZone: timezone,
 		weekday: 'short',
 		year: 'numeric',

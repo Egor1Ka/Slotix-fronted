@@ -11,7 +11,7 @@ interface BookingDateGroupProps {
 }
 
 const formatDateHeader = (dateStr: string, timezone: string): string =>
-	new Date(dateStr + 'T12:00:00Z').toLocaleDateString('uk-UA', {
+	new Date(dateStr + 'T12:00:00Z').toLocaleDateString('uk-UA', { // tz-ok: timeZone: timezone passed in options on next line
 		timeZone: timezone,
 		weekday: 'long',
 		day: 'numeric',

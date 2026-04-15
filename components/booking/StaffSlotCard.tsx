@@ -50,7 +50,7 @@ const formatSlotDate = (
 	}
 
 	const date = new Date(dateStr + 'T00:00:00')
-	return date.toLocaleDateString(locale, {
+	return date.toLocaleDateString(locale, { // tz-ok: date constructed from tz-correct YYYY-MM-DD+'T00:00:00'; displaying day/month/weekday labels, tz shift within same day is harmless
 		day: 'numeric',
 		month: 'long',
 		weekday: 'long',

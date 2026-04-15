@@ -156,7 +156,7 @@ function OrgStaffSlotItem({
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 const dateToISO = (date: Date): string =>
-	formatYMD(date.getFullYear(), date.getMonth() + 1, date.getDate())
+	formatYMD(date.getFullYear(), date.getMonth() + 1, date.getDate()) // tz-ok: date constructed from tz-correct YYYY-MM-DD string via new Date(dateStr+'T00:00:00'); local-tz parts reproduce the same date
 
 const getSelectedEventType = (
 	eventTypes: EventType[],

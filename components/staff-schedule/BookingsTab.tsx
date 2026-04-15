@@ -59,7 +59,7 @@ const groupByDate = (bookings: StaffBooking[]): Map<string, StaffBooking[]> => {
 const sortDatesAsc = (a: string, b: string): number => a.localeCompare(b)
 
 const formatShort = (dateStr: string, timezone: string): string =>
-	new Date(dateStr + 'T12:00:00Z').toLocaleDateString('uk-UA', {
+	new Date(dateStr + 'T12:00:00Z').toLocaleDateString('uk-UA', { // tz-ok: timeZone: timezone passed in options on next line
 		timeZone: timezone,
 		day: 'numeric',
 		month: 'short',
