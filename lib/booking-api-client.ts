@@ -390,6 +390,7 @@ const getStaffBookings = async (
 	staffId: string,
 	dateFrom: string,
 	dateTo: string,
+	timezone: string,
 	eventTypes: EventType[],
 	status?: BookingStatus[],
 	locationId?: string,
@@ -399,6 +400,7 @@ const getStaffBookings = async (
 		staffId,
 		dateFrom,
 		dateTo,
+		timezone,
 	})
 	if (status && status.length > 0) params.set('status', status.join(','))
 	if (locationId) params.set('locationId', locationId)

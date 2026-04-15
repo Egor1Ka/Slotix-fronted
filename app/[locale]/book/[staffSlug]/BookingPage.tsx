@@ -127,7 +127,7 @@ function BookingPage({
 		reloadBookings,
 		loading: bookingsLoading,
 		error: bookingsError,
-	} = useStaffBookings(staffToLoad, dateStr, view, eventTypes)
+	} = useStaffBookings(staffToLoad, dateStr, view, eventTypes, undefined, schedule?.timezone)
 
 	const loading = staffLoading || scheduleLoading || bookingsLoading
 	const error = staffError || scheduleError || bookingsError

@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/sheet'
 import { BookingDateGroup } from './BookingDateGroup'
 import { BookingDetailPanel } from '@/components/booking/BookingDetailPanel'
-import { bookingApi, eventTypeApi } from '@/lib/booking-api-client'
+import { bookingApi, eventTypeApi, scheduleApi } from '@/lib/booking-api-client'
 import type { StaffBooking, EventType } from '@/services/configs/booking.types'
 import type { BookingDetail } from '@/components/booking/BookingDetailPanel'
 
@@ -115,6 +115,7 @@ function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
 	)
 
 	const eventTypesRef = useRef<EventType[]>([])
+	const timezoneRef = useRef<string | null>(null)
 
 	const [eventTypesReady, setEventTypesReady] = useState(false)
 
@@ -123,8 +124,12 @@ function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
 			const fetchTypes = orgId
 				? () => eventTypeApi.getByOrg(orgId)
 				: () => eventTypeApi.getByStaff(staffId, orgId)
-			const types = await fetchTypes()
+			const [types, schedule] = await Promise.all([
+				fetchTypes(),
+				scheduleApi.getTemplate(staffId, orgId).catch(() => null),
+			])
 			eventTypesRef.current = types
+			timezoneRef.current = schedule?.timezone ?? null
 			setEventTypes(types)
 			setEventTypesReady(true)
 		}
@@ -133,6 +138,8 @@ function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
 	}, [staffId, orgId])
 
 	const fetchData = useCallback(async () => {
+		const timezone = timezoneRef.current
+		if (!timezone) return
 		setLoading(true)
 		try {
 			const { dateFrom, dateTo } = getWeekRange(weekOffset)
@@ -140,6 +147,7 @@ function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
 				staffId,
 				dateFrom,
 				dateTo,
+				timezone,
 				eventTypesRef.current,
 				undefined,
 				undefined,

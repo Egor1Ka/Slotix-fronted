@@ -159,7 +159,7 @@ function OrgCalendarPage({
 		reloadBookings,
 		loading: bookingsLoading,
 		error: bookingsError,
-	} = useStaffBookings(staffToLoad, dateStr, view, eventTypes, org?.id)
+	} = useStaffBookings(staffToLoad, dateStr, view, eventTypes, org?.id, schedule?.timezone)
 
 	// Начальная загрузка — блокирует рендер полностью
 	const initialLoading =

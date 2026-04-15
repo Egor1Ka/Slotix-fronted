@@ -32,6 +32,7 @@ const useStaffBookings = (
 	view: ViewMode,
 	eventTypes: EventType[],
 	orgId?: string,
+	timezone?: string,
 ): UseStaffBookingsResult => {
 	const [bookings, setBookings] = useState<CalendarDisplayBooking[]>([])
 	const [staffBookingsMap, setStaffBookingsMap] = useState<
@@ -51,7 +52,7 @@ const useStaffBookings = (
 	}, [])
 
 	useEffect(() => {
-		if (staffToLoad.length === 0 || eventTypes.length === 0) {
+		if (staffToLoad.length === 0 || eventTypes.length === 0 || !timezone) {
 			setBookings([])
 			setStaffBookingsMap({})
 			setLoading(false)
@@ -75,6 +76,7 @@ const useStaffBookings = (
 						staff.id,
 						range.from,
 						range.to,
+						timezone,
 						eventTypes,
 						undefined,
 						undefined,
@@ -118,7 +120,7 @@ const useStaffBookings = (
 		}
 
 		loadBookings()
-	}, [staffToLoad, dateStr, view, eventTypes, reloadTick, orgId])
+	}, [staffToLoad, dateStr, view, eventTypes, reloadTick, orgId, timezone])
 
 	return { bookings, staffBookingsMap, reloadBookings, loading, error }
 }
