@@ -15,6 +15,7 @@ interface BookingDetail {
 	color: string
 	startAt: string
 	endAt: string
+	timezone: string
 	durationMin: number
 	date: string
 	status: BookingStatus
@@ -130,9 +131,9 @@ function BookingDetailPanel({
 
 			<div className="grid grid-cols-2 gap-y-2 text-xs">
 				<span className="text-muted-foreground">{t('startTime')}</span>
-				<span className="font-medium">{formatLocalTime(booking.startAt)}</span>
+				<span className="font-medium">{formatLocalTime(booking.startAt, booking.timezone)}</span>
 				<span className="text-muted-foreground">{t('endTime')}</span>
-				<span className="font-medium">{formatLocalTime(booking.endAt)}</span>
+				<span className="font-medium">{formatLocalTime(booking.endAt, booking.timezone)}</span>
 				<span className="text-muted-foreground">{t('duration')}</span>
 				<span className="font-medium">
 					{booking.durationMin} {t('min')}

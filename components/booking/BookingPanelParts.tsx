@@ -6,12 +6,13 @@ import type { EventType } from '@/services/configs/booking.types'
 import type { ConfirmedBooking } from '@/lib/calendar/types'
 import { Separator } from '@/components/ui/separator'
 import { CheckCircle2Icon, ChevronDown, ChevronUp } from 'lucide-react'
+import { wallClockInTz } from '@/lib/calendar/tz'
 
-const formatLocalTime = (isoString: string): string => {
-	const d = new Date(isoString)
-	const hh = String(d.getUTCHours()).padStart(2, '0')
-	const mm = String(d.getUTCMinutes()).padStart(2, '0')
-	return `${hh}:${mm}`
+const pad2 = (n: number): string => String(n).padStart(2, '0')
+
+const formatLocalTime = (iso: string, timezone: string): string => {
+	const wc = wallClockInTz(iso, timezone)
+	return `${pad2(wc.hour)}:${pad2(wc.minute)}`
 }
 
 function EmptyState({ message }: { message?: string }) {
@@ -81,8 +82,8 @@ function ConfirmedState({
 	confirmLabel?: string
 }) {
 	const t = useTranslations('booking')
-	const startTime = formatLocalTime(confirmedBooking.startAt)
-	const endTime = formatLocalTime(confirmedBooking.endAt)
+	const startTime = formatLocalTime(confirmedBooking.startAt, confirmedBooking.timezone)
+	const endTime = formatLocalTime(confirmedBooking.endAt, confirmedBooking.timezone)
 
 	return (
 		<div className="flex flex-col gap-3">

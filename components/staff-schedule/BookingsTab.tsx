@@ -73,6 +73,7 @@ const toBookingDetail = (booking: StaffBooking): BookingDetail => ({
 	color: booking.color,
 	startAt: booking.startAt,
 	endAt: booking.endAt,
+	timezone: booking.timezone,
 	durationMin: Math.round(
 		(new Date(booking.endAt).getTime() - new Date(booking.startAt).getTime()) /
 			60000,
