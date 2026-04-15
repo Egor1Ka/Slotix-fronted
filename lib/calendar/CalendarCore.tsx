@@ -519,8 +519,7 @@ function CalendarCore({
 			const isToday = dayDate === today
 			const isSelected = dayDate === date
 			const isDisabled = isDayDisabled(dayDate)
-			const d = new Date(dayDate + 'T00:00:00')
-			const dayNum = d.getDate()
+			const dayNum = parseInt(dayDate.split('-')[2], 10)
 
 			return (
 				<div
@@ -657,7 +656,7 @@ function CalendarCore({
 			const blocks = strategy.getBlocks(cellDate)
 			const bookingBlocks = blocks.filter((b) => b.blockType === 'booking')
 			const isToday = cellDate === today
-			const dayNum = new Date(cellDate + 'T00:00:00').getDate()
+			const dayNum = parseInt(cellDate.split('-')[2], 10)
 			const handleClick = () => {
 				if (onDayClick) {
 					onDayClick(cellDate)
