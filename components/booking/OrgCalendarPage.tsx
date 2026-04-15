@@ -81,7 +81,7 @@ function OrgCalendarPage({
 	// ── URL state ──
 
 	const dateStr = searchParams.get('date') ?? todayStr()
-	const view = (searchParams.get('view') as ViewMode) ?? 'day'
+	const view = (searchParams.get('view') as ViewMode) ?? viewConfig.defaultView
 	const selectedStaffId = staffIdProp ?? null
 	const selectedEventTypeId = searchParams.get('eventType') ?? null
 	const selectedSlotTime = searchParams.get('slot') ?? null
