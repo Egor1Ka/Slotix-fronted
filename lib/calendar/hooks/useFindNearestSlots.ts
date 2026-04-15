@@ -10,7 +10,7 @@ import {
 import {
 	getWorkHoursForDate,
 	getNowMinForDate,
-	formatDateISO,
+	addDays,
 } from '@/lib/calendar/utils'
 import type {
 	ScheduleTemplate,
@@ -57,11 +57,6 @@ const filterBookingsByDate =
 	(booking: StaffBooking): boolean =>
 		normalizeDate(booking.startAt) === dateStr
 
-const addDaysToDate = (dateStr: string, days: number): Date => {
-	const date = new Date(dateStr + 'T00:00:00')
-	date.setDate(date.getDate() + days)
-	return date
-}
 
 const getSlotsForDate = (
 	dateStr: string,
@@ -122,8 +117,7 @@ const findNearestSlots = (
 		return { date: startDate, slots }
 	}
 
-	const tryDate = (_: unknown, i: number): string =>
-		formatDateISO(addDaysToDate(startDate, i))
+	const tryDate = (_: unknown, i: number): string => addDays(startDate, i)
 
 	const dates = Array.from({ length: MAX_SEARCH_DAYS }, tryDate)
 
