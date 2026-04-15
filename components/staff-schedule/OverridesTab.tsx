@@ -44,6 +44,15 @@ function OverridesTab({ staffId, orgId, readOnly }: OverridesTabProps) {
 	const [overrides, setOverrides] = useState<ScheduleOverride[]>([])
 	const [loading, setLoading] = useState(true)
 	const [showForm, setShowForm] = useState(false)
+	const [timezone, setTimezone] = useState<string | null>(null)
+
+	useEffect(() => {
+		const loadTimezone = async () => {
+			const schedule = await scheduleApi.getTemplate(staffId, orgId).catch(() => null)
+			setTimezone(schedule?.timezone ?? null)
+		}
+		loadTimezone()
+	}, [staffId, orgId])
 
 	const fetchOverrides = useCallback(async () => {
 		setLoading(true)
@@ -90,7 +99,7 @@ function OverridesTab({ staffId, orgId, readOnly }: OverridesTabProps) {
 
 	const toggleForm = () => setShowForm((prev) => !prev)
 
-	if (loading) {
+	if (loading || timezone === null) {
 		return (
 			<div className="flex justify-center py-12">
 				<Spinner className="size-6" />
@@ -110,6 +119,7 @@ function OverridesTab({ staffId, orgId, readOnly }: OverridesTabProps) {
 		<OverrideListItem
 			key={override.id}
 			override={override}
+			timezone={timezone}
 			readOnly={readOnly}
 			isPast={false}
 			onDelete={handleDelete}
@@ -120,6 +130,7 @@ function OverridesTab({ staffId, orgId, readOnly }: OverridesTabProps) {
 		<OverrideListItem
 			key={override.id}
 			override={override}
+			timezone={timezone}
 			readOnly={readOnly}
 			isPast
 			onDelete={handleDelete}

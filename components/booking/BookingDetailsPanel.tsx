@@ -69,14 +69,17 @@ const computeDurationMin = (startAt: string, endAt: string): number => {
 	return Math.round((endMs - startMs) / 60000)
 }
 
-const formatTime = (isoString: string): string =>
-	new Date(isoString).toLocaleTimeString([], {
+const formatTime = (isoString: string, timezone: string): string =>
+	new Date(isoString).toLocaleTimeString('uk-UA', {
+		timeZone: timezone,
 		hour: '2-digit',
 		minute: '2-digit',
+		hour12: false,
 	})
 
-const formatDate = (isoString: string): string =>
-	new Date(isoString).toLocaleDateString([], {
+const formatDate = (isoString: string, timezone: string): string =>
+	new Date(isoString).toLocaleDateString('uk-UA', {
+		timeZone: timezone,
 		weekday: 'short',
 		year: 'numeric',
 		month: 'short',
@@ -127,15 +130,15 @@ function TimeGrid({
 	return (
 		<div className="grid grid-cols-2 gap-y-2 text-xs">
 			<span className="text-muted-foreground">{t('startTime')}</span>
-			<span className="font-medium">{formatTime(booking.startAt)}</span>
+			<span className="font-medium">{formatTime(booking.startAt, booking.timezone)}</span>
 			<span className="text-muted-foreground">{t('endTime')}</span>
-			<span className="font-medium">{formatTime(booking.endAt)}</span>
+			<span className="font-medium">{formatTime(booking.endAt, booking.timezone)}</span>
 			<span className="text-muted-foreground">{t('duration')}</span>
 			<span className="font-medium">
 				{durationMin} {t('min')}
 			</span>
 			<span className="text-muted-foreground">{t('schedule.date')}</span>
-			<span className="font-medium">{formatDate(booking.startAt)}</span>
+			<span className="font-medium">{formatDate(booking.startAt, booking.timezone)}</span>
 		</div>
 	)
 }

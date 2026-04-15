@@ -10,26 +10,27 @@ import type { ScheduleOverride } from '@/services/configs/booking.types'
 
 interface OverrideListItemProps {
 	override: ScheduleOverride
+	timezone: string
 	readOnly: boolean
 	isPast: boolean
 	onDelete: (id: string) => Promise<void>
 }
 
-const formatDate = (dateStr: string): string => {
-	const normalized = dateStr.includes('T') ? dateStr : dateStr + 'T00:00:00'
-	return new Date(normalized).toLocaleDateString(undefined, {
+const formatDate = (dateStr: string, timezone: string): string =>
+	new Date(dateStr + 'T12:00:00Z').toLocaleDateString('uk-UA', {
+		timeZone: timezone,
 		weekday: 'short',
 		day: 'numeric',
 		month: 'short',
 		year: 'numeric',
 	})
-}
 
 const formatSlots = (slots: { start: string; end: string }[]): string =>
 	slots.map((s) => `${s.start} — ${s.end}`).join(', ')
 
 function OverrideListItem({
 	override,
+	timezone,
 	readOnly,
 	isPast,
 	onDelete,
@@ -68,7 +69,7 @@ function OverrideListItem({
 			<div className="flex flex-col gap-1">
 				<div className="flex items-center gap-2">
 					<span className="text-sm font-medium">
-						{formatDate(override.date)}
+						{formatDate(override.date, timezone)}
 					</span>
 					<Badge variant={variant} className="text-[10px]">
 						{label}
