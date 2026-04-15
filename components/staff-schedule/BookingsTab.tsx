@@ -20,6 +20,7 @@ import {
 import { BookingDateGroup } from './BookingDateGroup'
 import { BookingDetailPanel } from '@/components/booking/BookingDetailPanel'
 import { bookingApi, eventTypeApi, scheduleApi } from '@/lib/booking-api-client'
+import { getTodayStrInTz, getWeekStart, addDays } from '@/lib/calendar/utils'
 import type { StaffBooking, EventType } from '@/services/configs/booking.types'
 import type { BookingDetail } from '@/components/booking/BookingDetailPanel'
 
@@ -29,16 +30,15 @@ interface BookingsTabProps {
 	readOnly: boolean
 }
 
-const getWeekRange = (offset: number): { dateFrom: string; dateTo: string } => {
-	const now = new Date()
-	const monday = new Date(now)
-	monday.setDate(now.getDate() - now.getDay() + 1 + offset * 7)
-	const sunday = new Date(monday)
-	sunday.setDate(monday.getDate() + 6)
-
-	const toISODate = (d: Date): string => d.toISOString().split('T')[0]
-
-	return { dateFrom: toISODate(monday), dateTo: toISODate(sunday) }
+const computeWeekRange = (
+	offset: number,
+	timezone: string,
+): { dateFrom: string; dateTo: string } => {
+	const todayStr = getTodayStrInTz(timezone)
+	const baseMonday = getWeekStart(todayStr, timezone)
+	const monday = addDays(baseMonday, offset * 7)
+	const sunday = addDays(monday, 6)
+	return { dateFrom: monday, dateTo: sunday }
 }
 
 const extractDate = (isoString: string): string => isoString.split('T')[0]
@@ -58,14 +58,15 @@ const groupByDate = (bookings: StaffBooking[]): Map<string, StaffBooking[]> => {
 
 const sortDatesAsc = (a: string, b: string): number => a.localeCompare(b)
 
-const formatShort = (d: string): string =>
-	new Date(d + 'T00:00:00').toLocaleDateString(undefined, {
+const formatShort = (dateStr: string, timezone: string): string =>
+	new Date(dateStr + 'T12:00:00Z').toLocaleDateString('uk-UA', {
+		timeZone: timezone,
 		day: 'numeric',
 		month: 'short',
 	})
 
-const formatWeekLabel = (from: string, to: string): string =>
-	`${formatShort(from)} — ${formatShort(to)}`
+const formatWeekLabel = (from: string, to: string, timezone: string): string =>
+	`${formatShort(from, timezone)} — ${formatShort(to, timezone)}`
 
 const toBookingDetail = (booking: StaffBooking): BookingDetail => ({
 	id: booking.id,
@@ -145,7 +146,7 @@ function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
 		if (!timezone) return
 		setLoading(true)
 		try {
-			const { dateFrom, dateTo } = getWeekRange(weekOffset)
+			const { dateFrom, dateTo } = computeWeekRange(weekOffset, timezone)
 			const data = await bookingApi.getByStaff(
 				staffId,
 				dateFrom,
@@ -182,7 +183,7 @@ function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
 		fetchData()
 	}
 
-	const { dateFrom, dateTo } = getWeekRange(weekOffset)
+	const { dateFrom, dateTo } = computeWeekRange(weekOffset, timezoneRef.current ?? 'UTC')
 	const grouped = groupByDate(bookings)
 	const sortedDates = [...grouped.keys()].sort(sortDatesAsc)
 
@@ -194,7 +195,7 @@ function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
 					{t('prevWeek')}
 				</Button>
 				<span className="text-sm font-medium">
-					{formatWeekLabel(dateFrom, dateTo)}
+					{formatWeekLabel(dateFrom, dateTo, timezoneRef.current ?? 'UTC')}
 				</span>
 				<Button variant="ghost" size="sm" onClick={handleNextWeek}>
 					{t('nextWeek')}

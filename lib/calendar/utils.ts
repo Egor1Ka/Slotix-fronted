@@ -392,6 +392,7 @@ export {
 	getMonthGrid,
 	addDays,
 	addMonths,
+	getWeekStart,
 	findEventType,
 	getWorkHoursForDate,
 	getFirstStaffId,
