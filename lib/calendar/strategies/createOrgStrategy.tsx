@@ -210,7 +210,7 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 			slotMode: schedule?.slotMode ?? 'fixed',
 			bookings: allBookingsForSlots,
 			minNotice: 0,
-			nowMin: getNowMinForDate(blockDate),
+			nowMin: getNowMinForDate(blockDate, schedule?.timezone ?? 'UTC'),
 		})
 
 		const toDropZoneBlock = (slot: Slot): CalendarBlock | null => {
@@ -462,7 +462,7 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 				slotMode: schedule?.slotMode ?? 'fixed',
 				bookings: allBookingsForSlots,
 				minNotice: 0,
-				nowMin: getNowMinForDate(clickDate),
+				nowMin: getNowMinForDate(clickDate, schedule?.timezone ?? 'UTC'),
 			})
 
 			const isAfterClick = (slot: { startMin: number }): boolean =>

@@ -152,7 +152,7 @@ const createClientStrategy = (
 				slotMode: schedule.slotMode,
 				bookings: allBookingsForSlots,
 				minNotice: 30,
-				nowMin: getNowMinForDate(blockDate),
+				nowMin: getNowMinForDate(blockDate, schedule.timezone),
 			})
 
 			const toDropZoneBlock = (slot: Slot): CalendarBlock | null => {
@@ -268,7 +268,7 @@ const createClientStrategy = (
 					...clickBreakBookings,
 				],
 				minNotice: 30,
-				nowMin: getNowMinForDate(clickDate),
+				nowMin: getNowMinForDate(clickDate, schedule.timezone),
 			})
 
 			const isAfterClick = (slot: { startMin: number }): boolean =>

@@ -81,7 +81,7 @@ const getSlotsForDate = (
 	if (!workHours) return []
 
 	const dayBookings = bookings.filter(filterBookingsByDate(dateStr))
-	const nowMin = getNowMinForDate(dateStr)
+	const nowMin = getNowMinForDate(dateStr, schedule.timezone)
 
 	return getAvailableSlots({
 		workStart: workHours.workStart,

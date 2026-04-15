@@ -1,5 +1,5 @@
 import type { CalendarBlock } from './types'
-import { getDayOfWeekInTz } from './tz'
+import { getDayOfWeekInTz, wallClockInTz } from './tz'
 
 interface DateFilterable {
 	date: string
@@ -102,17 +102,20 @@ const formatDateISO = (d: Date): string => {
 	return `${year}-${month}-${day}`
 }
 
-const getTodayStr = (): string => formatDateISO(new Date())
+const getTodayStrInTz = (timezone: string): string => {
+	const wc = wallClockInTz(new Date().toISOString(), timezone)
+	return `${wc.year}-${String(wc.month).padStart(2, '0')}-${String(wc.day).padStart(2, '0')}`
+}
 
-// Возвращает «не раньше чем» в минутах для конкретной даты.
+// Возвращает «не раньше чем» в минутах для конкретной даты в заданном timezone.
 // Прошлые дни — Infinity (все слоты отфильтровываются движком),
 // сегодня — текущая минута, будущие дни — 0.
-const getNowMinForDate = (dateStr: string): number => {
-	const today = getTodayStr()
+const getNowMinForDate = (dateStr: string, timezone: string): number => {
+	const today = getTodayStrInTz(timezone)
 	if (dateStr < today) return Number.POSITIVE_INFINITY
 	if (dateStr > today) return 0
-	const now = new Date()
-	return now.getHours() * 60 + now.getMinutes()
+	const wc = wallClockInTz(new Date().toISOString(), timezone)
+	return wc.hour * 60 + wc.minute
 }
 
 const formatDateLocale = (
@@ -384,7 +387,7 @@ export {
 	durationToPx,
 	formatHour,
 	formatDateISO,
-	getTodayStr,
+	getTodayStrInTz,
 	getNowMinForDate,
 	formatDateLocale,
 	formatWeekRange,

@@ -189,7 +189,7 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 				slotMode: schedule.slotMode,
 				bookings: allBookingsForSlots,
 				minNotice: 0,
-				nowMin: getNowMinForDate(blockDate),
+				nowMin: getNowMinForDate(blockDate, schedule.timezone),
 			})
 
 			const toDropZoneBlock = (slot: Slot): CalendarBlock | null => {
@@ -311,7 +311,7 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 					...clickBreakBookings,
 				],
 				minNotice: 0,
-				nowMin: getNowMinForDate(clickDate),
+				nowMin: getNowMinForDate(clickDate, schedule.timezone),
 			})
 
 			const isAfterClick = (slot: { startMin: number }): boolean =>

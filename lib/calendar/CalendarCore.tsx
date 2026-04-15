@@ -36,14 +36,14 @@ import {
 	minutesToPx,
 	durationToPx,
 	formatHour,
-	getTodayStr,
+	getTodayStrInTz,
 	getWeekDates,
 	getMonthGrid,
 	addDays,
 	addMonths,
 	resolveOverlaps,
 } from './utils'
-import { getDayOfWeekInTz } from './tz'
+import { getDayOfWeekInTz, wallClockInTz } from './tz'
 
 const DEFAULT_VIEW_CONFIG: CalendarViewConfig = {
 	blockedTimeVisibility: 'full',
@@ -102,9 +102,9 @@ const useSafeViewConfig = (): CalendarViewConfig => {
 	}
 }
 
-const getCurrentMinuteOfDay = (): number => {
-	const now = new Date()
-	return now.getHours() * 60 + now.getMinutes()
+const getCurrentMinuteOfDay = (timezone: string): number => {
+	const wc = wallClockInTz(new Date().toISOString(), timezone)
+	return wc.hour * 60 + wc.minute
 }
 
 // Обрезает рабочий интервал: если сейчас уже внутри рабочего дня,
@@ -114,9 +114,10 @@ const getEffectiveWorkStartMin = (
 	workStartMin: number,
 	workEndMin: number,
 	isToday: boolean,
+	timezone: string,
 ): number => {
 	if (!isToday) return workStartMin
-	const nowMin = getCurrentMinuteOfDay()
+	const nowMin = getCurrentMinuteOfDay(timezone)
 	if (nowMin <= workStartMin) return workStartMin
 	return Math.min(nowMin, workEndMin)
 }
@@ -347,11 +348,12 @@ function CalendarCore({
 	const renderDayView = () => {
 		const workStartMin = timeToMin(workStart)
 		const workEndMin = timeToMin(workEnd)
-		const isTodayDate = date === getTodayStr()
+		const isTodayDate = date === getTodayStrInTz(scheduleTimezone)
 		const effectiveWorkStartMin = getEffectiveWorkStartMin(
 			workStartMin,
 			workEndMin,
 			isTodayDate,
+			scheduleTimezone,
 		)
 		const workTopPx = minutesToPx(effectiveWorkStartMin, grid.displayStart)
 		const workHeightPx = durationToPx(workEndMin - effectiveWorkStartMin)
@@ -393,7 +395,7 @@ function CalendarCore({
 
 	const renderWeekView = () => {
 		const weekDates = getWeekDates(date, scheduleTimezone)
-		const today = getTodayStr()
+		const today = getTodayStrInTz(scheduleTimezone)
 		const workStartMin = timeToMin(workStart)
 		const workEndMin = timeToMin(workEnd)
 		const gridHeight = grid.totalHours * PX_PER_HOUR
@@ -558,6 +560,7 @@ function CalendarCore({
 				workStartMin,
 				workEndMin,
 				isToday,
+				scheduleTimezone,
 			)
 			const columnWorkTopPx = minutesToPx(
 				columnEffectiveStartMin,
@@ -635,7 +638,7 @@ function CalendarCore({
 
 	const renderMonthView = () => {
 		const grid = getMonthGrid(date, scheduleTimezone)
-		const today = getTodayStr()
+		const today = getTodayStrInTz(scheduleTimezone)
 
 		const renderWeekdayHeader = (day: string) => (
 			<div
