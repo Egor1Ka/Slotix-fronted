@@ -16,8 +16,11 @@ interface OverrideListItemProps {
 	onDelete: (id: string) => Promise<void>
 }
 
+const normalizeDate = (dateStr: string): string =>
+	dateStr.includes('T') ? dateStr.split('T')[0] : dateStr
+
 const formatDate = (dateStr: string, timezone: string): string =>
-	new Date(dateStr + 'T12:00:00Z').toLocaleDateString('uk-UA', { // tz-ok: timeZone: timezone passed in options on next line
+	new Date(normalizeDate(dateStr) + 'T12:00:00Z').toLocaleDateString('uk-UA', { // tz-ok: timeZone: timezone passed in options on next line
 		timeZone: timezone,
 		weekday: 'short',
 		day: 'numeric',

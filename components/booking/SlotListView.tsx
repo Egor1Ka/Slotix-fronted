@@ -1,7 +1,9 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
+import { uk, enUS } from 'date-fns/locale'
+import type { Locale } from 'date-fns'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { Calendar } from '@/components/ui/calendar'
@@ -155,6 +157,14 @@ function OrgStaffSlotItem({
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
+const DATE_FNS_LOCALES: Record<string, Locale> = {
+	uk,
+	en: enUS,
+}
+
+const getDateFnsLocale = (locale: string): Locale =>
+	DATE_FNS_LOCALES[locale] ?? enUS
+
 const dateToISO = (date: Date): string =>
 	formatYMD(date.getFullYear(), date.getMonth() + 1, date.getDate()) // tz-ok: date constructed from tz-correct YYYY-MM-DD string via new Date(dateStr+'T00:00:00'); local-tz parts reproduce the same date
 
@@ -198,6 +208,8 @@ function SlotListView({
 	isSubmitting,
 }: SlotListViewProps) {
 	const t = useTranslations('booking')
+	const locale = useLocale()
+	const dateFnsLocale = getDateFnsLocale(locale)
 
 	const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
 	const [selectedStaffId, setSelectedStaffId] = useState<string | null>(null)
@@ -377,6 +389,7 @@ function SlotListView({
 					selected={new Date(dateStr + 'T00:00:00')}
 					onSelect={handleCalendarSelect}
 					disabled={{ before: new Date() }}
+					locale={dateFnsLocale}
 					className="shrink-0 rounded-lg border p-2"
 				/>
 

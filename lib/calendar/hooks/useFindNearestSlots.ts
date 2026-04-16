@@ -12,6 +12,7 @@ import {
 	getNowMinForDate,
 	addDays,
 } from '@/lib/calendar/utils'
+import { wallClockInTz } from '@/lib/calendar/tz'
 import type {
 	ScheduleTemplate,
 	ScheduleOverride,
@@ -35,28 +36,55 @@ interface FindNearestSlotsResult {
 
 const MAX_SEARCH_DAYS = 14
 
-const extractTimeStr = (isoStr: string): string =>
-	isoStr.split('T')[1]?.slice(0, 5) ?? '00:00'
+const diffMs = (a: string, b: string): number =>
+	new Date(b).getTime() - new Date(a).getTime()
 
-const calcDurationMin = (startAt: string, endAt: string): number => {
-	const startMin = timeToMin(extractTimeStr(startAt))
-	const endMin = timeToMin(extractTimeStr(endAt))
-	return endMin - startMin
-}
+const toSlotBookingInTz =
+	(timezone: string) =>
+	(booking: StaffBooking): SlotBooking => {
+		const wc = wallClockInTz(booking.startAt, timezone)
+		return {
+			startMin: wc.hour * 60 + wc.minute,
+			duration: Math.round(diffMs(booking.startAt, booking.endAt) / 60_000),
+		}
+	}
 
-const toSlotBooking = (booking: StaffBooking): SlotBooking => ({
-	startMin: timeToMin(extractTimeStr(booking.startAt)),
-	duration: calcDurationMin(booking.startAt, booking.endAt),
+const dateStrInTz = (iso: string, timezone: string): string =>
+	new Intl.DateTimeFormat('en-CA', { timeZone: timezone }).format(
+		new Date(iso),
+	)
+
+const filterBookingsByDate =
+	(dateStr: string, timezone: string) =>
+	(booking: StaffBooking): boolean =>
+		dateStrInTz(booking.startAt, timezone) === dateStr
+
+const toBreakBooking = (slot: {
+	start: string
+	end: string
+}): SlotBooking => ({
+	startMin: timeToMin(slot.start),
+	duration: timeToMin(slot.end) - timeToMin(slot.start),
 })
 
 const normalizeDate = (dateStr: string): string =>
 	dateStr.includes('T') ? dateStr.split('T')[0] : dateStr
 
-const filterBookingsByDate =
-	(dateStr: string) =>
-	(booking: StaffBooking): boolean =>
-		normalizeDate(booking.startAt) === dateStr
-
+const getBreakBookings = (
+	overrides: ScheduleOverride[],
+	dateStr: string,
+	staffId?: string,
+): SlotBooking[] => {
+	if (!staffId) return []
+	const dateOnly = normalizeDate(dateStr)
+	const matchesStaffAndDate = (o: ScheduleOverride): boolean =>
+		o.staffId === staffId && normalizeDate(o.date) === dateOnly
+	const override = overrides.find(matchesStaffAndDate)
+	if (!override) return []
+	const isPartialDayOff = !override.enabled && override.slots.length > 0
+	if (!isPartialDayOff) return []
+	return override.slots.map(toBreakBooking)
+}
 
 const getSlotsForDate = (
 	dateStr: string,
@@ -75,8 +103,10 @@ const getSlotsForDate = (
 	)
 	if (!workHours) return []
 
-	const dayBookings = bookings.filter(filterBookingsByDate(dateStr))
-	const nowMin = getNowMinForDate(dateStr, schedule.timezone)
+	const tz = schedule.timezone
+	const dayBookings = bookings.filter(filterBookingsByDate(dateStr, tz))
+	const breakBookings = getBreakBookings(overrides, dateStr, staffId)
+	const nowMin = getNowMinForDate(dateStr, tz)
 
 	return getAvailableSlots({
 		workStart: workHours.workStart,
@@ -84,7 +114,7 @@ const getSlotsForDate = (
 		duration,
 		slotStep: schedule.slotStepMin,
 		slotMode: schedule.slotMode,
-		bookings: dayBookings.map(toSlotBooking),
+		bookings: [...dayBookings.map(toSlotBookingInTz(tz)), ...breakBookings],
 		minNotice: 0,
 		nowMin,
 	})
