@@ -520,7 +520,8 @@
 		"staffInvited": "Staff member invited",
 		"minCharsHint": "Enter at least 3 characters",
 		"alreadyInOrg": "Already in organization",
-		"invited": "Invited"
+		"invited": "Invited",
+		"timezoneFromOrg": "Timezone is set by the organization"
 	},
 	"profile": {
 		"title": "Profile",

@@ -880,15 +880,19 @@ All date/time handling follows a single contract across frontend and backend.
 - All `Date` fields in MongoDB are stored in **UTC**
 - Timezone strings are stored as IANA identifiers (e.g. `"Europe/Kyiv"`, `"America/New_York"`)
 
-### Timezone Priority (highest → lowest)
-1. **`ScheduleTemplate.timezone`** — single source of truth for slot grid, booking creation, display
-2. **`Organization.timezone`** — default for new schedules; NOT used in runtime slot/booking logic
-3. **`"UTC"`** — last-resort fallback; never hardcode a specific city (no `"Europe/Kyiv"`)
+### Timezone Priority
+1. **Org schedule** → `Organization.timezone` (single source, `ScheduleTemplate.timezone` is `null`)
+2. **Personal schedule** → `ScheduleTemplate.timezone`
+3. **Fallback** → `"UTC"` (never hardcode a specific city)
+
+`ScheduleTemplate.timezone` exists ONLY for personal schedules (`orgId === null`).
+For org schedules, the field is absent — timezone is resolved from `Organization`.
+Backend `resolveScheduleTimezone()` handles this transparently.
 
 ### Frontend → Backend Contract
 - `startAt` is sent as **naive wall-clock ISO** without `Z` suffix: `"2026-04-15T14:00:00"`
 - The `timezone` field is sent alongside for informational purposes (client's timezone)
-- Backend reads `ScheduleTemplate.timezone` and calls `parseWallClockToUtc(startAt, template.timezone)`
+- Backend resolves timezone via `resolveScheduleTimezone()` (org → `Organization.timezone`, personal → `ScheduleTemplate.timezone`) and calls `parseWallClockToUtc(startAt, resolvedTimezone)`
 
 ### Display Rules
 - Always use `Intl.DateTimeFormat` with explicit `timeZone` parameter

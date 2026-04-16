@@ -237,13 +237,19 @@ function ScheduleViewTab({ staffId, orgId, readOnly }: ScheduleViewTabProps) {
 		<div className="flex flex-col gap-6">
 			<ScheduleEditor schedule={schedule} onSave={handleSave} />
 			<Separator />
-			<div className={cn(savingMode && 'pointer-events-none opacity-50')}>
-				<TimezoneSelector
-					value={localTimezone}
-					onChange={handleTimezoneChange}
-					label={t('timezone')}
-				/>
-			</div>
+			{orgId ? (
+				<div className="text-muted-foreground text-sm">
+					{t('timezoneFromOrg')}: <span className="font-medium">{localTimezone}</span>
+				</div>
+			) : (
+				<div className={cn(savingMode && 'pointer-events-none opacity-50')}>
+					<TimezoneSelector
+						value={localTimezone}
+						onChange={handleTimezoneChange}
+						label={t('timezone')}
+					/>
+				</div>
+			)}
 			<div className={savingMode ? 'pointer-events-none opacity-50' : ''}>
 				<SlotModeSelector
 					value={localSlotMode}
