@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useCallback } from 'react'
+import { useMemo, useCallback, useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import {
 	type ViewMode,
@@ -33,6 +33,8 @@ import type {
 	StaffBooking,
 	OrgStaffMember,
 } from '@/services/configs/booking.types'
+import { bookingStatusApi } from '@/lib/booking-api-client'
+import type { BookingStatusObject } from '@/services/configs/bookingStatus.types'
 
 // ── Module-level constants ──
 
@@ -85,6 +87,22 @@ function OrgCalendarPage({
 		loading: orgLoading,
 		error: orgError,
 	} = useOrgInfo(orgSlug)
+
+	const [availableStatuses, setAvailableStatuses] = useState<BookingStatusObject[]>([])
+
+	useEffect(() => {
+		if (!org) return
+		const loadStatuses = async () => {
+			try {
+				const statuses = await bookingStatusApi.getAll(org.id)
+				setAvailableStatuses(statuses)
+			} catch {
+				// обрабатывается интерцептором toast
+			}
+		}
+		loadStatuses()
+	}, [org])
+
 	const orgSchedules = useOrgSchedules(orgSlug)
 
 	const activeStaffId = staffIdProp ?? getFirstStaffId(staffList)
@@ -292,6 +310,7 @@ function OrgCalendarPage({
 		loading: contentLoading,
 		staffList,
 		overrides: orgSchedules.overrides,
+		availableStatuses,
 	})
 
 	// Фильтрация: рабочий день + фильтрация по услугам

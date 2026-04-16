@@ -19,10 +19,11 @@ import {
 } from '@/components/ui/sheet'
 import { BookingDateGroup } from './BookingDateGroup'
 import { BookingDetailPanel } from '@/components/booking/BookingDetailPanel'
-import { bookingApi, eventTypeApi, scheduleApi } from '@/lib/booking-api-client'
+import { bookingApi, eventTypeApi, scheduleApi, bookingStatusApi } from '@/lib/booking-api-client'
 import { getTodayStrInTz, getWeekStart, addDays } from '@/lib/calendar/utils'
 import { dateFromISO } from '@/lib/booking-utils'
 import type { StaffBooking, EventType } from '@/services/configs/booking.types'
+import type { BookingStatusObject } from '@/services/configs/bookingStatus.types'
 import type { BookingDetail } from '@/components/booking/BookingDetailPanel'
 
 interface BookingsTabProps {
@@ -122,6 +123,19 @@ function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
 	const timezoneRef = useRef<string | null>(null)
 
 	const [eventTypesReady, setEventTypesReady] = useState(false)
+	const [availableStatuses, setAvailableStatuses] = useState<BookingStatusObject[]>([])
+
+	useEffect(() => {
+		const loadStatuses = async () => {
+			try {
+				const statuses = await bookingStatusApi.getAll(orgId)
+				setAvailableStatuses(statuses)
+			} catch {
+				// обрабатывается интерцептором toast
+			}
+		}
+		loadStatuses()
+	}, [orgId])
 
 	useEffect(() => {
 		const loadEventTypes = async () => {
@@ -239,7 +253,7 @@ function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
 						<div className="px-6 pb-6">
 							<BookingDetailPanel
 								booking={toBookingDetail(selectedBooking, timezone)}
-								availableStatuses={[]}
+								availableStatuses={availableStatuses}
 								onClose={handleCloseSheet}
 								onStatusChange={handleStatusChange}
 							/>

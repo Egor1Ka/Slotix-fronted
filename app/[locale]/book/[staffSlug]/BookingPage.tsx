@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import {
 	type ViewMode,
@@ -26,6 +26,8 @@ import {
 	useBookingActions,
 } from '@/lib/calendar/hooks'
 import type { OrgStaffMember } from '@/services/configs/booking.types'
+import { bookingStatusApi } from '@/lib/booking-api-client'
+import type { BookingStatusObject } from '@/services/configs/bookingStatus.types'
 
 // ── Module-level constants ──
 
@@ -107,6 +109,21 @@ function BookingPage({
 		loading: bookingsLoading,
 		error: bookingsError,
 	} = useStaffBookings(staffToLoad, dateStr, view, eventTypes, undefined, schedule?.timezone)
+
+	const [availableStatuses, setAvailableStatuses] = useState<BookingStatusObject[]>([])
+
+	useEffect(() => {
+		if (!staff) return
+		const loadStatuses = async () => {
+			try {
+				const statuses = await bookingStatusApi.getAll()
+				setAvailableStatuses(statuses)
+			} catch {
+				// обрабатывается интерцептором toast
+			}
+		}
+		loadStatuses()
+	}, [staff?.id])
 
 	const loading = staffLoading || scheduleLoading || bookingsLoading
 	const error = staffError || scheduleError || bookingsError
@@ -251,6 +268,7 @@ function BookingPage({
 				onCloseBooking: bookingActions.handleBookingClose,
 				onBookingStatusChange: bookingActions.handleBookingStatusChange,
 				onBookingReschedule: bookingActions.handleBookingReschedule,
+				availableStatuses,
 			})
 		: createClientStrategy({
 				eventTypes,
