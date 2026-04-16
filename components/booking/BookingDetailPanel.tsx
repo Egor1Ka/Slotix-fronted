@@ -3,11 +3,11 @@
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { bookingApi } from '@/lib/booking-api-client'
+import { BookingStatusBadge } from '@/components/booking/BookingStatusBadge'
 import { formatLocalTime } from './BookingPanelParts'
-import type { BookingStatus } from '@/services/configs/booking.types'
+import type { BookingStatusObject } from '@/services/configs/bookingStatus.types'
 
 interface BookingDetail {
 	id: string
@@ -18,7 +18,8 @@ interface BookingDetail {
 	timezone: string
 	durationMin: number
 	date: string
-	status: BookingStatus
+	statusId: string
+	status: BookingStatusObject
 	invitee: {
 		name: string
 		email: string | null
@@ -33,39 +34,14 @@ interface BookingDetail {
 
 interface BookingDetailPanelProps {
 	booking: BookingDetail
+	availableStatuses: BookingStatusObject[]
 	onClose: () => void
-	onStatusChange: (bookingId: string, newStatus: BookingStatus) => void
-}
-
-const STATUS_VARIANT: Record<
-	BookingStatus,
-	'default' | 'secondary' | 'destructive' | 'outline'
-> = {
-	confirmed: 'default',
-	pending_payment: 'secondary',
-	completed: 'outline',
-	no_show: 'secondary',
-	cancelled: 'destructive',
-}
-
-const ALLOWED_TRANSITIONS: Record<string, BookingStatus[]> = {
-	pending_payment: ['confirmed', 'cancelled'],
-	confirmed: ['completed', 'no_show', 'cancelled'],
-}
-
-const ACTION_CONFIG: Record<
-	string,
-	{ translationKey: string; variant: 'default' | 'outline' | 'destructive' }
-> = {
-	completed: { translationKey: 'markCompleted', variant: 'default' },
-	no_show: { translationKey: 'markNoShow', variant: 'outline' },
-	cancelled: { translationKey: 'markCancelled', variant: 'destructive' },
-	confirmed: { translationKey: 'confirmed', variant: 'default' },
+	onStatusChange: (bookingId: string, newStatusId: string) => void
 }
 
 function BookingDetailPanel({
 	booking,
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	availableStatuses,
 	onClose,
 	onStatusChange,
 }: BookingDetailPanelProps) {
@@ -73,14 +49,16 @@ function BookingDetailPanel({
 	const [isUpdating, setIsUpdating] = useState(false)
 	const [error, setError] = useState<string | null>(null)
 
-	const allowedStatuses = ALLOWED_TRANSITIONS[booking.status] ?? []
+	const isNotCurrentStatus = (s: BookingStatusObject): boolean =>
+		s.id !== booking.statusId
+	const otherStatuses = availableStatuses.filter(isNotCurrentStatus)
 
-	const handleStatusChange = async (newStatus: BookingStatus) => {
+	const handleStatusChange = async (statusId: string) => {
 		try {
 			setIsUpdating(true)
 			setError(null)
-			await bookingApi.updateStatus(booking.id, newStatus)
-			onStatusChange(booking.id, newStatus)
+			await bookingApi.updateStatus(booking.id, statusId)
+			onStatusChange(booking.id, statusId)
 		} catch {
 			setError(t('statusUpdateFailed'))
 		} finally {
@@ -90,7 +68,7 @@ function BookingDetailPanel({
 
 	const formatDate = (isoString: string): string => {
 		const d = new Date(isoString)
-		return d.toLocaleDateString(undefined, { // tz-ok: BookingDetail has no timezone field; browser tz acceptable for admin panel date display
+		return d.toLocaleDateString(undefined, {
 			weekday: 'short',
 			day: 'numeric',
 			month: 'short',
@@ -98,21 +76,22 @@ function BookingDetailPanel({
 		})
 	}
 
-	const renderActionButton = (status: BookingStatus) => {
-		const config = ACTION_CONFIG[status]
-		if (!config) return null
-		const handleClick = () => handleStatusChange(status)
+	const renderStatusButton = (targetStatus: BookingStatusObject) => {
+		const handleClick = () => handleStatusChange(targetStatus.id)
+		const label = targetStatus.isDefault
+			? t(targetStatus.label as Parameters<typeof t>[0])
+			: targetStatus.label
 
 		return (
 			<Button
-				key={status}
-				variant={config.variant}
+				key={targetStatus.id}
+				variant="outline"
 				size="sm"
 				className="w-full"
 				onClick={handleClick}
 				disabled={isUpdating}
 			>
-				{t(config.translationKey)}
+				{label}
 			</Button>
 		)
 	}
@@ -124,39 +103,57 @@ function BookingDetailPanel({
 					className="size-3 shrink-0 rounded-full"
 					style={{ backgroundColor: booking.color }}
 				/>
-				<span className="text-sm font-semibold">{booking.eventTypeName}</span>
+				<span className="text-sm font-semibold">
+					{booking.eventTypeName}
+				</span>
 			</div>
 
 			<Separator />
 
 			<div className="grid grid-cols-2 gap-y-2 text-xs">
 				<span className="text-muted-foreground">{t('startTime')}</span>
-				<span className="font-medium">{formatLocalTime(booking.startAt, booking.timezone)}</span>
+				<span className="font-medium">
+					{formatLocalTime(booking.startAt, booking.timezone)}
+				</span>
 				<span className="text-muted-foreground">{t('endTime')}</span>
-				<span className="font-medium">{formatLocalTime(booking.endAt, booking.timezone)}</span>
+				<span className="font-medium">
+					{formatLocalTime(booking.endAt, booking.timezone)}
+				</span>
 				<span className="text-muted-foreground">{t('duration')}</span>
 				<span className="font-medium">
 					{booking.durationMin} {t('min')}
 				</span>
 				<span className="text-muted-foreground">{t('date')}</span>
-				<span className="font-medium">{formatDate(booking.startAt)}</span>
+				<span className="font-medium">
+					{formatDate(booking.startAt)}
+				</span>
 			</div>
 
 			<Separator />
 
 			<div className="grid grid-cols-2 gap-y-2 text-xs">
-				<span className="text-muted-foreground">{t('clientName_label')}</span>
+				<span className="text-muted-foreground">
+					{t('clientName_label')}
+				</span>
 				<span className="font-medium">{booking.invitee.name}</span>
 				{booking.invitee.email && (
 					<>
-						<span className="text-muted-foreground">{t('email')}</span>
-						<span className="font-medium">{booking.invitee.email}</span>
+						<span className="text-muted-foreground">
+							{t('email')}
+						</span>
+						<span className="font-medium">
+							{booking.invitee.email}
+						</span>
 					</>
 				)}
 				{booking.invitee.phone && (
 					<>
-						<span className="text-muted-foreground">{t('phone')}</span>
-						<span className="font-medium">{booking.invitee.phone}</span>
+						<span className="text-muted-foreground">
+							{t('phone')}
+						</span>
+						<span className="font-medium">
+							{booking.invitee.phone}
+						</span>
 					</>
 				)}
 			</div>
@@ -164,9 +161,7 @@ function BookingDetailPanel({
 			<Separator />
 
 			<div className="flex items-center gap-2">
-				<Badge variant={STATUS_VARIANT[booking.status]}>
-					{t(booking.status)}
-				</Badge>
+				<BookingStatusBadge status={booking.status} />
 			</div>
 
 			<div className="grid grid-cols-2 gap-y-2 text-xs">
@@ -178,11 +173,11 @@ function BookingDetailPanel({
 				</span>
 			</div>
 
-			{allowedStatuses.length > 0 && (
+			{otherStatuses.length > 0 && (
 				<>
 					<Separator />
 					<div className="flex flex-col gap-2">
-						{allowedStatuses.map(renderActionButton)}
+						{otherStatuses.map(renderStatusButton)}
 					</div>
 				</>
 			)}
