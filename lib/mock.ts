@@ -35,18 +35,6 @@ const MOCK_STATUS_COMPLETED: BookingStatusObject = {
 	order: 2,
 }
 
-const MOCK_STATUS_CANCELLED: BookingStatusObject = {
-	id: 'mock-status-cancelled',
-	label: 'status_cancelled',
-	color: 'red',
-	actions: [],
-	isDefault: false,
-	isArchived: false,
-	orgId: null,
-	userId: null,
-	order: 3,
-}
-
 // ── Staff ──
 
 export const mockStaff: StaffBySlugResponse = {
