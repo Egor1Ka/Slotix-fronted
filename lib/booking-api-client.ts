@@ -484,8 +484,32 @@ const getBookingStatuses = async (orgId?: string): Promise<BookingStatusObject[]
 	return get<BookingStatusObject[]>(`/booking-statuses${params}`)
 }
 
+const createBookingStatus = async (body: {
+	label: string
+	color: string
+	actions?: string[]
+	orgId?: string
+}): Promise<BookingStatusObject> =>
+	post<BookingStatusObject>('/booking-statuses', body)
+
+const updateBookingStatus2 = async (
+	id: string,
+	body: { label?: string; color?: string; actions?: string[]; order?: number },
+): Promise<BookingStatusObject> =>
+	patch<BookingStatusObject>(`/booking-statuses/${id}`, body)
+
+const archiveBookingStatus = async (id: string): Promise<BookingStatusObject> =>
+	patch<BookingStatusObject>(`/booking-statuses/${id}/archive`, {})
+
+const restoreBookingStatus = async (id: string): Promise<BookingStatusObject> =>
+	patch<BookingStatusObject>(`/booking-statuses/${id}/restore`, {})
+
 export const bookingStatusApi = {
 	getAll: getBookingStatuses,
+	create: createBookingStatus,
+	update: updateBookingStatus2,
+	archive: archiveBookingStatus,
+	restore: restoreBookingStatus,
 }
 
 // ── Exports ──

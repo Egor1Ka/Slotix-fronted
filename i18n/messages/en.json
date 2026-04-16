@@ -306,7 +306,23 @@
 		"pickServiceThenTime": "Pick a service, then tap {time} again",
 		"allStaff": "All",
 		"aboutStaff": "About specialist",
-		"confirmBookingTitle": "Confirm booking"
+		"confirmBookingTitle": "Confirm booking",
+		"bookingStatuses": "Booking Statuses",
+		"addStatus": "Add Status",
+		"editStatus": "Edit Status",
+		"createStatus": "Create Status",
+		"statusLabel": "Label",
+		"statusColor": "Color",
+		"statusActions": "Actions",
+		"hideFromSchedule": "Hide from schedule",
+		"archive": "Archive",
+		"restore": "Restore",
+		"defaultStatus": "Default",
+		"cannotArchiveDefault": "Cannot archive default status",
+		"statusCreated": "Status created",
+		"statusUpdated": "Status updated",
+		"statusArchived": "Status archived",
+		"statusRestored": "Status restored"
 	},
 	"calendar": {
 		"day": "Day",
@@ -359,7 +375,8 @@
 		"myScheduleSettings": "Schedule Settings",
 		"myServices": "My Services",
 		"orgProfile": "Organization Profile",
-		"myProfile": "My Profile"
+		"myProfile": "My Profile",
+		"bookingStatuses": "Booking Statuses"
 	},
 	"organizations": {
 		"title": "My organizations",
