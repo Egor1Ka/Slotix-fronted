@@ -209,7 +209,7 @@ function BookingStatusesManager({ orgId }: BookingStatusesManagerProps) {
 			<div className="flex min-w-0 flex-1 items-center gap-3">
 				<ColorDot color={status.color} />
 				<span className={cn('truncate text-sm font-medium', status.isArchived && 'line-through')}>
-					{status.label}
+					{status.isDefault ? t(status.label as Parameters<typeof t>[0]) : status.label}
 				</span>
 				{status.isDefault && (
 					<Badge variant="outline" className="shrink-0 text-xs">
