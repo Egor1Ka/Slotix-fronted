@@ -1,13 +1,5 @@
 import type { CustomFieldValue } from './booking-field.types'
-
-// ── Booking Status ──
-
-type BookingStatus =
-	| 'pending_payment'
-	| 'confirmed'
-	| 'cancelled'
-	| 'completed'
-	| 'no_show'
+import type { BookingStatusObject } from './bookingStatus.types'
 
 // ── Staff ──
 
@@ -120,7 +112,8 @@ interface BookingResponse {
 	endAt: string
 	timezone: string
 	locationId: string | null
-	status: BookingStatus
+	statusId: string
+	status: BookingStatusObject
 	cancelToken: string
 	invitee: Invitee
 	createdAt: string
@@ -133,7 +126,8 @@ interface StaffBooking {
 	startAt: string
 	endAt: string
 	timezone: string
-	status: BookingStatus
+	statusId: string
+	status: BookingStatusObject
 	invitee: Invitee
 	color: string
 	locationId: string | null
@@ -174,14 +168,14 @@ interface CalendarDisplayBooking {
 	color: string
 	date: string
 	bookingId: string
-	status: BookingStatus
+	statusId: string
+	status: BookingStatusObject
 	staffName: string
 	staffAvatar: string
 	timezone: string
 }
 
 export type {
-	BookingStatus,
 	SlotMode,
 	StaffMember,
 	StaffBySlugResponse,
@@ -200,3 +194,5 @@ export type {
 	OrgStaffMember,
 	CalendarDisplayBooking,
 }
+
+export type { BookingStatusObject } from './bookingStatus.types'
