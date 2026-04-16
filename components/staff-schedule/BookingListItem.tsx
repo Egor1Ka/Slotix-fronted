@@ -1,11 +1,8 @@
 'use client'
 
-import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-import type {
-	StaffBooking,
-	BookingStatus,
-} from '@/services/configs/booking.types'
+import { BookingStatusBadge } from '@/components/booking/BookingStatusBadge'
+import type { StaffBooking } from '@/services/configs/booking.types'
 
 interface BookingListItemProps {
 	booking: StaffBooking
@@ -13,19 +10,8 @@ interface BookingListItemProps {
 	onClick: (booking: StaffBooking) => void
 }
 
-const STATUS_VARIANT: Record<
-	BookingStatus,
-	'default' | 'secondary' | 'destructive' | 'outline'
-> = {
-	confirmed: 'default',
-	pending_payment: 'secondary',
-	completed: 'outline',
-	no_show: 'secondary',
-	cancelled: 'destructive',
-}
-
 const formatTime = (isoString: string, timezone: string): string =>
-	new Date(isoString).toLocaleTimeString('uk-UA', { // tz-ok: timeZone: timezone passed in options on next line
+	new Date(isoString).toLocaleTimeString('uk-UA', {
 		timeZone: timezone,
 		hour: '2-digit',
 		minute: '2-digit',
@@ -52,7 +38,8 @@ function BookingListItem({ booking, timezone, onClick }: BookingListItemProps) {
 			<div className="flex min-w-0 flex-1 items-center justify-between gap-2 pl-1">
 				<div className="flex min-w-0 flex-col">
 					<span className="text-sm font-medium">
-						{formatTime(booking.startAt, timezone)} — {formatTime(booking.endAt, timezone)}
+						{formatTime(booking.startAt, timezone)} —{' '}
+						{formatTime(booking.endAt, timezone)}
 					</span>
 					<span className="text-muted-foreground truncate text-xs">
 						{booking.eventTypeName}
@@ -62,12 +49,10 @@ function BookingListItem({ booking, timezone, onClick }: BookingListItemProps) {
 					<span className="text-muted-foreground hidden text-xs sm:inline">
 						{booking.invitee.name}
 					</span>
-					<Badge
-						variant={STATUS_VARIANT[booking.status]}
+					<BookingStatusBadge
+						status={booking.status}
 						className="text-[10px]"
-					>
-						{booking.status}
-					</Badge>
+					/>
 				</div>
 			</div>
 		</button>
