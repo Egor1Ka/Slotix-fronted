@@ -7,13 +7,13 @@ import type {
 	CreateBookingBody,
 	BookingResponse,
 	StaffBooking,
-	BookingStatus,
 	CancelByIdBody,
 	OrgByIdResponse,
 	OrgStaffMember,
 	SlotMode,
 	WeeklyHours,
 } from '@/services/configs/booking.types'
+import type { BookingStatusObject } from '@/services/configs/bookingStatus.types'
 import type { Slot } from './slot-engine'
 import type {
 	MergedBookingForm,
@@ -130,7 +130,8 @@ interface BackendBookingDto {
 	startAt: string
 	endAt: string
 	timezone: string
-	status: BookingStatus
+	statusId: string
+	status: BookingStatusObject
 	inviteeSnapshot: { name: string; email: string | null; phone: string | null }
 	clientNotes: string | null
 	customFieldValues?: { fieldId: string; label: string; value: string }[]
@@ -148,7 +149,8 @@ interface BackendBookingCreatedDto {
 	endAt: string
 	timezone: string
 	locationId: string | null
-	status: BookingStatus
+	statusId: string
+	status: BookingStatusObject
 	cancelToken: string
 	invitee: { name: string; email: string | null; phone: string | null }
 	payment: { status: string; amount: number; currency: string }
@@ -209,6 +211,7 @@ const toFrontendBookingResponse = (
 	endAt: raw.endAt,
 	timezone: raw.timezone,
 	locationId: raw.locationId,
+	statusId: raw.statusId,
 	status: raw.status,
 	cancelToken: raw.cancelToken,
 	invitee: {
@@ -231,6 +234,7 @@ const toFrontendStaffBooking = (
 		eventTypeName: eventType ? eventType.name : '',
 		startAt: raw.startAt,
 		endAt: raw.endAt,
+		statusId: raw.statusId,
 		status: raw.status,
 		invitee: {
 			name: raw.inviteeSnapshot.name,
@@ -392,7 +396,7 @@ const getStaffBookings = async (
 	dateTo: string,
 	timezone: string,
 	eventTypes: EventType[],
-	status?: BookingStatus[],
+	statusIds?: string[],
 	locationId?: string,
 	orgId?: string,
 ): Promise<StaffBooking[]> => {
@@ -402,7 +406,7 @@ const getStaffBookings = async (
 		dateTo,
 		timezone,
 	})
-	if (status && status.length > 0) params.set('status', status.join(','))
+	if (statusIds && statusIds.length > 0) params.set('status', statusIds.join(','))
 	if (locationId) params.set('locationId', locationId)
 	if (orgId) params.set('orgId', orgId)
 
@@ -424,9 +428,9 @@ const getBookingById = async (id: string): Promise<BackendBookingDto> =>
 
 const updateBookingStatus = async (
 	id: string,
-	status: BookingStatus,
+	statusId: string,
 ): Promise<BackendBookingDto> =>
-	patch<BackendBookingDto>(`/bookings/${id}/status`, { status })
+	patch<BackendBookingDto>(`/bookings/${id}/status`, { statusId })
 
 const rescheduleBooking = async (
 	id: string,
@@ -472,6 +476,17 @@ const updateStaffPosition = async (
 		`/org/${orgId}/staff/${staffId}/position`,
 		{ positionId },
 	)
+
+// ── Booking Status API ──
+
+const getBookingStatuses = async (orgId?: string): Promise<BookingStatusObject[]> => {
+	const params = orgId ? `?orgId=${orgId}` : ''
+	return get<BookingStatusObject[]>(`/booking-statuses${params}`)
+}
+
+export const bookingStatusApi = {
+	getAll: getBookingStatuses,
+}
 
 // ── Exports ──
 
