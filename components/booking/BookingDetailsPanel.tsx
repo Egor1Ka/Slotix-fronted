@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Separator } from '@/components/ui/separator'
-import type { BookingStatus } from '@/services/configs/booking.types'
+import { BookingStatusBadge } from '@/components/booking/BookingStatusBadge'
+import type { BookingStatusObject } from '@/services/configs/bookingStatus.types'
 
 interface CustomFieldEntry {
 	fieldId: string
@@ -21,7 +22,8 @@ interface BookingDetail {
 	startAt: string
 	endAt: string
 	timezone: string
-	status: BookingStatus
+	statusId: string
+	status: BookingStatusObject
 	inviteeSnapshot: { name: string; email: string | null; phone: string | null }
 	clientNotes: string | null
 	customFieldValues?: CustomFieldEntry[]
@@ -32,35 +34,15 @@ interface BookingDetail {
 
 interface BookingDetailsPanelProps {
 	booking: BookingDetail
+	availableStatuses: BookingStatusObject[]
 	eventTypeName: string
 	eventTypeColor: string
 	staffName?: string
 	staffAvatar?: string
 	staffPosition?: string
-	onChangeStatus: (bookingId: string, status: BookingStatus) => Promise<void>
+	onChangeStatus: (bookingId: string, statusId: string) => Promise<void>
 	onReschedule: (bookingId: string, newStartAt: string) => Promise<void>
 	onClose: () => void
-}
-
-const STATUS_CONFIG: Record<string, { bg: string; text: string }> = {
-	pending_payment: { bg: 'bg-yellow-100', text: 'text-yellow-800' },
-	confirmed: { bg: 'bg-green-100', text: 'text-green-800' },
-	cancelled: { bg: 'bg-red-100', text: 'text-red-800' },
-	completed: { bg: 'bg-blue-100', text: 'text-blue-800' },
-	no_show: { bg: 'bg-gray-100', text: 'text-gray-800' },
-}
-
-const STATUS_TRANSITIONS: Record<string, string[]> = {
-	pending_payment: ['confirmed', 'cancelled'],
-	confirmed: ['completed', 'no_show', 'cancelled'],
-}
-
-const ACTION_BUTTON_CLASS: Record<string, string> = {
-	confirmed: 'bg-primary text-primary-foreground hover:bg-primary/90',
-	completed: 'bg-green-600 text-white hover:bg-green-700',
-	cancelled:
-		'bg-destructive text-destructive-foreground hover:bg-destructive/90',
-	no_show: 'bg-muted text-muted-foreground hover:bg-muted/80',
 }
 
 const computeDurationMin = (startAt: string, endAt: string): number => {
@@ -201,22 +183,15 @@ function StatusAndPayment({
 	booking: BookingDetail
 	t: ReturnType<typeof useTranslations<'booking'>>
 }) {
-	const statusCfg = STATUS_CONFIG[booking.status] ?? {
-		bg: 'bg-gray-100',
-		text: 'text-gray-800',
-	}
-
 	return (
 		<div className="flex flex-col gap-2">
 			<div className="flex items-center gap-2">
-				<span
-					className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusCfg.bg} ${statusCfg.text}`}
-				>
-					{t(`status_${booking.status}` as Parameters<typeof t>[0])}
-				</span>
+				<BookingStatusBadge status={booking.status} />
 			</div>
 			<div className="grid grid-cols-2 gap-y-1 text-xs">
-				<span className="text-muted-foreground">{t('paymentStatus')}</span>
+				<span className="text-muted-foreground">
+					{t('paymentStatus')}
+				</span>
 				<span className="font-medium">{booking.payment.status}</span>
 				<span className="text-muted-foreground">{t('price')}</span>
 				<span className="font-medium">
@@ -229,47 +204,51 @@ function StatusAndPayment({
 
 function ActionButtons({
 	booking,
+	availableStatuses,
 	onChangeStatus,
 	t,
 }: {
 	booking: BookingDetail
-	onChangeStatus: (bookingId: string, status: BookingStatus) => Promise<void>
+	availableStatuses: BookingStatusObject[]
+	onChangeStatus: (bookingId: string, statusId: string) => Promise<void>
 	t: ReturnType<typeof useTranslations<'booking'>>
 }) {
-	const [pendingStatus, setPendingStatus] = useState<BookingStatus | null>(null)
-	const transitions = STATUS_TRANSITIONS[booking.status] ?? []
+	const [pendingStatusId, setPendingStatusId] = useState<string | null>(null)
+	const isNotCurrentStatus = (s: BookingStatusObject): boolean =>
+		s.id !== booking.statusId
+	const transitions = availableStatuses.filter(isNotCurrentStatus)
 
 	if (transitions.length === 0) return null
 
-	const handleClick = async (nextStatus: BookingStatus) => {
-		setPendingStatus(nextStatus)
-		await onChangeStatus(booking.id, nextStatus)
-		setPendingStatus(null)
+	const handleClick = async (targetStatus: BookingStatusObject) => {
+		setPendingStatusId(targetStatus.id)
+		await onChangeStatus(booking.id, targetStatus.id)
+		setPendingStatusId(null)
 	}
 
-	const renderButton = (nextStatus: string) => {
-		const buttonClass =
-			ACTION_BUTTON_CLASS[nextStatus] ??
-			'bg-muted text-muted-foreground hover:bg-muted/80'
-		const isLoading = pendingStatus === nextStatus
+	const renderButton = (targetStatus: BookingStatusObject) => {
+		const isLoading = pendingStatusId === targetStatus.id
+		const label = targetStatus.isDefault
+			? t(targetStatus.label as Parameters<typeof t>[0])
+			: targetStatus.label
 
 		return (
 			<button
-				key={nextStatus}
+				key={targetStatus.id}
 				type="button"
-				disabled={pendingStatus !== null}
-				onClick={() => handleClick(nextStatus as BookingStatus)}
-				className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50 ${buttonClass}`}
+				disabled={pendingStatusId !== null}
+				onClick={() => handleClick(targetStatus)}
+				className="bg-muted text-muted-foreground hover:bg-muted/80 rounded-md px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50"
 			>
-				{isLoading
-					? t('saving')
-					: `${t('markAs')} ${t(`status_${nextStatus}` as Parameters<typeof t>[0])}`}
+				{isLoading ? t('saving') : label}
 			</button>
 		)
 	}
 
 	return (
-		<div className="flex flex-wrap gap-2">{transitions.map(renderButton)}</div>
+		<div className="flex flex-wrap gap-2">
+			{transitions.map(renderButton)}
+		</div>
 	)
 }
 
@@ -315,6 +294,7 @@ function StaffSection({
 
 function BookingDetailsPanel({
 	booking,
+	availableStatuses,
 	eventTypeName,
 	eventTypeColor,
 	staffName,
@@ -350,7 +330,12 @@ function BookingDetailsPanel({
 			<Separator />
 			<StatusAndPayment booking={booking} t={t} />
 			<Separator />
-			<ActionButtons booking={booking} onChangeStatus={onChangeStatus} t={t} />
+			<ActionButtons
+				booking={booking}
+				availableStatuses={availableStatuses}
+				onChangeStatus={onChangeStatus}
+				t={t}
+			/>
 		</div>
 	)
 }
