@@ -179,7 +179,7 @@ const useBookingActions = (
 		const eventType = findEventTypeById(selectedEventTypeId)
 		if (!eventType) return
 
-		const startAt = `${resolvedDate}T${resolvedSlotTime}:00.000Z`
+		const startAt = `${resolvedDate}T${resolvedSlotTime}:00`
 
 		const dataRecord = data as Record<string, unknown>
 		const inviteeFields = extractInviteeFromCustomFields(dataRecord)

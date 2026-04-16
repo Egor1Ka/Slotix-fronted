@@ -872,6 +872,68 @@ docker run -p 3000:3000 frontend-template
 
 The `standalone` output mode bundles everything into a self-contained `server.js` — no `node_modules` needed in the final image.
 
+## Timezone Contract
+
+All date/time handling follows a single contract across frontend and backend.
+
+### Storage
+- All `Date` fields in MongoDB are stored in **UTC**
+- Timezone strings are stored as IANA identifiers (e.g. `"Europe/Kyiv"`, `"America/New_York"`)
+
+### Timezone Priority (highest → lowest)
+1. **`ScheduleTemplate.timezone`** — single source of truth for slot grid, booking creation, display
+2. **`Organization.timezone`** — default for new schedules; NOT used in runtime slot/booking logic
+3. **`"UTC"`** — last-resort fallback; never hardcode a specific city (no `"Europe/Kyiv"`)
+
+### Frontend → Backend Contract
+- `startAt` is sent as **naive wall-clock ISO** without `Z` suffix: `"2026-04-15T14:00:00"`
+- The `timezone` field is sent alongside for informational purposes (client's timezone)
+- Backend reads `ScheduleTemplate.timezone` and calls `parseWallClockToUtc(startAt, template.timezone)`
+
+### Display Rules
+- Always use `Intl.DateTimeFormat` with explicit `timeZone` parameter
+- Never use `.split('T')[0]` to extract date from ISO — use `dateFromISO(iso, timezone)` from `lib/booking-utils.ts`
+- Never use `new Date()` for "today" — use `getTodayStrInTz(timezone)` from `lib/calendar/utils.ts`
+- Never use `formatDateISO(new Date())` for default date — use browser timezone: `new Intl.DateTimeFormat('en-CA').format(new Date())`
+
+### Forbidden Patterns
+```ts
+// WRONG: Z suffix on wall-clock time
+const startAt = `${date}T${time}:00.000Z`
+
+// WRONG: naive date extraction from UTC ISO
+const date = isoString.split('T')[0]
+
+// WRONG: UTC-based "today"
+const today = formatDateISO(new Date())
+
+// WRONG: browser-local comparison without timezone
+return new Date(dateStr + 'T23:59:59') < new Date()
+
+// WRONG: hardcoded city fallback
+const tz = template?.timezone ?? "Europe/Kyiv"
+```
+
+### Correct Patterns
+```ts
+// wall-clock time without Z
+const startAt = `${date}T${time}:00`
+
+// timezone-aware date extraction
+const date = dateFromISO(isoString, timezone)
+// or: new Intl.DateTimeFormat('en-CA', { timeZone: timezone }).format(new Date(iso))
+
+// timezone-aware "today"
+const today = getTodayStrInTz(timezone)
+
+// timezone-aware past check
+const todayStr = getTodayStrInTz(timezone)
+return dateStr < todayStr
+
+// fallback chain (never hardcode a city)
+const tz = template?.timezone ?? org?.timezone ?? "UTC"
+```
+
 ## Monitoring (New Relic)
 
 Optional New Relic integration for APM, Browser monitoring, Error tracking, and Logs. Architecturally isolated in `lib/monitoring/`.

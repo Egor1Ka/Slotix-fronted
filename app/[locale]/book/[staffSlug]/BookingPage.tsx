@@ -13,7 +13,6 @@ import { useTranslations } from 'next-intl'
 import { useLocale } from 'next-intl'
 import { useViewConfig } from '@/lib/calendar/CalendarViewConfigContext'
 import {
-	formatDateISO,
 	getWorkHoursForDate,
 	getFirstStaffId,
 } from '@/lib/calendar/utils'
@@ -30,7 +29,8 @@ import type { OrgStaffMember } from '@/services/configs/booking.types'
 
 // ── Module-level constants ──
 
-const todayStr = (): string => formatDateISO(new Date())
+const todayStr = (): string =>
+	new Intl.DateTimeFormat('en-CA').format(new Date())
 
 const isDisabledDay = (wh: { dayOfWeek: number; enabled: boolean }): boolean =>
 	!wh.enabled

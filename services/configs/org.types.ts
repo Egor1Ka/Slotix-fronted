@@ -14,7 +14,7 @@ interface CreateOrgBody {
 	currency: 'UAH' | 'USD'
 	logoUrl?: string
 	brandColor?: string
-	defaultTimezone?: string
+	timezone?: string
 	defaultCountry?: string
 	description?: string
 	address?: string

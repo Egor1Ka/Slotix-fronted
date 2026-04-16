@@ -16,6 +16,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { ScheduleOverrideForm } from '@/components/booking/ScheduleOverrideForm'
 import { OverrideListItem } from './OverrideListItem'
 import { scheduleApi } from '@/lib/booking-api-client'
+import { getTodayStrInTz } from '@/lib/calendar/utils'
 import type {
 	ScheduleOverride,
 	CreateScheduleOverrideBody,
@@ -27,9 +28,10 @@ interface OverridesTabProps {
 	readOnly: boolean
 }
 
-const isDatePast = (dateStr: string): boolean => {
+const isDatePast = (dateStr: string, timezone: string): boolean => {
 	const dateOnly = dateStr.includes('T') ? dateStr.split('T')[0] : dateStr
-	return new Date(dateOnly + 'T23:59:59') < new Date()
+	const todayStr = getTodayStrInTz(timezone)
+	return dateOnly < todayStr
 }
 
 const sortByDate = (a: ScheduleOverride, b: ScheduleOverride): number =>
@@ -108,11 +110,11 @@ function OverridesTab({ staffId, orgId, readOnly }: OverridesTabProps) {
 	}
 
 	const futureOverrides = overrides
-		.filter((o) => !isDatePast(o.date))
+		.filter((o) => !isDatePast(o.date, timezone))
 		.sort(sortByDate)
 
 	const pastOverrides = overrides
-		.filter((o) => isDatePast(o.date))
+		.filter((o) => isDatePast(o.date, timezone))
 		.sort(sortByDateDesc)
 
 	const renderFutureItem = (override: ScheduleOverride) => (

@@ -39,4 +39,4 @@ const toCalendarDisplayBooking =
 	})
 
 export type { StaffInfo }
-export { toCalendarDisplayBooking }
+export { dateFromISO, toCalendarDisplayBooking }

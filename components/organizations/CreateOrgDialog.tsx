@@ -106,7 +106,7 @@ function CreateOrgDialog({ onCreated, plan, orgCount }: CreateOrgDialogProps) {
 				currency: data.currency,
 				brandColor: data.brandColor || undefined,
 				logoUrl: data.logoUrl || undefined,
-				defaultTimezone: data.defaultTimezone || undefined,
+				timezone: data.defaultTimezone || undefined,
 				defaultCountry: data.defaultCountry || undefined,
 			}
 			await orgApi.create({ body })

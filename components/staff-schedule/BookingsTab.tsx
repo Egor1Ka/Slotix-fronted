@@ -21,6 +21,7 @@ import { BookingDateGroup } from './BookingDateGroup'
 import { BookingDetailPanel } from '@/components/booking/BookingDetailPanel'
 import { bookingApi, eventTypeApi, scheduleApi } from '@/lib/booking-api-client'
 import { getTodayStrInTz, getWeekStart, addDays } from '@/lib/calendar/utils'
+import { dateFromISO } from '@/lib/booking-utils'
 import type { StaffBooking, EventType } from '@/services/configs/booking.types'
 import type { BookingDetail } from '@/components/booking/BookingDetailPanel'
 
@@ -41,13 +42,11 @@ const computeWeekRange = (
 	return { dateFrom: monday, dateTo: sunday }
 }
 
-const extractDate = (isoString: string): string => isoString.split('T')[0]
-
-const groupByDate = (bookings: StaffBooking[]): Map<string, StaffBooking[]> => {
+const groupByDate = (bookings: StaffBooking[], timezone: string): Map<string, StaffBooking[]> => {
 	const groups = new Map<string, StaffBooking[]>()
 
 	const addToGroup = (booking: StaffBooking) => {
-		const date = extractDate(booking.startAt)
+		const date = dateFromISO(booking.startAt, timezone)
 		const existing = groups.get(date) ?? []
 		groups.set(date, [...existing, booking])
 	}
@@ -68,7 +67,7 @@ const formatShort = (dateStr: string, timezone: string): string =>
 const formatWeekLabel = (from: string, to: string, timezone: string): string =>
 	`${formatShort(from, timezone)} — ${formatShort(to, timezone)}`
 
-const toBookingDetail = (booking: StaffBooking): BookingDetail => ({
+const toBookingDetail = (booking: StaffBooking, timezone: string): BookingDetail => ({
 	id: booking.id,
 	eventTypeName: booking.eventTypeName,
 	color: booking.color,
@@ -79,7 +78,7 @@ const toBookingDetail = (booking: StaffBooking): BookingDetail => ({
 		(new Date(booking.endAt).getTime() - new Date(booking.startAt).getTime()) /
 			60000,
 	),
-	date: extractDate(booking.startAt),
+	date: dateFromISO(booking.startAt, timezone),
 	status: booking.status,
 	invitee: {
 		name: booking.invitee.name,
@@ -193,7 +192,7 @@ function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
 	}
 
 	const { dateFrom, dateTo } = computeWeekRange(weekOffset, timezone)
-	const grouped = groupByDate(bookings)
+	const grouped = groupByDate(bookings, timezone)
 	const sortedDates = [...grouped.keys()].sort(sortDatesAsc)
 
 	return (
@@ -238,7 +237,7 @@ function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
 					{selectedBooking && (
 						<div className="px-6 pb-6">
 							<BookingDetailPanel
-								booking={toBookingDetail(selectedBooking)}
+								booking={toBookingDetail(selectedBooking, timezone)}
 								onClose={handleCloseSheet}
 								onStatusChange={handleStatusChange}
 							/>
