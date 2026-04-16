@@ -38,7 +38,7 @@ import {
 	BookingDetailsPanel,
 	type BookingDetail,
 } from '@/components/booking/BookingDetailsPanel'
-import type { BookingStatus } from '@/services/configs/booking.types'
+import type { BookingStatusObject } from '@/services/configs/bookingStatus.types'
 
 interface OrgStrategyParams {
 	orgName: string
@@ -60,9 +60,10 @@ interface OrgStrategyParams {
 	bookingError?: string | null
 	selectedBooking?: BookingDetail | null
 	onBookingSelect?: (bookingId: string) => void
+	availableStatuses?: BookingStatusObject[]
 	onBookingStatusChange?: (
 		bookingId: string,
-		status: BookingStatus,
+		statusId: string,
 	) => Promise<void>
 	onBookingReschedule?: (bookingId: string, newStartAt: string) => Promise<void>
 	onBookingClose?: () => void
@@ -122,6 +123,7 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 		bookingError = null,
 		selectedBooking = null,
 		onBookingSelect,
+		availableStatuses = [],
 		onBookingStatusChange,
 		onBookingReschedule,
 		onBookingClose,
@@ -359,6 +361,7 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 							staffName={bookingStaff?.name}
 							staffAvatar={bookingStaff?.avatar}
 							staffPosition={bookingStaff?.position ?? undefined}
+							availableStatuses={availableStatuses}
 							onChangeStatus={onBookingStatusChange ?? (async () => {})}
 							onReschedule={onBookingReschedule ?? (async () => {})}
 							onClose={onBookingClose ?? (() => {})}

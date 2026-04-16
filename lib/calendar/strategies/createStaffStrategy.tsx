@@ -35,7 +35,7 @@ import {
 	BookingDetailsPanel,
 	type BookingDetail,
 } from '@/components/booking/BookingDetailsPanel'
-import type { BookingStatus } from '@/services/configs/booking.types'
+import type { BookingStatusObject } from '@/services/configs/bookingStatus.types'
 
 const normalizeDate = (d: string): string =>
 	d.includes('T') ? d.split('T')[0] : d
@@ -80,9 +80,10 @@ interface StaffStrategyParams {
 	onBookingClick?: (bookingId: string) => void
 	selectedBooking?: BookingDetail | null
 	onCloseBooking?: () => void
+	availableStatuses?: BookingStatusObject[]
 	onBookingStatusChange?: (
 		bookingId: string,
-		newStatus: BookingStatus,
+		statusId: string,
 	) => Promise<void>
 	onBookingReschedule?: (bookingId: string, newStartAt: string) => Promise<void>
 	locale: string
@@ -110,6 +111,7 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 		onBookingClick,
 		selectedBooking = null,
 		onCloseBooking,
+		availableStatuses = [],
 		onBookingStatusChange,
 		onBookingReschedule,
 		locale,
@@ -258,6 +260,7 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 						booking={selectedBooking}
 						eventTypeName={bookingEventType?.name ?? ''}
 						eventTypeColor={bookingEventType?.color ?? '#888'}
+						availableStatuses={availableStatuses}
 						onChangeStatus={onBookingStatusChange}
 						onReschedule={onBookingReschedule ?? (async () => {})}
 						onClose={onCloseBooking}
