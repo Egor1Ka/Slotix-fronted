@@ -7,6 +7,7 @@ import {
 	Building2,
 	Calendar,
 	CalendarCog,
+	CircleDot,
 	Settings2,
 	UserCircle,
 } from 'lucide-react'
@@ -38,6 +39,7 @@ function PersonalSidebar() {
 	const myScheduleHref = buildHref('/my-schedule')
 	const myServicesHref = buildHref('/my-services')
 	const profileHref = buildHref('/profile')
+	const bookingStatusesHref = buildHref('/booking-statuses')
 	const orgsHref = buildHref('/organizations')
 
 	return (
@@ -85,6 +87,15 @@ function PersonalSidebar() {
 								>
 									<Settings2 className="size-4" />
 									<span>{t('myServices')}</span>
+								</SidebarMenuButton>
+							</SidebarMenuItem>
+							<SidebarMenuItem>
+								<SidebarMenuButton
+									render={<Link href={bookingStatusesHref} />}
+									isActive={isActive(bookingStatusesHref)}
+								>
+									<CircleDot className="size-4" />
+									<span>{t('bookingStatuses')}</span>
 								</SidebarMenuButton>
 							</SidebarMenuItem>
 							<SidebarMenuItem>

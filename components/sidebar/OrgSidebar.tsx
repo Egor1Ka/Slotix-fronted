@@ -12,6 +12,7 @@ import {
 	ClipboardList,
 	CalendarDays,
 	UserCircle,
+	CircleDot,
 } from 'lucide-react'
 import {
 	Sidebar,
@@ -70,6 +71,7 @@ function OrgSidebar() {
 	const positionsHref = buildHref(`/manage/${orgId}/positions`)
 	const servicesHref = buildHref(`/manage/${orgId}/services`)
 	const staffScheduleHref = buildHref(`/manage/${orgId}/staff-schedule`)
+	const bookingStatusesHref = buildHref(`/manage/${orgId}/booking-statuses`)
 	const myScheduleHref = buildHref(`/org/${orgId}/my-schedule`)
 	const myProfileHref = buildHref(`/org/${orgId}/my-profile`)
 	const orgsHref = buildHref('/organizations')
@@ -145,6 +147,15 @@ function OrgSidebar() {
 										>
 											<ClipboardList className="size-4" />
 											<span>{t('staffSchedule')}</span>
+										</SidebarMenuButton>
+									</SidebarMenuItem>
+									<SidebarMenuItem>
+										<SidebarMenuButton
+											render={<Link href={bookingStatusesHref} />}
+											isActive={isActive(bookingStatusesHref)}
+										>
+											<CircleDot className="size-4" />
+											<span>{t('bookingStatuses')}</span>
 										</SidebarMenuButton>
 									</SidebarMenuItem>
 								</>
