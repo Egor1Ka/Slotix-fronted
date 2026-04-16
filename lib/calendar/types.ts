@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import type { BookingStatus, Invitee } from '@/services/configs/booking.types'
+import type { BookingStatusObject, Invitee } from '@/services/configs/booking.types'
 
 type ViewMode = 'day' | 'week' | 'month' | 'list'
 
@@ -33,7 +33,8 @@ interface ConfirmedBooking {
 	timezone: string
 	locationId: string | null
 	cancelToken: string
-	status: BookingStatus
+	statusId: string
+	status: BookingStatusObject
 	color: string
 	durationMin: number
 	price: number

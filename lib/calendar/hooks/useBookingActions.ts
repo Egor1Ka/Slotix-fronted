@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { bookingApi, bookingFormApi } from '@/lib/booking-api-client'
 import type { ConfirmedBooking } from '../types'
 import type { EventType } from '@/services/configs/booking.types'
-import type { BookingStatus } from '@/services/configs/booking.types'
 import type { ClientInfoData } from '@/components/booking/ClientInfoForm'
 import type { BookingDetail } from '@/components/booking/BookingDetailsPanel'
 import type {
@@ -43,7 +42,7 @@ interface UseBookingActionsResult {
 	handleBookingSelect: (bookingId: string) => Promise<void>
 	handleBookingStatusChange: (
 		bookingId: string,
-		status: BookingStatus,
+		statusId: string,
 	) => Promise<void>
 	handleBookingReschedule: (
 		bookingId: string,
@@ -314,10 +313,10 @@ const useBookingActions = (
 
 	const handleBookingStatusChange = async (
 		bookingId: string,
-		status: BookingStatus,
+		statusId: string,
 	) => {
 		try {
-			await bookingApi.updateStatus(bookingId, status)
+			await bookingApi.updateStatus(bookingId, statusId)
 			setSelectedBooking(null)
 			reloadBookings()
 		} catch (err) {
