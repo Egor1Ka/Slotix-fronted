@@ -7,12 +7,12 @@ import type {
 	CreateBookingBody,
 	BookingResponse,
 	StaffBooking,
-	BookingStatus,
 	CancelByIdBody,
 	OrgByIdResponse,
 	OrgStaffMember,
 	SlotMode,
 } from '@/services/configs/booking.types'
+import type { BookingStatusObject } from '@/services/configs/bookingStatus.types'
 import {
 	mockStaff,
 	mockEventTypes,
@@ -128,6 +128,18 @@ const createBooking = async (
 	const startDate = new Date(body.startAt)
 	const endDate = new Date(startDate.getTime() + eventType.durationMin * 60000)
 
+	const mockConfirmedStatus: BookingStatusObject = {
+		id: 'mock-status-confirmed',
+		label: 'status_confirmed',
+		color: 'blue',
+		actions: [],
+		isDefault: true,
+		isArchived: false,
+		orgId: null,
+		userId: null,
+		order: 1,
+	}
+
 	const response: BookingResponse = {
 		id: bookingId,
 		eventTypeId: body.eventTypeId,
@@ -137,7 +149,8 @@ const createBooking = async (
 		endAt: endDate.toISOString(),
 		timezone: body.timezone,
 		locationId: null,
-		status: 'confirmed',
+		statusId: mockConfirmedStatus.id,
+		status: mockConfirmedStatus,
 		cancelToken,
 		invitee: body.invitee,
 		createdAt: new Date().toISOString(),
@@ -150,7 +163,8 @@ const createBooking = async (
 		startAt: body.startAt,
 		endAt: endDate.toISOString(),
 		timezone: body.timezone,
-		status: 'confirmed',
+		statusId: mockConfirmedStatus.id,
+		status: mockConfirmedStatus,
 		invitee: body.invitee,
 		color: eventType.color,
 		locationId: null,
@@ -166,7 +180,7 @@ const getStaffBookings = async (
 	staffId: string,
 	dateFrom: string,
 	dateTo: string,
-	status?: BookingStatus[],
+	status?: string[],
 	locationId?: string,
 ): Promise<StaffBooking[]> => {
 	await delay()
@@ -177,7 +191,7 @@ const getStaffBookings = async (
 	}
 
 	const matchesStatus = (b: StaffBooking): boolean =>
-		!status || status.length === 0 || status.includes(b.status)
+		!status || status.length === 0 || status.includes(b.statusId)
 
 	const matchesLocation = (b: StaffBooking): boolean =>
 		!locationId || b.locationId === locationId
@@ -206,8 +220,22 @@ const cancelById = async (
 	const found = bookingsStore.find(matchesId)
 	if (!found) throw new Error(`Booking not found: ${body.bookingId}`)
 
+	const mockCancelledStatus: BookingStatusObject = {
+		id: 'mock-status-cancelled',
+		label: 'status_cancelled',
+		color: 'red',
+		actions: [],
+		isDefault: false,
+		isArchived: false,
+		orgId: null,
+		userId: null,
+		order: 3,
+	}
+
 	const markCancelled = (b: StaffBooking): StaffBooking =>
-		b.id === body.bookingId ? { ...b, status: 'cancelled' } : b
+		b.id === body.bookingId
+			? { ...b, statusId: mockCancelledStatus.id, status: mockCancelledStatus }
+			: b
 
 	bookingsStore = bookingsStore.map(markCancelled)
 

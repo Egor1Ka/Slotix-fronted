@@ -3,11 +3,49 @@ import type {
 	EventType,
 	ScheduleTemplate,
 	StaffBooking,
-	BookingStatus,
 	OrgStaffMember,
 } from '@/services/configs/booking.types'
+import type { BookingStatusObject } from '@/services/configs/bookingStatus.types'
 import type { BookingField } from '@/services/configs/booking-field.types'
 import { wallClockInTz } from '@/lib/calendar/tz'
+
+// ── Mock Statuses ──
+
+const MOCK_STATUS_CONFIRMED: BookingStatusObject = {
+	id: 'mock-status-confirmed',
+	label: 'status_confirmed',
+	color: 'blue',
+	actions: [],
+	isDefault: true,
+	isArchived: false,
+	orgId: null,
+	userId: null,
+	order: 1,
+}
+
+const MOCK_STATUS_COMPLETED: BookingStatusObject = {
+	id: 'mock-status-completed',
+	label: 'status_completed',
+	color: 'green',
+	actions: [],
+	isDefault: false,
+	isArchived: false,
+	orgId: null,
+	userId: null,
+	order: 2,
+}
+
+const MOCK_STATUS_CANCELLED: BookingStatusObject = {
+	id: 'mock-status-cancelled',
+	label: 'status_cancelled',
+	color: 'red',
+	actions: [],
+	isDefault: false,
+	isArchived: false,
+	orgId: null,
+	userId: null,
+	order: 3,
+}
 
 // ── Staff ──
 
@@ -141,7 +179,8 @@ export const mockStaffBookings: StaffBooking[] = [
 		startAt: toISODateTime(today, '10:00'),
 		endAt: toISODateTime(today, '11:00'),
 		timezone: 'Europe/Kiev',
-		status: 'confirmed' as BookingStatus,
+		statusId: MOCK_STATUS_CONFIRMED.id,
+		status: MOCK_STATUS_CONFIRMED,
 		invitee: { name: 'Марія', email: null, phone: null, phoneCountry: null },
 		color: '#8B5CF6',
 		locationId: null,
@@ -154,7 +193,8 @@ export const mockStaffBookings: StaffBooking[] = [
 		startAt: toISODateTime(today, '14:00'),
 		endAt: toISODateTime(today, '15:30'),
 		timezone: 'Europe/Kiev',
-		status: 'confirmed' as BookingStatus,
+		statusId: MOCK_STATUS_CONFIRMED.id,
+		status: MOCK_STATUS_CONFIRMED,
 		invitee: { name: 'Олена', email: null, phone: null, phoneCountry: null },
 		color: '#EC4899',
 		locationId: null,
@@ -167,7 +207,8 @@ export const mockStaffBookings: StaffBooking[] = [
 		startAt: toISODateTime(tomorrow, '12:00'),
 		endAt: toISODateTime(tomorrow, '13:00'),
 		timezone: 'Europe/Kiev',
-		status: 'confirmed' as BookingStatus,
+		statusId: MOCK_STATUS_CONFIRMED.id,
+		status: MOCK_STATUS_CONFIRMED,
 		invitee: { name: 'Ірина', email: null, phone: null, phoneCountry: null },
 		color: '#06B6D4',
 		locationId: null,
@@ -180,7 +221,8 @@ export const mockStaffBookings: StaffBooking[] = [
 		startAt: toISODateTime(dayAfterTomorrow, '13:00'),
 		endAt: toISODateTime(dayAfterTomorrow, '13:45'),
 		timezone: 'Europe/Kiev',
-		status: 'confirmed' as BookingStatus,
+		statusId: MOCK_STATUS_CONFIRMED.id,
+		status: MOCK_STATUS_CONFIRMED,
 		invitee: { name: 'Софія', email: null, phone: null, phoneCountry: null },
 		color: '#F59E0B',
 		locationId: null,
@@ -193,7 +235,8 @@ export const mockStaffBookings: StaffBooking[] = [
 		startAt: toISODateTime(yesterday, '11:00'),
 		endAt: toISODateTime(yesterday, '13:00'),
 		timezone: 'Europe/Kiev',
-		status: 'completed' as BookingStatus,
+		statusId: MOCK_STATUS_COMPLETED.id,
+		status: MOCK_STATUS_COMPLETED,
 		invitee: {
 			name: 'Катерина',
 			email: null,
@@ -215,7 +258,8 @@ export interface CalendarDisplayBooking {
 	color: string
 	date: string
 	bookingId: string
-	status: BookingStatus
+	statusId: string
+	status: BookingStatusObject
 	timezone: string
 }
 
@@ -241,6 +285,7 @@ export const toCalendarDisplayBooking = (
 	color: b.color,
 	date: dateFromISO(b.startAt),
 	bookingId: b.id,
+	statusId: b.statusId,
 	status: b.status,
 	timezone: b.timezone,
 })
@@ -312,7 +357,8 @@ const mockOrgBookings: StaffBooking[] = [
 		startAt: toISODateTime(today, '10:00'),
 		endAt: toISODateTime(today, '11:00'),
 		timezone: 'Europe/Kiev',
-		status: 'confirmed' as BookingStatus,
+		statusId: MOCK_STATUS_CONFIRMED.id,
+		status: MOCK_STATUS_CONFIRMED,
 		invitee: { name: 'Марія', email: null, phone: null, phoneCountry: null },
 		color: '#8B5CF6',
 		locationId: 'loc-001',
@@ -325,7 +371,8 @@ const mockOrgBookings: StaffBooking[] = [
 		startAt: toISODateTime(today, '14:00'),
 		endAt: toISODateTime(today, '16:00'),
 		timezone: 'Europe/Kiev',
-		status: 'confirmed' as BookingStatus,
+		statusId: MOCK_STATUS_CONFIRMED.id,
+		status: MOCK_STATUS_CONFIRMED,
 		invitee: { name: 'Софія', email: null, phone: null, phoneCountry: null },
 		color: '#EC4899',
 		locationId: 'loc-001',
@@ -338,7 +385,8 @@ const mockOrgBookings: StaffBooking[] = [
 		startAt: toISODateTime(today, '11:00'),
 		endAt: toISODateTime(today, '13:00'),
 		timezone: 'Europe/Kiev',
-		status: 'confirmed' as BookingStatus,
+		statusId: MOCK_STATUS_CONFIRMED.id,
+		status: MOCK_STATUS_CONFIRMED,
 		invitee: { name: 'Катерина', email: null, phone: null, phoneCountry: null },
 		color: '#EC4899',
 		locationId: 'loc-002',
@@ -351,7 +399,8 @@ const mockOrgBookings: StaffBooking[] = [
 		startAt: toISODateTime(today, '10:00'),
 		endAt: toISODateTime(today, '10:30'),
 		timezone: 'Europe/Kiev',
-		status: 'confirmed' as BookingStatus,
+		statusId: MOCK_STATUS_CONFIRMED.id,
+		status: MOCK_STATUS_CONFIRMED,
 		invitee: { name: 'Олена', email: null, phone: null, phoneCountry: null },
 		color: '#F59E0B',
 		locationId: 'loc-002',
@@ -364,7 +413,8 @@ const mockOrgBookings: StaffBooking[] = [
 		startAt: toISODateTime(tomorrow, '13:00'),
 		endAt: toISODateTime(tomorrow, '13:30'),
 		timezone: 'Europe/Kiev',
-		status: 'confirmed' as BookingStatus,
+		statusId: MOCK_STATUS_CONFIRMED.id,
+		status: MOCK_STATUS_CONFIRMED,
 		invitee: { name: 'Тетяна', email: null, phone: null, phoneCountry: null },
 		color: '#F59E0B',
 		locationId: 'loc-002',

@@ -212,6 +212,7 @@ const useBookingActions = (
 				timezone: response.timezone,
 				locationId: response.locationId,
 				cancelToken: response.cancelToken,
+				statusId: response.statusId,
 				status: response.status,
 				color: eventType.color,
 				durationMin: eventType.durationMin,

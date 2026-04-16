@@ -84,7 +84,6 @@ export type {
 	CatalogProduct,
 } from './configs/billing.config'
 export type {
-	BookingStatus,
 	StaffMember,
 	StaffBySlugResponse,
 	EventType,

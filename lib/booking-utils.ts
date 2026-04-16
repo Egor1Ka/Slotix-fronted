@@ -32,6 +32,7 @@ const toCalendarDisplayBooking =
 		color: b.color,
 		date: dateFromISO(b.startAt, scheduleTimezone),
 		bookingId: b.id,
+		statusId: b.statusId,
 		status: b.status,
 		staffName: staff.name,
 		staffAvatar: staff.avatar,

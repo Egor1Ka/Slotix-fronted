@@ -117,7 +117,11 @@ function ConfirmedState({
 					{confirmedBooking.price} {confirmedBooking.currency}
 				</span>
 				<span className="text-muted-foreground">{t('status')}</span>
-				<span className="font-medium">{confirmedBooking.status}</span>
+				<span className="font-medium">
+					{confirmedBooking.status.isDefault
+						? t(confirmedBooking.status.label)
+						: confirmedBooking.status.label}
+				</span>
 			</div>
 			<button
 				type="button"

@@ -79,6 +79,7 @@ const toBookingDetail = (booking: StaffBooking, timezone: string): BookingDetail
 			60000,
 	),
 	date: dateFromISO(booking.startAt, timezone),
+	statusId: booking.statusId,
 	status: booking.status,
 	invitee: {
 		name: booking.invitee.name,
@@ -177,7 +178,7 @@ function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
 		setSelectedBooking(booking)
 	const handleCloseSheet = () => setSelectedBooking(null)
 
-	const handleStatusChange = () => {
+	const handleStatusChange = (_bookingId: string, _newStatusId: string) => {
 		setSelectedBooking(null)
 		fetchData()
 	}
@@ -238,6 +239,7 @@ function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
 						<div className="px-6 pb-6">
 							<BookingDetailPanel
 								booking={toBookingDetail(selectedBooking, timezone)}
+								availableStatuses={[]}
 								onClose={handleCloseSheet}
 								onStatusChange={handleStatusChange}
 							/>
