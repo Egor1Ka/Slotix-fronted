@@ -173,6 +173,7 @@ export const mockStaffBookings: StaffBooking[] = [
 		color: '#8B5CF6',
 		locationId: null,
 		orgId: null,
+		payment: { status: 'none', amount: 0, currency: 'UAH' },
 	},
 	{
 		id: '707f1f77bcf86cd799439002',
@@ -187,6 +188,7 @@ export const mockStaffBookings: StaffBooking[] = [
 		color: '#EC4899',
 		locationId: null,
 		orgId: null,
+		payment: { status: 'none', amount: 0, currency: 'UAH' },
 	},
 	{
 		id: '707f1f77bcf86cd799439003',
@@ -201,6 +203,7 @@ export const mockStaffBookings: StaffBooking[] = [
 		color: '#06B6D4',
 		locationId: null,
 		orgId: null,
+		payment: { status: 'none', amount: 0, currency: 'UAH' },
 	},
 	{
 		id: '707f1f77bcf86cd799439004',
@@ -215,6 +218,7 @@ export const mockStaffBookings: StaffBooking[] = [
 		color: '#F59E0B',
 		locationId: null,
 		orgId: null,
+		payment: { status: 'none', amount: 0, currency: 'UAH' },
 	},
 	{
 		id: '707f1f77bcf86cd799439005',
@@ -234,6 +238,7 @@ export const mockStaffBookings: StaffBooking[] = [
 		color: '#EC4899',
 		locationId: null,
 		orgId: null,
+		payment: { status: 'none', amount: 0, currency: 'UAH' },
 	},
 ]
 
@@ -351,6 +356,7 @@ const mockOrgBookings: StaffBooking[] = [
 		color: '#8B5CF6',
 		locationId: 'loc-001',
 		orgId: '807f1f77bcf86cd799439001',
+		payment: { status: 'none', amount: 0, currency: 'UAH' },
 	},
 	{
 		id: '807f1f77bcf86cd799439102',
@@ -365,6 +371,7 @@ const mockOrgBookings: StaffBooking[] = [
 		color: '#EC4899',
 		locationId: 'loc-001',
 		orgId: '807f1f77bcf86cd799439001',
+		payment: { status: 'none', amount: 0, currency: 'UAH' },
 	},
 	{
 		id: '807f1f77bcf86cd799439103',
@@ -379,6 +386,7 @@ const mockOrgBookings: StaffBooking[] = [
 		color: '#EC4899',
 		locationId: 'loc-002',
 		orgId: '807f1f77bcf86cd799439001',
+		payment: { status: 'none', amount: 0, currency: 'UAH' },
 	},
 	{
 		id: '807f1f77bcf86cd799439104',
@@ -393,6 +401,7 @@ const mockOrgBookings: StaffBooking[] = [
 		color: '#F59E0B',
 		locationId: 'loc-002',
 		orgId: '807f1f77bcf86cd799439001',
+		payment: { status: 'none', amount: 0, currency: 'UAH' },
 	},
 	{
 		id: '807f1f77bcf86cd799439105',
@@ -407,6 +416,7 @@ const mockOrgBookings: StaffBooking[] = [
 		color: '#F59E0B',
 		locationId: 'loc-002',
 		orgId: '807f1f77bcf86cd799439001',
+		payment: { status: 'none', amount: 0, currency: 'UAH' },
 	},
 ]
 

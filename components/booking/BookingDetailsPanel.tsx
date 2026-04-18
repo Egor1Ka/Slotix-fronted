@@ -119,6 +119,14 @@ function TimeGrid({
 			<span className="font-medium">
 				{durationMin} {t('min')}
 			</span>
+			{booking.payment.amount > 0 && (
+				<>
+					<span className="text-muted-foreground">{t('price')}</span>
+					<span className="font-medium">
+						{booking.payment.amount} {booking.payment.currency}
+					</span>
+				</>
+			)}
 			<span className="text-muted-foreground">{t('schedule.date')}</span>
 			<span className="font-medium">{formatDate(booking.startAt, booking.timezone)}</span>
 		</div>
@@ -187,16 +195,6 @@ function StatusAndPayment({
 		<div className="flex flex-col gap-2">
 			<div className="flex items-center gap-2">
 				<BookingStatusBadge status={booking.status} />
-			</div>
-			<div className="grid grid-cols-2 gap-y-1 text-xs">
-				<span className="text-muted-foreground">
-					{t('paymentStatus')}
-				</span>
-				<span className="font-medium">{booking.payment.status}</span>
-				<span className="text-muted-foreground">{t('price')}</span>
-				<span className="font-medium">
-					{booking.payment.amount} {booking.payment.currency}
-				</span>
 			</div>
 		</div>
 	)

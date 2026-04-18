@@ -575,6 +575,7 @@ function ServiceDialog({
 							<Textarea
 								id="service-description"
 								placeholder={t('descriptionPlaceholder')}
+								className="break-all"
 								{...register('description')}
 							/>
 							<FieldError errors={[errors.description]} />

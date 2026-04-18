@@ -246,6 +246,7 @@ const toFrontendStaffBooking = (
 		locationId: raw.locationId,
 		orgId: raw.orgId,
 		timezone: raw.timezone,
+		payment: raw.payment,
 	}
 }
 

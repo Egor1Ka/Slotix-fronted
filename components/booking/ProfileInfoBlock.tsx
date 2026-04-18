@@ -80,7 +80,7 @@ function ProfileInfoBlock({
 
 	return (
 		<div className="bg-card w-full border-b">
-			<div className="mx-auto max-w-5xl px-6">
+			<div className="mx-auto max-w-5xl overflow-hidden px-6">
 				<div className="flex w-full items-center gap-3 py-3">
 					<button
 						type="button"
@@ -133,7 +133,7 @@ function ProfileInfoBlock({
 						<Separator className="mb-3" />
 
 						{hasDescription && (
-							<p className="text-muted-foreground mb-3 text-sm leading-relaxed">
+							<p className="text-muted-foreground mb-3 break-words text-sm leading-relaxed">
 								{description}
 							</p>
 						)}

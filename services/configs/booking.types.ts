@@ -119,6 +119,12 @@ interface BookingResponse {
 	createdAt: string
 }
 
+interface BookingPayment {
+	status: string
+	amount: number
+	currency: string
+}
+
 interface StaffBooking {
 	id: string
 	eventTypeId: string
@@ -132,6 +138,7 @@ interface StaffBooking {
 	color: string
 	locationId: string | null
 	orgId: string | null
+	payment: BookingPayment
 }
 
 interface CancelByIdBody {
@@ -188,6 +195,7 @@ export type {
 	Invitee,
 	CreateBookingBody,
 	BookingResponse,
+	BookingPayment,
 	StaffBooking,
 	CancelByIdBody,
 	OrgByIdResponse,

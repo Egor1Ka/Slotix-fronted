@@ -50,19 +50,17 @@ const toSlotBookingInTz =
 	}
 
 const dateStrInTz = (iso: string, timezone: string): string =>
-	new Intl.DateTimeFormat('en-CA', { timeZone: timezone }).format(
-		new Date(iso),
-	)
+	new Intl.DateTimeFormat('en-CA', { timeZone: timezone }).format(new Date(iso))
+
+const isVisibleOnSchedule = (booking: StaffBooking): boolean =>
+	!booking.status?.actions?.includes('hideFromSchedule')
 
 const filterBookingsByDate =
 	(dateStr: string, timezone: string) =>
 	(booking: StaffBooking): boolean =>
 		dateStrInTz(booking.startAt, timezone) === dateStr
 
-const toBreakBooking = (slot: {
-	start: string
-	end: string
-}): SlotBooking => ({
+const toBreakBooking = (slot: { start: string; end: string }): SlotBooking => ({
 	startMin: timeToMin(slot.start),
 	duration: timeToMin(slot.end) - timeToMin(slot.start),
 })
@@ -104,7 +102,9 @@ const getSlotsForDate = (
 	if (!workHours) return []
 
 	const tz = schedule.timezone
-	const dayBookings = bookings.filter(filterBookingsByDate(dateStr, tz))
+	const dayBookings = bookings
+		.filter(isVisibleOnSchedule)
+		.filter(filterBookingsByDate(dateStr, tz))
 	const breakBookings = getBreakBookings(overrides, dateStr, staffId)
 	const nowMin = getNowMinForDate(dateStr, tz)
 

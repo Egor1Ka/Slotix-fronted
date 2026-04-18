@@ -52,8 +52,8 @@ function ServiceInfo({ eventType }: { eventType: EventType }) {
 			{hasDescription && (
 				<>
 					<Separator />
-					<div className="text-muted-foreground text-xs leading-relaxed">
-						<p className={expanded ? '' : 'line-clamp-3'}>
+					<div className="text-muted-foreground min-w-0 text-xs leading-relaxed">
+						<p className={expanded ? 'break-all' : 'line-clamp-3 break-all'}>
 							{eventType.description}
 						</p>
 						<button

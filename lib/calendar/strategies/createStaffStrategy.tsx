@@ -120,9 +120,10 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 	const calendarLocale = getCalendarLocale(locale)
 	const selectedEventType = findEventType(eventTypes, selectedEventTypeId)
 
-	const allBookings = (() => {
-		return bookings
-	})()
+	const isVisibleOnSchedule = (booking: CalendarDisplayBooking): boolean =>
+		!booking.status?.actions?.includes('hideFromSchedule')
+
+	const allBookings = bookings.filter(isVisibleOnSchedule)
 
 	return {
 		getBlocks(blockDate: string): CalendarBlock[] {
@@ -173,7 +174,7 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 			)
 			if (!workHours) return [...bookingBlocks, ...breakBlocks]
 
-			const dayBookingsForSlots = getBookingsForDate(bookings, blockDate)
+			const dayBookingsForSlots = getBookingsForDate(allBookings, blockDate)
 			const toSlotEngine = (b: CalendarDisplayBooking) => ({
 				startMin: b.startMin,
 				duration: b.duration,
@@ -294,7 +295,7 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 			)
 			if (!workHours) return
 
-			const dayBookingsForSlots = getBookingsForDate(bookings, clickDate)
+			const dayBookingsForSlots = getBookingsForDate(allBookings, clickDate)
 			const toSlotEngine = (b: CalendarDisplayBooking) => ({
 				startMin: b.startMin,
 				duration: b.duration,

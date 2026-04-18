@@ -169,6 +169,7 @@ const createBooking = async (
 		color: eventType.color,
 		locationId: null,
 		orgId: null,
+		payment: { status: 'none', amount: 0, currency: 'UAH' },
 	}
 
 	bookingsStore = [...bookingsStore, staffBooking]

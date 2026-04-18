@@ -87,7 +87,7 @@ const toBookingDetail = (booking: StaffBooking, timezone: string): BookingDetail
 		email: booking.invitee.email,
 		phone: booking.invitee.phone,
 	},
-	payment: { status: 'unknown', amount: 0, currency: '' },
+	payment: booking.payment,
 })
 
 const renderDateGroup = (

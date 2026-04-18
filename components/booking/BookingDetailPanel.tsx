@@ -123,6 +123,14 @@ function BookingDetailPanel({
 				<span className="font-medium">
 					{booking.durationMin} {t('min')}
 				</span>
+				{booking.payment.amount > 0 && (
+					<>
+						<span className="text-muted-foreground">{t('price')}</span>
+						<span className="font-medium">
+							{booking.payment.amount} {booking.payment.currency}
+						</span>
+					</>
+				)}
 				<span className="text-muted-foreground">{t('date')}</span>
 				<span className="font-medium">
 					{formatDate(booking.startAt)}
@@ -164,14 +172,6 @@ function BookingDetailPanel({
 				<BookingStatusBadge status={booking.status} />
 			</div>
 
-			<div className="grid grid-cols-2 gap-y-2 text-xs">
-				<span className="text-muted-foreground">{t('payment')}</span>
-				<span className="font-medium">{booking.payment.status}</span>
-				<span className="text-muted-foreground">{t('price')}</span>
-				<span className="font-medium">
-					{booking.payment.amount} {booking.payment.currency}
-				</span>
-			</div>
 
 			{otherStatuses.length > 0 && (
 				<>
