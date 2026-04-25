@@ -20,7 +20,10 @@ function LogoutButton() {
 	}
 
 	return (
-		<SidebarMenuButton onClick={handleLogout}>
+		<SidebarMenuButton
+			onClick={handleLogout}
+			className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive data-[active=true]:bg-destructive/10 data-[active=true]:text-destructive"
+		>
 			<LogOut className="size-4" />
 			<span>{t('logout')}</span>
 		</SidebarMenuButton>

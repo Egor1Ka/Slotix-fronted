@@ -27,7 +27,7 @@ const renderSkeletonItem = (i: number) => (
 )
 
 const renderSkeletonChip = (i: number) => (
-	<Skeleton key={i} className="h-9 w-28 shrink-0 rounded-full" />
+	<Skeleton key={i} className="h-14 w-44 shrink-0 rounded-2xl" />
 )
 
 function ServiceList({
@@ -55,21 +55,24 @@ function ServiceList({
 					onClick={handleClick}
 					disabled={isDisabled}
 					className={cn(
-						'flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-xs transition-all',
+						'group flex shrink-0 items-center gap-3 rounded-2xl border bg-card px-4 py-3 text-left transition-all hover:-translate-y-0.5 hover:shadow-md',
 						isActive
-							? 'border-primary bg-primary/10 ring-primary/30 shadow-sm ring-1'
-							: 'border-border hover:bg-muted',
-						isDisabled && 'cursor-not-allowed opacity-40 hover:bg-transparent',
+							? 'border-primary bg-primary/5 ring-2 ring-primary/40 shadow-md'
+							: 'border-border',
+						isDisabled && 'cursor-not-allowed opacity-40 hover:translate-y-0 hover:shadow-none',
 					)}
 				>
 					<div
-						className="size-2 shrink-0 rounded-full"
+						className="size-3 shrink-0 rounded-full"
 						style={{ backgroundColor: eventType.color }}
 					/>
-					<span className="font-medium">{eventType.name}</span>
-					<span className="text-muted-foreground">
-						{eventType.price} {eventType.currency}
-					</span>
+					<div className="flex flex-col">
+						<span className="text-sm font-semibold leading-tight">{eventType.name}</span>
+						<span className="text-muted-foreground text-xs leading-tight">
+							{eventType.durationMin} {t('min')} · {eventType.price}{' '}
+							{eventType.currency}
+						</span>
+					</div>
 				</button>
 			)
 		}
@@ -111,9 +114,9 @@ function ServiceList({
 	return (
 		<div
 			className={cn(
-				'gap-2 transition-opacity',
+				'gap-3 transition-opacity',
 				loading && 'pointer-events-none opacity-50',
-				isHorizontal ? 'flex overflow-x-auto pb-2' : 'flex flex-col',
+				isHorizontal ? 'flex overflow-x-auto px-1 pt-1.5 pb-3' : 'flex flex-col',
 			)}
 		>
 			{!isHorizontal && (

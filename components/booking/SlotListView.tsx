@@ -5,8 +5,16 @@ import { useTranslations, useLocale } from 'next-intl'
 import { uk, enUS } from 'date-fns/locale'
 import type { Locale } from 'date-fns'
 import { toast } from 'sonner'
+import { CalendarOff } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Calendar } from '@/components/ui/calendar'
+import {
+	Empty,
+	EmptyDescription,
+	EmptyHeader,
+	EmptyMedia,
+	EmptyTitle,
+} from '@/components/ui/empty'
 import { ServiceList } from './ServiceList'
 import { TimeSlotGrid } from './TimeSlotGrid'
 import { StaffSlotCard } from './StaffSlotCard'
@@ -382,15 +390,18 @@ function SlotListView({
 	}
 
 	return (
-		<div className="flex flex-col gap-4">
+		<div className="flex flex-col gap-6">
 			{/* Service selection */}
-			<div
+			<section
 				ref={serviceListRef}
 				className={cn(
-					'rounded-lg transition-all',
+					'flex flex-col gap-3 rounded-2xl transition-all',
 					highlightServices && 'ring-primary/40 ring-2 ring-offset-2',
 				)}
 			>
+				<h3 className="text-muted-foreground text-sm font-medium tracking-wide uppercase">
+					{t('services')}
+				</h3>
 				<ServiceList
 					eventTypes={eventTypes}
 					selectedId={selectedEventTypeId}
@@ -399,36 +410,50 @@ function SlotListView({
 					variant="horizontal"
 					allowedIds={allowedIdsForPendingSlot}
 				/>
-			</div>
+			</section>
 
 			{/* Date picker + slots — side by side on desktop */}
-			<div className="flex flex-col gap-4 md:flex-row md:items-start">
+			<div className="flex flex-col gap-4 md:flex-row md:items-start md:gap-6">
 				<Calendar
 					mode="single"
 					selected={new Date(dateStr + 'T00:00:00')}
 					onSelect={handleCalendarSelect}
 					disabled={{ before: new Date() }}
 					locale={dateFnsLocale}
-					className="shrink-0 rounded-lg border p-2"
+					className="bg-card shrink-0 rounded-xl border p-3 shadow-sm"
 				/>
 
 				<div className="flex flex-1 flex-col gap-3">
 					{variant === 'personal' && (
-						<PersonalSlotView
-							schedule={schedule ?? null}
-							overrides={overrides}
-							bookings={bookings}
-							duration={duration}
-							startDate={startDate}
-							fixedDate={fixedDate}
-							staffId={staffId}
-							selectedSlot={selectedSlot}
-							onSlotSelect={handlePersonalSlotSelect}
-						/>
+						<div className="bg-card flex flex-col gap-4 rounded-xl border p-5 shadow-sm">
+							<PersonalSlotView
+								schedule={schedule ?? null}
+								overrides={overrides}
+								bookings={bookings}
+								duration={duration}
+								startDate={startDate}
+								fixedDate={fixedDate}
+								staffId={staffId}
+								selectedSlot={selectedSlot}
+								onSlotSelect={handlePersonalSlotSelect}
+							/>
+						</div>
 					)}
 
-					{variant === 'org' && (
-						<div className="flex flex-col gap-3">
+					{variant === 'org' && displayStaff.length === 0 && (
+						<Empty className="bg-card border-border min-h-[260px] border shadow-sm">
+							<EmptyHeader>
+								<EmptyMedia variant="icon">
+									<CalendarOff />
+								</EmptyMedia>
+								<EmptyTitle>{t('dayOff')}</EmptyTitle>
+								<EmptyDescription>{t('pickAnotherDate')}</EmptyDescription>
+							</EmptyHeader>
+						</Empty>
+					)}
+
+					{variant === 'org' && displayStaff.length > 0 && (
+						<div className="flex flex-col gap-4">
 							{displayStaff.map(renderOrgStaffItem)}
 						</div>
 					)}

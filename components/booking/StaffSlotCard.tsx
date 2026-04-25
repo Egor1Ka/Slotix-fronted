@@ -78,17 +78,17 @@ function StaffSlotCard({
 	}
 
 	return (
-		<div className="flex flex-col gap-3 rounded-lg border p-4">
+		<div className="flex flex-col gap-4 rounded-xl border bg-card p-5 shadow-sm transition-shadow hover:shadow-md">
 			<div className="flex items-center justify-between">
 				<div className="flex items-center gap-3">
-					<Avatar className="size-10">
+					<Avatar className="size-12 ring-2 ring-border">
 						<AvatarImage src={staff.avatar} alt={staff.name} />
-						<AvatarFallback className="text-xs">
+						<AvatarFallback className="text-sm">
 							{getInitials(staff.name)}
 						</AvatarFallback>
 					</Avatar>
 					<div className="flex flex-col">
-						<span className="text-sm font-semibold">{staff.name}</span>
+						<span className="text-base font-semibold">{staff.name}</span>
 						{staff.position && (
 							<span className="text-muted-foreground text-xs">
 								{staff.position}

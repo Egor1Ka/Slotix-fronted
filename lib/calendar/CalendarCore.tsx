@@ -729,16 +729,16 @@ function CalendarCore({
 	)
 
 	return (
-		<div className="flex min-h-screen flex-col">
+		<div className="flex flex-col">
 			{profileInfo && <ProfileInfoBlock {...profileInfo} />}
-			<div className="flex flex-1 flex-col md:flex-row">
+			<div className="flex flex-1 flex-col lg:flex-row">
 				{!hideSidebar && view !== 'list' && (
-					<aside className="hidden w-[220px] shrink-0 flex-col border-r p-4 md:flex">
+					<aside className="hidden w-[220px] shrink-0 flex-col border-r p-4 lg:flex">
 						{strategy.renderSidebar()}
 					</aside>
 				)}
 
-				<main className="flex-1 overflow-auto p-4">
+				<main className="min-w-0 flex-1 p-4">
 					<div className="flex flex-col gap-4">
 						<div className="flex flex-wrap items-center justify-between gap-2">
 							{view !== 'list' && (
@@ -804,7 +804,7 @@ function CalendarCore({
 						</div>
 
 						{!hideSidebar && view !== 'list' && (
-							<div className="md:hidden">
+							<div className="lg:hidden">
 								{strategy.renderMobileSidebar?.() ?? strategy.renderSidebar()}
 							</div>
 						)}
@@ -818,7 +818,7 @@ function CalendarCore({
 					</div>
 				</main>
 
-				<aside className="w-full min-w-0 shrink-0 border-t p-4 md:w-[280px] md:border-t-0 md:border-l">
+				<aside className="w-full min-w-0 shrink-0 border-t p-4 lg:w-[280px] lg:border-t-0 lg:border-l">
 					{strategy.renderPanel()}
 				</aside>
 
@@ -827,7 +827,7 @@ function CalendarCore({
 						<Button
 							variant="outline"
 							size="icon"
-							className="fixed bottom-4 left-4 z-50 shadow-lg md:hidden"
+							className="fixed bottom-4 left-4 z-50 shadow-lg lg:hidden"
 							onClick={handleOpenSheet}
 						>
 							<MenuIcon />

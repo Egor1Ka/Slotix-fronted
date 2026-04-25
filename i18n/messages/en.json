@@ -249,6 +249,7 @@
 		"selectStaffToBook": "Select a staff member to create a booking",
 		"dayOff": "Day off — no staff members are working today",
 		"staffDayOff": "This specialist doesn't work today",
+		"pickAnotherDate": "Pick another date in the calendar",
 		"bookingDetails": "Booking details",
 		"date": "Date",
 		"clientName_label": "Client name",
@@ -416,7 +417,15 @@
 		"myServices": "My Services",
 		"orgProfile": "Organization Profile",
 		"myProfile": "My Profile",
-		"bookingStatuses": "Booking Statuses"
+		"bookingStatuses": "Booking Statuses",
+		"groupCalendar": "Calendar",
+		"groupManage": "Manage",
+		"groupAccount": "Account",
+		"groupAdmin": "Administration",
+		"groupPersonal": "Personal",
+		"groupOrgProfile": "Profile",
+		"groupSchedule": "Schedule",
+		"groupStructure": "Structure"
 	},
 	"organizations": {
 		"title": "My organizations",

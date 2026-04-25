@@ -20,11 +20,13 @@ import {
 	SidebarFooter,
 	SidebarGroup,
 	SidebarGroupContent,
+	SidebarGroupLabel,
 	SidebarHeader,
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from '@/components/ui/sidebar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { LogoutButton } from './LogoutButton'
 import { orgApi } from '@/services'
 import type { OrgByIdResponse } from '@/services'
@@ -81,29 +83,34 @@ function OrgSidebar() {
 	return (
 		<Sidebar>
 			<SidebarHeader className="border-b p-4">
-				<div className="flex items-center gap-2">
-					{org ? (
-						<>
-							{org.logo ? (
-								<img src={org.logo} alt={org.name} className="size-6 rounded" />
-							) : (
-								<div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded text-xs font-bold">
-									{getInitial(org.name)}
-								</div>
+				{org ? (
+					<div className="flex items-center gap-3">
+						<Avatar className="ring-border size-10 ring-2">
+							<AvatarImage src={org.logo ?? undefined} alt={org.name} />
+							<AvatarFallback className="text-sm font-bold">
+								{getInitial(org.name)}
+							</AvatarFallback>
+						</Avatar>
+						<div className="flex min-w-0 flex-col gap-0.5">
+							<span className="truncate text-sm font-semibold">{org.name}</span>
+							{role && (
+								<span className="text-muted-foreground truncate text-xs capitalize">
+									{role}
+								</span>
 							)}
-							<span className="font-semibold">{org.name}</span>
-						</>
-					) : (
-						<span className="text-muted-foreground text-sm">Loading...</span>
-					)}
-				</div>
+						</div>
+					</div>
+				) : (
+					<span className="text-muted-foreground text-sm">Loading...</span>
+				)}
 			</SidebarHeader>
 			<SidebarContent>
-				<SidebarGroup>
-					<SidebarGroupContent>
-						<SidebarMenu>
-							{isAdmin && (
-								<>
+				{isAdmin && (
+					<>
+						<SidebarGroup>
+							<SidebarGroupLabel>{t('groupOrgProfile')}</SidebarGroupLabel>
+							<SidebarGroupContent>
+								<SidebarMenu>
 									<SidebarMenuItem>
 										<SidebarMenuButton
 											render={<Link href={profileHref} />}
@@ -113,6 +120,13 @@ function OrgSidebar() {
 											<span>{t('orgProfile')}</span>
 										</SidebarMenuButton>
 									</SidebarMenuItem>
+								</SidebarMenu>
+							</SidebarGroupContent>
+						</SidebarGroup>
+						<SidebarGroup>
+							<SidebarGroupLabel>{t('groupSchedule')}</SidebarGroupLabel>
+							<SidebarGroupContent>
+								<SidebarMenu>
 									<SidebarMenuItem>
 										<SidebarMenuButton
 											render={<Link href={orgScheduleHref} />}
@@ -122,6 +136,22 @@ function OrgSidebar() {
 											<span>{t('generalSchedule')}</span>
 										</SidebarMenuButton>
 									</SidebarMenuItem>
+									<SidebarMenuItem>
+										<SidebarMenuButton
+											render={<Link href={staffScheduleHref} />}
+											isActive={isActive(staffScheduleHref)}
+										>
+											<ClipboardList className="size-4" />
+											<span>{t('staffSchedule')}</span>
+										</SidebarMenuButton>
+									</SidebarMenuItem>
+								</SidebarMenu>
+							</SidebarGroupContent>
+						</SidebarGroup>
+						<SidebarGroup>
+							<SidebarGroupLabel>{t('groupStructure')}</SidebarGroupLabel>
+							<SidebarGroupContent>
+								<SidebarMenu>
 									<SidebarMenuItem>
 										<SidebarMenuButton
 											render={<Link href={positionsHref} />}
@@ -142,15 +172,6 @@ function OrgSidebar() {
 									</SidebarMenuItem>
 									<SidebarMenuItem>
 										<SidebarMenuButton
-											render={<Link href={staffScheduleHref} />}
-											isActive={isActive(staffScheduleHref)}
-										>
-											<ClipboardList className="size-4" />
-											<span>{t('staffSchedule')}</span>
-										</SidebarMenuButton>
-									</SidebarMenuItem>
-									<SidebarMenuItem>
-										<SidebarMenuButton
 											render={<Link href={bookingStatusesHref} />}
 											isActive={isActive(bookingStatusesHref)}
 										>
@@ -158,8 +179,15 @@ function OrgSidebar() {
 											<span>{t('bookingStatuses')}</span>
 										</SidebarMenuButton>
 									</SidebarMenuItem>
-								</>
-							)}
+								</SidebarMenu>
+							</SidebarGroupContent>
+						</SidebarGroup>
+					</>
+				)}
+				<SidebarGroup>
+					<SidebarGroupLabel>{t('groupPersonal')}</SidebarGroupLabel>
+					<SidebarGroupContent>
+						<SidebarMenu>
 							<SidebarMenuItem>
 								<SidebarMenuButton
 									render={<Link href={myScheduleHref} />}

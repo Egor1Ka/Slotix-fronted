@@ -16,7 +16,7 @@ interface TimeSlotGridProps {
 const SKELETON_ITEMS = [1, 2, 3, 4, 5, 6]
 
 const renderSkeletonSlot = (i: number) => (
-	<Skeleton key={i} className="h-10 rounded-full" />
+	<Skeleton key={i} className="h-12 rounded-xl" />
 )
 
 function TimeSlotGrid({
@@ -30,7 +30,7 @@ function TimeSlotGrid({
 
 	if (loading) {
 		return (
-			<div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+			<div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
 				{SKELETON_ITEMS.map(renderSkeletonSlot)}
 			</div>
 		)
@@ -57,11 +57,11 @@ function TimeSlotGrid({
 				onClick={handleClick}
 				disabled={disabled}
 				className={cn(
-					'rounded-full border px-4 py-2.5 text-sm font-medium transition-all',
+					'rounded-xl border px-4 py-3 text-base font-semibold transition-all',
 					disabled && 'cursor-default opacity-60',
 					isActive
-						? 'border-primary bg-primary text-primary-foreground shadow-sm'
-						: 'border-border bg-muted/50 hover:bg-muted',
+						? 'border-primary bg-primary text-primary-foreground shadow-md scale-[1.02]'
+						: 'border-border bg-muted/40 hover:-translate-y-0.5 hover:bg-muted hover:shadow-sm',
 				)}
 			>
 				{slot.startTime}
@@ -72,7 +72,7 @@ function TimeSlotGrid({
 	return (
 		<div
 			className={cn(
-				'grid grid-cols-2 gap-2 sm:grid-cols-3',
+				'grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4',
 				loading && 'pointer-events-none opacity-50',
 			)}
 		>

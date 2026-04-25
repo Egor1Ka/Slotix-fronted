@@ -249,6 +249,7 @@
 		"selectStaffToBook": "Оберіть виконавця для створення запису",
 		"dayOff": "Вихідний — сьогодні ніхто не працює",
 		"staffDayOff": "Цей спеціаліст сьогодні не працює",
+		"pickAnotherDate": "Оберіть іншу дату в календарі",
 		"bookingDetails": "Деталі запису",
 		"date": "Дата",
 		"clientName_label": "Ім'я клієнта",
@@ -416,7 +417,15 @@
 		"myServices": "Мої послуги",
 		"orgProfile": "Профіль організації",
 		"myProfile": "Мій профіль",
-		"bookingStatuses": "Статуси бронювань"
+		"bookingStatuses": "Статуси бронювань",
+		"groupCalendar": "Календар",
+		"groupManage": "Управління",
+		"groupAccount": "Акаунт",
+		"groupAdmin": "Адміністрування",
+		"groupPersonal": "Особисте",
+		"groupOrgProfile": "Профіль",
+		"groupSchedule": "Розклад",
+		"groupStructure": "Структура"
 	},
 	"organizations": {
 		"title": "Мої організації",

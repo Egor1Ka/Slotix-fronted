@@ -1,4 +1,5 @@
-import { LanguageSwitcher } from '@/components/language-switcher'
+import { AppHeader } from '@/components/app-header'
+import { AppFooter } from '@/components/app-footer'
 
 export default function PublicLayout({
 	children,
@@ -6,11 +7,10 @@ export default function PublicLayout({
 	children: React.ReactNode
 }>) {
 	return (
-		<main className="min-h-svh">
-			<div className="fixed top-4 right-4 z-50">
-				<LanguageSwitcher />
-			</div>
-			{children}
-		</main>
+		<div className="flex min-h-svh flex-col">
+			<AppHeader />
+			<main className="flex-1">{children}</main>
+			<AppFooter />
+		</div>
 	)
 }

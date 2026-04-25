@@ -17,13 +17,20 @@ import {
 	SidebarFooter,
 	SidebarGroup,
 	SidebarGroupContent,
+	SidebarGroupLabel,
 	SidebarHeader,
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from '@/components/ui/sidebar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { LogoutButton } from './LogoutButton'
 import { useUser } from '@/lib/auth/user-provider'
+
+const getInitial = (part: string): string => part[0] ?? ''
+
+const getInitials = (name: string): string =>
+	name.split(' ').map(getInitial).join('').toUpperCase().slice(0, 2)
 
 function PersonalSidebar() {
 	const pathname = usePathname()
@@ -45,23 +52,28 @@ function PersonalSidebar() {
 	return (
 		<Sidebar>
 			<SidebarHeader className="border-b p-4">
-				<div className="flex items-center gap-2">
-					<span className="text-lg font-semibold">{user.name}</span>
+				<div className="flex items-center gap-3">
+					<Avatar className="ring-border size-10 ring-2">
+						<AvatarImage src={user.avatar} alt={user.name} />
+						<AvatarFallback className="text-sm font-medium">
+							{getInitials(user.name)}
+						</AvatarFallback>
+					</Avatar>
+					<div className="flex min-w-0 flex-col gap-0.5">
+						<span className="truncate text-sm font-semibold">{user.name}</span>
+						{user.email && (
+							<span className="text-muted-foreground truncate text-xs">
+								{user.email}
+							</span>
+						)}
+					</div>
 				</div>
 			</SidebarHeader>
 			<SidebarContent>
 				<SidebarGroup>
+					<SidebarGroupLabel>{t('groupCalendar')}</SidebarGroupLabel>
 					<SidebarGroupContent>
 						<SidebarMenu>
-							<SidebarMenuItem>
-								<SidebarMenuButton
-									render={<Link href={profileHref} />}
-									isActive={isActive(profileHref)}
-								>
-									<UserCircle className="size-4" />
-									<span>{t('myProfile')}</span>
-								</SidebarMenuButton>
-							</SidebarMenuItem>
 							<SidebarMenuItem>
 								<SidebarMenuButton
 									render={<Link href={scheduleHref} />}
@@ -80,6 +92,13 @@ function PersonalSidebar() {
 									<span>{t('myScheduleSettings')}</span>
 								</SidebarMenuButton>
 							</SidebarMenuItem>
+						</SidebarMenu>
+					</SidebarGroupContent>
+				</SidebarGroup>
+				<SidebarGroup>
+					<SidebarGroupLabel>{t('groupManage')}</SidebarGroupLabel>
+					<SidebarGroupContent>
+						<SidebarMenu>
 							<SidebarMenuItem>
 								<SidebarMenuButton
 									render={<Link href={myServicesHref} />}
@@ -96,6 +115,22 @@ function PersonalSidebar() {
 								>
 									<CircleDot className="size-4" />
 									<span>{t('bookingStatuses')}</span>
+								</SidebarMenuButton>
+							</SidebarMenuItem>
+						</SidebarMenu>
+					</SidebarGroupContent>
+				</SidebarGroup>
+				<SidebarGroup>
+					<SidebarGroupLabel>{t('groupAccount')}</SidebarGroupLabel>
+					<SidebarGroupContent>
+						<SidebarMenu>
+							<SidebarMenuItem>
+								<SidebarMenuButton
+									render={<Link href={profileHref} />}
+									isActive={isActive(profileHref)}
+								>
+									<UserCircle className="size-4" />
+									<span>{t('myProfile')}</span>
 								</SidebarMenuButton>
 							</SidebarMenuItem>
 							<SidebarMenuItem>
