@@ -8,39 +8,52 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Field, FieldError, FieldLabel } from '@/components/ui/field'
-import { orgApi, userApi, setServerErrors } from '@/services'
+import {
+	Field,
+	FieldDescription,
+	FieldError,
+	FieldLabel,
+} from '@/components/ui/field'
+import { Badge } from '@/components/ui/badge'
+import { Spinner } from '@/components/ui/spinner'
+import { ProfileHeader } from '@/components/profile/ProfileHeader'
+import { useUser } from '@/lib/auth/user-provider'
+import { orgApi, setServerErrors } from '@/services'
+import type { OrgMembership } from '@/services/configs/org.types'
 
-const bioSchema = z.object({
+const profileSchema = z.object({
+	displayName: z
+		.string()
+		.trim()
+		.max(100)
+		.optional()
+		.or(z.literal(''))
+		.refine((v) => !v || v.length >= 2, {
+			message: 'Minimum 2 characters',
+		}),
 	bio: z.string().max(500).optional().or(z.literal('')),
 })
 
-type BioFormData = z.infer<typeof bioSchema>
+type ProfileFormData = z.infer<typeof profileSchema>
 
 function StaffMyProfilePage() {
 	const params = useParams<{ orgId: string }>()
 	const t = useTranslations('profile')
-	const [staffId, setStaffId] = useState<string | null>(null)
+	const user = useUser()
+	const [membership, setMembership] = useState<OrgMembership | null>(null)
 	const [loading, setLoading] = useState(true)
-	const [currentBio, setCurrentBio] = useState<string>('')
 
 	const orgId = params.orgId
 
 	useEffect(() => {
-		const fetchData = async () => {
+		const fetchMembership = async () => {
 			try {
-				const userResponse = await userApi.me()
-				const userId = userResponse.data.id
-
-				const staffResponse = await orgApi.getStaff({
+				const response = await orgApi.getMyMembership({
 					pathParams: { id: orgId },
 				})
-				const me = staffResponse.data.find((s) => s.id === userId)
-				if (me) {
-					setStaffId(me.id)
-					setCurrentBio(me.bio ?? '')
-				}
+				setMembership(response.data)
 			} catch {
 				// toast interceptor handles errors
 			} finally {
@@ -48,7 +61,7 @@ function StaffMyProfilePage() {
 			}
 		}
 
-		fetchData()
+		fetchMembership()
 	}, [orgId])
 
 	const {
@@ -56,22 +69,35 @@ function StaffMyProfilePage() {
 		handleSubmit,
 		formState: { errors, isSubmitting },
 		setError,
-	} = useForm<BioFormData>({
-		resolver: zodResolver(bioSchema),
-		values: { bio: currentBio },
+	} = useForm<ProfileFormData>({
+		resolver: zodResolver(profileSchema),
+		values: {
+			displayName: membership?.displayName ?? '',
+			bio: membership?.bio ?? '',
+		},
 	})
 
-	const onSubmit = async (data: BioFormData) => {
-		if (!staffId) return
+	const onSubmit = async (data: ProfileFormData) => {
+		const displayName = data.displayName?.trim() || null
+		const bio = data.bio?.trim() || null
 		try {
-			await orgApi.updateStaffBio({
-				pathParams: { orgId, staffId },
-				body: { bio: data.bio || null },
+			const response = await orgApi.updateStaffMember({
+				pathParams: { orgId, staffId: user.id },
+				body: { displayName, bio },
 			})
+			setMembership((prev) =>
+				prev
+					? {
+							...prev,
+							displayName: response.data.displayName,
+							bio: response.data.bio,
+						}
+					: prev,
+			)
 			toast.success(t('saved'))
 		} catch (err) {
 			if (!setServerErrors(err, setError)) {
-				// toast already shown
+				// toast already shown by interceptor
 			}
 		}
 	}
@@ -79,17 +105,56 @@ function StaffMyProfilePage() {
 	if (loading) {
 		return (
 			<div className="flex items-center justify-center py-20">
-				<p className="text-muted-foreground text-sm">Loading...</p>
+				<Spinner />
 			</div>
 		)
 	}
 
-	if (!staffId) return null
+	if (!membership) return null
+
+	const effectiveName = membership.displayName || user.name
+	const roleLabel = t(`role.${membership.role}`)
+
+	const renderBadges = () => {
+		const badges = [
+			<Badge key="role" variant="secondary">
+				{roleLabel}
+			</Badge>,
+		]
+		if (membership.position) {
+			badges.push(
+				<Badge key="position" variant="outline">
+					{membership.position}
+				</Badge>,
+			)
+		}
+		return badges
+	}
 
 	return (
-		<div className="mx-auto max-w-2xl p-6">
-			<h1 className="mb-6 text-2xl font-bold">{t('myTitle')}</h1>
+		<div className="mx-auto max-w-2xl space-y-6 p-6">
+			<h1 className="text-2xl font-bold">{t('myTitle')}</h1>
+
+			<ProfileHeader
+				avatar={user.avatar}
+				name={effectiveName}
+				badges={renderBadges()}
+			/>
+
 			<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+				<Field data-invalid={!!errors.displayName || undefined}>
+					<FieldLabel htmlFor="org-display-name">
+						{t('orgDisplayNameLabel')}
+					</FieldLabel>
+					<Input
+						id="org-display-name"
+						placeholder={user.name}
+						{...register('displayName')}
+					/>
+					<FieldDescription>{t('orgDisplayNameHint')}</FieldDescription>
+					<FieldError errors={[errors.displayName]} />
+				</Field>
+
 				<Field data-invalid={!!errors.bio || undefined}>
 					<FieldLabel htmlFor="staff-bio">{t('bio')}</FieldLabel>
 					<Textarea
@@ -100,6 +165,7 @@ function StaffMyProfilePage() {
 					/>
 					<FieldError errors={[errors.bio]} />
 				</Field>
+
 				<Button type="submit" disabled={isSubmitting}>
 					{t('save')}
 				</Button>

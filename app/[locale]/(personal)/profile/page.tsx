@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { userApi } from '@/services'
 import type { User } from '@/services'
+import { ProfileHeader } from '@/components/profile/ProfileHeader'
 import { ProfileForm } from '@/components/profile/ProfileForm'
 import type { ProfileFormData } from '@/components/profile/ProfileForm'
 import { TelegramConnect } from '@/components/profile/TelegramConnect'
@@ -123,6 +124,11 @@ function PersonalProfilePage() {
 	return (
 		<div className="mx-auto max-w-2xl space-y-6 p-6">
 			<h1 className="text-2xl font-bold">{t('myTitle')}</h1>
+			<ProfileHeader
+				avatar={user.avatar}
+				name={user.name}
+				subtitle={user.email}
+			/>
 			<ProfileForm defaultValues={defaultValues} onSubmit={handleSubmit} />
 			{schedule && (
 				<>

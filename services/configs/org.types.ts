@@ -40,6 +40,10 @@ interface AddStaffBody {
 interface OrgMembership {
 	role: 'owner' | 'admin' | 'member'
 	status: 'active' | 'invited' | 'suspended' | 'left'
+	displayName: string | null
+	bio: string | null
+	positionId: string | null
+	position: string | null
 }
 
 export type {

@@ -58,3 +58,131 @@
 		opacity: 0.4;
 	}
 }
+
+@keyframes landing-shimmer {
+	0% {
+		background-position: -200% center;
+	}
+	100% {
+		background-position: 200% center;
+	}
+}
+
+@keyframes landing-glow {
+	0%,
+	100% {
+		box-shadow: 0 0 0 0 oklch(0.72 0.18 145 / 0.25);
+	}
+	50% {
+		box-shadow: 0 0 40px 8px oklch(0.72 0.18 145 / 0.3);
+	}
+}
+
+@keyframes landing-marquee {
+	from {
+		transform: translateX(0);
+	}
+	to {
+		transform: translateX(-50%);
+	}
+}
+
+@keyframes landing-tick {
+	0% {
+		transform: scale(0) rotate(-45deg);
+		opacity: 0;
+	}
+	60% {
+		transform: scale(1.15) rotate(0);
+		opacity: 1;
+	}
+	100% {
+		transform: scale(1) rotate(0);
+		opacity: 1;
+	}
+}
+
+@keyframes landing-grid-drift {
+	0% {
+		background-position: 0 0;
+	}
+	100% {
+		background-position: 48px 48px;
+	}
+}
+
+.landing-scroll-reveal {
+	opacity: 0;
+	transform: translateY(40px);
+	animation: landing-reveal 0.9s ease both;
+}
+
+@supports (animation-timeline: view()) {
+	.landing-scroll-reveal {
+		animation-timeline: view();
+		animation-range: entry 0% entry 60%;
+		animation-fill-mode: both;
+	}
+}
+
+.landing-shimmer-text {
+	background: linear-gradient(
+		90deg,
+		oklch(0.65 0.15 145) 0%,
+		oklch(0.85 0.18 145) 45%,
+		oklch(0.65 0.15 145) 55%,
+		oklch(0.65 0.15 145) 100%
+	);
+	background-size: 200% auto;
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+	animation: landing-shimmer 6s linear infinite;
+}
+
+.landing-grid-bg {
+	background-image:
+		linear-gradient(to right, oklch(0.65 0.02 250 / 0.08) 1px, transparent 1px),
+		linear-gradient(to bottom, oklch(0.65 0.02 250 / 0.08) 1px, transparent 1px);
+	background-size: 48px 48px;
+	mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);
+	animation: landing-grid-drift 30s linear infinite;
+}
+
+.landing-card-hover {
+	transition:
+		transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+		box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+		border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.landing-card-hover:hover {
+	transform: translateY(-4px);
+}
+
+.landing-marquee {
+	mask-image: linear-gradient(
+		to right,
+		transparent 0%,
+		black 10%,
+		black 90%,
+		transparent 100%
+	);
+}
+
+.landing-marquee-track {
+	animation: landing-marquee 40s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.landing-scroll-reveal,
+	.landing-shimmer-text,
+	.landing-marquee-track,
+	.landing-grid-bg {
+		animation: none !important;
+	}
+	.landing-scroll-reveal {
+		opacity: 1;
+		transform: none;
+	}
+}

@@ -2,7 +2,18 @@ import Link from 'next/link'
 import { cookies } from 'next/headers'
 import { getTranslations } from 'next-intl/server'
 import { getUser } from '@/lib/auth/get-user'
-import { ArrowRight, Check, Clock, Users, Zap, CalendarCog } from 'lucide-react'
+import {
+	ArrowRight,
+	Check,
+	Clock,
+	Users,
+	Zap,
+	CalendarCog,
+	Sparkles,
+	Building2,
+	Network,
+} from 'lucide-react'
+import { HeroVideo } from '@/components/landing/hero-video'
 
 const CREEM_PRODUCT_ORG_CREATOR = process.env.CREEM_PRODUCT_ORG_CREATOR || ''
 
@@ -117,7 +128,7 @@ export default async function LandingPage() {
 							<h1 className="animate-[landing-reveal_0.7s_0.1s_ease_both] text-5xl leading-[1.05] font-bold tracking-tight sm:text-6xl lg:text-7xl">
 								{t('hero.title')}
 								<br />
-								<span className="text-emerald-500 dark:text-emerald-400">
+								<span className="landing-shimmer-text">
 									{t('hero.titleAccent')}
 								</span>
 							</h1>
@@ -260,10 +271,106 @@ export default async function LandingPage() {
 				<div className="bg-border h-px" />
 			</div>
 
-			{/* Features */}
-			<section id="features" className="px-4 py-28 sm:px-6 lg:px-8">
+			{/* Video showcase */}
+			<section className="relative overflow-hidden px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+				<div className="mx-auto max-w-6xl">
+					<div className="landing-scroll-reveal mx-auto mb-12 max-w-2xl text-center">
+						<span className="mb-4 block font-mono text-xs tracking-widest text-emerald-600 uppercase dark:text-emerald-400">
+							{t('showcase.eyebrow')}
+						</span>
+						<h2 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+							{t('showcase.title')}
+						</h2>
+						<p className="text-muted-foreground mt-4 text-lg">
+							{t('showcase.subtitle')}
+						</p>
+					</div>
+
+					<div className="landing-scroll-reveal relative">
+						<div
+							aria-hidden="true"
+							className="pointer-events-none absolute -inset-8 -z-10 rounded-[3rem] bg-[radial-gradient(ellipse_at_center,oklch(0.72_0.18_145_/_0.12),transparent_65%)] blur-3xl"
+						/>
+						<div className="border-border/60 bg-card relative overflow-hidden rounded-3xl border shadow-2xl ring-1 ring-white/5 dark:ring-white/10">
+							<div className="border-border/60 bg-muted/40 flex items-center gap-2 border-b px-4 py-3">
+								<div className="flex items-center gap-1.5">
+									<span className="h-2.5 w-2.5 rounded-full bg-red-400/70" />
+									<span className="h-2.5 w-2.5 rounded-full bg-amber-400/70" />
+									<span className="h-2.5 w-2.5 rounded-full bg-emerald-400/70" />
+								</div>
+								<div className="flex flex-1 justify-center">
+									<span className="bg-background/60 text-muted-foreground rounded-md px-3 py-0.5 font-mono text-[11px]">
+										slotix.app
+									</span>
+								</div>
+								<div className="w-[54px]" />
+							</div>
+							<div className="relative aspect-video bg-black">
+								<HeroVideo className="absolute inset-0 h-full w-full object-cover" />
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+				<div className="bg-border h-px" />
+			</div>
+
+			{/* Audiences */}
+			<section
+				id="audiences"
+				className="relative overflow-hidden px-4 py-16 sm:px-6 sm:py-20 lg:px-8"
+			>
+				<div className="landing-grid-bg pointer-events-none absolute inset-0 -z-10 opacity-60" />
 				<div className="mx-auto max-w-7xl">
-					<div className="mb-16 max-w-2xl">
+					<div className="landing-scroll-reveal mb-10 sm:mb-12 max-w-2xl">
+						<span className="mb-4 block font-mono text-xs tracking-widest text-emerald-600 uppercase dark:text-emerald-400">
+							{t('audiences.eyebrow')}
+						</span>
+						<h2 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+							{t('audiences.title')}
+						</h2>
+						<p className="text-muted-foreground mt-4 text-lg">
+							{t('audiences.subtitle')}
+						</p>
+					</div>
+
+					<div className="grid gap-6 md:grid-cols-3">
+						<AudienceCard
+							icon={<Sparkles className="h-5 w-5" />}
+							title={t('audiences.solo.title')}
+							description={t('audiences.solo.description')}
+							tags={t.raw('audiences.solo.tags') as string[]}
+							accent="emerald"
+						/>
+						<AudienceCard
+							icon={<Building2 className="h-5 w-5" />}
+							title={t('audiences.team.title')}
+							description={t('audiences.team.description')}
+							tags={t.raw('audiences.team.tags') as string[]}
+							accent="sky"
+							highlighted
+						/>
+						<AudienceCard
+							icon={<Network className="h-5 w-5" />}
+							title={t('audiences.enterprise.title')}
+							description={t('audiences.enterprise.description')}
+							tags={t.raw('audiences.enterprise.tags') as string[]}
+							accent="violet"
+						/>
+					</div>
+				</div>
+			</section>
+
+			<div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+				<div className="bg-border h-px" />
+			</div>
+
+			{/* Features */}
+			<section id="features" className="px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+				<div className="mx-auto max-w-7xl">
+					<div className="landing-scroll-reveal mb-10 sm:mb-12 max-w-2xl">
 						<span className="mb-4 block font-mono text-xs tracking-widest text-emerald-600 uppercase dark:text-emerald-400">
 							{t('nav.features')}
 						</span>
@@ -294,9 +401,9 @@ export default async function LandingPage() {
 			</section>
 
 			{/* Pricing */}
-			<section id="pricing" className="px-4 py-28 sm:px-6 lg:px-8">
+			<section id="pricing" className="px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
 				<div className="mx-auto max-w-5xl">
-					<div className="mb-16 text-center">
+					<div className="landing-scroll-reveal mb-10 sm:mb-12 text-center">
 						<span className="mb-4 block font-mono text-xs tracking-widest text-emerald-600 uppercase dark:text-emerald-400">
 							{t('nav.pricing')}
 						</span>
@@ -308,7 +415,7 @@ export default async function LandingPage() {
 						</p>
 					</div>
 
-					<div className="grid gap-8 md:grid-cols-2">
+					<div className="landing-scroll-reveal grid gap-8 md:grid-cols-2">
 						<PricingCard
 							name={t('pricing.free.name')}
 							price={t('pricing.free.price')}
@@ -338,9 +445,16 @@ export default async function LandingPage() {
 			</div>
 
 			{/* CTA */}
-			<section className="relative overflow-hidden px-4 py-32 sm:px-6 lg:px-8">
+			<section className="relative overflow-hidden px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
 				<div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-emerald-500/[0.04] to-transparent" />
-				<div className="mx-auto flex max-w-3xl flex-col items-center gap-8 text-center">
+				<div
+					className="pointer-events-none absolute top-1/2 left-1/2 -z-10 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,oklch(0.72_0.18_145_/_0.08)_0%,transparent_70%)] blur-3xl"
+					style={{
+						animation:
+							'landing-mesh-1 18s ease-in-out infinite',
+					}}
+				/>
+				<div className="landing-scroll-reveal mx-auto flex max-w-3xl flex-col items-center gap-8 text-center">
 					<h2 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
 						{t('cta.title')}
 					</h2>
@@ -349,10 +463,11 @@ export default async function LandingPage() {
 					</p>
 					<Link
 						href={authHref}
-						className="group inline-flex h-12 items-center gap-2 rounded-xl bg-emerald-600 px-8 text-sm font-semibold text-white shadow-lg shadow-emerald-600/25 transition-all hover:bg-emerald-700 hover:shadow-emerald-600/40"
+						className="group relative inline-flex h-12 items-center gap-2 overflow-hidden rounded-xl bg-emerald-600 px-8 text-sm font-semibold text-white shadow-lg shadow-emerald-600/25 transition-all hover:bg-emerald-700 hover:shadow-emerald-600/40"
 					>
-						{t('cta.button')}
-						<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+						<span className="pointer-events-none absolute inset-0 -translate-x-full bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.25),transparent)] transition-transform duration-700 group-hover:translate-x-full" />
+						<span className="relative">{t('cta.button')}</span>
+						<ArrowRight className="relative h-4 w-4 transition-transform group-hover:translate-x-0.5" />
 					</Link>
 				</div>
 			</section>
@@ -420,9 +535,10 @@ function FeatureCard({
 	children: React.ReactNode
 }) {
 	return (
-		<div className="group border-border/60 hover:border-foreground/20 relative overflow-hidden rounded-2xl border p-8 transition-all duration-300 hover:shadow-lg">
+		<div className="group landing-scroll-reveal landing-card-hover border-border/60 hover:border-emerald-500/40 hover:shadow-emerald-500/5 relative overflow-hidden rounded-2xl border p-8 hover:shadow-2xl">
+			<div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_right,oklch(0.72_0.18_145_/_0.08),transparent_60%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 			<div className="mb-6">
-				<div className="bg-foreground/[0.05] text-foreground mb-4 flex h-10 w-10 items-center justify-center rounded-lg transition-colors group-hover:bg-emerald-500/15 group-hover:text-emerald-600 dark:group-hover:text-emerald-400">
+				<div className="bg-foreground/[0.05] text-foreground mb-4 flex h-10 w-10 items-center justify-center rounded-lg transition-all duration-300 group-hover:scale-110 group-hover:bg-emerald-500/15 group-hover:text-emerald-600 dark:group-hover:text-emerald-400">
 					{icon}
 				</div>
 				<h3 className="mb-2 text-lg font-semibold">{title}</h3>
@@ -431,6 +547,77 @@ function FeatureCard({
 				</p>
 			</div>
 			<div className="mt-2">{children}</div>
+		</div>
+	)
+}
+
+const AUDIENCE_ACCENTS = {
+	emerald: {
+		icon: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+		ring: 'hover:border-emerald-500/40 hover:shadow-emerald-500/10',
+		glow: 'bg-[radial-gradient(circle_at_top_left,oklch(0.72_0.18_145_/_0.15),transparent_60%)]',
+		tag: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20',
+	},
+	sky: {
+		icon: 'bg-sky-500/10 text-sky-600 dark:text-sky-400',
+		ring: 'hover:border-sky-500/40 hover:shadow-sky-500/10',
+		glow: 'bg-[radial-gradient(circle_at_top_left,oklch(0.75_0.15_210_/_0.18),transparent_60%)]',
+		tag: 'bg-sky-500/10 text-sky-700 dark:text-sky-300 border-sky-500/20',
+	},
+	violet: {
+		icon: 'bg-violet-500/10 text-violet-600 dark:text-violet-400',
+		ring: 'hover:border-violet-500/40 hover:shadow-violet-500/10',
+		glow: 'bg-[radial-gradient(circle_at_top_left,oklch(0.70_0.18_300_/_0.15),transparent_60%)]',
+		tag: 'bg-violet-500/10 text-violet-700 dark:text-violet-300 border-violet-500/20',
+	},
+} as const
+
+function AudienceCard({
+	icon,
+	title,
+	description,
+	tags,
+	accent,
+	highlighted = false,
+}: {
+	icon: React.ReactNode
+	title: string
+	description: string
+	tags: string[]
+	accent: keyof typeof AUDIENCE_ACCENTS
+	highlighted?: boolean
+}) {
+	const a = AUDIENCE_ACCENTS[accent]
+	return (
+		<div
+			className={`group landing-scroll-reveal landing-card-hover relative overflow-hidden rounded-2xl border p-7 shadow-sm hover:shadow-2xl ${
+				highlighted
+					? 'border-foreground/20 bg-card'
+					: 'border-border/60 bg-card/50'
+			} ${a.ring}`}
+		>
+			<div
+				className={`pointer-events-none absolute inset-0 -z-10 opacity-0 transition-opacity duration-500 group-hover:opacity-100 ${a.glow}`}
+			/>
+			<div
+				className={`mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110 ${a.icon}`}
+			>
+				{icon}
+			</div>
+			<h3 className="mb-2 text-lg font-semibold">{title}</h3>
+			<p className="text-muted-foreground mb-5 text-sm leading-relaxed">
+				{description}
+			</p>
+			<div className="flex flex-wrap gap-1.5">
+				{tags.map((tag) => (
+					<span
+						key={tag}
+						className={`rounded-full border px-2.5 py-0.5 text-[11px] font-medium ${a.tag}`}
+					>
+						{tag}
+					</span>
+				))}
+			</div>
 		</div>
 	)
 }

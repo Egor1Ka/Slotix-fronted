@@ -164,6 +164,7 @@ interface OrgStaffMember extends StaffMember {
 	bookingCount: number
 	status?: 'active' | 'invited' | 'suspended'
 	positionId?: string | null
+	displayName?: string | null
 }
 
 // ── Calendar Display ──

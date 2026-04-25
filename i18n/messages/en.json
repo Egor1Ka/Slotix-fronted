@@ -1,49 +1,75 @@
 {
 	"metadata": {
-		"title": "Slotix — Intelligent Booking Platform",
-		"description": "End scheduling chaos. Automate growth with the intelligent booking layer for modern service businesses."
+		"title": "Slotix — Booking that grows with you",
+		"description": "One booking platform for every stage of your business — from a private tutor to a multi-location studio. Start solo, scale to teams."
 	},
 	"landing": {
 		"nav": {
 			"logo": "Slotix",
+			"audiences": "Who it's for",
 			"features": "Features",
 			"pricing": "Pricing",
 			"login": "Login",
 			"signup": "Get started"
 		},
 		"hero": {
-			"badge": "SLOTIX ENGINE V2.0 LIVE",
-			"title": "End scheduling chaos.",
-			"titleAccent": "Automate growth.",
-			"subtitle": "The intelligent booking layer for modern service businesses. Solo or team, fixed or dynamic — Slotix aligns client demand with your optimal availability, entirely frictionless.",
-			"cta": "Start Free Trial",
-			"demo": "View Live Demo",
-			"noCard": "NO CREDIT CARD REQUIRED • PUBLIC BOOKING PAGE INCLUDED"
+			"badge": "ONE PLATFORM · EVERY STAGE",
+			"title": "Booking that grows",
+			"titleAccent": "with you.",
+			"subtitle": "Whether you're a private tutor, a personal trainer, or running a multi-location studio — Slotix handles every booking at every stage. Start solo. Scale to a team. Run a network. One platform, zero migrations.",
+			"cta": "Start for free",
+			"demo": "See live demo",
+			"noCard": "NO CREDIT CARD · PUBLIC BOOKING PAGE INCLUDED · 5-MINUTE SETUP"
+		},
+		"showcase": {
+			"eyebrow": "WATCH IT WORK",
+			"title": "Slotix in action",
+			"subtitle": "From empty calendar to confirmed booking in under a minute."
+		},
+		"audiences": {
+			"eyebrow": "WHO IT'S FOR",
+			"title": "From solo pros to entire networks",
+			"subtitle": "The same platform covers every scale — you never outgrow it.",
+			"solo": {
+				"title": "Private professionals",
+				"description": "Tutors, trainers, coaches, therapists, consultants, barbers, nail artists — anyone selling their time.",
+				"tags": ["Tutor", "Trainer", "Coach", "Therapist", "Consultant"]
+			},
+			"team": {
+				"title": "Growing teams",
+				"description": "Studios, cabinets, small salons and clinics with 2–10 specialists sharing a calendar.",
+				"tags": ["Studio", "Salon", "Clinic", "Gym"]
+			},
+			"enterprise": {
+				"title": "Large business",
+				"description": "Chains, franchises, medical centers, schools and coworkings — multi-location and multi-team.",
+				"tags": ["Network", "Franchise", "School", "Fitness club"]
+			}
 		},
 		"features": {
-			"title": "Built for how you actually work",
-			"subtitle": "Every feature designed to eliminate friction between your availability and client demand.",
+			"title": "Every feature grows with you",
+			"subtitle": "The same engine handles one calendar or a hundred. Friction-free on day one, enterprise-ready on day one thousand.",
 			"items": {
 				"slots": {
-					"title": "Intelligent Slot Algorithms",
-					"description": "Choose between strict fixed intervals or let our dynamic engine optimize gaps to maximize your daily yield and prevent fragmented schedules."
+					"title": "Intelligent slot engine",
+					"description": "Fixed, optimal or dynamic — three scheduling modes that eliminate dead gaps. Solo mastery of your day, team-wide efficiency across a network."
 				},
 				"booking": {
-					"title": "Zero-Login Booking",
-					"description": "Conversion drops when clients have to create accounts. Slotix public pages require zero registration. Select, confirm, done."
+					"title": "Zero-login booking",
+					"description": "Clients skip accounts, passwords and apps. Open link → pick service → confirm. Higher conversion for a single tutor, higher throughput for a whole chain."
 				},
 				"team": {
-					"title": "Solo or Team Scaling",
-					"description": "Operate as a lone wolf or manage a multi-staff studio. Route bookings based on individual specialist availability and skill set."
+					"title": "From solo to network",
+					"description": "Start with one calendar. Add staff when you grow. Spin up a second location. Match clients by position, skill and availability — automatically."
 				},
 				"schedule": {
-					"title": "Flexible Schedule Control",
-					"description": "Set custom work hours for each day, add day-off overrides for vacations or sick days, and let Slotix automatically block unavailable time across all booking pages."
+					"title": "Full schedule control",
+					"description": "Custom hours per day, vacations, sick days, per-staff overrides, timezones. Public pages update instantly so clients only see real availability."
 				}
 			}
 		},
 		"pricing": {
-			"title": "Simple pricing",
+			"title": "Pricing",
 			"subtitle": "Choose the plan that fits your needs.",
 			"popular": "Popular",
 			"free": {
@@ -77,9 +103,9 @@
 			}
 		},
 		"cta": {
-			"title": "Ready to end scheduling chaos?",
-			"subtitle": "Join thousands of service businesses that automate their bookings with Slotix. Set up in under 5 minutes.",
-			"button": "Start Free Trial"
+			"title": "One platform. Every stage of your business.",
+			"subtitle": "From the first booking of a private tutor to the thousandth booking in a chain — same link, same account, zero migrations. Set up in under 5 minutes.",
+			"button": "Start for free"
 		},
 		"preview": {
 			"day": "Day",
@@ -587,6 +613,15 @@
 		"timezone": "My Timezone",
 		"timezoneHint": "Defines your personal schedule. Change if you work in a different timezone.",
 		"timezoneSaved": "Timezone updated",
-		"timezoneSave": "Save"
+		"timezoneSave": "Save",
+		"emailLabel": "Email",
+		"orgDisplayNameLabel": "Your name in this organization",
+		"orgDisplayNamePlaceholder": "Leave empty to use your global name",
+		"orgDisplayNameHint": "This name is visible only inside this organization",
+		"role": {
+			"owner": "Owner",
+			"admin": "Admin",
+			"member": "Member"
+		}
 	}
 }

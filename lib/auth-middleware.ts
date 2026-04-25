@@ -2,13 +2,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { isSafeRedirectPath } from '@/lib/utils'
 
-const protectedPaths = [
-	'/dashboard',
-	'/shadcndemo',
-	'/organizations',
-	'/schedule',
-	'/manage',
-]
+const protectedPaths = ['/organizations', '/schedule', '/manage']
 const authPaths = ['/login', '/signup']
 
 const isProtectedPath = (pathname: string): boolean =>
@@ -24,7 +18,7 @@ function consumeCallbackUrl(request: NextRequest): NextResponse {
 	const callbackUrl =
 		rawCallbackUrl && isSafeRedirectPath(decodeURIComponent(rawCallbackUrl))
 			? decodeURIComponent(rawCallbackUrl)
-			: '/dashboard'
+			: '/organizations'
 	const redirectUrl = new URL(callbackUrl, request.url)
 	const response = NextResponse.redirect(redirectUrl)
 	response.cookies.delete('callbackUrl')

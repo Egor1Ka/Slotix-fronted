@@ -68,13 +68,14 @@ const orgApiConfig = {
 		defaultErrorMessage: 'Failed to decline invitation',
 	}),
 
-	updateStaffBio: endpoint<{ bio: string | null }, ApiResponse<OrgStaffMember>>(
-		{
-			url: ({ orgId, staffId }) => `/api/org/${orgId}/staff/${staffId}`,
-			method: patchData,
-			defaultErrorMessage: 'Failed to update bio',
-		},
-	),
+	updateStaffMember: endpoint<
+		{ bio?: string | null; displayName?: string | null },
+		ApiResponse<{ bio: string | null; displayName: string | null }>
+	>({
+		url: ({ orgId, staffId }) => `/api/org/${orgId}/staff/${staffId}`,
+		method: patchData,
+		defaultErrorMessage: 'Failed to update profile',
+	}),
 
 	getMyMembership: endpoint<void, ApiResponse<OrgMembership>>({
 		url: ({ id }) => `/api/org/${id}/my-membership`,
