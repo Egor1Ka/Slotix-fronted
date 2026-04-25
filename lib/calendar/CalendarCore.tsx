@@ -53,6 +53,7 @@ const DEFAULT_VIEW_CONFIG: CalendarViewConfig = {
 	onEmptyCellClick: 'open-booking-flow',
 	onBlockClick: 'none',
 	canBookForClient: false,
+	isPublicBookingPage: false,
 	filterByStaffCapability: false,
 	showScheduleEditor: false,
 	allowListView: false,

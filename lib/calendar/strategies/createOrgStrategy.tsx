@@ -1,9 +1,4 @@
-import type {
-	CalendarStrategy,
-	CalendarBlock,
-	ConfirmedBooking,
-	ViewMode,
-} from '../types'
+import type { CalendarStrategy, CalendarBlock, ViewMode } from '../types'
 import {
 	formatDateLocale,
 	formatWeekRange,
@@ -31,9 +26,6 @@ import type {
 import { ServiceList } from '@/components/booking/ServiceList'
 import { ServiceInfo } from '@/components/booking/BookingPanelParts'
 import { StaffInfoCard } from '@/components/booking/StaffInfoCard'
-import { StaffBookingPanel } from '@/components/booking/StaffBookingPanel'
-import type { ClientInfoData } from '@/components/booking/ClientInfoForm'
-import type { MergedBookingForm } from '@/services/configs/booking-field.types'
 import {
 	BookingDetailsPanel,
 	type BookingDetail,
@@ -48,16 +40,9 @@ interface OrgStrategyParams {
 	schedule?: ScheduleTemplate
 	selectedEventTypeId?: string | null
 	selectedSlot?: string | null
-	confirmedBooking?: ConfirmedBooking | null
 	date?: string
 	onSelectEventType?: (eventTypeId: string) => void
 	onSelectSlot?: (time: string, date?: string) => void
-	onConfirmWithClient?: (data: ClientInfoData) => void
-	onCancel?: () => void
-	onResetSlot?: () => void
-	isSubmitting?: boolean
-	formConfig?: MergedBookingForm | null
-	bookingError?: string | null
 	selectedBooking?: BookingDetail | null
 	onBookingSelect?: (bookingId: string) => void
 	availableStatuses?: BookingStatusObject[]
@@ -111,16 +96,9 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 		schedule,
 		selectedEventTypeId = null,
 		selectedSlot = null,
-		confirmedBooking = null,
 		date = '',
 		onSelectEventType,
 		onSelectSlot,
-		onConfirmWithClient,
-		onCancel,
-		onResetSlot,
-		isSubmitting = false,
-		formConfig = null,
-		bookingError = null,
 		selectedBooking = null,
 		onBookingSelect,
 		availableStatuses = [],
@@ -177,8 +155,7 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 			!canBookForClient ||
 			!selectedEventType ||
 			!selectedStaffId ||
-			!schedule ||
-			confirmedBooking
+			!schedule
 		)
 			return []
 
@@ -243,8 +220,7 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 			!canBookForClient ||
 			!selectedEventType ||
 			!selectedSlot ||
-			blockDate !== date ||
-			confirmedBooking
+			blockDate !== date
 		)
 			return []
 		const slotMin = timeToMin(selectedSlot)
@@ -351,25 +327,18 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 				const bookingStaff = staffList.find(findStaffByUserId)
 
 				return (
-					<>
-						{bookingError && (
-							<div className="text-destructive bg-destructive/10 mb-3 rounded-md p-3 text-sm">
-								{bookingError}
-							</div>
-						)}
-						<BookingDetailsPanel
-							booking={selectedBooking}
-							eventTypeName={bookingEventType?.name ?? ''}
-							eventTypeColor={bookingEventType?.color ?? '#888'}
-							staffName={bookingStaff?.name}
-							staffAvatar={bookingStaff?.avatar}
-							staffPosition={bookingStaff?.position ?? undefined}
-							availableStatuses={availableStatuses}
-							onChangeStatus={onBookingStatusChange ?? (async () => {})}
-							onReschedule={onBookingReschedule ?? (async () => {})}
-							onClose={onBookingClose ?? (() => {})}
-						/>
-					</>
+					<BookingDetailsPanel
+						booking={selectedBooking}
+						eventTypeName={bookingEventType?.name ?? ''}
+						eventTypeColor={bookingEventType?.color ?? '#888'}
+						staffName={bookingStaff?.name}
+						staffAvatar={bookingStaff?.avatar}
+						staffPosition={bookingStaff?.position ?? undefined}
+						availableStatuses={availableStatuses}
+						onChangeStatus={onBookingStatusChange ?? (async () => {})}
+						onReschedule={onBookingReschedule ?? (async () => {})}
+						onClose={onBookingClose ?? (() => {})}
+					/>
 				)
 			}
 
@@ -381,7 +350,6 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 				)
 			}
 
-			// Услуга выбрана, но сотрудник — нет
 			if (selectedEventType && !selectedStaffId) {
 				return (
 					<>
@@ -397,6 +365,24 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 				s.id === selectedStaffId
 			const selectedStaff = staffList?.find(findSelectedStaff) ?? null
 
+			if (!selectedEventType) {
+				return (
+					<>
+						{selectedStaff && (
+							<StaffInfoCard
+								name={selectedStaff.name}
+								avatar={selectedStaff.avatar}
+								position={selectedStaff.position}
+								bio={selectedStaff.bio}
+							/>
+						)}
+						<div className="text-muted-foreground mt-3 text-sm">
+							{selectStaffLabel}
+						</div>
+					</>
+				)
+			}
+
 			return (
 				<>
 					{selectedStaff && (
@@ -407,21 +393,7 @@ const createOrgStrategy = (params: OrgStrategyParams): CalendarStrategy => {
 							bio={selectedStaff.bio}
 						/>
 					)}
-					{bookingError && (
-						<div className="text-destructive bg-destructive/10 mb-3 rounded-md p-3 text-sm">
-							{bookingError}
-						</div>
-					)}
-					<StaffBookingPanel
-						selectedEventType={selectedEventType}
-						selectedSlot={selectedSlot}
-						confirmedBooking={confirmedBooking}
-						formConfig={formConfig}
-						onConfirmWithClient={onConfirmWithClient ?? (() => {})}
-						onCancel={onCancel ?? (() => {})}
-						onResetSlot={onResetSlot ?? (() => {})}
-						isSubmitting={isSubmitting}
-					/>
+					<ServiceInfo eventType={selectedEventType} />
 				</>
 			)
 		},

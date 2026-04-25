@@ -348,7 +348,21 @@
 		"statusCreated": "Status created",
 		"statusUpdated": "Status updated",
 		"statusArchived": "Status archived",
-		"statusRestored": "Status restored"
+		"statusRestored": "Status restored",
+		"success": {
+			"title": "Booking confirmed!",
+			"subtitle": "We've sent the details to you",
+			"bookAgain": "Book again",
+			"shareLink": "Share booking page",
+			"linkCopied": "Link copied",
+			"copyFailed": "Couldn't copy link",
+			"client": "Client",
+			"staff": "Staff",
+			"dateTime": "Date & time",
+			"notFound": "Booking not found",
+			"notFoundHint": "Maybe the page was reloaded — check your inbox for the booking details.",
+			"goHome": "Go to homepage"
+		}
 	},
 	"calendar": {
 		"day": "Day",

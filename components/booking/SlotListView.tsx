@@ -10,7 +10,7 @@ import { Calendar } from '@/components/ui/calendar'
 import { ServiceList } from './ServiceList'
 import { TimeSlotGrid } from './TimeSlotGrid'
 import { StaffSlotCard } from './StaffSlotCard'
-import { BookingConfirmSheet } from './BookingConfirmSheet'
+import { BookingFlowDialog } from './BookingFlowDialog'
 import { useFindNearestSlots } from '@/lib/calendar/hooks/useFindNearestSlots'
 import { formatYMD } from '@/lib/calendar/utils'
 import type { ClientInfoData } from './ClientInfoForm'
@@ -22,6 +22,7 @@ import type {
 	OrgStaffMember,
 } from '@/services/configs/booking.types'
 import type { MergedBookingForm } from '@/services/configs/booking-field.types'
+import type { ConfirmedBooking } from '@/lib/calendar/types'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -50,8 +51,11 @@ interface SlotListViewProps {
 	onConfirmWithClient: (
 		data: ClientInfoData,
 		overrides?: { slotTime?: string; date?: string; staffId?: string },
-	) => Promise<void>
+	) => Promise<ConfirmedBooking | null>
 	isSubmitting: boolean
+	shareUrl: string
+	onBookAgain: () => void
+	onSuccessNavigate?: (result: ConfirmedBooking) => void
 }
 
 interface PersonalSlotViewProps {
@@ -206,6 +210,9 @@ function SlotListView({
 	formConfig,
 	onConfirmWithClient,
 	isSubmitting,
+	shareUrl,
+	onBookAgain,
+	onSuccessNavigate,
 }: SlotListViewProps) {
 	const t = useTranslations('booking')
 	const locale = useLocale()
@@ -239,6 +246,15 @@ function SlotListView({
 	}
 
 	const handlePersonalSlotSelect = (time: string) => {
+		if (!selectedEventTypeId) {
+			serviceListRef.current?.scrollIntoView({
+				behavior: 'smooth',
+				block: 'start',
+			})
+			triggerServiceListHighlight()
+			toast.info(t('pickServiceThenTime', { time }))
+			return
+		}
 		setSelectedSlot(time)
 		setSelectedStaffId(null)
 		setSheetOpen(true)
@@ -310,15 +326,18 @@ function SlotListView({
 		}
 	}
 
-	const handleConfirm = async (data: ClientInfoData) => {
-		await onConfirmWithClient(data, {
+	const handleDialogSubmit = (data: ClientInfoData) =>
+		onConfirmWithClient(data, {
 			slotTime: selectedSlot ?? undefined,
 			date: startDate,
 			staffId: selectedStaffId ?? staffId ?? undefined,
 		})
+
+	const handleDialogBookAgain = () => {
 		setSheetOpen(false)
 		setSelectedSlot(null)
 		setSelectedStaffId(null)
+		onBookAgain()
 	}
 
 	const selectedOrgStaff =
@@ -394,12 +413,6 @@ function SlotListView({
 				/>
 
 				<div className="flex flex-1 flex-col gap-3">
-					{!selectedEventTypeId && variant === 'personal' && (
-						<p className="text-muted-foreground text-center text-xs">
-							{t('selectServiceFirstPersonal')}
-						</p>
-					)}
-
 					{variant === 'personal' && (
 						<PersonalSlotView
 							schedule={schedule ?? null}
@@ -411,7 +424,6 @@ function SlotListView({
 							staffId={staffId}
 							selectedSlot={selectedSlot}
 							onSlotSelect={handlePersonalSlotSelect}
-							disabled={!selectedEventTypeId}
 						/>
 					)}
 
@@ -424,7 +436,7 @@ function SlotListView({
 			</div>
 
 			{/* Booking confirm sheet */}
-			<BookingConfirmSheet
+			<BookingFlowDialog
 				open={sheetOpen}
 				onOpenChange={handleSheetOpenChange}
 				eventType={selectedEventType}
@@ -433,8 +445,11 @@ function SlotListView({
 				slotTime={selectedSlot}
 				slotDate={dateStr}
 				formConfig={formConfig}
-				onConfirm={handleConfirm}
+				onSubmit={handleDialogSubmit}
 				isSubmitting={isSubmitting}
+				shareUrl={shareUrl}
+				onBookAgain={handleDialogBookAgain}
+				onSuccessNavigate={onSuccessNavigate}
 			/>
 		</div>
 	)

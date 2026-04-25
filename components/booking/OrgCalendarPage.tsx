@@ -1,7 +1,9 @@
 'use client'
 
 import { useMemo, useCallback, useState, useEffect } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
+import { saveBookingSuccess } from '@/lib/booking/booking-success-storage'
+import type { ConfirmedBooking } from '@/lib/calendar/types'
 import {
 	type ViewMode,
 	CalendarProvider,
@@ -18,6 +20,8 @@ import {
 } from '@/lib/calendar/utils'
 import { StaffTabs } from '@/components/booking/StaffTabs'
 import { SlotListView } from '@/components/booking/SlotListView'
+import { BookingFlowDialog } from '@/components/booking/BookingFlowDialog'
+import { buildShareUrl } from '@/lib/booking/build-share-url'
 import {
 	useOrgInfo,
 	useOrgFiltering,
@@ -59,6 +63,7 @@ function OrgCalendarPage({
 	publicUrl: publicUrlProp,
 }: OrgCalendarPageProps) {
 	const searchParams = useSearchParams()
+	const router = useRouter()
 	const viewConfig = useViewConfig()
 	const t = useTranslations('booking')
 	const locale = useLocale()
@@ -70,6 +75,8 @@ function OrgCalendarPage({
 	const selectedStaffId = staffIdProp ?? null
 	const selectedEventTypeId = searchParams.get('eventType') ?? null
 	const selectedSlotTime = searchParams.get('slot') ?? null
+
+	const [bookingDialogOpen, setBookingDialogOpen] = useState(false)
 
 	// ── Navigation (до данных, т.к. фильтрация использует handleStaffSelect) ──
 
@@ -190,8 +197,6 @@ function OrgCalendarPage({
 	// ── Navigation wrappers (reset booking state on navigation) ──
 
 	const resetBookingState = () => {
-		if (bookingActions.confirmedBooking) reloadBookings()
-		bookingActions.setConfirmedBooking(null)
 		bookingActions.setBookingError(null)
 		bookingActions.handleBookingClose()
 	}
@@ -289,19 +294,13 @@ function OrgCalendarPage({
 		schedule: staffSchedule ?? schedule ?? undefined,
 		selectedEventTypeId,
 		selectedSlot: selectedSlotTime,
-		confirmedBooking: bookingActions.confirmedBooking,
 		date: dateStr,
 		onSelectEventType: onEventTypeSelect,
 		onSelectSlot: (time: string, slotDate?: string) => {
 			navigation.handleSlotSelect(time, slotDate)
 			bookingActions.handleBookingClose()
+			setBookingDialogOpen(true)
 		},
-		onConfirmWithClient: bookingActions.handleConfirmWithClient,
-		onCancel: bookingActions.handleCancel,
-		onResetSlot: bookingActions.handleResetSlot,
-		isSubmitting: bookingActions.isSubmitting,
-		formConfig: bookingActions.formConfig,
-		bookingError: bookingActions.bookingError,
 		selectedBooking: bookingActions.selectedBooking,
 		onBookingSelect: bookingActions.handleBookingSelect,
 		onBookingStatusChange: bookingActions.handleBookingStatusChange,
@@ -338,6 +337,45 @@ function OrgCalendarPage({
 	const getStaffBookingsById = (staffId: string): StaffBooking[] =>
 		staffBookingsMap[staffId] ?? []
 
+	const dialogShareUrlForList =
+		typeof window !== 'undefined'
+			? buildShareUrl({
+					origin: window.location.origin,
+					variant: selectedStaffId ? 'staff' : 'org',
+					orgSlug: org.id,
+					staffId: selectedStaffId ?? undefined,
+				})
+			: ''
+
+	const handleListBookAgain = () => {
+		navigation.setParams({ eventType: null, slot: null })
+	}
+
+	const dialogStaff =
+		staffList.find((s) => s.id === selectedStaffId) ?? null
+
+	// ── Success navigation (only public users) ──
+
+	const returnUrl = viewConfig.isPublicBookingPage
+		? selectedStaffId
+			? `/${locale}/org/${orgSlug}/${selectedStaffId}`
+			: `/${locale}/org/${orgSlug}`
+		: ''
+
+	const handleSuccessNavigate = (result: ConfirmedBooking) => {
+		saveBookingSuccess({
+			result,
+			staffName: dialogStaff?.name ?? null,
+			staffAvatar: dialogStaff?.avatar ?? null,
+			returnUrl,
+		})
+		router.push(`/${locale}/booking/success`)
+	}
+
+	const navigateOnSuccess = viewConfig.isPublicBookingPage
+		? handleSuccessNavigate
+		: undefined
+
 	const listViewSlot = (
 		<SlotListView
 			variant="org"
@@ -355,6 +393,9 @@ function OrgCalendarPage({
 			formConfig={bookingActions.formConfig}
 			onConfirmWithClient={bookingActions.handleConfirmWithClient}
 			isSubmitting={bookingActions.isSubmitting}
+			shareUrl={dialogShareUrlForList}
+			onBookAgain={handleListBookAgain}
+			onSuccessNavigate={navigateOnSuccess}
 		/>
 	)
 
@@ -384,6 +425,35 @@ function OrgCalendarPage({
 		showThemeToggle: !publicUrlProp,
 	}
 
+	// ── Booking flow dialog ──
+
+	const dialogShareUrl =
+		typeof window !== 'undefined'
+			? buildShareUrl({
+					origin: window.location.origin,
+					variant: selectedStaffId ? 'staff' : 'org',
+					orgSlug: org.id,
+					staffId: selectedStaffId ?? undefined,
+				})
+			: ''
+
+	const handleDialogOpenChange = (next: boolean) => {
+		setBookingDialogOpen(next)
+		if (!next) navigation.setParams({ slot: null })
+	}
+
+	const handleDialogBookAgain = () => {
+		setBookingDialogOpen(false)
+		navigation.setParams({ eventType: null, slot: null })
+	}
+
+	const findEventTypeById = (id: string | null) =>
+		eventTypes.find((et) => et.id === id) ?? null
+	const dialogEventType = findEventTypeById(selectedEventTypeId)
+
+	const isDialogOpen =
+		bookingDialogOpen && !!selectedEventTypeId && !!selectedSlotTime
+
 	// ── Render ──
 
 	return (
@@ -403,6 +473,21 @@ function OrgCalendarPage({
 				publicUrl={publicUrlProp}
 				profileInfo={profileInfo}
 				scheduleTimezone={scheduleSource.timezone}
+			/>
+			<BookingFlowDialog
+				open={isDialogOpen}
+				onOpenChange={handleDialogOpenChange}
+				eventType={dialogEventType}
+				staffName={dialogStaff?.name ?? null}
+				staffAvatar={dialogStaff?.avatar ?? null}
+				slotTime={selectedSlotTime}
+				slotDate={dateStr}
+				formConfig={bookingActions.formConfig}
+				onSubmit={bookingActions.handleConfirmWithClient}
+				isSubmitting={bookingActions.isSubmitting}
+				shareUrl={dialogShareUrl}
+				onBookAgain={handleDialogBookAgain}
+				onSuccessNavigate={navigateOnSuccess}
 			/>
 		</CalendarProvider>
 	)

@@ -1,9 +1,4 @@
-import type {
-	CalendarStrategy,
-	CalendarBlock,
-	ConfirmedBooking,
-	ViewMode,
-} from '../types'
+import type { CalendarStrategy, CalendarBlock, ViewMode } from '../types'
 import {
 	formatDateLocale,
 	formatWeekRange,
@@ -28,9 +23,7 @@ import type {
 	CalendarDisplayBooking,
 } from '@/services/configs/booking.types'
 import { ServiceList } from '@/components/booking/ServiceList'
-import { StaffBookingPanel } from '@/components/booking/StaffBookingPanel'
-import type { ClientInfoData } from '@/components/booking/ClientInfoForm'
-import type { MergedBookingForm } from '@/services/configs/booking-field.types'
+import { ServiceInfo } from '@/components/booking/BookingPanelParts'
 import {
 	BookingDetailsPanel,
 	type BookingDetail,
@@ -68,15 +61,9 @@ interface StaffStrategyParams {
 	staffId?: string
 	selectedEventTypeId: string | null
 	selectedSlot: string | null
-	confirmedBooking: ConfirmedBooking | null
 	date: string
 	onSelectEventType: (eventTypeId: string) => void
 	onSelectSlot: (time: string, date?: string) => void
-	onConfirmWithClient: (data: ClientInfoData) => void
-	onCancel: () => void
-	onResetSlot: () => void
-	isSubmitting: boolean
-	formConfig?: MergedBookingForm | null
 	onBookingClick?: (bookingId: string) => void
 	selectedBooking?: BookingDetail | null
 	onCloseBooking?: () => void
@@ -99,15 +86,9 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 		staffId: strategyStaffId,
 		selectedEventTypeId,
 		selectedSlot,
-		confirmedBooking,
 		date,
 		onSelectEventType,
 		onSelectSlot,
-		onConfirmWithClient,
-		onCancel,
-		onResetSlot,
-		isSubmitting,
-		formConfig = null,
 		onBookingClick,
 		selectedBooking = null,
 		onCloseBooking,
@@ -162,8 +143,7 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 				blockType: 'locked' as const,
 			}))
 
-			if (!selectedEventType || confirmedBooking)
-				return [...bookingBlocks, ...breakBlocks]
+			if (!selectedEventType) return [...bookingBlocks, ...breakBlocks]
 
 			const workHours = getWorkHoursForDate(
 				schedule.weeklyHours,
@@ -215,7 +195,7 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 			const dropZoneBlocks = slots.map(toDropZoneBlock).filter(isNotNull)
 
 			const pendingBlock: CalendarBlock[] = (() => {
-				if (!selectedSlot || blockDate !== date || confirmedBooking) return []
+				if (!selectedSlot || blockDate !== date) return []
 				const slotMin = timeToMin(selectedSlot)
 				return [
 					{
@@ -269,18 +249,8 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 				)
 			}
 
-			return (
-				<StaffBookingPanel
-					selectedEventType={selectedEventType}
-					selectedSlot={selectedSlot}
-					confirmedBooking={confirmedBooking}
-					formConfig={formConfig}
-					onConfirmWithClient={onConfirmWithClient}
-					onCancel={onCancel}
-					onResetSlot={onResetSlot}
-					isSubmitting={isSubmitting}
-				/>
-			)
+			if (!selectedEventType) return null
+			return <ServiceInfo eventType={selectedEventType} />
 		},
 
 		onCellClick(clickDate: string, startMin: number) {

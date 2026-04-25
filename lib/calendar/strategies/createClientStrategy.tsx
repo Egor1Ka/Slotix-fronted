@@ -1,9 +1,4 @@
-import type {
-	CalendarStrategy,
-	CalendarBlock,
-	ConfirmedBooking,
-	ViewMode,
-} from '../types'
+import type { CalendarStrategy, CalendarBlock, ViewMode } from '../types'
 import {
 	formatDateLocale,
 	formatWeekRange,
@@ -28,7 +23,7 @@ import type {
 	CalendarDisplayBooking,
 } from '@/services/configs/booking.types'
 import { ServiceList } from '@/components/booking/ServiceList'
-import { BookingPanel } from '@/components/booking/BookingPanel'
+import { ServiceInfo } from '@/components/booking/BookingPanelParts'
 
 interface ClientStrategyParams {
 	eventTypes: EventType[]
@@ -39,13 +34,9 @@ interface ClientStrategyParams {
 	staffName: string
 	selectedEventTypeId: string | null
 	selectedSlot: string | null
-	confirmedBooking: ConfirmedBooking | null
 	date: string
 	onSelectEventType: (eventTypeId: string) => void
 	onSelectSlot: (time: string, date?: string) => void
-	onConfirm: () => void
-	onCancel: () => void
-	onResetSlot: () => void
 	locale: string
 }
 
@@ -83,13 +74,9 @@ const createClientStrategy = (
 		staffName,
 		selectedEventTypeId,
 		selectedSlot,
-		confirmedBooking,
 		date,
 		onSelectEventType,
 		onSelectSlot,
-		onConfirm,
-		onCancel,
-		onResetSlot,
 		locale,
 	} = params
 
@@ -120,7 +107,7 @@ const createClientStrategy = (
 
 			const bookingBlocks = dayBookings.map(toBookingBlock)
 
-			if (!selectedEventType || confirmedBooking) return bookingBlocks
+			if (!selectedEventType) return bookingBlocks
 
 			const workHours = getWorkHoursForDate(
 				schedule.weeklyHours,
@@ -175,7 +162,7 @@ const createClientStrategy = (
 			const dropZoneBlocks = slots.map(toDropZoneBlock).filter(isNotNull)
 
 			const pendingBlock: CalendarBlock[] = (() => {
-				if (!selectedSlot || blockDate !== date || confirmedBooking) return []
+				if (!selectedSlot || blockDate !== date) return []
 				const slotMin = timeToMin(selectedSlot)
 				return [
 					{
@@ -224,16 +211,8 @@ const createClientStrategy = (
 		},
 
 		renderPanel() {
-			return (
-				<BookingPanel
-					selectedEventType={selectedEventType}
-					selectedSlot={selectedSlot}
-					confirmedBooking={confirmedBooking}
-					onConfirm={onConfirm}
-					onCancel={onCancel}
-					onResetSlot={onResetSlot}
-				/>
-			)
+			if (!selectedEventType) return null
+			return <ServiceInfo eventType={selectedEventType} />
 		},
 
 		onCellClick(clickDate: string, startMin: number) {

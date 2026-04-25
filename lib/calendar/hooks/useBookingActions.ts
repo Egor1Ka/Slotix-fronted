@@ -27,18 +27,14 @@ interface UseBookingActionsParams {
 
 interface UseBookingActionsResult {
 	bookingError: string | null
-	confirmedBooking: ConfirmedBooking | null
 	isSubmitting: boolean
 	selectedBooking: BookingDetail | null
 	formConfig: MergedBookingForm | null
 	setBookingError: (error: string | null) => void
-	setConfirmedBooking: (booking: ConfirmedBooking | null) => void
 	handleConfirmWithClient: (
 		data: ClientInfoData,
 		overrides?: { slotTime?: string; date?: string; staffId?: string },
-	) => Promise<void>
-	handleCancel: () => Promise<void>
-	handleResetSlot: () => void
+	) => Promise<ConfirmedBooking | null>
 	handleBookingSelect: (bookingId: string) => Promise<void>
 	handleBookingStatusChange: (
 		bookingId: string,
@@ -69,8 +65,6 @@ const useBookingActions = (
 	} = params
 
 	const [bookingError, setBookingError] = useState<string | null>(null)
-	const [confirmedBooking, setConfirmedBooking] =
-		useState<ConfirmedBooking | null>(null)
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [selectedBooking, setSelectedBooking] = useState<BookingDetail | null>(
 		null,
@@ -166,17 +160,17 @@ const useBookingActions = (
 	const handleConfirmWithClient = async (
 		data: ClientInfoData,
 		overrides?: { slotTime?: string; date?: string; staffId?: string },
-	) => {
+	): Promise<ConfirmedBooking | null> => {
 		const resolvedSlotTime = overrides?.slotTime ?? selectedSlotTime
 		const resolvedDate = overrides?.date ?? dateStr
 		const resolvedStaffId =
 			overrides?.staffId ?? staffId ?? getFirstStaffId(staffList)
 
-		if (!selectedEventTypeId || !resolvedSlotTime) return
-		if (!resolvedStaffId) return
+		if (!selectedEventTypeId || !resolvedSlotTime) return null
+		if (!resolvedStaffId) return null
 
 		const eventType = findEventTypeById(selectedEventTypeId)
-		if (!eventType) return
+		if (!eventType) return null
 
 		const startAt = `${resolvedDate}T${resolvedSlotTime}:00`
 
@@ -203,7 +197,7 @@ const useBookingActions = (
 			reloadBookings()
 			setFormReloadTick((n) => n + 1)
 
-			setConfirmedBooking({
+			const confirmed: ConfirmedBooking = {
 				bookingId: response.id,
 				eventTypeId: response.eventTypeId,
 				eventTypeName: response.eventTypeName,
@@ -219,42 +213,21 @@ const useBookingActions = (
 				price: eventType.price,
 				currency: eventType.currency,
 				invitee: response.invitee,
-			})
+			}
+
+			return confirmed
 		} catch (err) {
 			const message = err instanceof Error ? err.message : t('bookingFailed')
 			setBookingError(message)
+			return null
 		} finally {
 			setIsSubmitting(false)
 		}
 	}
 
-	const handleCancel = async () => {
-		if (!confirmedBooking) return
-
-		try {
-			await bookingApi.cancelById({
-				bookingId: confirmedBooking.bookingId,
-				reason: t('cancelledByAdmin'),
-			})
-			setConfirmedBooking(null)
-			setParams({ slot: null })
-			reloadBookings()
-		} catch (err) {
-			const message = err instanceof Error ? err.message : t('cancelFailed')
-			setBookingError(message)
-		}
-	}
-
-	const handleResetSlot = () => {
-		if (confirmedBooking) reloadBookings()
-		setConfirmedBooking(null)
-		setParams({ slot: null })
-	}
-
 	const handleBookingSelect = async (bookingId: string) => {
 		try {
 			setParams({ eventType: null, slot: null })
-			setConfirmedBooking(null)
 			reloadBookings()
 			const detail = await bookingApi.getById(bookingId)
 
@@ -346,15 +319,11 @@ const useBookingActions = (
 
 	return {
 		bookingError,
-		confirmedBooking,
 		isSubmitting,
 		selectedBooking,
 		formConfig,
 		setBookingError,
-		setConfirmedBooking,
 		handleConfirmWithClient,
-		handleCancel,
-		handleResetSlot,
 		handleBookingSelect,
 		handleBookingStatusChange,
 		handleBookingReschedule,
