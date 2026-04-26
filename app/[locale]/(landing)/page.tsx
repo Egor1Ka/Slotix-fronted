@@ -18,7 +18,7 @@ import { HeroVideo } from '@/components/landing/hero-video'
 
 const CREEM_PRODUCT_ORG_CREATOR = process.env.CREEM_PRODUCT_ORG_CREATOR || ''
 
-const checkoutHref = `/api/checkout?productId=${CREEM_PRODUCT_ORG_CREATOR}`
+const checkoutHref = `/checkout?productId=${CREEM_PRODUCT_ORG_CREATOR}`
 
 async function hasActiveSubscription(): Promise<boolean> {
 	const cookieStore = await cookies()
