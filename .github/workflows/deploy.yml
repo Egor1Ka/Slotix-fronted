@@ -35,6 +35,7 @@ jobs:
             ${{ env.IMAGE_NAME }}:${{ github.sha }}
           build-args: |
             NEXT_PUBLIC_GA_ID=${{ vars.NEXT_PUBLIC_GA_ID }}
+            NEXT_PUBLIC_SITE_URL=${{ vars.NEXT_PUBLIC_SITE_URL }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -45,12 +46,29 @@ jobs:
     steps:
       - name: SSH and update web service
         uses: appleboy/ssh-action@v1
+        env:
+          CREEM_API_KEY: ${{ secrets.CREEM_API_KEY }}
+          CREEM_PRODUCT_ORG_CREATOR: ${{ secrets.CREEM_PRODUCT_ORG_CREATOR }}
+          CREEM_WEBHOOK_SECRET: ${{ secrets.CREEM_WEBHOOK_SECRET }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: CREEM_API_KEY,CREEM_PRODUCT_ORG_CREATOR,CREEM_WEBHOOK_SECRET
           script: |
+            set -euo pipefail
             cd /opt/slotix
+            umask 077
+            touch .env
+            # обновляем только CREEM_* ключи, остальное (BACKEND_URL и пр.) не трогаем
+            grep -v -E '^(CREEM_API_KEY|CREEM_PRODUCT_ORG_CREATOR|CREEM_WEBHOOK_SECRET)=' .env > .env.tmp || true
+            {
+              echo "CREEM_API_KEY=${CREEM_API_KEY}"
+              echo "CREEM_PRODUCT_ORG_CREATOR=${CREEM_PRODUCT_ORG_CREATOR}"
+              echo "CREEM_WEBHOOK_SECRET=${CREEM_WEBHOOK_SECRET}"
+            } >> .env.tmp
+            chmod 600 .env.tmp
+            mv .env.tmp .env
             docker compose -f docker-compose.prod.yml pull web
-            docker compose -f docker-compose.prod.yml up -d web
+            docker compose -f docker-compose.prod.yml up -d --force-recreate web
             docker image prune -f
