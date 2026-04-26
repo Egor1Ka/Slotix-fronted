@@ -88,7 +88,7 @@
 			},
 			"org_creator": {
 				"name": "Бізнес",
-				"price": "$2",
+				"price": "$4.99",
 				"period": "/місяць",
 				"description": "Для команд та організацій",
 				"cta": "Почати Бізнес план",
@@ -192,9 +192,9 @@
 		"orgCreator": {
 			"paywallTitle": "Потрібна підписка",
 			"paywallDescription": "Підпишіться на план Org Creator, щоб створювати та керувати організаціями.",
-			"paywallPrice": "$2/місяць",
+			"paywallPrice": "$4.99/місяць",
 			"limitReached": "Досягнуто ліміт організацій ({count}/{max})",
-			"subscribe": "Підписатися — $2/міс"
+			"subscribe": "Підписатися — $4.99/міс"
 		},
 		"orgDeactivated": {
 			"public": "Ця організація тимчасово недоступна",

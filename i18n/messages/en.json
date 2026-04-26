@@ -88,7 +88,7 @@
 			},
 			"org_creator": {
 				"name": "Business",
-				"price": "$2",
+				"price": "$4.99",
 				"period": "/month",
 				"description": "For teams and organizations",
 				"cta": "Start Business Plan",
@@ -192,9 +192,9 @@
 		"orgCreator": {
 			"paywallTitle": "Subscription Required",
 			"paywallDescription": "Subscribe to the Org Creator plan to create and manage organizations.",
-			"paywallPrice": "$2/month",
+			"paywallPrice": "$4.99/month",
 			"limitReached": "Organization limit reached ({count}/{max})",
-			"subscribe": "Subscribe — $2/mo"
+			"subscribe": "Subscribe — $4.99/mo"
 		},
 		"orgDeactivated": {
 			"public": "This organization is temporarily unavailable",
