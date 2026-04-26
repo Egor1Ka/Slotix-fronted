@@ -212,7 +212,7 @@
 			"cancelDialogTitle": "Скасувати підписку?",
 			"cancelDialogDescription": "Доступ збережеться до {date}. Після цієї дати організації, які ви створили, буде деактивовано.",
 			"cancelDialogConfirm": "Скасувати",
-			"cancelDialogDismiss": "Передумав",
+			"cancelDialogDismiss": "Залишити підписку",
 			"cancelSuccessToast": "Підписку скасовано. Доступ до {date}.",
 			"paymentsHistoryTitle": "Історія платежів",
 			"paymentsEmpty": "Платежів ще немає",
