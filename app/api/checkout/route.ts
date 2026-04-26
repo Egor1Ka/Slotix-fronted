@@ -2,15 +2,25 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Checkout } from '@creem_io/nextjs'
 import { getUser } from '@/lib/auth/get-user'
 
-const creemApiKey = process.env.CREEM_API_KEY
-if (!creemApiKey)
-	throw new Error('CREEM_API_KEY environment variable is required')
+export const dynamic = 'force-dynamic'
 
-const checkoutHandler = Checkout({
-	apiKey: creemApiKey,
-	testMode: process.env.NODE_ENV !== 'production',
-	defaultSuccessUrl: '/organizations?checkout=success',
-})
+let cachedCheckoutHandler: ReturnType<typeof Checkout> | null = null
+
+const getCheckoutHandler = () => {
+	if (cachedCheckoutHandler) return cachedCheckoutHandler
+
+	const creemApiKey = process.env.CREEM_API_KEY
+	if (!creemApiKey) {
+		throw new Error('CREEM_API_KEY environment variable is required')
+	}
+
+	cachedCheckoutHandler = Checkout({
+		apiKey: creemApiKey,
+		testMode: process.env.NODE_ENV !== 'production',
+		defaultSuccessUrl: '/organizations?checkout=success',
+	})
+	return cachedCheckoutHandler
+}
 
 const buildCustomerParam = (user: { email: string; name?: string }): string =>
 	JSON.stringify({
@@ -36,5 +46,5 @@ export async function GET(request: NextRequest) {
 	}
 
 	const proxiedRequest = new NextRequest(url, request)
-	return checkoutHandler(proxiedRequest)
+	return getCheckoutHandler()(proxiedRequest)
 }
