@@ -67,6 +67,20 @@ jobs:
             } >> .env.tmp
             chmod 600 .env.tmp
             mv .env.tmp .env
+
+            # одноразовый патч: добавить env_file: .env в сервис web, если его там ещё нет
+            if ! awk '
+              /^  web:$/ { in_web=1; next }
+              /^  [a-zA-Z_-]+:$/ { in_web=0 }
+              in_web && /^[[:space:]]+env_file:/ { found=1 }
+              END { exit !found }
+            ' docker-compose.prod.yml; then
+              sed -i '/^    container_name: slotix-web$/a\    env_file:\n      - .env' docker-compose.prod.yml
+              echo "[patch] added env_file: .env to web service in docker-compose.prod.yml"
+            else
+              echo "[patch] env_file already configured for web service, skipping"
+            fi
+
             docker compose -f docker-compose.prod.yml pull web
             docker compose -f docker-compose.prod.yml up -d --force-recreate web
             docker image prune -f
