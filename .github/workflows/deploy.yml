@@ -115,3 +115,18 @@ jobs:
             echo "4. container running?"
             echo "=========================================="
             docker compose -f docker-compose.prod.yml ps web
+            echo
+            echo "=========================================="
+            echo "5. container image digest"
+            echo "=========================================="
+            docker compose -f docker-compose.prod.yml images web
+            echo
+            echo "=========================================="
+            echo "6. /checkout file in container?"
+            echo "=========================================="
+            docker compose -f docker-compose.prod.yml exec -T web sh -c 'find /app -path "*checkout*" -not -path "*/node_modules/*" 2>/dev/null | head -20' || true
+            echo
+            echo "=========================================="
+            echo "7. curl /checkout from inside container"
+            echo "=========================================="
+            docker compose -f docker-compose.prod.yml exec -T web sh -c 'wget -q -S -O - http://localhost:3000/checkout 2>&1 | head -30' || true
