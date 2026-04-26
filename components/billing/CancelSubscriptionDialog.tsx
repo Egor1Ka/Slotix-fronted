@@ -48,13 +48,15 @@ function CancelSubscriptionDialog({
 		}
 	}
 
-	const handleDismiss = () => {
-		if (submitting) return
-		onOpenChange(false)
+	const handleOpenChange = (nextOpen: boolean) => {
+		if (!nextOpen && submitting) return
+		onOpenChange(nextOpen)
 	}
 
+	const handleDismissClick = () => handleOpenChange(false)
+
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
+		<Dialog open={open} onOpenChange={handleOpenChange}>
 			<DialogContent>
 				<DialogHeader>
 					<DialogTitle>{t('cancelDialogTitle')}</DialogTitle>
@@ -65,7 +67,7 @@ function CancelSubscriptionDialog({
 				<DialogFooter>
 					<Button
 						variant="outline"
-						onClick={handleDismiss}
+						onClick={handleDismissClick}
 						disabled={submitting}
 					>
 						{t('cancelDialogDismiss')}
