@@ -27,7 +27,7 @@ describe('formatPeriod', () => {
 		const start = '2026-04-01T00:00:00Z'
 		const end = '2026-05-01T00:00:00Z'
 		const result = formatPeriod(start, end, 'en-CA')
-		expect(result).toMatch(/2026-04-01.+2026-05-01/)
+		expect(result).toBe('2026-04-01 — 2026-05-01')
 	})
 
 	it('returns null when either date missing', () => {
@@ -39,7 +39,7 @@ describe('formatPeriod', () => {
 describe('formatDate', () => {
 	it('formats ISO string in given locale', () => {
 		const result = formatDate('2026-04-26T10:00:00Z', 'en-CA')
-		expect(result).toMatch(/2026-04-26/)
+		expect(result).toBe('2026-04-26')
 	})
 })
 
