@@ -3,6 +3,8 @@ import createNextIntlPlugin from 'next-intl/plugin'
 
 const withNextIntl = createNextIntlPlugin('./i18n/request.ts')
 
+const BACKEND_URL = process.env.BACKEND_URL || 'http://api:9000'
+
 const nextConfig: NextConfig = {
 	output: 'standalone',
 	serverExternalPackages: ['newrelic'],
@@ -10,7 +12,7 @@ const nextConfig: NextConfig = {
 		return [
 			{
 				source: '/api/:path*',
-				destination: `${process.env.BACKEND_URL}/api/:path*`,
+				destination: `${BACKEND_URL}/api/:path*`,
 			},
 		]
 	},
