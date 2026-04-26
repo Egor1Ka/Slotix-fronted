@@ -202,6 +202,53 @@
 			"member": "This organization is currently inactive.",
 			"description": "To manage organizations, go to the pricing plans and subscribe.",
 			"renewLink": "View plans"
+		},
+		"page": {
+			"title": "Billing",
+			"subtitle": "Manage your subscription and review payments",
+			"currentPeriod": "Current period",
+			"cancelAction": "Cancel subscription",
+			"cancelScheduled": "Cancellation scheduled for {date}",
+			"cancelDialogTitle": "Cancel subscription?",
+			"cancelDialogDescription": "Access remains until {date}. After that date, organizations you created will be deactivated.",
+			"cancelDialogConfirm": "Cancel subscription",
+			"cancelDialogDismiss": "Keep subscription",
+			"cancelSuccessToast": "Subscription cancelled. Access until {date}.",
+			"paymentsHistoryTitle": "Payment history",
+			"paymentsEmpty": "No payments yet",
+			"paymentsEmptyHint": "Your future payments will appear here",
+			"upgrade": "Upgrade to Business",
+			"subscribeAgain": "Subscribe again",
+			"bannerScheduledTitle": "Subscription cancelled",
+			"bannerScheduledDescription": "Access remains until {date}. After that, your organizations will be deactivated.",
+			"loadError": "Could not load billing data. Try refreshing the page.",
+			"retry": "Retry",
+			"colDate": "Date",
+			"colAmount": "Amount",
+			"colType": "Type",
+			"colEvent": "Event",
+			"typeSubscription": "Subscription",
+			"typeOneTime": "One-time",
+			"pastDueHint": "Payment failed. Update payment details in Creem dashboard.",
+			"pausedHint": "Subscription paused.",
+			"customPlanLabel": "Custom plan",
+			"freeFeatures": "Personal booking page, no organization creation",
+			"businessFeatures": "Up to 3 organizations, full staff management, public booking pages"
+		},
+		"events": {
+			"checkoutCompleted": "Initial payment",
+			"subscriptionPaid": "Renewal",
+			"refundCreated": "Refund",
+			"disputeCreated": "Dispute",
+			"unknown": "Other"
+		},
+		"status": {
+			"active": "Active",
+			"scheduledCancel": "Cancelled",
+			"canceled": "Ended",
+			"expired": "Expired",
+			"pastDue": "Past due",
+			"paused": "Paused"
 		}
 	},
 	"booking": {
@@ -425,7 +472,8 @@
 		"groupPersonal": "Personal",
 		"groupOrgProfile": "Profile",
 		"groupSchedule": "Schedule",
-		"groupStructure": "Structure"
+		"groupStructure": "Structure",
+		"billing": "Billing"
 	},
 	"organizations": {
 		"title": "My organizations",

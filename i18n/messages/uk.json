@@ -202,6 +202,53 @@
 			"member": "Ця організація наразі неактивна.",
 			"description": "Щоб керувати організаціями, перейдіть до тарифних планів та оформіть підписку.",
 			"renewLink": "Переглянути плани"
+		},
+		"page": {
+			"title": "Підписка та платежі",
+			"subtitle": "Керуйте підпискою та переглядайте історію платежів",
+			"currentPeriod": "Поточний період",
+			"cancelAction": "Скасувати підписку",
+			"cancelScheduled": "Скасування заплановано на {date}",
+			"cancelDialogTitle": "Скасувати підписку?",
+			"cancelDialogDescription": "Доступ збережеться до {date}. Після цієї дати організації, які ви створили, буде деактивовано.",
+			"cancelDialogConfirm": "Скасувати",
+			"cancelDialogDismiss": "Передумав",
+			"cancelSuccessToast": "Підписку скасовано. Доступ до {date}.",
+			"paymentsHistoryTitle": "Історія платежів",
+			"paymentsEmpty": "Платежів ще немає",
+			"paymentsEmptyHint": "Ваші майбутні платежі з'являться тут",
+			"upgrade": "Перейти на Business",
+			"subscribeAgain": "Підписатися знову",
+			"bannerScheduledTitle": "Підписку скасовано",
+			"bannerScheduledDescription": "Доступ збережеться до {date}. Після цієї дати організації буде деактивовано.",
+			"loadError": "Не вдалося завантажити дані. Спробуйте оновити сторінку.",
+			"retry": "Спробувати знову",
+			"colDate": "Дата",
+			"colAmount": "Сума",
+			"colType": "Тип",
+			"colEvent": "Подія",
+			"typeSubscription": "Підписка",
+			"typeOneTime": "Разовий",
+			"pastDueHint": "Платіж не пройшов. Оновіть платіжні дані в Creem dashboard.",
+			"pausedHint": "Підписку призупинено.",
+			"customPlanLabel": "Спеціальний план",
+			"freeFeatures": "Особиста сторінка бронювання, без створення організацій",
+			"businessFeatures": "До 3 організацій, повне керування персоналом, публічні сторінки бронювання"
+		},
+		"events": {
+			"checkoutCompleted": "Перший платіж",
+			"subscriptionPaid": "Продовження",
+			"refundCreated": "Повернення",
+			"disputeCreated": "Спір",
+			"unknown": "Інше"
+		},
+		"status": {
+			"active": "Активна",
+			"scheduledCancel": "Скасована",
+			"canceled": "Завершена",
+			"expired": "Прострочена",
+			"pastDue": "Прострочений платіж",
+			"paused": "Призупинена"
 		}
 	},
 	"booking": {
@@ -425,7 +472,8 @@
 		"groupPersonal": "Особисте",
 		"groupOrgProfile": "Профіль",
 		"groupSchedule": "Розклад",
-		"groupStructure": "Структура"
+		"groupStructure": "Структура",
+		"billing": "Підписка та платежі"
 	},
 	"organizations": {
 		"title": "Мої організації",
