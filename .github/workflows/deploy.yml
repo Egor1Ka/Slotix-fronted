@@ -70,3 +70,34 @@ jobs:
             docker compose -f docker-compose.prod.yml pull web
             docker compose -f docker-compose.prod.yml up -d --force-recreate web
             docker image prune -f
+
+      - name: Debug — inspect deployed container
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set +e
+            cd /opt/slotix
+            echo "=========================================="
+            echo "1. docker-compose.prod.yml"
+            echo "=========================================="
+            cat docker-compose.prod.yml
+            echo
+            echo "=========================================="
+            echo "2. .env keys (values masked)"
+            echo "=========================================="
+            sed -E 's/^([A-Z_]+)=.*/\1=***/' .env
+            echo
+            echo "=========================================="
+            echo "3. container env (CREEM/BACKEND/NEXT_PUBLIC, values masked)"
+            echo "=========================================="
+            docker compose -f docker-compose.prod.yml exec -T web printenv \
+              | grep -E '^(CREEM|BACKEND|NEXT_PUBLIC)' \
+              | sed -E 's/=.*/=***/' || echo "(no matching vars in container)"
+            echo
+            echo "=========================================="
+            echo "4. container running?"
+            echo "=========================================="
+            docker compose -f docker-compose.prod.yml ps web
