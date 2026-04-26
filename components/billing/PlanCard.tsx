@@ -90,7 +90,7 @@ function PlanCard({
 		? formatAmount(catalogEntry.price, catalogEntry.currency)
 		: '—'
 	const periodSuffix = catalogEntry
-		? `/${tBilling(`period.${catalogEntry.period}`)}`
+		? tBilling(`period.${catalogEntry.period}`)
 		: ''
 
 	const periodText = subscription
