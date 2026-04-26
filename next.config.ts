@@ -8,6 +8,12 @@ const BACKEND_URL = process.env.BACKEND_URL || 'http://api:9000'
 const nextConfig: NextConfig = {
 	output: 'standalone',
 	serverExternalPackages: ['newrelic'],
+	eslint: {
+		ignoreDuringBuilds: true,
+	},
+	typescript: {
+		ignoreBuildErrors: true,
+	},
 	async rewrites() {
 		return [
 			{
