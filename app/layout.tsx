@@ -1,10 +1,13 @@
 import { ThemeProvider } from 'next-themes'
+import { GoogleAnalytics } from '@next/third-parties/google'
 import { NewRelicBrowserScript } from '@/lib/monitoring/new-relic-browser-script'
 import { Toaster } from '@/components/ui/sonner'
 import { cn } from '@/lib/utils'
 import type { Metadata } from 'next'
 import { Inter, Cormorant } from 'next/font/google'
 import './globals.css'
+
+const gaId = process.env.NEXT_PUBLIC_GA_ID
 
 const inter = Inter({ subsets: ['latin', 'cyrillic'], variable: '--font-sans' })
 const cormorant = Cormorant({
@@ -64,6 +67,7 @@ export default function RootLayout({
 				</ThemeProvider>
 				<Toaster />
 				<NewRelicBrowserScript />
+				{gaId && <GoogleAnalytics gaId={gaId} />}
 			</body>
 		</html>
 	)

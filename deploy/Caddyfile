@@ -1,4 +1,4 @@
-:80 {
+slotixs.uk {
 	log {
 		output stdout
 		format console
@@ -11,4 +11,8 @@
 	handle {
 		reverse_proxy web:3000
 	}
+}
+
+www.slotixs.uk {
+	redir https://slotixs.uk{uri} permanent
 }
