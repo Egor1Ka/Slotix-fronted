@@ -21,6 +21,7 @@ import {
 import { StaffTabs } from '@/components/booking/StaffTabs'
 import { SlotListView } from '@/components/booking/SlotListView'
 import { BookingFlowDialog } from '@/components/booking/BookingFlowDialog'
+import { BookingErrorState } from '@/components/booking/BookingErrorState'
 import { buildShareUrl } from '@/lib/booking/build-share-url'
 import {
 	useOrgInfo,
@@ -232,11 +233,7 @@ function OrgCalendarPage({
 	}
 
 	if (error || !org) {
-		return (
-			<div className="flex items-center justify-center py-20">
-				<p className="text-destructive text-sm">{error ?? t('loadError')}</p>
-			</div>
-		)
+		return <BookingErrorState status={error} />
 	}
 
 	// ── Derived data ──

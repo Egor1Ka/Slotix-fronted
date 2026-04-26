@@ -1,6 +1,7 @@
 import Link from 'next/link'
+import type { Metadata } from 'next'
 import { cookies } from 'next/headers'
-import { getTranslations } from 'next-intl/server'
+import { getLocale, getTranslations } from 'next-intl/server'
 import { getUser } from '@/lib/auth/get-user'
 import {
 	ArrowRight,
@@ -68,6 +69,38 @@ type PreviewTranslations = {
 	dayOff: string
 	unifiedCalendar: string
 	bookNow: string
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+	const locale = await getLocale()
+	const t = await getTranslations('metadata')
+	const title = t('title')
+	const description = t('description')
+
+	return {
+		title,
+		description,
+		alternates: {
+			canonical: '/',
+			languages: {
+				en: '/en',
+				uk: '/uk',
+			},
+		},
+		openGraph: {
+			type: 'website',
+			locale,
+			url: '/',
+			siteName: 'Slotix',
+			title,
+			description,
+		},
+		twitter: {
+			card: 'summary_large_image',
+			title,
+			description,
+		},
+	}
 }
 
 export default async function LandingPage() {

@@ -26,6 +26,7 @@ function PositionsTabs({ orgId }: PositionsTabsProps) {
 	}
 
 	useEffect(() => {
+		// eslint-disable-next-line react-hooks/set-state-in-effect, react-hooks/exhaustive-deps
 		loadStaff()
 	}, [orgId])
 

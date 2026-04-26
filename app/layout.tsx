@@ -12,9 +12,35 @@ const cormorant = Cormorant({
 	variable: '--font-display',
 })
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://slotix.app'
+
 export const metadata: Metadata = {
-	title: 'Frontend Template',
-	description: 'Next.js frontend template',
+	metadataBase: new URL(siteUrl),
+	title: {
+		default: 'Slotix — Booking that grows with you',
+		template: '%s · Slotix',
+	},
+	description:
+		'One booking platform for every stage of your business — from a private tutor to a multi-location studio. Start solo, scale to teams.',
+	applicationName: 'Slotix',
+	manifest: '/site.webmanifest',
+	icons: {
+		icon: [
+			{ url: '/favicons/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+			{ url: '/favicons/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+			{ url: '/favicons/favicon-48x48.png', sizes: '48x48', type: 'image/png' },
+			{
+				url: '/favicons/favicon-192x192.png',
+				sizes: '192x192',
+				type: 'image/png',
+			},
+			{
+				url: '/favicons/favicon-512x512.png',
+				sizes: '512x512',
+				type: 'image/png',
+			},
+		],
+	},
 }
 
 export default function RootLayout({

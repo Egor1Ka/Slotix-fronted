@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { useLocale, useTranslations } from 'next-intl'
+import { useTranslations } from 'next-intl'
 import { Spinner } from '@/components/ui/spinner'
 import { Button } from '@/components/ui/button'
 import { billingApi } from '@/services'
@@ -14,6 +14,8 @@ import { PlanCard } from './PlanCard'
 import { PaymentsTable } from './PaymentsTable'
 import { ScheduledCancelBanner } from './ScheduledCancelBanner'
 import { getEffectiveCancelDate } from '@/lib/billing/format'
+
+const UPGRADE_HREF = '/#pricing'
 
 interface BillingState {
 	subscription: BillingSubscription | null
@@ -33,10 +35,9 @@ const INITIAL_STATE: BillingState = {
 
 function BillingPage() {
 	const t = useTranslations('billing.page')
-	const locale = useLocale()
 	const [state, setState] = useState<BillingState>(INITIAL_STATE)
 
-	const upgradeHref = `/${locale}/billing/checkout`
+	const upgradeHref = UPGRADE_HREF
 
 	const loadAll = useCallback(async () => {
 		setState((prev) => ({ ...prev, loading: true, error: false }))

@@ -50,7 +50,7 @@ function TimezoneSelector({
 	id,
 	disabled,
 }: TimezoneSelectorProps) {
-	const options = useMemo(getSupportedTimezones, [])
+	const options = useMemo(() => getSupportedTimezones(), [])
 
 	const handleValueChange = (next: string | null) => {
 		if (!next) return

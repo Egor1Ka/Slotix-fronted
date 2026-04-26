@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
 import { useTranslations, useLocale } from 'next-intl'
 import {
 	Card,
@@ -120,9 +119,9 @@ function PlanCard({
 	const renderCta = () => {
 		if (!subscription) {
 			return (
-				<Link href={upgradeHref} className={cn(buttonVariants())}>
+				<a href={upgradeHref} className={cn(buttonVariants())}>
 					{t('upgrade')}
-				</Link>
+				</a>
 			)
 		}
 
@@ -148,9 +147,9 @@ function PlanCard({
 
 		if (status === 'canceled' || status === 'expired') {
 			return (
-				<Link href={upgradeHref} className={cn(buttonVariants())}>
+				<a href={upgradeHref} className={cn(buttonVariants())}>
 					{t('subscribeAgain')}
-				</Link>
+				</a>
 			)
 		}
 
