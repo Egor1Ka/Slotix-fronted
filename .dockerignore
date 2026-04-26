@@ -1,9 +1,11 @@
 .git
+.github
 .next
 node_modules
 out
 build
 coverage
+deploy
 .env*
 .DS_Store
 *.md

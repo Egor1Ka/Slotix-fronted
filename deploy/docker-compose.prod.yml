@@ -1,0 +1,42 @@
+services:
+  caddy:
+    image: caddy:2-alpine
+    container_name: slotix-caddy
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    restart: unless-stopped
+    networks: [slotix]
+    depends_on: [web, api]
+
+  web:
+    image: ghcr.io/egor1ka/slotix-fronted:latest
+    container_name: slotix-web
+    pull_policy: always
+    environment:
+      NODE_ENV: production
+      BACKEND_URL: http://api:9000
+    restart: unless-stopped
+    networks: [slotix]
+    depends_on: [api]
+
+  api:
+    image: ghcr.io/egor1ka/slotx-backend:latest
+    container_name: slotix-api
+    pull_policy: always
+    env_file:
+      - .env.api
+    restart: unless-stopped
+    networks: [slotix]
+
+networks:
+  slotix:
+    driver: bridge
+
+volumes:
+  caddy_data:
+  caddy_config:
