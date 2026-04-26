@@ -105,8 +105,11 @@ function PlanCard({
 		planKey === 'free' ? t('freeFeatures') : t('businessFeatures')
 
 	const status = subscription?.status ?? null
-	const statusLabel = status ? tStatus(STATUS_LABEL_KEY[status]) : null
-	const statusVariant = status ? STATUS_BADGE_VARIANT[status] : 'default'
+	const statusLabelKey = status ? (STATUS_LABEL_KEY[status] ?? null) : null
+	const statusLabel = statusLabelKey ? tStatus(statusLabelKey) : null
+	const statusVariant = status
+		? (STATUS_BADGE_VARIANT[status] ?? 'outline')
+		: 'default'
 
 	const cancelDate = subscription
 		? getEffectiveCancelDate(subscription)
@@ -123,7 +126,7 @@ function PlanCard({
 			)
 		}
 
-		if (canCancelSubscription(subscription)) {
+		if (canCancelSubscription(subscription) && cancelDate) {
 			return (
 				<Button
 					variant="outline"
