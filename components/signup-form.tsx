@@ -15,7 +15,8 @@ export function SignupForm({
 
 	const handleGoogleSignup = () => {
 		const tz = Intl.DateTimeFormat().resolvedOptions().timeZone // tz-ok: capturing user's browser tz for OAuth registration
-		window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google?timezone=${encodeURIComponent(tz)}`
+		const apiBase = process.env.NEXT_PUBLIC_API_URL ?? ''
+		window.location.href = `${apiBase}/api/auth/google?timezone=${encodeURIComponent(tz)}`
 	}
 
 	return (

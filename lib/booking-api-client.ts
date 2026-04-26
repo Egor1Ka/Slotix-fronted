@@ -22,7 +22,7 @@ import type {
 	UpdateBookingFieldBody,
 } from '@/services/configs/booking-field.types'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:9000'
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? ''
 
 // ── HTTP helpers ──
 
