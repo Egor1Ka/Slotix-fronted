@@ -8,6 +8,7 @@ import {
 	Calendar,
 	CalendarCog,
 	CircleDot,
+	CreditCard,
 	Settings2,
 	UserCircle,
 } from 'lucide-react'
@@ -46,6 +47,7 @@ function PersonalSidebar() {
 	const myScheduleHref = buildHref('/my-schedule')
 	const myServicesHref = buildHref('/my-services')
 	const profileHref = buildHref('/profile')
+	const billingHref = buildHref('/billing')
 	const bookingStatusesHref = buildHref('/booking-statuses')
 	const orgsHref = buildHref('/organizations')
 
@@ -131,6 +133,15 @@ function PersonalSidebar() {
 								>
 									<UserCircle className="size-4" />
 									<span>{t('myProfile')}</span>
+								</SidebarMenuButton>
+							</SidebarMenuItem>
+							<SidebarMenuItem>
+								<SidebarMenuButton
+									render={<Link href={billingHref} />}
+									isActive={isActive(billingHref)}
+								>
+									<CreditCard className="size-4" />
+									<span>{t('billing')}</span>
 								</SidebarMenuButton>
 							</SidebarMenuItem>
 							<SidebarMenuItem>
