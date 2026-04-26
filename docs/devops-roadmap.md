@@ -50,7 +50,7 @@
 
 - Workflow в Slotix-fronted: `build → push в GHCR → SSH → docker compose pull web && up -d web`
 - Workflow в Slotx-backend: то же + **генерация `.env.api` из GitHub Secrets** на сервере перед запуском
-- GitHub Secrets: `SSH_HOST`, `SSH_USER`, `SSH_PRIVATE_KEY`, плюс ~11 секретов с прод-ключами (DB_URL, JWT_SECRET, GOOGLE_*, CREEM_*, TELEGRAM_*)
+- GitHub Secrets: `SSH_HOST`, `SSH_USER`, `SSH_PRIVATE_KEY`, плюс ~11 секретов с прод-ключами (`DB_URL`, `JWT_SECRET`, `GOOGLE_*`, `CREEM_*`, `TELEGRAM_*`)
 
 ### 1.7. Грабли, на которые наступили
 
@@ -288,6 +288,7 @@ LiveOverflow про реверс-инжиниринг и web security (как л
 Lee Robinson — VP of Product в Vercel, объясняет Next.js best practices. Theo — горячие takes, иногда полезные иногда мусор, но интересно.
 
 **Полезные видео:**
+
 - Lee Robinson — [Next.js Caching Explained](https://youtu.be/VBlSe8tvg4U)
 - Theo — [Self-hosting Next.js](https://youtu.be/sIVL4JMqRfc)
 
@@ -359,16 +360,16 @@ Lee Robinson — VP of Product в Vercel, объясняет Next.js best practi
 
 ## 7. Контакты инфры (быстрая справка)
 
-| Что | Где |
-| --- | --- |
-| VPS | Contabo, IP `213.136.67.77`, Ubuntu 24.04 |
-| Домен | `slotixs.uk` через Cloudflare Registrar |
-| DNS | Cloudflare, A-записи (DNS only) |
-| Образы | `ghcr.io/egor1ka/slotix-fronted`, `ghcr.io/egor1ka/slotx-backend` |
-| БД | MongoDB Atlas, кластер `slotix-prod` (Frankfurt) |
-| OAuth | Google Cloud Console → проект CardFront |
-| CI/CD | GitHub Actions в обоих репо |
-| SSH-ключ для CI | `~/.ssh/slotix_deploy` (мак) → `/home/deploy/.ssh/authorized_keys` (сервер) |
-| Compose файл на сервере | `/opt/slotix/docker-compose.prod.yml` |
-| Caddyfile на сервере | `/opt/slotix/Caddyfile` |
-| Env файл на сервере | `/opt/slotix/.env.api` (генерится workflow'ом из GH Secrets) |
+| Что                     | Где                                                                         |
+| ----------------------- | --------------------------------------------------------------------------- |
+| VPS                     | Contabo, IP `213.136.67.77`, Ubuntu 24.04                                   |
+| Домен                   | `slotixs.uk` через Cloudflare Registrar                                     |
+| DNS                     | Cloudflare, A-записи (DNS only)                                             |
+| Образы                  | `ghcr.io/egor1ka/slotix-fronted`, `ghcr.io/egor1ka/slotx-backend`           |
+| БД                      | MongoDB Atlas, кластер `slotix-prod` (Frankfurt)                            |
+| OAuth                   | Google Cloud Console → проект CardFront                                     |
+| CI/CD                   | GitHub Actions в обоих репо                                                 |
+| SSH-ключ для CI         | `~/.ssh/slotix_deploy` (мак) → `/home/deploy/.ssh/authorized_keys` (сервер) |
+| Compose файл на сервере | `/opt/slotix/docker-compose.prod.yml`                                       |
+| Caddyfile на сервере    | `/opt/slotix/Caddyfile`                                                     |
+| Env файл на сервере     | `/opt/slotix/.env.api` (генерится workflow'ом из GH Secrets)                |
