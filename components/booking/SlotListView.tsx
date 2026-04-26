@@ -229,9 +229,10 @@ function SlotListView({
 	const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
 	const [selectedStaffId, setSelectedStaffId] = useState<string | null>(null)
 	const [sheetOpen, setSheetOpen] = useState(false)
-	const [pendingSlot, setPendingSlot] = useState<
-		{ staffId: string; time: string } | null
-	>(null)
+	const [pendingSlot, setPendingSlot] = useState<{
+		staffId: string
+		time: string
+	} | null>(null)
 	const serviceListRef = useRef<HTMLDivElement>(null)
 	const [highlightServices, setHighlightServices] = useState(false)
 

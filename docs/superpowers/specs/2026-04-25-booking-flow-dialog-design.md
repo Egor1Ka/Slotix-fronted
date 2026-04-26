@@ -9,10 +9,10 @@
 
 ## Текущая ситуация (что сломано)
 
-| Вид                 | Поведение сейчас                                                                |
-| ------------------- | ------------------------------------------------------------------------------- |
+| Вид                        | Поведение сейчас                                                                                                                                                                              |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Календарь (day/week/month) | Клик по слоту → `BookingPanel` в правом сайдбаре показывает `PendingSlot` (детали + кнопка Confirm). Форма ввода клиента — **в том же сайдбаре**. После успеха — `ConfirmedState` в сайдбаре. |
-| Список (list)       | Клик по слоту → открывается **`BookingConfirmSheet`** (Sheet-модалка) с формой. После успеха — модалка закрывается, никакого финального экрана нет. |
+| Список (list)              | Клик по слоту → открывается **`BookingConfirmSheet`** (Sheet-модалка) с формой. После успеха — модалка закрывается, никакого финального экрана нет.                                           |
 
 Проблема: разный UX, разные компоненты, дублирующая логика, и финальное подтверждение либо «прячется» в сайдбаре, либо отсутствует.
 
@@ -84,27 +84,27 @@ i18n/messages/{en,uk}.json                       ← добавляются кл
 
 ```ts
 interface BookingFlowDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+	open: boolean
+	onOpenChange: (open: boolean) => void
 
-  // Контекст бронирования
-  eventType: EventType | null
-  staffName: string | null
-  staffAvatar: string | null
-  slotTime: string | null
-  slotDate: string | null
-  slotTimezone: string
+	// Контекст бронирования
+	eventType: EventType | null
+	staffName: string | null
+	staffAvatar: string | null
+	slotTime: string | null
+	slotDate: string | null
+	slotTimezone: string
 
-  // Форма
-  formConfig: MergedBookingForm | null
-  isSubmitting: boolean
+	// Форма
+	formConfig: MergedBookingForm | null
+	isSubmitting: boolean
 
-  // Submit + результат
-  onSubmit: (data: ClientInfoData) => Promise<ConfirmedBooking | null>
+	// Submit + результат
+	onSubmit: (data: ClientInfoData) => Promise<ConfirmedBooking | null>
 
-  // Поведение success
-  shareUrl: string         // абсолютный публичный URL страницы букинга
-  onBookAgain: () => void  // полный сброс state выше (eventType + slot)
+	// Поведение success
+	shareUrl: string // абсолютный публичный URL страницы букинга
+	onBookAgain: () => void // полный сброс state выше (eventType + slot)
 }
 ```
 
@@ -119,12 +119,14 @@ interface BookingFlowDialogProps {
 ### `useBookingActions` — изменения
 
 **До:**
+
 ```ts
 handleConfirmWithClient: (data, overrides?) => Promise<void>
 // + сетит confirmedBooking в state, который рендерится в сайдбаре
 ```
 
 **После:**
+
 ```ts
 handleConfirmWithClient: (data, overrides?) => Promise<ConfirmedBooking | null>
 // возвращает результат вызывающему (BookingFlowDialog), state confirmedBooking уходит
@@ -154,21 +156,21 @@ renderPanel() {
 const isAbsoluteUrl = (s: string): boolean => /^https?:\/\//.test(s)
 
 const buildShareUrl = (input: {
-  origin: string
-  orgSlug?: string
-  staffId?: string
-  variant: 'org' | 'staff' | 'personal'
+	origin: string
+	orgSlug?: string
+	staffId?: string
+	variant: 'org' | 'staff' | 'personal'
 }): string => {
-  if (input.variant === 'personal' && input.staffId) {
-    return `${input.origin}/profile/${input.staffId}`
-  }
-  if (input.variant === 'staff' && input.orgSlug && input.staffId) {
-    return `${input.origin}/org/${input.orgSlug}/${input.staffId}`
-  }
-  if (input.variant === 'org' && input.orgSlug) {
-    return `${input.origin}/org/${input.orgSlug}`
-  }
-  return input.origin
+	if (input.variant === 'personal' && input.staffId) {
+		return `${input.origin}/profile/${input.staffId}`
+	}
+	if (input.variant === 'staff' && input.orgSlug && input.staffId) {
+		return `${input.origin}/org/${input.orgSlug}/${input.staffId}`
+	}
+	if (input.variant === 'org' && input.orgSlug) {
+		return `${input.origin}/org/${input.orgSlug}`
+	}
+	return input.origin
 }
 
 export { buildShareUrl, isAbsoluteUrl }
@@ -180,32 +182,32 @@ export { buildShareUrl, isAbsoluteUrl }
 
 ```ts
 const writeWithClipboardApi = async (text: string): Promise<boolean> => {
-  if (!navigator.clipboard) return false
-  try {
-    await navigator.clipboard.writeText(text)
-    return true
-  } catch {
-    return false
-  }
+	if (!navigator.clipboard) return false
+	try {
+		await navigator.clipboard.writeText(text)
+		return true
+	} catch {
+		return false
+	}
 }
 
 const writeWithExecCommand = (text: string): boolean => {
-  const ta = document.createElement('textarea')
-  ta.value = text
-  ta.setAttribute('readonly', '')
-  ta.style.position = 'absolute'
-  ta.style.left = '-9999px'
-  document.body.appendChild(ta)
-  ta.select()
-  const ok = document.execCommand('copy')
-  document.body.removeChild(ta)
-  return ok
+	const ta = document.createElement('textarea')
+	ta.value = text
+	ta.setAttribute('readonly', '')
+	ta.style.position = 'absolute'
+	ta.style.left = '-9999px'
+	document.body.appendChild(ta)
+	ta.select()
+	const ok = document.execCommand('copy')
+	document.body.removeChild(ta)
+	return ok
 }
 
 const copyToClipboard = async (text: string): Promise<boolean> => {
-  const viaApi = await writeWithClipboardApi(text)
-  if (viaApi) return true
-  return writeWithExecCommand(text)
+	const viaApi = await writeWithClipboardApi(text)
+	if (viaApi) return true
+	return writeWithExecCommand(text)
 }
 
 export { copyToClipboard }
@@ -221,40 +223,44 @@ export { copyToClipboard }
 import { useEffect, useRef } from 'react'
 
 const prefersReducedMotion = (): boolean =>
-  window.matchMedia('(prefers-reduced-motion: reduce)').matches
+	window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 const fireBurst = async (origin: { x: number; y: number }) => {
-  const confetti = (await import('canvas-confetti')).default
-  const fire = (particleRatio: number, opts: object) => {
-    confetti({ origin, particleCount: Math.floor(140 * particleRatio), ...opts })
-  }
-  fire(0.25, { spread: 26, startVelocity: 55 })
-  fire(0.2,  { spread: 60 })
-  fire(0.35, { spread: 100, decay: 0.91, scalar: 0.9 })
-  fire(0.1,  { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 })
-  fire(0.1,  { spread: 120, startVelocity: 45 })
+	const confetti = (await import('canvas-confetti')).default
+	const fire = (particleRatio: number, opts: object) => {
+		confetti({
+			origin,
+			particleCount: Math.floor(140 * particleRatio),
+			...opts,
+		})
+	}
+	fire(0.25, { spread: 26, startVelocity: 55 })
+	fire(0.2, { spread: 60 })
+	fire(0.35, { spread: 100, decay: 0.91, scalar: 0.9 })
+	fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 })
+	fire(0.1, { spread: 120, startVelocity: 45 })
 }
 
 interface ConfettiBurstProps {
-  targetRef: React.RefObject<HTMLElement | null>
+	targetRef: React.RefObject<HTMLElement | null>
 }
 
 function ConfettiBurst({ targetRef }: ConfettiBurstProps) {
-  const fired = useRef(false)
-  useEffect(() => {
-    if (fired.current) return
-    fired.current = true
-    if (prefersReducedMotion()) return
-    const el = targetRef.current
-    if (!el) return
-    const rect = el.getBoundingClientRect()
-    const origin = {
-      x: (rect.left + rect.width / 2) / window.innerWidth,
-      y: rect.top / window.innerHeight,
-    }
-    fireBurst(origin)
-  }, [targetRef])
-  return null
+	const fired = useRef(false)
+	useEffect(() => {
+		if (fired.current) return
+		fired.current = true
+		if (prefersReducedMotion()) return
+		const el = targetRef.current
+		if (!el) return
+		const rect = el.getBoundingClientRect()
+		const origin = {
+			x: (rect.left + rect.width / 2) / window.innerWidth,
+			y: rect.top / window.innerHeight,
+		}
+		fireBurst(origin)
+	}, [targetRef])
+	return null
 }
 
 export { ConfettiBurst }
@@ -278,32 +284,32 @@ export { ConfettiBurst }
 
 ## Edge cases
 
-| Кейс                                              | Поведение                                                                                          |
-| ------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| Двойной submit                                    | Кнопка `Confirm` отключается через `isSubmitting` (как сейчас в `ClientInfoForm`)                  |
-| Закрытие диалога во время submit                  | `onOpenChange(false)` игнорится пока `isSubmitting === true`; Esc/X disabled                       |
+| Кейс                                              | Поведение                                                                                                                                                                      |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Двойной submit                                    | Кнопка `Confirm` отключается через `isSubmitting` (как сейчас в `ClientInfoForm`)                                                                                              |
+| Закрытие диалога во время submit                  | `onOpenChange(false)` игнорится пока `isSubmitting === true`; Esc/X disabled                                                                                                   |
 | API вернул ошибку                                 | `handleConfirmWithClient` возвращает `null`, `result` остаётся `null`, форма продолжает рендериться, ошибка показывается banner-ом над формой (вместо текущего sidebar-banner) |
-| Reduced motion                                    | `ConfettiBurst` не запускает анимацию, success рендерится без эффектов                              |
-| `canBookForClient === false`                      | `onSelectSlot` уже отсекает кейс — диалог не открывается                                            |
-| Buffer copy fail (HTTP origin / no clipboard API) | Фолбэк через `document.execCommand('copy')`; если и он fail — toast `success.copyFailed`            |
-| Загрузка `formConfig` упала                       | Диалог не открывается, ошибка через глобальный `createToastInterceptor` (как сейчас)                |
-| `bookingError` существует, форма ещё не открыта   | toast (через интерсептор) — banner внутри диалога только для ошибок submit                          |
+| Reduced motion                                    | `ConfettiBurst` не запускает анимацию, success рендерится без эффектов                                                                                                         |
+| `canBookForClient === false`                      | `onSelectSlot` уже отсекает кейс — диалог не открывается                                                                                                                       |
+| Buffer copy fail (HTTP origin / no clipboard API) | Фолбэк через `document.execCommand('copy')`; если и он fail — toast `success.copyFailed`                                                                                       |
+| Загрузка `formConfig` упала                       | Диалог не открывается, ошибка через глобальный `createToastInterceptor` (как сейчас)                                                                                           |
+| `bookingError` существует, форма ещё не открыта   | toast (через интерсептор) — banner внутри диалога только для ошибок submit                                                                                                     |
 
 ## i18n
 
 Новые ключи под `booking`:
 
-| Ключ                  | EN                              | UK                                |
-| --------------------- | ------------------------------- | --------------------------------- |
-| `success.title`       | Booking confirmed!              | Бронь створено!                   |
-| `success.subtitle`    | We've sent the details to you   | Деталі надіслано вам              |
-| `success.bookAgain`   | Book again                      | Забронювати ще                    |
-| `success.shareLink`   | Share booking page              | Поділитися сторінкою              |
-| `success.linkCopied`  | Link copied                     | Посилання скопійовано             |
-| `success.copyFailed`  | Couldn't copy link              | Не вдалося скопіювати посилання   |
-| `success.client`      | Client                          | Клієнт                            |
-| `success.staff`       | Staff                           | Виконавець                        |
-| `success.dateTime`    | Date & time                     | Дата і час                        |
+| Ключ                 | EN                            | UK                              |
+| -------------------- | ----------------------------- | ------------------------------- |
+| `success.title`      | Booking confirmed!            | Бронь створено!                 |
+| `success.subtitle`   | We've sent the details to you | Деталі надіслано вам            |
+| `success.bookAgain`  | Book again                    | Забронювати ще                  |
+| `success.shareLink`  | Share booking page            | Поділитися сторінкою            |
+| `success.linkCopied` | Link copied                   | Посилання скопійовано           |
+| `success.copyFailed` | Couldn't copy link            | Не вдалося скопіювати посилання |
+| `success.client`     | Client                        | Клієнт                          |
+| `success.staff`      | Staff                         | Виконавець                      |
+| `success.dateTime`   | Date & time                   | Дата і час                      |
 
 Ключи `bookingConfirmed`, `chooseAnotherTime`, `cancel` (контекст «только что созданной брони») удаляются после рефакторинга, если grep не находит их в других местах.
 

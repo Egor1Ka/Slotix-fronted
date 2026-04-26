@@ -60,8 +60,8 @@ function TimeSlotGrid({
 					'rounded-xl border px-4 py-3 text-base font-semibold transition-all',
 					disabled && 'cursor-default opacity-60',
 					isActive
-						? 'border-primary bg-primary text-primary-foreground shadow-md scale-[1.02]'
-						: 'border-border bg-muted/40 hover:-translate-y-0.5 hover:bg-muted hover:shadow-sm',
+						? 'border-primary bg-primary text-primary-foreground scale-[1.02] shadow-md'
+						: 'border-border bg-muted/40 hover:bg-muted hover:-translate-y-0.5 hover:shadow-sm',
 				)}
 			>
 				{slot.startTime}

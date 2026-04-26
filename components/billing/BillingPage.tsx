@@ -117,10 +117,7 @@ function BillingPage() {
 
 			<section className="space-y-3">
 				<h2 className="text-xl font-semibold">{t('paymentsHistoryTitle')}</h2>
-				<PaymentsTable
-					payments={state.payments}
-					loading={state.loading}
-				/>
+				<PaymentsTable payments={state.payments} loading={state.loading} />
 			</section>
 		</main>
 	)

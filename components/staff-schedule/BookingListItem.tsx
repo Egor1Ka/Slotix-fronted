@@ -49,10 +49,7 @@ function BookingListItem({ booking, timezone, onClick }: BookingListItemProps) {
 					<span className="text-muted-foreground hidden text-xs sm:inline">
 						{booking.invitee.name}
 					</span>
-					<BookingStatusBadge
-						status={booking.status}
-						className="text-[10px]"
-					/>
+					<BookingStatusBadge status={booking.status} className="text-[10px]" />
 				</div>
 			</div>
 		</button>

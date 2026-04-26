@@ -93,7 +93,7 @@ function StaffTabs({
 					type="button"
 					onClick={handleAllClick}
 					className={cn(
-						'flex shrink-0 items-center gap-2 rounded-lg border-2 px-3 py-2 transition-all hover:bg-muted cursor-pointer',
+						'hover:bg-muted flex shrink-0 cursor-pointer items-center gap-2 rounded-lg border-2 px-3 py-2 transition-all',
 						allActive
 							? 'border-primary bg-primary/5'
 							: 'text-muted-foreground border-transparent',

@@ -133,7 +133,7 @@ function ProfileInfoBlock({
 						<Separator className="mb-3" />
 
 						{hasDescription && (
-							<p className="text-muted-foreground mb-3 break-words text-sm leading-relaxed">
+							<p className="text-muted-foreground mb-3 text-sm leading-relaxed break-words">
 								{description}
 							</p>
 						)}

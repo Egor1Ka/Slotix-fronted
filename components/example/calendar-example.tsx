@@ -20,7 +20,8 @@ export default function CalendarExample() {
 			<p className="text-muted-foreground text-sm">
 				Выбранная дата:{' '}
 				{date
-					? date.toLocaleDateString('ru-RU', { // tz-ok: example/demo file only, not production code
+					? date.toLocaleDateString('ru-RU', {
+							// tz-ok: example/demo file only, not production code
 							day: 'numeric',
 							month: 'long',
 							year: 'numeric',

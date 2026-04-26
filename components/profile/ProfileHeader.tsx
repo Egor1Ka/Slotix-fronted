@@ -28,7 +28,9 @@ function ProfileHeader({ avatar, name, subtitle, badges }: ProfileHeaderProps) {
 				{subtitle ? (
 					<p className="text-muted-foreground truncate text-sm">{subtitle}</p>
 				) : null}
-				{badges ? <div className="mt-1 flex flex-wrap gap-2">{badges}</div> : null}
+				{badges ? (
+					<div className="mt-1 flex flex-wrap gap-2">{badges}</div>
+				) : null}
 			</div>
 		</div>
 	)

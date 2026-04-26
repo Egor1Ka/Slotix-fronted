@@ -68,10 +68,7 @@ interface StaffStrategyParams {
 	selectedBooking?: BookingDetail | null
 	onCloseBooking?: () => void
 	availableStatuses?: BookingStatusObject[]
-	onBookingStatusChange?: (
-		bookingId: string,
-		statusId: string,
-	) => Promise<void>
+	onBookingStatusChange?: (bookingId: string, statusId: string) => Promise<void>
 	onBookingReschedule?: (bookingId: string, newStartAt: string) => Promise<void>
 	locale: string
 }

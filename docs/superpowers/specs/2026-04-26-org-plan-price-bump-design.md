@@ -25,9 +25,9 @@ A search across `BackendTemplate/src` and `Slotix-fronted` for `"$2"`, `"price":
 
 ### Backend (1 line)
 
-| File | Line | Old | New |
-|---|---|---|---|
-| `BackendTemplate/src/modules/billing/constants/billing.js` | 46 | `price: 200` | `price: 499` |
+| File                                                       | Line | Old          | New          |
+| ---------------------------------------------------------- | ---- | ------------ | ------------ |
+| `BackendTemplate/src/modules/billing/constants/billing.js` | 46   | `price: 200` | `price: 499` |
 
 `PLAN_CATALOG.org_creator.price` is denominated in **cents**. `200 → 499` means $2.00 → $4.99. This value is exposed via `GET /billing/catalog` and consumed by the frontend pricing/paywall surfaces that prefer it over the i18n string.
 
@@ -35,14 +35,14 @@ A search across `BackendTemplate/src` and `Slotix-fronted` for `"$2"`, `"price":
 
 Both locales mirror each other. All strings live under the existing pricing/paywall namespaces.
 
-| File | Line | Old | New |
-|---|---|---|---|
-| `i18n/messages/en.json` | 91  | `"$2"` | `"$4.99"` |
-| `i18n/messages/en.json` | 195 | `"$2/month"` | `"$4.99/month"` |
-| `i18n/messages/en.json` | 197 | `"Subscribe — $2/mo"` | `"Subscribe — $4.99/mo"` |
-| `i18n/messages/uk.json` | 91  | `"$2"` | `"$4.99"` |
-| `i18n/messages/uk.json` | 195 | `"$2/місяць"` | `"$4.99/місяць"` |
-| `i18n/messages/uk.json` | 197 | `"Підписатися — $2/міс"` | `"Підписатися — $4.99/міс"` |
+| File                    | Line | Old                      | New                         |
+| ----------------------- | ---- | ------------------------ | --------------------------- |
+| `i18n/messages/en.json` | 91   | `"$2"`                   | `"$4.99"`                   |
+| `i18n/messages/en.json` | 195  | `"$2/month"`             | `"$4.99/month"`             |
+| `i18n/messages/en.json` | 197  | `"Subscribe — $2/mo"`    | `"Subscribe — $4.99/mo"`    |
+| `i18n/messages/uk.json` | 91   | `"$2"`                   | `"$4.99"`                   |
+| `i18n/messages/uk.json` | 195  | `"$2/місяць"`            | `"$4.99/місяць"`            |
+| `i18n/messages/uk.json` | 197  | `"Підписатися — $2/міс"` | `"Підписатися — $4.99/міс"` |
 
 ## Coupling between backend price and frontend strings
 

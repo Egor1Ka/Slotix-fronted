@@ -1,5 +1,8 @@
 import type { ReactNode } from 'react'
-import type { BookingStatusObject, Invitee } from '@/services/configs/booking.types'
+import type {
+	BookingStatusObject,
+	Invitee,
+} from '@/services/configs/booking.types'
 
 type ViewMode = 'day' | 'week' | 'month' | 'list'
 

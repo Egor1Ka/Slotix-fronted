@@ -44,7 +44,10 @@ type LogoProps = {
 	textClassName?: string
 }
 
-const SIZE_MAP: Record<NonNullable<LogoProps['size']>, { mark: number; text: string; gap: string }> = {
+const SIZE_MAP: Record<
+	NonNullable<LogoProps['size']>,
+	{ mark: number; text: string; gap: string }
+> = {
 	sm: { mark: 24, text: 'text-base', gap: 'gap-2' },
 	md: { mark: 32, text: 'text-xl', gap: 'gap-2.5' },
 	lg: { mark: 44, text: 'text-2xl', gap: 'gap-3' },
@@ -62,10 +65,16 @@ function Logo({
 	const content = (
 		<span
 			data-slot="logo"
-			className={cn('inline-flex items-center font-bold tracking-tight', gap, className)}
+			className={cn(
+				'inline-flex items-center font-bold tracking-tight',
+				gap,
+				className,
+			)}
 		>
 			<LogoMark size={mark} />
-			<span className={cn('text-foreground', text, textClassName)}>{label}</span>
+			<span className={cn('text-foreground', text, textClassName)}>
+				{label}
+			</span>
 		</span>
 	)
 

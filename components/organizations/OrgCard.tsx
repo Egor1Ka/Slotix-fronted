@@ -50,7 +50,9 @@ function OrgCard({ org, onInvitationHandled }: OrgCardProps) {
 	const isInvited = org.status === 'invited'
 	const ADMIN_ROLES = ['owner', 'admin']
 	const isAdmin = ADMIN_ROLES.includes(org.role)
-	const orgPath = isAdmin ? `/${locale}/manage/${org.id}` : `/${locale}/org/${org.id}/my-schedule`
+	const orgPath = isAdmin
+		? `/${locale}/manage/${org.id}`
+		: `/${locale}/org/${org.id}/my-schedule`
 
 	const handleClick = () => {
 		if (isInvited) {

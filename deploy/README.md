@@ -75,11 +75,11 @@ After the first manual deploy works, GitHub Actions takes over:
 
 Required GitHub Secrets (in **both** repos):
 
-| Secret              | Value                                    |
-| ------------------- | ---------------------------------------- |
-| `SSH_HOST`          | `213.136.67.77`                          |
-| `SSH_USER`          | `deploy`                                 |
-| `SSH_PRIVATE_KEY`   | contents of `~/.ssh/slotix_deploy` (full file, including header/footer) |
+| Secret            | Value                                                                   |
+| ----------------- | ----------------------------------------------------------------------- |
+| `SSH_HOST`        | `213.136.67.77`                                                         |
+| `SSH_USER`        | `deploy`                                                                |
+| `SSH_PRIVATE_KEY` | contents of `~/.ssh/slotix_deploy` (full file, including header/footer) |
 
 GHCR auth: workflows use the built-in `GITHUB_TOKEN` with `packages: write` permission. No PAT needed.
 

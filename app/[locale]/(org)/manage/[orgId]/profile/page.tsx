@@ -141,7 +141,10 @@ function OrgProfilePage() {
 				</Button>
 			</div>
 
-			<AlertDialog open={pendingTimezone !== null} onOpenChange={handleTimezoneCancel}>
+			<AlertDialog
+				open={pendingTimezone !== null}
+				onOpenChange={handleTimezoneCancel}
+			>
 				<AlertDialogContent>
 					<AlertDialogHeader>
 						<AlertDialogTitle>{tOrg('timezoneWarningTitle')}</AlertDialogTitle>

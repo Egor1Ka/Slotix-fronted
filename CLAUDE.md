@@ -877,10 +877,12 @@ The `standalone` output mode bundles everything into a self-contained `server.js
 All date/time handling follows a single contract across frontend and backend.
 
 ### Storage
+
 - All `Date` fields in MongoDB are stored in **UTC**
 - Timezone strings are stored as IANA identifiers (e.g. `"Europe/Kyiv"`, `"America/New_York"`)
 
 ### Timezone Priority
+
 1. **Org schedule** → `Organization.timezone` (single source, `ScheduleTemplate.timezone` is `null`)
 2. **Personal schedule** → `ScheduleTemplate.timezone`
 3. **Fallback** → `"UTC"` (never hardcode a specific city)
@@ -890,17 +892,20 @@ For org schedules, the field is absent — timezone is resolved from `Organizati
 Backend `resolveScheduleTimezone()` handles this transparently.
 
 ### Frontend → Backend Contract
+
 - `startAt` is sent as **naive wall-clock ISO** without `Z` suffix: `"2026-04-15T14:00:00"`
 - The `timezone` field is sent alongside for informational purposes (client's timezone)
 - Backend resolves timezone via `resolveScheduleTimezone()` (org → `Organization.timezone`, personal → `ScheduleTemplate.timezone`) and calls `parseWallClockToUtc(startAt, resolvedTimezone)`
 
 ### Display Rules
+
 - Always use `Intl.DateTimeFormat` with explicit `timeZone` parameter
 - Never use `.split('T')[0]` to extract date from ISO — use `dateFromISO(iso, timezone)` from `lib/booking-utils.ts`
 - Never use `new Date()` for "today" — use `getTodayStrInTz(timezone)` from `lib/calendar/utils.ts`
 - Never use `formatDateISO(new Date())` for default date — use browser timezone: `new Intl.DateTimeFormat('en-CA').format(new Date())`
 
 ### Forbidden Patterns
+
 ```ts
 // WRONG: Z suffix on wall-clock time
 const startAt = `${date}T${time}:00.000Z`
@@ -915,10 +920,11 @@ const today = formatDateISO(new Date())
 return new Date(dateStr + 'T23:59:59') < new Date()
 
 // WRONG: hardcoded city fallback
-const tz = template?.timezone ?? "Europe/Kyiv"
+const tz = template?.timezone ?? 'Europe/Kyiv'
 ```
 
 ### Correct Patterns
+
 ```ts
 // wall-clock time without Z
 const startAt = `${date}T${time}:00`
@@ -935,7 +941,7 @@ const todayStr = getTodayStrInTz(timezone)
 return dateStr < todayStr
 
 // fallback chain (never hardcode a city)
-const tz = template?.timezone ?? org?.timezone ?? "UTC"
+const tz = template?.timezone ?? org?.timezone ?? 'UTC'
 ```
 
 ## Monitoring (New Relic)

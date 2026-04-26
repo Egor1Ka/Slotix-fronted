@@ -77,7 +77,7 @@ function SuccessContent({ payload, confettiTargetRef }: SuccessContentProps) {
 				ref={confettiTargetRef}
 				className="flex w-full max-w-md flex-col items-center gap-5 sm:gap-6"
 			>
-				<div className="bg-green-500/10 ring-green-500/20 animate-in fade-in zoom-in-95 flex size-20 items-center justify-center rounded-full ring-4 duration-500 sm:size-24">
+				<div className="animate-in fade-in zoom-in-95 flex size-20 items-center justify-center rounded-full bg-green-500/10 ring-4 ring-green-500/20 duration-500 sm:size-24">
 					<CheckCircle2Icon className="size-10 text-green-600 sm:size-12" />
 				</div>
 

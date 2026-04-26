@@ -18,19 +18,19 @@
 
 ```ts
 interface CalendarViewConfig {
-  // ... существующие поля
-  defaultView: ViewMode  // 'day' | 'week' | 'month' | 'list'
+	// ... существующие поля
+	defaultView: ViewMode // 'day' | 'week' | 'month' | 'list'
 }
 ```
 
 ### Значения по пресетам
 
-| Preset | `defaultView` | Контекст |
-|---|---|---|
-| `STAFF_PUBLIC_CONFIG` | `'list'` | Публичная ссылка сотрудника |
-| `ORG_PUBLIC_CONFIG` | `'list'` | Публичная ссылка организации |
-| `STAFF_SELF_CONFIG` | `'day'` | Личная страница сотрудника |
-| `ORG_ADMIN_CONFIG` | `'day'` | Админка организации |
+| Preset                | `defaultView` | Контекст                     |
+| --------------------- | ------------- | ---------------------------- |
+| `STAFF_PUBLIC_CONFIG` | `'list'`      | Публичная ссылка сотрудника  |
+| `ORG_PUBLIC_CONFIG`   | `'list'`      | Публичная ссылка организации |
+| `STAFF_SELF_CONFIG`   | `'day'`       | Личная страница сотрудника   |
+| `ORG_ADMIN_CONFIG`    | `'day'`       | Админка организации          |
 
 Во всех пресетах уже стоит `allowListView: true`, так что `'list'` валиден везде.
 

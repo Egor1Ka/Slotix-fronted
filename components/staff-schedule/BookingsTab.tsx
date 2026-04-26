@@ -19,7 +19,12 @@ import {
 } from '@/components/ui/sheet'
 import { BookingDateGroup } from './BookingDateGroup'
 import { BookingDetailPanel } from '@/components/booking/BookingDetailPanel'
-import { bookingApi, eventTypeApi, scheduleApi, bookingStatusApi } from '@/lib/booking-api-client'
+import {
+	bookingApi,
+	eventTypeApi,
+	scheduleApi,
+	bookingStatusApi,
+} from '@/lib/booking-api-client'
 import { getTodayStrInTz, getWeekStart, addDays } from '@/lib/calendar/utils'
 import { dateFromISO } from '@/lib/booking-utils'
 import type { StaffBooking, EventType } from '@/services/configs/booking.types'
@@ -43,7 +48,10 @@ const computeWeekRange = (
 	return { dateFrom: monday, dateTo: sunday }
 }
 
-const groupByDate = (bookings: StaffBooking[], timezone: string): Map<string, StaffBooking[]> => {
+const groupByDate = (
+	bookings: StaffBooking[],
+	timezone: string,
+): Map<string, StaffBooking[]> => {
 	const groups = new Map<string, StaffBooking[]>()
 
 	const addToGroup = (booking: StaffBooking) => {
@@ -59,7 +67,8 @@ const groupByDate = (bookings: StaffBooking[], timezone: string): Map<string, St
 const sortDatesAsc = (a: string, b: string): number => a.localeCompare(b)
 
 const formatShort = (dateStr: string, timezone: string): string =>
-	new Date(dateStr + 'T12:00:00Z').toLocaleDateString('uk-UA', { // tz-ok: timeZone: timezone passed in options on next line
+	new Date(dateStr + 'T12:00:00Z').toLocaleDateString('uk-UA', {
+		// tz-ok: timeZone: timezone passed in options on next line
 		timeZone: timezone,
 		day: 'numeric',
 		month: 'short',
@@ -68,7 +77,10 @@ const formatShort = (dateStr: string, timezone: string): string =>
 const formatWeekLabel = (from: string, to: string, timezone: string): string =>
 	`${formatShort(from, timezone)} — ${formatShort(to, timezone)}`
 
-const toBookingDetail = (booking: StaffBooking, timezone: string): BookingDetail => ({
+const toBookingDetail = (
+	booking: StaffBooking,
+	timezone: string,
+): BookingDetail => ({
 	id: booking.id,
 	eventTypeName: booking.eventTypeName,
 	color: booking.color,
@@ -123,7 +135,9 @@ function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
 	const timezoneRef = useRef<string | null>(null)
 
 	const [eventTypesReady, setEventTypesReady] = useState(false)
-	const [availableStatuses, setAvailableStatuses] = useState<BookingStatusObject[]>([])
+	const [availableStatuses, setAvailableStatuses] = useState<
+		BookingStatusObject[]
+	>([])
 
 	useEffect(() => {
 		const loadStatuses = async () => {
@@ -240,7 +254,9 @@ function BookingsTab({ staffId, orgId, readOnly }: BookingsTabProps) {
 				</Empty>
 			) : (
 				<div className="flex flex-col gap-4">
-					{sortedDates.map(renderDateGroup(handleBookingClick, grouped, timezone))}
+					{sortedDates.map(
+						renderDateGroup(handleBookingClick, grouped, timezone),
+					)}
 				</div>
 			)}
 

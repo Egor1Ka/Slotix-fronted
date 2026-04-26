@@ -50,7 +50,8 @@ const formatSlotDate = (
 	}
 
 	const date = new Date(dateStr + 'T00:00:00')
-	return date.toLocaleDateString(locale, { // tz-ok: date constructed from tz-correct YYYY-MM-DD+'T00:00:00'; displaying day/month/weekday labels, tz shift within same day is harmless
+	return date.toLocaleDateString(locale, {
+		// tz-ok: date constructed from tz-correct YYYY-MM-DD+'T00:00:00'; displaying day/month/weekday labels, tz shift within same day is harmless
 		day: 'numeric',
 		month: 'long',
 		weekday: 'long',
@@ -78,10 +79,10 @@ function StaffSlotCard({
 	}
 
 	return (
-		<div className="flex flex-col gap-4 rounded-xl border bg-card p-5 shadow-sm transition-shadow hover:shadow-md">
+		<div className="bg-card flex flex-col gap-4 rounded-xl border p-5 shadow-sm transition-shadow hover:shadow-md">
 			<div className="flex items-center justify-between">
 				<div className="flex items-center gap-3">
-					<Avatar className="size-12 ring-2 ring-border">
+					<Avatar className="ring-border size-12 ring-2">
 						<AvatarImage src={staff.avatar} alt={staff.name} />
 						<AvatarFallback className="text-sm">
 							{getInitials(staff.name)}

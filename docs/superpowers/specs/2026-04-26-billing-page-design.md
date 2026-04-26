@@ -26,16 +26,16 @@ The backend (`POST /api/billing/cancel`, `GET /api/billing/subscription`, `GET /
 
 ### Files
 
-| File | Type | Responsibility |
-|---|---|---|
-| `app/[locale]/(personal)/billing/page.tsx` | Server Component | Auth guard (redirect `/login` if no user), render `<BillingPage />` |
-| `components/billing/BillingPage.tsx` | Client | Orchestrates data load (subscription + payments + catalog), passes data to children, handles cancel callback |
-| `components/billing/PlanCard.tsx` | Client | Renders plan name, status badge, price, period, CTA button |
-| `components/billing/CancelSubscriptionDialog.tsx` | Client | Confirmation modal with `cancelAt` warning, calls `billingApi.cancel()`, returns success/failure to parent |
-| `components/billing/PaymentsTable.tsx` | Client | Renders shadcn Table with payment rows, skeleton loading, empty state |
-| `components/billing/ScheduledCancelBanner.tsx` | Client | Top-of-page Alert when `status === 'scheduled_cancel'` |
-| `components/sidebar/PersonalSidebar.tsx` | Client (modify) | Add "Billing" entry to existing `groupAccount` group |
-| `i18n/messages/en.json`, `i18n/messages/uk.json` | Data (modify) | New `billing.page.*` namespace plus sidebar entry |
+| File                                              | Type             | Responsibility                                                                                               |
+| ------------------------------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------ |
+| `app/[locale]/(personal)/billing/page.tsx`        | Server Component | Auth guard (redirect `/login` if no user), render `<BillingPage />`                                          |
+| `components/billing/BillingPage.tsx`              | Client           | Orchestrates data load (subscription + payments + catalog), passes data to children, handles cancel callback |
+| `components/billing/PlanCard.tsx`                 | Client           | Renders plan name, status badge, price, period, CTA button                                                   |
+| `components/billing/CancelSubscriptionDialog.tsx` | Client           | Confirmation modal with `cancelAt` warning, calls `billingApi.cancel()`, returns success/failure to parent   |
+| `components/billing/PaymentsTable.tsx`            | Client           | Renders shadcn Table with payment rows, skeleton loading, empty state                                        |
+| `components/billing/ScheduledCancelBanner.tsx`    | Client           | Top-of-page Alert when `status === 'scheduled_cancel'`                                                       |
+| `components/sidebar/PersonalSidebar.tsx`          | Client (modify)  | Add "Billing" entry to existing `groupAccount` group                                                         |
+| `i18n/messages/en.json`, `i18n/messages/uk.json`  | Data (modify)    | New `billing.page.*` namespace plus sidebar entry                                                            |
 
 ### Data flow
 
@@ -44,6 +44,7 @@ The backend (`POST /api/billing/cancel`, `GET /api/billing/subscription`, `GET /
 `subscription` may be `null` for users on the free plan. `PlanCard` handles that: shows "Free" preset, CTA "Upgrade to Business" → routes to existing checkout entry (`/billing/checkout?plan=org_creator` or whatever the existing paywall uses; the page reuses, does not reimplement).
 
 When user clicks Cancel:
+
 1. `CancelSubscriptionDialog` opens, shows the date until access remains (`cancelAt ?? currentPeriodEnd`).
 2. On confirm: call `billingApi.cancel()`. While in flight, dialog button is disabled with spinner.
 3. On success: dialog closes, parent calls a `reload()` callback that re-fetches `subscription` and `payments`. The new state has `status === 'scheduled_cancel'`, so the page now renders the banner and the PlanCard CTA changes to disabled hint.
@@ -94,6 +95,7 @@ shadcn `Card` with the existing visual language (rounded-xl, border, shadow-sm).
 `<h2>` "Історія платежів" / "Payment history" + `<p.muted>` count or empty descriptor.
 
 shadcn `Table` with columns:
+
 1. **Дата** — `formatDate(payment.createdAt, locale)`.
 2. **Сума** — `{(payment.amount / 100).toFixed(2)} {payment.currency}` (amounts are stored in cents per project convention; this is the only place we render them).
 3. **Тип** — `<Badge>` "Підписка" / "Разовий" based on `payment.type`.
@@ -116,6 +118,7 @@ When `subscription === null` and `payments.length === 0`, the page still has str
 ### i18n keys to add
 
 Under `billing.page` (both locales):
+
 - `title` — "Підписка та платежі" / "Billing"
 - `subtitle` — "Керуйте підпискою та переглядайте історію платежів" / "Manage your subscription and review payments"
 - `currentPeriod` — "Поточний період" / "Current period"
@@ -135,12 +138,14 @@ Under `billing.page` (both locales):
 - `bannerScheduledDescription` — "Доступ збережеться до {date}. Після цієї дати організації буде деактивовано." / "Access remains until {date}. After that, your organizations will be deactivated."
 
 Under `billing.events`:
+
 - `checkout.completed` — "Перший платіж" / "Initial payment"
 - `subscription.paid` — "Продовження" / "Renewal"
 - `refund.created` — "Повернення" / "Refund"
 - `dispute.created` — "Спір" / "Dispute"
 
 Under `billing.status` (used by status badge text):
+
 - `active` — "Активна" / "Active"
 - `scheduled_cancel` — "Скасовано" / "Cancelled"
 - `canceled` — "Завершена" / "Ended"
@@ -149,6 +154,7 @@ Under `billing.status` (used by status badge text):
 - `paused` — "Призупинено" / "Paused"
 
 Under `sidebar`:
+
 - `billing` — "Підписка та платежі" / "Billing"
 
 ## Error handling
@@ -195,6 +201,7 @@ No new automated tests are added in this iteration. The page is presentation log
 ## Visual style
 
 Follow the existing booking design refresh:
+
 - `bg-card`, `rounded-xl`, `border`, `shadow-sm`, `hover:shadow-md` for cards.
 - Status badges via shadcn Badge variants (custom warning variant if needed).
 - Spacing: `space-y-6` between sections, `gap-4` inside cards.

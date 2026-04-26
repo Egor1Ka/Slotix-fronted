@@ -239,7 +239,8 @@ function ScheduleViewTab({ staffId, orgId, readOnly }: ScheduleViewTabProps) {
 			<Separator />
 			{orgId ? (
 				<div className="text-muted-foreground text-sm">
-					{t('timezoneFromOrg')}: <span className="font-medium">{localTimezone}</span>
+					{t('timezoneFromOrg')}:{' '}
+					<span className="font-medium">{localTimezone}</span>
 				</div>
 			) : (
 				<div className={cn(savingMode && 'pointer-events-none opacity-50')}>
@@ -256,9 +257,17 @@ function ScheduleViewTab({ staffId, orgId, readOnly }: ScheduleViewTabProps) {
 					onChange={handleSlotModeChange}
 				/>
 			</div>
-			<div className={cn('flex flex-col gap-2', savingMode && 'pointer-events-none opacity-50')}>
+			<div
+				className={cn(
+					'flex flex-col gap-2',
+					savingMode && 'pointer-events-none opacity-50',
+				)}
+			>
 				<Label>{t('slotStep')}</Label>
-				<Select value={String(localSlotStep)} onValueChange={handleSlotStepChange}>
+				<Select
+					value={String(localSlotStep)}
+					onValueChange={handleSlotStepChange}
+				>
 					<SelectTrigger className="w-32">
 						<SelectValue />
 					</SelectTrigger>

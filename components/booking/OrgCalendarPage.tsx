@@ -96,7 +96,9 @@ function OrgCalendarPage({
 		error: orgError,
 	} = useOrgInfo(orgSlug)
 
-	const [availableStatuses, setAvailableStatuses] = useState<BookingStatusObject[]>([])
+	const [availableStatuses, setAvailableStatuses] = useState<
+		BookingStatusObject[]
+	>([])
 
 	useEffect(() => {
 		if (!org) return
@@ -168,7 +170,14 @@ function OrgCalendarPage({
 		reloadBookings,
 		loading: bookingsLoading,
 		error: bookingsError,
-	} = useStaffBookings(staffToLoad, dateStr, view, eventTypes, org?.id, schedule?.timezone)
+	} = useStaffBookings(
+		staffToLoad,
+		dateStr,
+		view,
+		eventTypes,
+		org?.id,
+		schedule?.timezone,
+	)
 
 	// Начальная загрузка — блокирует рендер полностью
 	const initialLoading =
@@ -348,8 +357,7 @@ function OrgCalendarPage({
 		navigation.setParams({ eventType: null, slot: null })
 	}
 
-	const dialogStaff =
-		staffList.find((s) => s.id === selectedStaffId) ?? null
+	const dialogStaff = staffList.find((s) => s.id === selectedStaffId) ?? null
 
 	// ── Success navigation (only public users) ──
 
@@ -396,17 +404,16 @@ function OrgCalendarPage({
 		/>
 	)
 
-	const staffTabsSlot =
-		viewConfig.showStaffTabs ? (
-			<StaffTabs
-				staff={displayStaff}
-				selectedId={selectedStaffId}
-				behavior={viewConfig.staffTabBehavior}
-				allowAll
-				onSelect={onStaffSelect}
-				loading={contentLoading}
-			/>
-		) : null
+	const staffTabsSlot = viewConfig.showStaffTabs ? (
+		<StaffTabs
+			staff={displayStaff}
+			selectedId={selectedStaffId}
+			behavior={viewConfig.staffTabBehavior}
+			allowAll
+			onSelect={onStaffSelect}
+			loading={contentLoading}
+		/>
+	) : null
 
 	// ── Profile info ──
 

@@ -50,7 +50,9 @@ function OverridesTab({ staffId, orgId, readOnly }: OverridesTabProps) {
 
 	useEffect(() => {
 		const loadTimezone = async () => {
-			const schedule = await scheduleApi.getTemplate(staffId, orgId).catch(() => null)
+			const schedule = await scheduleApi
+				.getTemplate(staffId, orgId)
+				.catch(() => null)
 			setTimezone(schedule?.timezone ?? null)
 		}
 		loadTimezone()

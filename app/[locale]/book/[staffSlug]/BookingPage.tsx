@@ -14,10 +14,7 @@ import {
 import { useTranslations } from 'next-intl'
 import { useLocale } from 'next-intl'
 import { useViewConfig } from '@/lib/calendar/CalendarViewConfigContext'
-import {
-	getWorkHoursForDate,
-	getFirstStaffId,
-} from '@/lib/calendar/utils'
+import { getWorkHoursForDate, getFirstStaffId } from '@/lib/calendar/utils'
 import { SlotListView } from '@/components/booking/SlotListView'
 import { BookingFlowDialog } from '@/components/booking/BookingFlowDialog'
 import { buildShareUrl } from '@/lib/booking/build-share-url'
@@ -115,9 +112,18 @@ function BookingPage({
 		reloadBookings,
 		loading: bookingsLoading,
 		error: bookingsError,
-	} = useStaffBookings(staffToLoad, dateStr, view, eventTypes, undefined, schedule?.timezone)
+	} = useStaffBookings(
+		staffToLoad,
+		dateStr,
+		view,
+		eventTypes,
+		undefined,
+		schedule?.timezone,
+	)
 
-	const [availableStatuses, setAvailableStatuses] = useState<BookingStatusObject[]>([])
+	const [availableStatuses, setAvailableStatuses] = useState<
+		BookingStatusObject[]
+	>([])
 
 	useEffect(() => {
 		if (!staff) return

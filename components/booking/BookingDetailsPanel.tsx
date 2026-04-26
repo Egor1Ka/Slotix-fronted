@@ -52,7 +52,8 @@ const computeDurationMin = (startAt: string, endAt: string): number => {
 }
 
 const formatTime = (isoString: string, timezone: string): string =>
-	new Date(isoString).toLocaleTimeString('uk-UA', { // tz-ok: timeZone: timezone passed in options on next line
+	new Date(isoString).toLocaleTimeString('uk-UA', {
+		// tz-ok: timeZone: timezone passed in options on next line
 		timeZone: timezone,
 		hour: '2-digit',
 		minute: '2-digit',
@@ -60,7 +61,8 @@ const formatTime = (isoString: string, timezone: string): string =>
 	})
 
 const formatDate = (isoString: string, timezone: string): string =>
-	new Date(isoString).toLocaleDateString('uk-UA', { // tz-ok: timeZone: timezone passed in options on next line
+	new Date(isoString).toLocaleDateString('uk-UA', {
+		// tz-ok: timeZone: timezone passed in options on next line
 		timeZone: timezone,
 		weekday: 'short',
 		year: 'numeric',
@@ -112,9 +114,13 @@ function TimeGrid({
 	return (
 		<div className="grid grid-cols-2 gap-y-2 text-xs">
 			<span className="text-muted-foreground">{t('startTime')}</span>
-			<span className="font-medium">{formatTime(booking.startAt, booking.timezone)}</span>
+			<span className="font-medium">
+				{formatTime(booking.startAt, booking.timezone)}
+			</span>
 			<span className="text-muted-foreground">{t('endTime')}</span>
-			<span className="font-medium">{formatTime(booking.endAt, booking.timezone)}</span>
+			<span className="font-medium">
+				{formatTime(booking.endAt, booking.timezone)}
+			</span>
 			<span className="text-muted-foreground">{t('duration')}</span>
 			<span className="font-medium">
 				{durationMin} {t('min')}
@@ -128,7 +134,9 @@ function TimeGrid({
 				</>
 			)}
 			<span className="text-muted-foreground">{t('schedule.date')}</span>
-			<span className="font-medium">{formatDate(booking.startAt, booking.timezone)}</span>
+			<span className="font-medium">
+				{formatDate(booking.startAt, booking.timezone)}
+			</span>
 		</div>
 	)
 }
@@ -244,9 +252,7 @@ function ActionButtons({
 	}
 
 	return (
-		<div className="flex flex-wrap gap-2">
-			{transitions.map(renderButton)}
-		</div>
+		<div className="flex flex-wrap gap-2">{transitions.map(renderButton)}</div>
 	)
 }
 

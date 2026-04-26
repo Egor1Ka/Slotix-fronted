@@ -80,9 +80,7 @@ function PlanCard({
 
 	const planKey = subscription?.planKey ?? 'free'
 	const planLabelKey = PLAN_LABEL_KEY[planKey]
-	const planLabel = planLabelKey
-		? tBilling(planLabelKey)
-		: t('customPlanLabel')
+	const planLabel = planLabelKey ? tBilling(planLabelKey) : t('customPlanLabel')
 
 	const catalogEntry = findCatalogPlan(catalog, planKey)
 	const priceText = catalogEntry
@@ -110,9 +108,7 @@ function PlanCard({
 		? (STATUS_BADGE_VARIANT[status] ?? 'outline')
 		: 'default'
 
-	const cancelDate = subscription
-		? getEffectiveCancelDate(subscription)
-		: null
+	const cancelDate = subscription ? getEffectiveCancelDate(subscription) : null
 
 	const handleCancelClick = () => setDialogOpen(true)
 
@@ -169,8 +165,12 @@ function PlanCard({
 			<Card className="rounded-xl shadow-sm">
 				<CardHeader className="flex flex-row items-start justify-between gap-4">
 					<div className="flex flex-col gap-2">
-						<CardTitle className="text-2xl font-semibold">{planLabel}</CardTitle>
-						{statusLabel && <Badge variant={statusVariant}>{statusLabel}</Badge>}
+						<CardTitle className="text-2xl font-semibold">
+							{planLabel}
+						</CardTitle>
+						{statusLabel && (
+							<Badge variant={statusVariant}>{statusLabel}</Badge>
+						)}
 					</div>
 				</CardHeader>
 				<CardContent className="grid gap-6 md:grid-cols-2">

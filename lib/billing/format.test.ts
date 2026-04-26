@@ -45,7 +45,10 @@ describe('formatDate', () => {
 
 describe('getEffectiveCancelDate', () => {
 	it('returns cancelAt when present', () => {
-		const sub = { cancelAt: '2026-05-01T00:00:00Z', currentPeriodEnd: '2026-05-15T00:00:00Z' }
+		const sub = {
+			cancelAt: '2026-05-01T00:00:00Z',
+			currentPeriodEnd: '2026-05-15T00:00:00Z',
+		}
 		expect(getEffectiveCancelDate(sub)).toBe('2026-05-01T00:00:00Z')
 	})
 

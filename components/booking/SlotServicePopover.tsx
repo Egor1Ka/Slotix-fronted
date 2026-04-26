@@ -29,8 +29,7 @@ const buildFitList = (
 	workEnd: string,
 ): EventType[] => {
 	const windowMin = minutesBetween(slotTime, workEnd)
-	const fits = (service: EventType): boolean =>
-		service.durationMin <= windowMin
+	const fits = (service: EventType): boolean => service.durationMin <= windowMin
 	return services.filter(fits)
 }
 

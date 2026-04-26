@@ -11,6 +11,7 @@
 **Spec:** [docs/superpowers/specs/2026-04-26-org-plan-price-bump-design.md](../specs/2026-04-26-org-plan-price-bump-design.md)
 
 **Repos:**
+
 - Backend: `/Users/egorzozula/Desktop/BackendTemplate`
 - Frontend: `/Users/egorzozula/Desktop/Slotix-fronted/Slotix-fronted`
 
@@ -19,6 +20,7 @@
 ### Task 1: Backend — bump catalog price and align test fixtures
 
 **Files:**
+
 - Modify: `BackendTemplate/src/modules/billing/constants/billing.js:46`
 - Modify: `BackendTemplate/src/modules/billing/__tests__/helpers.js:41`
 - Modify: `BackendTemplate/src/modules/billing/__tests__/helpers.js:67`
@@ -65,10 +67,10 @@ In `BackendTemplate/src/modules/billing/__tests__/billing.test.js`, change the t
 
 ```js
 // line 57
-      assert.equal(payment.amount, 499);
+assert.equal(payment.amount, 499)
 
 // line 133
-      assert.equal(payment.amount, 499);
+assert.equal(payment.amount, 499)
 ```
 
 - [ ] **Step 4: Run backend billing tests**
@@ -109,6 +111,7 @@ EOF
 ### Task 2: Frontend — update i18n strings (en + uk)
 
 **Files:**
+
 - Modify: `Slotix-fronted/i18n/messages/en.json:91`
 - Modify: `Slotix-fronted/i18n/messages/en.json:195`
 - Modify: `Slotix-fronted/i18n/messages/en.json:197`
@@ -157,6 +160,7 @@ node -e "JSON.parse(require('fs').readFileSync('i18n/messages/uk.json','utf8'));
 ```
 
 Expected output:
+
 ```
 en.json ok
 uk.json ok

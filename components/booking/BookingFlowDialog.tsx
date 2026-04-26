@@ -173,9 +173,7 @@ function BookingSummaryCard({
 				)}
 				{clientName && (
 					<>
-						<span className="text-muted-foreground">
-							{t('success.client')}
-						</span>
+						<span className="text-muted-foreground">{t('success.client')}</span>
 						<span className="font-medium">{clientName}</span>
 					</>
 				)}

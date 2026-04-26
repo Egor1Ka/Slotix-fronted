@@ -357,7 +357,7 @@ export default async function LandingPage() {
 			>
 				<div className="landing-grid-bg pointer-events-none absolute inset-0 -z-10 opacity-60" />
 				<div className="mx-auto max-w-7xl">
-					<div className="landing-scroll-reveal mb-10 sm:mb-12 max-w-2xl">
+					<div className="landing-scroll-reveal mb-10 max-w-2xl sm:mb-12">
 						<span className="mb-4 block font-mono text-xs tracking-widest text-emerald-600 uppercase dark:text-emerald-400">
 							{t('audiences.eyebrow')}
 						</span>
@@ -403,7 +403,7 @@ export default async function LandingPage() {
 			{/* Features */}
 			<section id="features" className="px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
 				<div className="mx-auto max-w-7xl">
-					<div className="landing-scroll-reveal mb-10 sm:mb-12 max-w-2xl">
+					<div className="landing-scroll-reveal mb-10 max-w-2xl sm:mb-12">
 						<span className="mb-4 block font-mono text-xs tracking-widest text-emerald-600 uppercase dark:text-emerald-400">
 							{t('nav.features')}
 						</span>
@@ -436,7 +436,7 @@ export default async function LandingPage() {
 			{/* Pricing */}
 			<section id="pricing" className="px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
 				<div className="mx-auto max-w-5xl">
-					<div className="landing-scroll-reveal mb-10 sm:mb-12 text-center">
+					<div className="landing-scroll-reveal mb-10 text-center sm:mb-12">
 						<span className="mb-4 block font-mono text-xs tracking-widest text-emerald-600 uppercase dark:text-emerald-400">
 							{t('nav.pricing')}
 						</span>
@@ -483,8 +483,7 @@ export default async function LandingPage() {
 				<div
 					className="pointer-events-none absolute top-1/2 left-1/2 -z-10 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,oklch(0.72_0.18_145_/_0.08)_0%,transparent_70%)] blur-3xl"
 					style={{
-						animation:
-							'landing-mesh-1 18s ease-in-out infinite',
+						animation: 'landing-mesh-1 18s ease-in-out infinite',
 					}}
 				/>
 				<div className="landing-scroll-reveal mx-auto flex max-w-3xl flex-col items-center gap-8 text-center">
@@ -568,7 +567,7 @@ function FeatureCard({
 	children: React.ReactNode
 }) {
 	return (
-		<div className="group landing-scroll-reveal landing-card-hover border-border/60 hover:border-emerald-500/40 hover:shadow-emerald-500/5 relative overflow-hidden rounded-2xl border p-8 hover:shadow-2xl">
+		<div className="group landing-scroll-reveal landing-card-hover border-border/60 relative overflow-hidden rounded-2xl border p-8 hover:border-emerald-500/40 hover:shadow-2xl hover:shadow-emerald-500/5">
 			<div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_right,oklch(0.72_0.18_145_/_0.08),transparent_60%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 			<div className="mb-6">
 				<div className="bg-foreground/[0.05] text-foreground mb-4 flex h-10 w-10 items-center justify-center rounded-lg transition-all duration-300 group-hover:scale-110 group-hover:bg-emerald-500/15 group-hover:text-emerald-600 dark:group-hover:text-emerald-400">

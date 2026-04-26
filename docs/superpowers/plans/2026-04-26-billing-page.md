@@ -16,23 +16,24 @@
 
 ## File map
 
-| File | Type | Status |
-|---|---|---|
-| `i18n/messages/en.json`, `i18n/messages/uk.json` | data | Modify (add `billing.page.*`, `billing.events.*`, `billing.status.*`, `sidebar.billing`) |
-| `lib/billing/format.ts` | module | Create — pure helpers |
-| `components/billing/PaymentsTable.tsx` | client component | Create |
-| `components/billing/PlanCard.tsx` | client component | Create |
-| `components/billing/ScheduledCancelBanner.tsx` | client component | Create |
-| `components/billing/CancelSubscriptionDialog.tsx` | client component | Create |
-| `components/billing/BillingPage.tsx` | client component | Create — orchestrator |
-| `app/[locale]/(personal)/billing/page.tsx` | server component | Create — auth + render |
-| `components/sidebar/PersonalSidebar.tsx` | client component | Modify — add Billing entry |
+| File                                              | Type             | Status                                                                                   |
+| ------------------------------------------------- | ---------------- | ---------------------------------------------------------------------------------------- |
+| `i18n/messages/en.json`, `i18n/messages/uk.json`  | data             | Modify (add `billing.page.*`, `billing.events.*`, `billing.status.*`, `sidebar.billing`) |
+| `lib/billing/format.ts`                           | module           | Create — pure helpers                                                                    |
+| `components/billing/PaymentsTable.tsx`            | client component | Create                                                                                   |
+| `components/billing/PlanCard.tsx`                 | client component | Create                                                                                   |
+| `components/billing/ScheduledCancelBanner.tsx`    | client component | Create                                                                                   |
+| `components/billing/CancelSubscriptionDialog.tsx` | client component | Create                                                                                   |
+| `components/billing/BillingPage.tsx`              | client component | Create — orchestrator                                                                    |
+| `app/[locale]/(personal)/billing/page.tsx`        | server component | Create — auth + render                                                                   |
+| `components/sidebar/PersonalSidebar.tsx`          | client component | Modify — add Billing entry                                                               |
 
 ---
 
 ### Task 1: i18n strings — add all billing-page keys to both locales
 
 **Files:**
+
 - Modify: `i18n/messages/en.json`
 - Modify: `i18n/messages/uk.json`
 
@@ -205,6 +206,7 @@ EOF
 ### Task 2: Pure formatting helpers
 
 **Files:**
+
 - Create: `lib/billing/format.ts`
 - Create: `lib/billing/format.test.ts`
 
@@ -262,7 +264,10 @@ describe('formatDate', () => {
 
 describe('getEffectiveCancelDate', () => {
 	it('returns cancelAt when present', () => {
-		const sub = { cancelAt: '2026-05-01T00:00:00Z', currentPeriodEnd: '2026-05-15T00:00:00Z' }
+		const sub = {
+			cancelAt: '2026-05-01T00:00:00Z',
+			currentPeriodEnd: '2026-05-15T00:00:00Z',
+		}
 		expect(getEffectiveCancelDate(sub)).toBe('2026-05-01T00:00:00Z')
 	})
 
@@ -410,6 +415,7 @@ EOF
 ### Task 3: PaymentsTable component
 
 **Files:**
+
 - Create: `components/billing/PaymentsTable.tsx`
 
 Renders the payment history table with skeleton/empty states.
@@ -476,9 +482,7 @@ function PaymentsTable({ payments, loading }: PaymentsTableProps) {
 
 	const renderRow = (payment: BillingPayment) => {
 		const typeLabel =
-			payment.type === 'subscription'
-				? t('typeSubscription')
-				: t('typeOneTime')
+			payment.type === 'subscription' ? t('typeSubscription') : t('typeOneTime')
 		const eventLabel = tEvents(getEventLabelKey(payment.eventType))
 
 		return (
@@ -562,6 +566,7 @@ EOF
 ### Task 4: ScheduledCancelBanner component
 
 **Files:**
+
 - Create: `components/billing/ScheduledCancelBanner.tsx`
 
 - [ ] **Step 1: Implement**
@@ -626,6 +631,7 @@ EOF
 ### Task 5: CancelSubscriptionDialog component
 
 **Files:**
+
 - Create: `components/billing/CancelSubscriptionDialog.tsx`
 
 Wraps confirmation modal + Cancel API call. Owns its own loading state.
@@ -752,6 +758,7 @@ EOF
 ### Task 6: PlanCard component
 
 **Files:**
+
 - Create: `components/billing/PlanCard.tsx`
 
 Renders plan name, status, price, period, and a context-sensitive CTA (Cancel / Upgrade / Subscribe again / status hint). Triggers cancel dialog open.
@@ -839,9 +846,7 @@ function PlanCard({
 
 	const planKey = subscription?.planKey ?? 'free'
 	const planLabelKey = PLAN_LABEL_KEY[planKey]
-	const planLabel = planLabelKey
-		? tBilling(planLabelKey)
-		: t('customPlanLabel')
+	const planLabel = planLabelKey ? tBilling(planLabelKey) : t('customPlanLabel')
 
 	const catalogEntry = findCatalogPlan(catalog, planKey)
 	const priceText = catalogEntry
@@ -866,9 +871,7 @@ function PlanCard({
 	const statusLabel = status ? tStatus(STATUS_LABEL_KEY[status]) : null
 	const statusVariant = status ? STATUS_BADGE_VARIANT[status] : 'default'
 
-	const cancelDate = subscription
-		? getEffectiveCancelDate(subscription)
-		: null
+	const cancelDate = subscription ? getEffectiveCancelDate(subscription) : null
 
 	const handleCancelClick = () => setDialogOpen(true)
 
@@ -925,8 +928,12 @@ function PlanCard({
 			<Card className="rounded-xl shadow-sm">
 				<CardHeader className="flex flex-row items-start justify-between gap-4">
 					<div className="flex flex-col gap-2">
-						<CardTitle className="text-2xl font-semibold">{planLabel}</CardTitle>
-						{statusLabel && <Badge variant={statusVariant}>{statusLabel}</Badge>}
+						<CardTitle className="text-2xl font-semibold">
+							{planLabel}
+						</CardTitle>
+						{statusLabel && (
+							<Badge variant={statusVariant}>{statusLabel}</Badge>
+						)}
 					</div>
 				</CardHeader>
 				<CardContent className="grid gap-6 md:grid-cols-2">
@@ -998,6 +1005,7 @@ EOF
 ### Task 7: BillingPage orchestrator
 
 **Files:**
+
 - Create: `components/billing/BillingPage.tsx`
 
 - [ ] **Step 1: Implement**
@@ -1118,10 +1126,7 @@ function BillingPage() {
 
 			<section className="space-y-3">
 				<h2 className="text-xl font-semibold">{t('paymentsHistoryTitle')}</h2>
-				<PaymentsTable
-					payments={state.payments}
-					loading={state.loading}
-				/>
+				<PaymentsTable payments={state.payments} loading={state.loading} />
 			</section>
 		</main>
 	)
@@ -1161,6 +1166,7 @@ EOF
 ### Task 8: Server route + sidebar entry
 
 **Files:**
+
 - Create: `app/[locale]/(personal)/billing/page.tsx`
 - Modify: `components/sidebar/PersonalSidebar.tsx`
 
@@ -1201,21 +1207,21 @@ import {
 b. After the existing href constants (`profileHref`, `bookingStatusesHref`, `orgsHref`) add:
 
 ```tsx
-	const billingHref = buildHref('/billing')
+const billingHref = buildHref('/billing')
 ```
 
 c. Inside the `groupAccount` `<SidebarGroup>` (the one with `myProfile` and `myOrganizations`), add a new `<SidebarMenuItem>` after `myProfile` and before `myOrganizations`:
 
 ```tsx
-								<SidebarMenuItem>
-									<SidebarMenuButton
-										render={<Link href={billingHref} />}
-										isActive={isActive(billingHref)}
-									>
-										<CreditCard className="size-4" />
-										<span>{t('billing')}</span>
-									</SidebarMenuButton>
-								</SidebarMenuItem>
+<SidebarMenuItem>
+	<SidebarMenuButton
+		render={<Link href={billingHref} />}
+		isActive={isActive(billingHref)}
+	>
+		<CreditCard className="size-4" />
+		<span>{t('billing')}</span>
+	</SidebarMenuButton>
+</SidebarMenuItem>
 ```
 
 - [ ] **Step 3: Run lint**
@@ -1233,6 +1239,7 @@ npm run dev
 ```
 
 Open http://localhost:3000/en/billing in a browser. Expected:
+
 - Sidebar has new "Billing" entry under Account group with credit card icon.
 - Page loads, shows header, PlanCard (Free for current test user without subscription, or Business if subscribed), PaymentsTable (empty for free user, populated otherwise).
 - No console errors.
@@ -1272,6 +1279,7 @@ npm run dev
 - [ ] **Step 2: Free user path**
 
 Sign in with a user that has no active subscription. Navigate to /en/billing. Verify:
+
 - Page header with title and subtitle.
 - PlanCard shows "Free" plan, $0 / month, no period text, "Upgrade to Business" CTA.
 - PaymentsTable shows Empty state with Receipt icon and "No payments yet" / "Платежів ще немає".
@@ -1282,6 +1290,7 @@ Switch locale to /uk/billing. Verify all strings render in Ukrainian.
 - [ ] **Step 3: Active subscriber path**
 
 Sign in (or simulate via DB) as a user with status `active`. Verify:
+
 - PlanCard shows "Business", $4.99 / month, status badge "Active", current period DD.MM.YYYY — DD.MM.YYYY.
 - CTA is outline-styled "Cancel subscription" in destructive color.
 - PaymentsTable populated with one or more rows from real payments.
@@ -1290,6 +1299,7 @@ Sign in (or simulate via DB) as a user with status `active`. Verify:
 - [ ] **Step 4: Cancel flow**
 
 Click "Cancel subscription". Verify:
+
 - Dialog opens with title, description showing date until access remains.
 - "Keep subscription" closes the dialog without action.
 - "Cancel subscription" disables both buttons during in-flight, then closes dialog on success.

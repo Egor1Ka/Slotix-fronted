@@ -92,12 +92,12 @@ Rules:
 
 ```ts
 {
-  role: 'owner' | 'admin' | 'member'
-  status: 'active' | 'invited' | 'suspended' | 'left'
-  displayName: string | null   // NEW
-  bio: string | null           // NEW
-  positionId: string | null    // NEW
-  position: string | null      // NEW (position name, not id)
+	role: 'owner' | 'admin' | 'member'
+	status: 'active' | 'invited' | 'suspended' | 'left'
+	displayName: string | null // NEW
+	bio: string | null // NEW
+	positionId: string | null // NEW
+	position: string | null // NEW (position name, not id)
 }
 ```
 
@@ -116,10 +116,10 @@ Apply the same `name` substitution rule wherever staff members are serialised fo
 
 ```tsx
 interface ProfileHeaderProps {
-  avatar: string
-  name: string
-  subtitle?: string
-  badges?: React.ReactNode
+	avatar: string
+	name: string
+	subtitle?: string
+	badges?: React.ReactNode
 }
 ```
 
@@ -130,11 +130,7 @@ Layout: 64px rounded avatar on the left; on the right a stack of `name` (h2), `s
 Above the existing `<ProfileForm />`, render:
 
 ```tsx
-<ProfileHeader
-  avatar={user.avatar}
-  name={user.name}
-  subtitle={user.email}
-/>
+<ProfileHeader avatar={user.avatar} name={user.name} subtitle={user.email} />
 ```
 
 No form changes. Name stays editable inside `ProfileForm`.
@@ -173,7 +169,7 @@ Data loading (parallel):
 ```ts
 const { user } = useUser()
 const { data: membership } = await orgApi.getMyMembership({
-  pathParams: { id: orgId },
+	pathParams: { id: orgId },
 })
 ```
 
@@ -191,14 +187,21 @@ Save handler:
 
 ```ts
 await orgApi.updateStaffMember({
-  pathParams: { orgId, staffId: user.id },
-  body: {
-    displayName: data.displayName.trim() || null,
-    bio: data.bio.trim() || null,
-  },
+	pathParams: { orgId, staffId: user.id },
+	body: {
+		displayName: data.displayName.trim() || null,
+		bio: data.bio.trim() || null,
+	},
 })
 // local state update so the header reflects new name without refetch
-setMembership((prev) => prev && { ...prev, displayName: data.displayName || null, bio: data.bio || null })
+setMembership(
+	(prev) =>
+		prev && {
+			...prev,
+			displayName: data.displayName || null,
+			bio: data.bio || null,
+		},
+)
 toast.success(t('saved'))
 ```
 
@@ -206,16 +209,16 @@ Validation (zod):
 
 ```ts
 const schema = z.object({
-  displayName: z
-    .string()
-    .trim()
-    .max(100)
-    .optional()
-    .or(z.literal(''))
-    .refine((v) => !v || v.length >= 2, {
-      message: 'At least 2 characters',
-    }),
-  bio: z.string().max(500).optional().or(z.literal('')),
+	displayName: z
+		.string()
+		.trim()
+		.max(100)
+		.optional()
+		.or(z.literal(''))
+		.refine((v) => !v || v.length >= 2, {
+			message: 'At least 2 characters',
+		}),
+	bio: z.string().max(500).optional().or(z.literal('')),
 })
 ```
 
@@ -225,12 +228,12 @@ const schema = z.object({
 
 ```ts
 interface OrgMembership {
-  role: 'owner' | 'admin' | 'member'
-  status: 'active' | 'invited' | 'suspended' | 'left'
-  displayName: string | null
-  bio: string | null
-  positionId: string | null
-  position: string | null
+	role: 'owner' | 'admin' | 'member'
+	status: 'active' | 'invited' | 'suspended' | 'left'
+	displayName: string | null
+	bio: string | null
+	positionId: string | null
+	position: string | null
 }
 ```
 
@@ -238,10 +241,10 @@ interface OrgMembership {
 
 ```ts
 interface OrgStaffMember extends StaffMember {
-  bookingCount: number
-  status?: 'active' | 'invited' | 'suspended'
-  positionId?: string | null
-  displayName?: string | null   // raw override, optional consumer
+	bookingCount: number
+	status?: 'active' | 'invited' | 'suspended'
+	positionId?: string | null
+	displayName?: string | null // raw override, optional consumer
 }
 ```
 
@@ -255,15 +258,15 @@ interface OrgStaffMember extends StaffMember {
 
 `i18n/messages/en.json` + `uk.json` — new keys under `profile`:
 
-| Key | EN | UK |
-|-----|-----|-----|
-| `profile.emailLabel` | Email | Пошта |
-| `profile.orgDisplayNameLabel` | Your name in this organization | Ваше ім'я в цій організації |
-| `profile.orgDisplayNamePlaceholder` | Leave empty to use your global name | Залиште пустим, щоб використати глобальне ім'я |
-| `profile.orgDisplayNameHint` | This name is visible only inside this organization | Це ім'я видно лише в межах цієї організації |
-| `profile.role.owner` | Owner | Власник |
-| `profile.role.admin` | Admin | Адмін |
-| `profile.role.member` | Member | Учасник |
+| Key                                 | EN                                                 | UK                                             |
+| ----------------------------------- | -------------------------------------------------- | ---------------------------------------------- |
+| `profile.emailLabel`                | Email                                              | Пошта                                          |
+| `profile.orgDisplayNameLabel`       | Your name in this organization                     | Ваше ім'я в цій організації                    |
+| `profile.orgDisplayNamePlaceholder` | Leave empty to use your global name                | Залиште пустим, щоб використати глобальне ім'я |
+| `profile.orgDisplayNameHint`        | This name is visible only inside this organization | Це ім'я видно лише в межах цієї організації    |
+| `profile.role.owner`                | Owner                                              | Власник                                        |
+| `profile.role.admin`                | Admin                                              | Адмін                                          |
+| `profile.role.member`               | Member                                             | Учасник                                        |
 
 Russian equivalents where applicable (project uses uk + en; no ru locale).
 

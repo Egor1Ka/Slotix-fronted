@@ -95,7 +95,9 @@ const durationToPx = (min: number): number => (min / 60) * PX_PER_HOUR
 const formatHour = (hour: number): string =>
 	`${String(hour).padStart(2, '0')}:00`
 
-const parseYMD = (str: string): { year: number; month: number; day: number } => {
+const parseYMD = (
+	str: string,
+): { year: number; month: number; day: number } => {
 	const [y, m, d] = str.split('-').map(Number)
 	return { year: y, month: m, day: d }
 }
@@ -157,13 +159,21 @@ const getBookingsForDate = <T extends DateFilterable>(
 const addDays = (dateStr: string, days: number): string => {
 	const { year, month, day } = parseYMD(dateStr)
 	const utc = new Date(Date.UTC(year, month - 1, day + days))
-	return formatYMD(utc.getUTCFullYear(), utc.getUTCMonth() + 1, utc.getUTCDate())
+	return formatYMD(
+		utc.getUTCFullYear(),
+		utc.getUTCMonth() + 1,
+		utc.getUTCDate(),
+	)
 }
 
 const addMonths = (dateStr: string, months: number): string => {
 	const { year, month, day } = parseYMD(dateStr)
 	const utc = new Date(Date.UTC(year, month - 1 + months, day))
-	return formatYMD(utc.getUTCFullYear(), utc.getUTCMonth() + 1, utc.getUTCDate())
+	return formatYMD(
+		utc.getUTCFullYear(),
+		utc.getUTCMonth() + 1,
+		utc.getUTCDate(),
+	)
 }
 
 const getWeekStart = (dateStr: string, timezone: string): string => {

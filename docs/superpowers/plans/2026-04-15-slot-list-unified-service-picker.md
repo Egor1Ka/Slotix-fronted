@@ -23,6 +23,7 @@ All changes land in a single commit so `git revert <sha>` restores the old behav
 ## Task 1: i18n key for "no services for this staff"
 
 **Files:**
+
 - Modify: `i18n/messages/uk.json`
 - Modify: `i18n/messages/en.json`
 
@@ -56,6 +57,7 @@ Expected: `ok`
 ## Task 2: Add `allowedIds` prop to `ServiceList`
 
 **Files:**
+
 - Modify: `components/booking/ServiceList.tsx`
 
 - [ ] **Step 1: Extend props interface**
@@ -171,6 +173,7 @@ Expected: no errors introduced in `ServiceList.tsx`.
 ## Task 3: Replace `servicePicker` with `pendingSlot` in `SlotListView`
 
 **Files:**
+
 - Modify: `components/booking/SlotListView.tsx`
 
 - [ ] **Step 1: Add imports for sonner toast and useRef**
@@ -190,9 +193,10 @@ import { toast } from 'sonner'
 Find the block around the existing `const [servicePicker, setServicePicker] = useState<...>(null)` line and the `getStaffMember` / `isServiceForStaff` / `servicesForPicker` block. Replace it with:
 
 ```tsx
-const [pendingSlot, setPendingSlot] = useState<
-	{ staffId: string; time: string } | null
->(null)
+const [pendingSlot, setPendingSlot] = useState<{
+	staffId: string
+	time: string
+} | null>(null)
 const serviceListRef = useRef<HTMLDivElement>(null)
 const [highlightServices, setHighlightServices] = useState(false)
 
@@ -308,14 +312,16 @@ If `cn` is not yet imported in this file, add: `import { cn } from '@/lib/utils'
 Locate the `{variant === 'org' && (` section that contains:
 
 ```tsx
-{servicePicker && (
-	<div className="rounded-lg border p-3">
-		<div className="text-muted-foreground mb-2 text-xs font-semibold">
-			{t('pickServiceTitle')}
+{
+	servicePicker && (
+		<div className="rounded-lg border p-3">
+			<div className="text-muted-foreground mb-2 text-xs font-semibold">
+				{t('pickServiceTitle')}
+			</div>
+			...
 		</div>
-		...
-	</div>
-)}
+	)
+}
 ```
 
 Delete the entire `{servicePicker && (...)}` block (including the cancel button inside). Keep the surrounding `variant === 'org' &&` wrapper and the sibling org staff list rendering.

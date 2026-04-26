@@ -46,10 +46,7 @@ interface OrgStrategyParams {
 	selectedBooking?: BookingDetail | null
 	onBookingSelect?: (bookingId: string) => void
 	availableStatuses?: BookingStatusObject[]
-	onBookingStatusChange?: (
-		bookingId: string,
-		statusId: string,
-	) => Promise<void>
+	onBookingStatusChange?: (bookingId: string, statusId: string) => Promise<void>
 	onBookingReschedule?: (bookingId: string, newStartAt: string) => Promise<void>
 	onBookingClose?: () => void
 	locale: string

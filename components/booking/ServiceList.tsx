@@ -55,11 +55,12 @@ function ServiceList({
 					onClick={handleClick}
 					disabled={isDisabled}
 					className={cn(
-						'group flex shrink-0 items-center gap-3 rounded-2xl border bg-card px-4 py-3 text-left transition-all hover:-translate-y-0.5 hover:shadow-md',
+						'group bg-card flex shrink-0 items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-all hover:-translate-y-0.5 hover:shadow-md',
 						isActive
-							? 'border-primary bg-primary/5 ring-2 ring-primary/40 shadow-md'
+							? 'border-primary bg-primary/5 ring-primary/40 shadow-md ring-2'
 							: 'border-border',
-						isDisabled && 'cursor-not-allowed opacity-40 hover:translate-y-0 hover:shadow-none',
+						isDisabled &&
+							'cursor-not-allowed opacity-40 hover:translate-y-0 hover:shadow-none',
 					)}
 				>
 					<div
@@ -67,7 +68,9 @@ function ServiceList({
 						style={{ backgroundColor: eventType.color }}
 					/>
 					<div className="flex flex-col">
-						<span className="text-sm font-semibold leading-tight">{eventType.name}</span>
+						<span className="text-sm leading-tight font-semibold">
+							{eventType.name}
+						</span>
 						<span className="text-muted-foreground text-xs leading-tight">
 							{eventType.durationMin} {t('min')} · {eventType.price}{' '}
 							{eventType.currency}
@@ -116,7 +119,9 @@ function ServiceList({
 			className={cn(
 				'gap-3 transition-opacity',
 				loading && 'pointer-events-none opacity-50',
-				isHorizontal ? 'flex overflow-x-auto px-1 pt-1.5 pb-3' : 'flex flex-col',
+				isHorizontal
+					? 'flex overflow-x-auto px-1 pt-1.5 pb-3'
+					: 'flex flex-col',
 			)}
 		>
 			{!isHorizontal && (

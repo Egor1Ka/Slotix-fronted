@@ -103,9 +103,7 @@ function BookingDetailPanel({
 					className="size-3 shrink-0 rounded-full"
 					style={{ backgroundColor: booking.color }}
 				/>
-				<span className="text-sm font-semibold">
-					{booking.eventTypeName}
-				</span>
+				<span className="text-sm font-semibold">{booking.eventTypeName}</span>
 			</div>
 
 			<Separator />
@@ -132,36 +130,24 @@ function BookingDetailPanel({
 					</>
 				)}
 				<span className="text-muted-foreground">{t('date')}</span>
-				<span className="font-medium">
-					{formatDate(booking.startAt)}
-				</span>
+				<span className="font-medium">{formatDate(booking.startAt)}</span>
 			</div>
 
 			<Separator />
 
 			<div className="grid grid-cols-2 gap-y-2 text-xs">
-				<span className="text-muted-foreground">
-					{t('clientName_label')}
-				</span>
+				<span className="text-muted-foreground">{t('clientName_label')}</span>
 				<span className="font-medium">{booking.invitee.name}</span>
 				{booking.invitee.email && (
 					<>
-						<span className="text-muted-foreground">
-							{t('email')}
-						</span>
-						<span className="font-medium">
-							{booking.invitee.email}
-						</span>
+						<span className="text-muted-foreground">{t('email')}</span>
+						<span className="font-medium">{booking.invitee.email}</span>
 					</>
 				)}
 				{booking.invitee.phone && (
 					<>
-						<span className="text-muted-foreground">
-							{t('phone')}
-						</span>
-						<span className="font-medium">
-							{booking.invitee.phone}
-						</span>
+						<span className="text-muted-foreground">{t('phone')}</span>
+						<span className="font-medium">{booking.invitee.phone}</span>
 					</>
 				)}
 			</div>
@@ -171,7 +157,6 @@ function BookingDetailPanel({
 			<div className="flex items-center gap-2">
 				<BookingStatusBadge status={booking.status} />
 			</div>
-
 
 			{otherStatuses.length > 0 && (
 				<>

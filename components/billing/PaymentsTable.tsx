@@ -57,9 +57,7 @@ function PaymentsTable({ payments, loading }: PaymentsTableProps) {
 
 	const renderRow = (payment: BillingPayment) => {
 		const typeLabel =
-			payment.type === 'subscription'
-				? t('typeSubscription')
-				: t('typeOneTime')
+			payment.type === 'subscription' ? t('typeSubscription') : t('typeOneTime')
 		const eventLabel = tEvents(getEventLabelKey(payment.eventType))
 
 		return (

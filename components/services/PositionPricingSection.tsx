@@ -50,11 +50,10 @@ const PositionPricingSection = forwardRef<
 		load()
 	}, [orgId, eventTypeId])
 
-	const handleChange = (positionId: string) => (
-		e: React.ChangeEvent<HTMLInputElement>,
-	) => {
-		setOverrides((prev) => ({ ...prev, [positionId]: e.target.value }))
-	}
+	const handleChange =
+		(positionId: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+			setOverrides((prev) => ({ ...prev, [positionId]: e.target.value }))
+		}
 
 	const save = async (idForSave: string) => {
 		const toPayload = (positionId: string) => {

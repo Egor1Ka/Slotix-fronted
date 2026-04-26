@@ -252,16 +252,24 @@ const toFrontendStaffBooking = (
 
 // ── Staff API ──
 
-const getStaffById = async (id: string, orgId?: string): Promise<StaffBySlugResponse> => {
+const getStaffById = async (
+	id: string,
+	orgId?: string,
+): Promise<StaffBySlugResponse> => {
 	const query = orgId ? `?orgId=${orgId}` : ''
 	return get<StaffBySlugResponse>(`/staff/${id}${query}`)
 }
 
 // ── Event Types API ──
 
-const getEventTypesByStaff = async (staffId: string, orgId?: string): Promise<EventType[]> => {
+const getEventTypesByStaff = async (
+	staffId: string,
+	orgId?: string,
+): Promise<EventType[]> => {
 	const orgParam = orgId ? `&orgId=${orgId}` : ''
-	const raw = await get<BackendEventType[]>(`/event-types?staffId=${staffId}${orgParam}`)
+	const raw = await get<BackendEventType[]>(
+		`/event-types?staffId=${staffId}${orgParam}`,
+	)
 	return raw.map(toFrontendEventType)
 }
 
@@ -407,7 +415,8 @@ const getStaffBookings = async (
 		dateTo,
 		timezone,
 	})
-	if (statusIds && statusIds.length > 0) params.set('status', statusIds.join(','))
+	if (statusIds && statusIds.length > 0)
+		params.set('status', statusIds.join(','))
 	if (locationId) params.set('locationId', locationId)
 	if (orgId) params.set('orgId', orgId)
 
@@ -480,7 +489,9 @@ const updateStaffPosition = async (
 
 // ── Booking Status API ──
 
-const getBookingStatuses = async (orgId?: string): Promise<BookingStatusObject[]> => {
+const getBookingStatuses = async (
+	orgId?: string,
+): Promise<BookingStatusObject[]> => {
 	const params = orgId ? `?orgId=${orgId}` : ''
 	return get<BookingStatusObject[]>(`/booking-statuses${params}`)
 }

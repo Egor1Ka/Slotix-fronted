@@ -60,7 +60,11 @@ function TimezoneSelector({
 	return (
 		<div className="flex flex-col gap-2">
 			{label && <Label htmlFor={id}>{label}</Label>}
-			<Select value={value} onValueChange={handleValueChange} disabled={disabled}>
+			<Select
+				value={value}
+				onValueChange={handleValueChange}
+				disabled={disabled}
+			>
 				<SelectTrigger id={id} className="w-full max-w-sm">
 					<SelectValue placeholder="Оберіть часовий пояс" />
 				</SelectTrigger>
@@ -68,7 +72,7 @@ function TimezoneSelector({
 					{options.map(renderOption)}
 				</SelectContent>
 			</Select>
-			{hint && <p className="text-xs text-muted-foreground">{hint}</p>}
+			{hint && <p className="text-muted-foreground text-xs">{hint}</p>}
 		</div>
 	)
 }

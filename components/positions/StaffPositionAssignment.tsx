@@ -87,18 +87,18 @@ function StaffPositionAssignment({
 			key={member.id}
 			className="flex items-center justify-between gap-3 py-2.5"
 		>
-			<div className="flex items-center gap-2 min-w-0">
+			<div className="flex min-w-0 items-center gap-2">
 				<Avatar className="size-7 shrink-0">
 					<AvatarImage src={member.avatar} alt={member.name} />
 					<AvatarFallback className="text-xs">
 						{getInitials(member.name)}
 					</AvatarFallback>
 				</Avatar>
-				<span className="text-sm font-medium truncate">{member.name}</span>
+				<span className="truncate text-sm font-medium">{member.name}</span>
 				{member.status === 'invited' && (
 					<Badge
 						variant="outline"
-						className="text-muted-foreground px-1.5 py-0 text-[10px] shrink-0"
+						className="text-muted-foreground shrink-0 px-1.5 py-0 text-[10px]"
 					>
 						{t('invited')}
 					</Badge>
@@ -133,7 +133,7 @@ function StaffPositionAssignment({
 
 	if (staff.length === 0) {
 		return (
-			<p className="text-muted-foreground text-sm text-center py-12">
+			<p className="text-muted-foreground py-12 text-center text-sm">
 				{t('noStaff')}
 			</p>
 		)
@@ -141,9 +141,7 @@ function StaffPositionAssignment({
 
 	return (
 		<div className="rounded-lg border p-4">
-			<div className="flex flex-col divide-y">
-				{staff.map(renderStaffRow)}
-			</div>
+			<div className="flex flex-col divide-y">{staff.map(renderStaffRow)}</div>
 		</div>
 	)
 }
