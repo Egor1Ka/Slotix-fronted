@@ -503,6 +503,10 @@
 		"pickServiceThenTime": "Оберіть послугу, потім натисніть {time} ще раз",
 		"allStaff": "Всі",
 		"aboutStaff": "Про спеціаліста",
+		"aboutService": "Про послугу",
+		"whoLeads": "Хто веде",
+		"anyStaff": "Будь-який спеціаліст",
+		"bookThisService": "Записатись на цю послугу",
 		"confirmBookingTitle": "Підтвердження запису",
 		"bookingStatuses": "Статуси бронювань",
 		"addStatus": "Додати статус",
@@ -575,6 +579,11 @@
 			"serverError": "Помилка сервера. Спробуйте пізніше.",
 			"serviceUnavailable": "Сервіс тимчасово недоступний. Спробуйте пізніше.",
 			"unknown": "Виникла несподівана помилка. Спробуйте ще раз."
+		},
+		"upload": {
+			"invalidFormat": "Невірний формат файлу. Дозволено: JPEG, PNG, WebP, GIF",
+			"tooLarge": "Файл завеликий (макс. {max})",
+			"tooSmall": "Зображення замале (мін. {min})"
 		}
 	},
 	"sidebar": {
@@ -645,7 +654,13 @@
 		"timezoneWarningTitle": "Змінити часовий пояс?",
 		"timezoneWarningDesc": "Нові розклади будуть створюватись у новій часовій зоні. Існуючі розклади не зміняться. Продовжити?",
 		"timezoneWarningConfirm": "Продовжити",
-		"timezoneWarningCancel": "Скасувати"
+		"timezoneWarningCancel": "Скасувати",
+		"logo": {
+			"title": "Логотип",
+			"uploadLogo": "Завантажити логотип",
+			"removeLogo": "Видалити логотип",
+			"logoUpdated": "Логотип оновлено"
+		}
 	},
 	"positions": {
 		"title": "Позиції",
@@ -718,6 +733,13 @@
 			"fieldUpdated": "Поле оновлено",
 			"fieldDeleted": "Поле видалено",
 			"noCustomFields": "Додаткових полів ще немає"
+		},
+		"photo": {
+			"title": "Фото",
+			"uploadPhoto": "Завантажити фото",
+			"removePhoto": "Видалити фото",
+			"photoUpdated": "Фото оновлено",
+			"saveBeforePhoto": "Збережіть послугу, щоб додати фото"
 		}
 	},
 	"staffSchedule": {
@@ -820,6 +842,17 @@
 			"owner": "Власник",
 			"admin": "Адмін",
 			"member": "Учасник"
-		}
+		},
+		"changePhoto": "Змінити фото",
+		"removePhoto": "Видалити фото",
+		"confirmRemove": "Підтвердити видалення?",
+		"uploadingPhoto": "Завантаження...",
+		"photoUpdated": "Фото оновлено",
+		"dropOrClick": "Перетягніть файл або натисніть, щоб обрати",
+		"acceptedFormats": "JPEG, PNG, WebP, GIF · до 2 МБ"
+	},
+	"common": {
+		"cancel": "Скасувати",
+		"save": "Зберегти"
 	}
 }

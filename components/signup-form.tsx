@@ -57,8 +57,8 @@ export function SignupForm({
 				</CardContent>
 			</Card>
 			<FieldDescription className="px-6 text-center">
-				{t('terms')} <Link href="/terms">{t('termsOfService')}</Link>{' '}
-				{t('and')} <Link href="/privacy">{t('privacyPolicy')}</Link>.
+				{t('terms')} <Link href="/terms">{t('termsOfService')}</Link> {t('and')}{' '}
+				<Link href="/privacy">{t('privacyPolicy')}</Link>.
 			</FieldDescription>
 		</div>
 	)

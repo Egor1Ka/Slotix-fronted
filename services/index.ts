@@ -40,6 +40,7 @@ import positionApiConfig from './configs/position.config'
 import eventTypeApiConfig from './configs/event-type.config'
 import bookingFieldApiConfig from './configs/booking-field.config'
 import userSearchApiConfig from './configs/user-search.config'
+import mediaApiConfig from './configs/media.config'
 
 const defaultInterceptors = {
 	interceptors: {
@@ -73,6 +74,7 @@ export const userSearchApi = createApiMethods(
 	userSearchApiConfig,
 	defaultInterceptors,
 )
+export const mediaApi = createApiMethods(mediaApiConfig, defaultInterceptors)
 export type { User, UpdateUserBody } from './configs/user.config'
 export type {
 	Plan,
@@ -126,3 +128,8 @@ export type {
 	CustomFieldValue,
 } from './configs/booking-field.types'
 export type { UserSearchResult } from './configs/user-search.types'
+export type {
+	UploadAvatarResponse,
+	StaffAvatarResponse,
+} from './configs/media.config'
+export type { AssetType, UploadConfig } from './configs/media.types'

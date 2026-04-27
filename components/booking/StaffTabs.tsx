@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { StaffInfoSheet } from './StaffInfoSheet'
 import type { OrgStaffMember } from '@/services/configs/booking.types'
 
 interface StaffTabsProps {
@@ -49,36 +50,50 @@ function StaffTabs({
 	const allActive = selectedId === null
 
 	const renderTab = (member: OrgStaffMember) => (
-		<button
+		<div
 			key={member.id}
-			type="button"
-			onClick={handleClick(member)}
 			className={cn(
-				'flex shrink-0 items-center gap-2 rounded-lg border-2 px-3 py-2 transition-all',
+				'flex shrink-0 items-center gap-1 rounded-lg border-2 pr-1 transition-all',
 				isSelected(member)
 					? 'border-primary bg-primary/5'
 					: isActive(member)
 						? 'border-transparent'
 						: 'text-muted-foreground border-transparent',
-				behavior === 'select-one' && 'hover:bg-muted cursor-pointer',
-				behavior === 'show-all' && 'cursor-default',
+				behavior === 'select-one' && 'hover:bg-muted',
 			)}
 		>
-			<Avatar className="size-6">
-				<AvatarImage src={member.avatar} alt={member.name} />
-				<AvatarFallback className="text-[10px]">
-					{getInitials(member.name)}
-				</AvatarFallback>
-			</Avatar>
-			<div className="flex flex-col items-start">
-				<span className="text-sm font-medium">{member.name}</span>
-				{member.position && (
-					<span className="text-muted-foreground text-[10px] leading-tight">
-						{member.position}
-					</span>
+			<button
+				type="button"
+				onClick={handleClick(member)}
+				className={cn(
+					'flex items-center gap-2 py-2 pr-1 pl-3',
+					behavior === 'select-one' && 'cursor-pointer',
+					behavior === 'show-all' && 'cursor-default',
 				)}
-			</div>
-		</button>
+			>
+				<Avatar className="size-6">
+					<AvatarImage src={member.avatar} alt={member.name} />
+					<AvatarFallback className="text-[10px]">
+						{getInitials(member.name)}
+					</AvatarFallback>
+				</Avatar>
+				<div className="flex flex-col items-start">
+					<span className="text-sm font-medium">{member.name}</span>
+					{member.position && (
+						<span className="text-muted-foreground text-[10px] leading-tight">
+							{member.position}
+						</span>
+					)}
+				</div>
+			</button>
+			<StaffInfoSheet
+				staffId={member.id}
+				name={member.name}
+				avatar={member.avatar}
+				position={member.position ?? null}
+				bio={member.bio ?? null}
+			/>
+		</div>
 	)
 
 	return (

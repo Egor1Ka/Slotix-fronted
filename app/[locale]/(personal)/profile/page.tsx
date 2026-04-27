@@ -15,6 +15,9 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { scheduleApi } from '@/lib/booking-api-client'
 import type { ScheduleTemplate } from '@/services/configs/booking.types'
+import { AvatarUploader } from '@/components/media/AvatarUploader'
+import { AVATAR_UPLOAD_CONFIG } from '@/components/media/AvatarUploader.config'
+import { mediaApi } from '@/services'
 
 function PersonalProfilePage() {
 	const t = useTranslations('profile')
@@ -121,6 +124,22 @@ function PersonalProfilePage() {
 		}
 	}
 
+	const handleAvatarUpload = async (file: File) => {
+		const formData = new FormData()
+		formData.append('file', file)
+		const response = await mediaApi.uploadUserAvatar({ body: formData })
+		return { avatar: response.data.avatar }
+	}
+
+	const handleAvatarDelete = async () => {
+		const response = await mediaApi.deleteUserAvatar()
+		return { avatar: response.data.avatar }
+	}
+
+	const handleAvatarSuccess = (avatarUrl: string) => {
+		setUser((prev) => (prev ? { ...prev, avatar: avatarUrl } : prev))
+	}
+
 	return (
 		<div className="mx-auto max-w-2xl space-y-6 p-6">
 			<h1 className="text-2xl font-bold">{t('myTitle')}</h1>
@@ -128,6 +147,14 @@ function PersonalProfilePage() {
 				avatar={user.avatar}
 				name={user.name}
 				subtitle={user.email}
+			/>
+			<AvatarUploader
+				currentAvatar={user.avatar}
+				fallbackText={user.name}
+				config={AVATAR_UPLOAD_CONFIG}
+				onUpload={handleAvatarUpload}
+				onDelete={handleAvatarDelete}
+				onSuccess={handleAvatarSuccess}
 			/>
 			<ProfileForm defaultValues={defaultValues} onSubmit={handleSubmit} />
 			{schedule && (

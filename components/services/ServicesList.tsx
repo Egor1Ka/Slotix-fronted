@@ -30,6 +30,7 @@ import {
 	EmptyTitle,
 } from '@/components/ui/empty'
 import { ServiceDialog } from '@/components/services/ServiceDialog'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { cn } from '@/lib/utils'
 import { eventTypeApi } from '@/services'
 import { eventTypeApi as bookingEventTypeApi } from '@/lib/booking-api-client'
@@ -123,6 +124,9 @@ function ServicesList({ ownerId, ownerType, currency }: ServicesListProps) {
 		return labels[policy]
 	}
 
+	const getInitial = (text: string) =>
+		text.trim() ? text.trim().charAt(0).toUpperCase() : '?'
+
 	const renderService = (service: EventType) => (
 		<div
 			key={service.id}
@@ -132,7 +136,16 @@ function ServicesList({ ownerId, ownerType, currency }: ServicesListProps) {
 				className="absolute inset-y-0 left-0 w-1 shrink-0 rounded-l-lg"
 				style={{ backgroundColor: service.color }}
 			/>
-			<div className="flex min-w-0 flex-1 items-center gap-4 py-3 pr-3 pl-5">
+			<div className="flex min-w-0 flex-1 items-center gap-3 py-3 pr-3 pl-5">
+				<Avatar className="size-10 shrink-0 rounded-md">
+					{service.image ? <AvatarImage src={service.image} alt="" /> : null}
+					<AvatarFallback
+						className="text-sm"
+						style={{ backgroundColor: service.color }}
+					>
+						{getInitial(service.name)}
+					</AvatarFallback>
+				</Avatar>
 				<div className="min-w-0 flex-1">
 					<div className="truncate text-base font-medium">{service.name}</div>
 					<div className="mt-1 flex items-center gap-3">

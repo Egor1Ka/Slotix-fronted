@@ -6,7 +6,7 @@ import { useForm, Controller, type FieldErrors } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { toast } from 'sonner'
-import { Trash2, Pencil, Plus } from 'lucide-react'
+import { Camera, Pencil, Plus, Trash2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
 	Dialog,
@@ -27,9 +27,19 @@ import {
 	PositionPricingSection,
 	type PositionPricingHandle,
 } from './PositionPricingSection'
-import { eventTypeApi, positionApi, orgApi, setServerErrors } from '@/services'
+import {
+	eventTypeApi,
+	positionApi,
+	orgApi,
+	mediaApi,
+	setServerErrors,
+} from '@/services'
 import { bookingFieldApi } from '@/lib/booking-api-client'
 import type { EventType, Position, OrgStaffMember } from '@/services'
+import { AvatarUploader } from '@/components/media/AvatarUploader'
+import { SERVICE_PHOTO_UPLOAD_CONFIG } from '@/components/media/AvatarUploader.config'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { validateFile } from '@/hooks/use-file-validation'
 import type {
 	BookingField,
 	BookingFieldType,
@@ -107,12 +117,78 @@ function ServiceDialog({
 	onSuccess,
 }: ServiceDialogProps) {
 	const t = useTranslations('services')
+	const tPhoto = useTranslations('services.photo')
+	const tRoot = useTranslations()
 	const isEdit = !!eventType
 	const isOrg = ownerType === 'org'
 
 	const [positions, setPositions] = useState<Position[]>([])
 	const [staff, setStaff] = useState<OrgStaffMember[]>([])
 	const [loadingData, setLoadingData] = useState(false)
+	const [currentImage, setCurrentImage] = useState<string>(
+		eventType?.image ?? '',
+	)
+	const [pendingFile, setPendingFile] = useState<File | null>(null)
+	const [pendingPreview, setPendingPreview] = useState<string | null>(null)
+
+	useEffect(() => {
+		setCurrentImage(eventType?.image ?? '')
+	}, [eventType?.id, eventType?.image])
+
+	const clearPending = useCallback(() => {
+		setPendingPreview((prev) => {
+			if (prev) URL.revokeObjectURL(prev)
+			return null
+		})
+		setPendingFile(null)
+	}, [])
+
+	const handlePickPendingFile = async (
+		event: React.ChangeEvent<HTMLInputElement>,
+	) => {
+		const file = event.target.files?.[0]
+		if (!file) return
+		const error = await validateFile(file, SERVICE_PHOTO_UPLOAD_CONFIG)
+		if (error) {
+			toast.error(tRoot(error.key, error.params || {}))
+			event.target.value = ''
+			return
+		}
+		clearPending()
+		setPendingFile(file)
+		setPendingPreview(URL.createObjectURL(file))
+		event.target.value = ''
+	}
+
+	const uploadPhoto = (file: File) => {
+		if (!eventType || !eventType.id) {
+			return Promise.reject(new Error('saveBeforePhoto'))
+		}
+		const fd = new FormData()
+		fd.append('file', file)
+		return mediaApi
+			.uploadServicePhoto({
+				pathParams: { id: eventType.id },
+				body: fd,
+			})
+			.then((r) => ({ avatar: r.data.image }))
+	}
+
+	const deletePhoto = () => {
+		if (!eventType || !eventType.id) {
+			return Promise.reject(new Error('saveBeforePhoto'))
+		}
+		return mediaApi
+			.deleteServicePhoto({ pathParams: { id: eventType.id } })
+			.then((r) => ({ avatar: r.data.image }))
+	}
+
+	const handlePhotoSuccess = (image: string) => {
+		setCurrentImage(image)
+	}
+
+	const getInitial = (text: string) =>
+		text.trim() ? text.trim().charAt(0).toUpperCase() : '?'
 
 	// ── Per-service custom fields state ──
 	const [customFields, setCustomFields] = useState<BookingField[]>([])
@@ -211,8 +287,17 @@ function ServiceDialog({
 			setCustomFields([])
 			setEditingField(null)
 			setIsAddingField(false)
+			clearPending()
 		}
-	}, [open, eventType, reset, loadReferenceData, loadCustomFields, isOrg])
+	}, [
+		open,
+		eventType,
+		reset,
+		loadReferenceData,
+		loadCustomFields,
+		isOrg,
+		clearPending,
+	])
 
 	// ── Submit ──
 
@@ -309,9 +394,18 @@ function ServiceDialog({
 				if (isOrg && created.data?.id) {
 					await pricingRef.current?.save(created.data.id)
 				}
+				if (pendingFile && created.data?.id) {
+					const fd = new FormData()
+					fd.append('file', pendingFile)
+					await mediaApi.uploadServicePhoto({
+						pathParams: { id: created.data.id },
+						body: fd,
+					})
+				}
 				toast.success(t('created'))
 			}
 			reset()
+			clearPending()
 			onOpenChange(false)
 			onSuccess()
 		} catch (err) {
@@ -502,6 +596,65 @@ function ServiceDialog({
 				<DialogHeader>
 					<DialogTitle>{isEdit ? t('edit') : t('add')}</DialogTitle>
 				</DialogHeader>
+				{eventType && eventType.id ? (
+					<section className="mb-4 flex flex-col items-start gap-3">
+						<h3 className="text-sm font-medium">{tPhoto('title')}</h3>
+						<Avatar className="size-20 rounded-md">
+							{currentImage ? <AvatarImage src={currentImage} alt="" /> : null}
+							<AvatarFallback className="text-xl">
+								{getInitial(eventType.name)}
+							</AvatarFallback>
+						</Avatar>
+						<AvatarUploader
+							currentAvatar={currentImage}
+							fallbackText={eventType.name}
+							config={SERVICE_PHOTO_UPLOAD_CONFIG}
+							labels={{
+								triggerButton: tPhoto('uploadPhoto'),
+								dialogTitle: tPhoto('uploadPhoto'),
+								removeButton: tPhoto('removePhoto'),
+								successToast: tPhoto('photoUpdated'),
+							}}
+							onUpload={uploadPhoto}
+							onDelete={deletePhoto}
+							onSuccess={handlePhotoSuccess}
+						/>
+					</section>
+				) : (
+					<section className="mb-4 flex flex-col items-start gap-3">
+						<h3 className="text-sm font-medium">{tPhoto('title')}</h3>
+						<Avatar className="size-20 rounded-md">
+							{pendingPreview ? (
+								<AvatarImage src={pendingPreview} alt="" />
+							) : null}
+							<AvatarFallback className="text-xl">
+								{getInitial(watch('name') || '')}
+							</AvatarFallback>
+						</Avatar>
+						{pendingFile ? (
+							<Button
+								type="button"
+								variant="outline"
+								size="sm"
+								onClick={clearPending}
+							>
+								<X className="size-4" />
+								{tPhoto('removePhoto')}
+							</Button>
+						) : (
+							<label className="border-input bg-background hover:bg-accent inline-flex cursor-pointer items-center gap-2 rounded-md border px-3 py-1.5 text-sm font-medium">
+								<Camera className="size-4" />
+								{tPhoto('uploadPhoto')}
+								<input
+									type="file"
+									accept={SERVICE_PHOTO_UPLOAD_CONFIG.accept.join(',')}
+									className="hidden"
+									onChange={handlePickPendingFile}
+								/>
+							</label>
+						)}
+					</section>
+				)}
 				{loadingData ? (
 					<div className="flex justify-center py-8">
 						<Spinner className="size-6" />

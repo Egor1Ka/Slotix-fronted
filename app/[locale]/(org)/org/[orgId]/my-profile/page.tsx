@@ -19,8 +19,10 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
 import { ProfileHeader } from '@/components/profile/ProfileHeader'
+import { AvatarUploader } from '@/components/media/AvatarUploader'
+import { AVATAR_UPLOAD_CONFIG } from '@/components/media/AvatarUploader.config'
 import { useUser } from '@/lib/auth/user-provider'
-import { orgApi, setServerErrors } from '@/services'
+import { orgApi, mediaApi, setServerErrors } from '@/services'
 import type { OrgMembership } from '@/services/configs/org.types'
 
 const profileSchema = z.object({
@@ -102,6 +104,27 @@ function StaffMyProfilePage() {
 		}
 	}
 
+	const handleAvatarUpload = async (file: File) => {
+		const formData = new FormData()
+		formData.append('file', file)
+		const response = await mediaApi.uploadStaffAvatar({
+			pathParams: { orgId, staffId: user.id },
+			body: formData,
+		})
+		return { avatar: response.data.avatar }
+	}
+
+	const handleAvatarDelete = async () => {
+		const response = await mediaApi.deleteStaffAvatar({
+			pathParams: { orgId, staffId: user.id },
+		})
+		return { avatar: response.data.avatar }
+	}
+
+	const handleAvatarSuccess = (avatarUrl: string) => {
+		setMembership((prev) => (prev ? { ...prev, avatar: avatarUrl } : prev))
+	}
+
 	if (loading) {
 		return (
 			<div className="flex items-center justify-center py-20">
@@ -136,9 +159,18 @@ function StaffMyProfilePage() {
 			<h1 className="text-2xl font-bold">{t('myTitle')}</h1>
 
 			<ProfileHeader
-				avatar={user.avatar}
+				avatar={membership.avatar}
 				name={effectiveName}
 				badges={renderBadges()}
+			/>
+
+			<AvatarUploader
+				currentAvatar={membership.avatar}
+				fallbackText={effectiveName}
+				config={AVATAR_UPLOAD_CONFIG}
+				onUpload={handleAvatarUpload}
+				onDelete={handleAvatarDelete}
+				onSuccess={handleAvatarSuccess}
 			/>
 
 			<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

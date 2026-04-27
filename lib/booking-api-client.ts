@@ -87,6 +87,8 @@ interface BackendEventType {
 	orgId: string | null
 	slug: string
 	name: string
+	image: string
+	ogImage: string | null
 	durationMin: number
 	type: string
 	color: string
@@ -173,6 +175,8 @@ const toFrontendEventType = (raw: BackendEventType): EventType => ({
 	id: raw.id,
 	name: raw.name,
 	slug: raw.slug,
+	image: raw.image ?? '',
+	ogImage: raw.ogImage ?? null,
 	durationMin: raw.durationMin,
 	price: raw.price ? raw.price.amount : 0,
 	currency: raw.price ? raw.price.currency : 'usd',

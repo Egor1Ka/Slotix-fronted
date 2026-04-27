@@ -12,7 +12,6 @@ interface OrgListItem {
 interface CreateOrgBody {
 	name: string
 	currency: 'UAH' | 'USD'
-	logoUrl?: string
 	brandColor?: string
 	timezone?: string
 	defaultCountry?: string
@@ -28,7 +27,6 @@ interface UpdateOrgBody {
 	address?: string | null
 	phone?: string | null
 	website?: string | null
-	logoUrl?: string | null
 	brandColor?: string | null
 	timezone?: string
 }
@@ -40,6 +38,7 @@ interface AddStaffBody {
 interface OrgMembership {
 	role: 'owner' | 'admin' | 'member'
 	status: 'active' | 'invited' | 'suspended' | 'left'
+	avatar: string // per-org avatar from Membership.avatar; '' = no override (frontend shows letter fallback)
 	displayName: string | null
 	bio: string | null
 	positionId: string | null

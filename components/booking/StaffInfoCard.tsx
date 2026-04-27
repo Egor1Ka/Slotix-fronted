@@ -24,8 +24,6 @@ function StaffInfoCard({ name, avatar, position, bio }: StaffInfoCardProps) {
 	const t = useTranslations('profile')
 	const [expanded, setExpanded] = useState(false)
 
-	if (!bio && !position) return null
-
 	const toggleExpanded = () => setExpanded((prev) => !prev)
 
 	return (
