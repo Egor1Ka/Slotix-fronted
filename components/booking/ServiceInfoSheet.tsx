@@ -29,31 +29,38 @@ interface ServiceInfoSheetProps {
 const getInitial = (text: string): string =>
 	text.trim() ? text.trim().charAt(0).toUpperCase() : '?'
 
-const buildStaffItemRenderer = () => (member: OrgStaffMember) => (
-	<div
-		key={member.id}
-		className="hover:bg-muted/60 flex items-center gap-3 rounded-xl px-2 py-2 transition-colors"
-	>
-		<Avatar className="size-12">
-			{member.avatar ? (
-				<AvatarImage src={member.avatar} alt={member.name} />
-			) : null}
-			<AvatarFallback>{getInitial(member.name)}</AvatarFallback>
-		</Avatar>
-		<div className="flex flex-1 flex-col">
-			<span className="text-sm font-semibold leading-tight">{member.name}</span>
-			{member.position ? (
-				<span className="text-muted-foreground text-xs">{member.position}</span>
-			) : null}
+function StaffItem({ member }: { member: OrgStaffMember }) {
+	return (
+		<div className="hover:bg-muted/60 flex items-center gap-3 rounded-xl px-2 py-2 transition-colors">
+			<Avatar className="size-12">
+				{member.avatar ? (
+					<AvatarImage src={member.avatar} alt={member.name} />
+				) : null}
+				<AvatarFallback>{getInitial(member.name)}</AvatarFallback>
+			</Avatar>
+			<div className="flex flex-1 flex-col">
+				<span className="text-sm font-semibold leading-tight">
+					{member.name}
+				</span>
+				{member.position ? (
+					<span className="text-muted-foreground text-xs">
+						{member.position}
+					</span>
+				) : null}
+			</div>
+			<StaffInfoSheet
+				staffId={member.id}
+				name={member.name}
+				avatar={member.avatar}
+				position={member.position ?? null}
+				bio={member.bio ?? null}
+			/>
 		</div>
-		<StaffInfoSheet
-			staffId={member.id}
-			name={member.name}
-			avatar={member.avatar}
-			position={member.position ?? null}
-			bio={member.bio ?? null}
-		/>
-	</div>
+	)
+}
+
+const renderStaffItem = (member: OrgStaffMember) => (
+	<StaffItem key={member.id} member={member} />
 )
 
 function ServiceInfoSheet({
@@ -99,8 +106,6 @@ function ServiceInfoSheet({
 			<InfoIcon className="size-4" />
 		</Button>
 	)
-
-	const renderStaffItem = buildStaffItemRenderer()
 
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>
