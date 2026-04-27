@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { MapPin, Phone, Globe, ChevronDown, ChevronUp } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Separator } from '@/components/ui/separator'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { cn } from '@/lib/utils'
 
@@ -45,6 +44,7 @@ function ProfileInfoBlock({
 	const toggleOpen = () => setOpen((prev) => !prev)
 	const imageSource = isOrg ? logo : avatar
 	const toggleLabel = open ? t('hide') : isOrg ? t('aboutUs') : t('about')
+	const showHeaderAvatar = !open
 
 	if (!hasDetails) {
 		return (
@@ -87,23 +87,24 @@ function ProfileInfoBlock({
 						onClick={toggleOpen}
 						className="flex flex-1 items-center gap-3 text-left"
 					>
-						{isOrg && imageSource ? (
-							<img
-								src={imageSource}
-								alt={name}
-								className="size-9 shrink-0 rounded-lg object-cover"
-							/>
-						) : (
-							<Avatar className="size-9 shrink-0">
-								<AvatarImage src={imageSource ?? undefined} />
-								<AvatarFallback className="text-sm">
-									{getInitial(name)}
-								</AvatarFallback>
-							</Avatar>
-						)}
+						{showHeaderAvatar &&
+							(isOrg && imageSource ? (
+								<img
+									src={imageSource}
+									alt={name}
+									className="size-9 shrink-0 rounded-lg object-cover"
+								/>
+							) : (
+								<Avatar className="size-9 shrink-0">
+									<AvatarImage src={imageSource ?? undefined} />
+									<AvatarFallback className="text-sm">
+										{getInitial(name)}
+									</AvatarFallback>
+								</Avatar>
+							))}
 
 						<span className="flex-1">
-							<span className="block text-sm font-semibold">{name}</span>
+							<h1 className="block text-sm font-semibold">{name}</h1>
 							{orgName && (
 								<span className="text-muted-foreground block text-xs">
 									{orgName}
@@ -130,12 +131,35 @@ function ProfileInfoBlock({
 					)}
 				>
 					<div className="overflow-hidden">
-						<Separator className="mb-3" />
+						{isOrg && imageSource && (
+							<div className="mb-4 overflow-hidden rounded-xl">
+								<img
+									src={imageSource}
+									alt={name}
+									className="aspect-3/1 w-full object-cover"
+								/>
+							</div>
+						)}
 
-						{hasDescription && (
-							<p className="text-muted-foreground mb-3 text-sm leading-relaxed break-words">
-								{description}
-							</p>
+						{!isOrg && imageSource ? (
+							<div className="mb-3 flex gap-4">
+								<img
+									src={imageSource}
+									alt={name}
+									className="size-32 shrink-0 rounded-xl object-cover"
+								/>
+								{hasDescription && (
+									<p className="text-muted-foreground flex-1 text-sm leading-relaxed wrap-break-word">
+										{description}
+									</p>
+								)}
+							</div>
+						) : (
+							hasDescription && (
+								<p className="text-muted-foreground mb-3 text-sm leading-relaxed wrap-break-word">
+									{description}
+								</p>
+							)
 						)}
 
 						{hasContactInfo && (

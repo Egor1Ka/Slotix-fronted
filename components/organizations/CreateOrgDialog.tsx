@@ -51,7 +51,6 @@ const createOrgSchema = z.object({
 		.min(2, 'Name must be at least 2 characters'),
 	currency: z.enum(['UAH', 'USD']),
 	brandColor: z.string().optional(),
-	logoUrl: z.string().url('Must be a valid URL').optional().or(z.literal('')),
 	defaultTimezone: z.string().optional(),
 	defaultCountry: z.string().optional(),
 })
@@ -105,7 +104,6 @@ function CreateOrgDialog({ onCreated, plan, orgCount }: CreateOrgDialogProps) {
 				name: data.name,
 				currency: data.currency,
 				brandColor: data.brandColor || undefined,
-				logoUrl: data.logoUrl || undefined,
 				timezone: data.defaultTimezone || undefined,
 				defaultCountry: data.defaultCountry || undefined,
 			}
@@ -196,16 +194,6 @@ function CreateOrgDialog({ onCreated, plan, orgCount }: CreateOrgDialogProps) {
 								{...register('brandColor')}
 							/>
 							<FieldError errors={[errors.brandColor]} />
-						</Field>
-
-						<Field data-invalid={!!errors.logoUrl || undefined}>
-							<FieldLabel htmlFor="logoUrl">{t('form.logo')}</FieldLabel>
-							<Input
-								id="logoUrl"
-								placeholder={t('form.logoPlaceholder')}
-								{...register('logoUrl')}
-							/>
-							<FieldError errors={[errors.logoUrl]} />
 						</Field>
 
 						<Field>

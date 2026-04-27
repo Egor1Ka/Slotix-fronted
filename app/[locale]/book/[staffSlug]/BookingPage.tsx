@@ -49,6 +49,7 @@ const toStaffMember = (staff: {
 	id: staff.id,
 	name: staff.name,
 	avatar: staff.avatar ?? '',
+	ogImage: null,
 	position: staff.position ?? null,
 	bio: staff.bio ?? null,
 	bookingCount: 0,

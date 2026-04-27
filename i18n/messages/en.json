@@ -503,6 +503,10 @@
 		"pickServiceThenTime": "Pick a service, then tap {time} again",
 		"allStaff": "All",
 		"aboutStaff": "About specialist",
+		"aboutService": "About service",
+		"whoLeads": "Who leads",
+		"anyStaff": "Any specialist",
+		"bookThisService": "Book this service",
 		"confirmBookingTitle": "Confirm booking",
 		"bookingStatuses": "Booking Statuses",
 		"addStatus": "Add Status",
@@ -575,6 +579,11 @@
 			"serverError": "Server error. Please try again later.",
 			"serviceUnavailable": "Service is temporarily unavailable. Please try again later.",
 			"unknown": "An unexpected error occurred. Please try again."
+		},
+		"upload": {
+			"invalidFormat": "Invalid file format. Allowed: JPEG, PNG, WebP, GIF",
+			"tooLarge": "File too large (max {max})",
+			"tooSmall": "Image too small (min {min})"
 		}
 	},
 	"sidebar": {
@@ -645,7 +654,13 @@
 		"timezoneWarningTitle": "Change timezone?",
 		"timezoneWarningDesc": "New schedules will be created in the new timezone. Existing schedules will not change. Continue?",
 		"timezoneWarningConfirm": "Continue",
-		"timezoneWarningCancel": "Cancel"
+		"timezoneWarningCancel": "Cancel",
+		"logo": {
+			"title": "Logo",
+			"uploadLogo": "Upload logo",
+			"removeLogo": "Remove logo",
+			"logoUpdated": "Logo updated"
+		}
 	},
 	"positions": {
 		"title": "Positions",
@@ -718,6 +733,13 @@
 			"fieldUpdated": "Field updated",
 			"fieldDeleted": "Field deleted",
 			"noCustomFields": "No custom fields yet"
+		},
+		"photo": {
+			"title": "Photo",
+			"uploadPhoto": "Upload photo",
+			"removePhoto": "Remove photo",
+			"photoUpdated": "Photo updated",
+			"saveBeforePhoto": "Save the service to add a photo"
 		}
 	},
 	"staffSchedule": {
@@ -820,6 +842,17 @@
 			"owner": "Owner",
 			"admin": "Admin",
 			"member": "Member"
-		}
+		},
+		"changePhoto": "Change photo",
+		"removePhoto": "Remove photo",
+		"confirmRemove": "Confirm remove?",
+		"uploadingPhoto": "Uploading...",
+		"photoUpdated": "Photo updated",
+		"dropOrClick": "Drop a file or click to choose",
+		"acceptedFormats": "JPEG, PNG, WebP, GIF · up to 2 MB"
+	},
+	"common": {
+		"cancel": "Cancel",
+		"save": "Save"
 	}
 }

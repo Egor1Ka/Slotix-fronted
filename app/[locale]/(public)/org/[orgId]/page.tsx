@@ -1,9 +1,46 @@
 import { Suspense } from 'react'
+import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { CalendarViewConfigProvider } from '@/lib/calendar/CalendarViewConfigContext'
 import { ORG_PUBLIC_CONFIG } from '@/lib/calendar/view-config'
 import { OrgCalendarPage } from '@/components/booking/OrgCalendarPage'
 import { OrgDeactivatedBanner } from '@/components/organizations/OrgDeactivatedBanner'
+import { buildOgMetadata } from '@/lib/seo/og-metadata'
+
+async function fetchOrgForMeta(orgId: string) {
+	const backendUrl = process.env.BACKEND_URL ?? ''
+	try {
+		const response = await fetch(`${backendUrl}/api/org/${orgId}`, {
+			cache: 'force-cache',
+			next: { revalidate: 60 },
+		})
+		if (!response.ok) return null
+		const json = await response.json()
+		return json.data as {
+			name: string
+			description: string | null
+			ogImage: string | null
+		}
+	} catch {
+		return null
+	}
+}
+
+export async function generateMetadata({
+	params,
+}: {
+	params: Promise<{ locale: string; orgId: string }>
+}): Promise<Metadata> {
+	const { locale, orgId } = await params
+	const org = await fetchOrgForMeta(orgId)
+	if (!org) return {}
+	return buildOgMetadata({
+		title: org.name,
+		description: org.description ?? '',
+		image: org.ogImage,
+		locale,
+	})
+}
 
 async function fetchOrgActive(orgId: string): Promise<boolean> {
 	const backendUrl = process.env.BACKEND_URL ?? ''

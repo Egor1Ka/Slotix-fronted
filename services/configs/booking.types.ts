@@ -7,6 +7,7 @@ interface StaffMember {
 	id: string
 	name: string
 	avatar: string
+	ogImage: string | null
 	position: string | null
 	bio: string | null
 }
@@ -15,6 +16,7 @@ interface StaffBySlugResponse {
 	id: string
 	name: string
 	avatar: string
+	ogImage: string | null
 	position: string | null
 	orgId: string | null
 	locationIds: string[]
@@ -33,6 +35,8 @@ interface EventType {
 	id: string
 	name: string
 	slug: string
+	image: string
+	ogImage: string | null
 	durationMin: number
 	price: number
 	currency: string
@@ -152,6 +156,7 @@ interface OrgByIdResponse {
 	id: string
 	name: string
 	logo: string | null
+	ogImage: string | null
 	description: string | null
 	address: string | null
 	phone: string | null
