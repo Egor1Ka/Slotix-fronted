@@ -33,7 +33,7 @@ function ProfileInfoBlock({
 	phone,
 	website,
 	isOrg,
-	showThemeToggle = true,
+	showThemeToggle = false,
 }: ProfileInfoBlockProps) {
 	const t = useTranslations('profile')
 	const [open, setOpen] = useState(false)
