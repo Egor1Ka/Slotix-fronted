@@ -26,21 +26,21 @@
 
 ## 2. Зафиксированные решения
 
-| Решение | Выбор |
-| --- | --- |
-| Где хранить лого | Существующее `Organization.settings.logoUrl` — заменяем механизм заполнения, поле то же |
-| Где хранить фото услуги | Новое поле `EventType.image: String, default: ''` |
-| Solo-услуги (`type='solo'`, `userId` set) | Поддерживают загрузку фото |
-| Формат | Одно квадратное изображение 400×400, автокроп `g_auto` (не `g_face`) |
-| Авторизация лого | `owner` / `admin` орг |
-| Авторизация фото услуги (org) | `owner` / `admin` той же орг |
-| Авторизация фото услуги (solo) | `eventType.userId === req.user.id` |
-| Валидация | jpeg/png/webp/gif, ≤2 MB, мин. 200×200 — те же лимиты, что у аватарок |
-| UI лого | Секция «Логотип» на `manage/[orgId]/profile/page.tsx` |
-| UI фото услуги | Блок «Фото» в диалоге редактирования услуги на `manage/[orgId]/services/page.tsx` |
-| Создание услуги | На этапе создания фото скрыто. После сохранения — открыть редактирование и загрузить |
-| Отображение фото услуги при выборе | Миниатюра в карточках выбора услуги (fallback-буква) |
-| `UpdateOrgBody.logoUrl` | Удаляется из принимаемого body — теперь поле read-only через update |
+| Решение                                   | Выбор                                                                                   |
+| ----------------------------------------- | --------------------------------------------------------------------------------------- |
+| Где хранить лого                          | Существующее `Organization.settings.logoUrl` — заменяем механизм заполнения, поле то же |
+| Где хранить фото услуги                   | Новое поле `EventType.image: String, default: ''`                                       |
+| Solo-услуги (`type='solo'`, `userId` set) | Поддерживают загрузку фото                                                              |
+| Формат                                    | Одно квадратное изображение 400×400, автокроп `g_auto` (не `g_face`)                    |
+| Авторизация лого                          | `owner` / `admin` орг                                                                   |
+| Авторизация фото услуги (org)             | `owner` / `admin` той же орг                                                            |
+| Авторизация фото услуги (solo)            | `eventType.userId === req.user.id`                                                      |
+| Валидация                                 | jpeg/png/webp/gif, ≤2 MB, мин. 200×200 — те же лимиты, что у аватарок                   |
+| UI лого                                   | Секция «Логотип» на `manage/[orgId]/profile/page.tsx`                                   |
+| UI фото услуги                            | Блок «Фото» в диалоге редактирования услуги на `manage/[orgId]/services/page.tsx`       |
+| Создание услуги                           | На этапе создания фото скрыто. После сохранения — открыть редактирование и загрузить    |
+| Отображение фото услуги при выборе        | Миниатюра в карточках выбора услуги (fallback-буква)                                    |
+| `UpdateOrgBody.logoUrl`                   | Удаляется из принимаемого body — теперь поле read-only через update                     |
 
 ---
 
@@ -62,22 +62,22 @@ image: { type: String, default: '' }
 
 ```js
 export const ASSET_TYPES = Object.freeze({
-  USER_AVATAR: 'user-avatar',
-  STAFF_AVATAR: 'staff-avatar',
-  ORG_LOGO: 'org-logo',           // новый
-  SERVICE_PHOTO: 'service-photo', // новый
+	USER_AVATAR: 'user-avatar',
+	STAFF_AVATAR: 'staff-avatar',
+	ORG_LOGO: 'org-logo', // новый
+	SERVICE_PHOTO: 'service-photo', // новый
 })
 
 const COMMON_IMAGE_LIMITS = {
-  maxBytes: 2 * 1024 * 1024,
-  mimes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
+	maxBytes: 2 * 1024 * 1024,
+	mimes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
 }
 
 export const ASSET_LIMITS = Object.freeze({
-  [ASSET_TYPES.USER_AVATAR]: COMMON_IMAGE_LIMITS,
-  [ASSET_TYPES.STAFF_AVATAR]: COMMON_IMAGE_LIMITS,
-  [ASSET_TYPES.ORG_LOGO]: COMMON_IMAGE_LIMITS,
-  [ASSET_TYPES.SERVICE_PHOTO]: COMMON_IMAGE_LIMITS,
+	[ASSET_TYPES.USER_AVATAR]: COMMON_IMAGE_LIMITS,
+	[ASSET_TYPES.STAFF_AVATAR]: COMMON_IMAGE_LIMITS,
+	[ASSET_TYPES.ORG_LOGO]: COMMON_IMAGE_LIMITS,
+	[ASSET_TYPES.SERVICE_PHOTO]: COMMON_IMAGE_LIMITS,
 })
 ```
 
@@ -87,11 +87,14 @@ export const ASSET_LIMITS = Object.freeze({
 
 ```js
 const buildPublicId = (assetType, ownerId) => {
-  if (assetType === ASSET_TYPES.USER_AVATAR)    return `slotix/avatars/users/${ownerId}`
-  if (assetType === ASSET_TYPES.STAFF_AVATAR)   return `slotix/avatars/staff/${ownerId}`
-  if (assetType === ASSET_TYPES.ORG_LOGO)       return `slotix/orgs/${ownerId}/logo`
-  if (assetType === ASSET_TYPES.SERVICE_PHOTO)  return `slotix/services/${ownerId}`
-  throw new Error(`Unknown assetType for publicId: ${assetType}`)
+	if (assetType === ASSET_TYPES.USER_AVATAR)
+		return `slotix/avatars/users/${ownerId}`
+	if (assetType === ASSET_TYPES.STAFF_AVATAR)
+		return `slotix/avatars/staff/${ownerId}`
+	if (assetType === ASSET_TYPES.ORG_LOGO) return `slotix/orgs/${ownerId}/logo`
+	if (assetType === ASSET_TYPES.SERVICE_PHOTO)
+		return `slotix/services/${ownerId}`
+	throw new Error(`Unknown assetType for publicId: ${assetType}`)
 }
 ```
 
@@ -101,26 +104,38 @@ const buildPublicId = (assetType, ownerId) => {
 
 ```js
 const TRANSFORMATIONS = Object.freeze({
-  [ASSET_TYPES.USER_AVATAR]:    [{ width: 400, height: 400, crop: 'fill', gravity: 'face' }, { quality: 'auto', fetch_format: 'auto' }],
-  [ASSET_TYPES.STAFF_AVATAR]:   [{ width: 400, height: 400, crop: 'fill', gravity: 'face' }, { quality: 'auto', fetch_format: 'auto' }],
-  [ASSET_TYPES.ORG_LOGO]:       [{ width: 400, height: 400, crop: 'fill', gravity: 'auto' }, { quality: 'auto', fetch_format: 'auto' }],
-  [ASSET_TYPES.SERVICE_PHOTO]:  [{ width: 400, height: 400, crop: 'fill', gravity: 'auto' }, { quality: 'auto', fetch_format: 'auto' }],
+	[ASSET_TYPES.USER_AVATAR]: [
+		{ width: 400, height: 400, crop: 'fill', gravity: 'face' },
+		{ quality: 'auto', fetch_format: 'auto' },
+	],
+	[ASSET_TYPES.STAFF_AVATAR]: [
+		{ width: 400, height: 400, crop: 'fill', gravity: 'face' },
+		{ quality: 'auto', fetch_format: 'auto' },
+	],
+	[ASSET_TYPES.ORG_LOGO]: [
+		{ width: 400, height: 400, crop: 'fill', gravity: 'auto' },
+		{ quality: 'auto', fetch_format: 'auto' },
+	],
+	[ASSET_TYPES.SERVICE_PHOTO]: [
+		{ width: 400, height: 400, crop: 'fill', gravity: 'auto' },
+		{ quality: 'auto', fetch_format: 'auto' },
+	],
 })
 
 const upload = async (file, { assetType, ownerId }) => {
-  const publicId = buildPublicId(assetType, ownerId)
-  const result = await uploadStream(file.buffer, {
-    public_id: publicId,
-    overwrite: true,
-    resource_type: 'image',
-    invalidate: true,
-  })
-  const url = cloudinary.url(result.public_id, {
-    secure: true,
-    version: result.version,
-    transformation: TRANSFORMATIONS[assetType],
-  })
-  return { url, providerId: result.public_id }
+	const publicId = buildPublicId(assetType, ownerId)
+	const result = await uploadStream(file.buffer, {
+		public_id: publicId,
+		overwrite: true,
+		resource_type: 'image',
+		invalidate: true,
+	})
+	const url = cloudinary.url(result.public_id, {
+		secure: true,
+		version: result.version,
+		transformation: TRANSFORMATIONS[assetType],
+	})
+	return { url, providerId: result.public_id }
 }
 ```
 
@@ -176,12 +191,12 @@ const upload = async (file, { assetType, ownerId }) => {
 
 ### 3.5. Изменения существующих эндпоинтов
 
-| Endpoint | Изменения |
-| --- | --- |
-| `PATCH /api/org/:orgId` | Удалить `logoUrl` из принимаемого body. Тесты обновить. |
-| `GET /api/org/:orgId` | Без изменений — `logo` уже отдаётся через `orgDto`. |
-| `GET /api/event-types/:id` | DTO `eventTypeDto` — добавить `image` в выдачу. |
-| `GET /api/event-types?orgId|userId=` | То же — `image` в каждом элементе. |
+| Endpoint                    | Изменения                                               |
+| --------------------------- | ------------------------------------------------------- | ---------------------------------- |
+| `PATCH /api/org/:orgId`     | Удалить `logoUrl` из принимаемого body. Тесты обновить. |
+| `GET /api/org/:orgId`       | Без изменений — `logo` уже отдаётся через `orgDto`.     |
+| `GET /api/event-types/:id`  | DTO `eventTypeDto` — добавить `image` в выдачу.         |
+| `GET /api/event-types?orgId | userId=`                                                | То же — `image` в каждом элементе. |
 
 ### 3.6. Авторизация
 
@@ -206,39 +221,39 @@ const upload = async (file, { assetType, ownerId }) => {
 type AssetType = 'user-avatar' | 'staff-avatar' | 'org-logo' | 'service-photo'
 
 interface OrgLogoResponse {
-  id: string
-  name: string
-  logo: string | null
-  description: string | null
-  address: string | null
-  phone: string | null
-  website: string | null
-  active: boolean
-  timezone?: string
+	id: string
+	name: string
+	logo: string | null
+	description: string | null
+	address: string | null
+	phone: string | null
+	website: string | null
+	active: boolean
+	timezone?: string
 }
 
 interface ServicePhotoResponse {
-  id: string
-  name: string
-  slug: string
-  image: string
-  durationMin: number
-  price: number
-  currency: string
-  color: string
-  description: string | null
-  staffPolicy: 'any' | 'by_position' | 'specific'
-  assignedPositions: string[]
-  assignedStaff: string[]
+	id: string
+	name: string
+	slug: string
+	image: string
+	durationMin: number
+	price: number
+	currency: string
+	color: string
+	description: string | null
+	staffPolicy: 'any' | 'by_position' | 'specific'
+	assignedPositions: string[]
+	assignedStaff: string[]
 }
 
 export type {
-  AssetType,
-  UploadConfig,
-  UploadAvatarResponse,
-  StaffAvatarResponse,
-  OrgLogoResponse,
-  ServicePhotoResponse,
+	AssetType,
+	UploadConfig,
+	UploadAvatarResponse,
+	StaffAvatarResponse,
+	OrgLogoResponse,
+	ServicePhotoResponse,
 }
 ```
 
@@ -271,35 +286,35 @@ export type {
 
 ```ts
 import type {
-  UploadAvatarResponse,
-  StaffAvatarResponse,
-  OrgLogoResponse,
-  ServicePhotoResponse,
+	UploadAvatarResponse,
+	StaffAvatarResponse,
+	OrgLogoResponse,
+	ServicePhotoResponse,
 } from './media.types'
 
 const mediaApiConfig = {
-  // ...existing user/staff endpoints...
+	// ...existing user/staff endpoints...
 
-  uploadOrgLogo: endpoint<FormData, ApiResponse<OrgLogoResponse>>({
-    url: ({ orgId }) => `/api/org/${orgId}/logo`,
-    method: postData,
-    defaultErrorMessage: 'Failed to upload logo',
-  }),
-  deleteOrgLogo: endpoint<void, ApiResponse<OrgLogoResponse>>({
-    url: ({ orgId }) => `/api/org/${orgId}/logo`,
-    method: deleteData,
-    defaultErrorMessage: 'Failed to delete logo',
-  }),
-  uploadServicePhoto: endpoint<FormData, ApiResponse<ServicePhotoResponse>>({
-    url: ({ id }) => `/api/event-types/${id}/photo`,
-    method: postData,
-    defaultErrorMessage: 'Failed to upload service photo',
-  }),
-  deleteServicePhoto: endpoint<void, ApiResponse<ServicePhotoResponse>>({
-    url: ({ id }) => `/api/event-types/${id}/photo`,
-    method: deleteData,
-    defaultErrorMessage: 'Failed to delete service photo',
-  }),
+	uploadOrgLogo: endpoint<FormData, ApiResponse<OrgLogoResponse>>({
+		url: ({ orgId }) => `/api/org/${orgId}/logo`,
+		method: postData,
+		defaultErrorMessage: 'Failed to upload logo',
+	}),
+	deleteOrgLogo: endpoint<void, ApiResponse<OrgLogoResponse>>({
+		url: ({ orgId }) => `/api/org/${orgId}/logo`,
+		method: deleteData,
+		defaultErrorMessage: 'Failed to delete logo',
+	}),
+	uploadServicePhoto: endpoint<FormData, ApiResponse<ServicePhotoResponse>>({
+		url: ({ id }) => `/api/event-types/${id}/photo`,
+		method: postData,
+		defaultErrorMessage: 'Failed to upload service photo',
+	}),
+	deleteServicePhoto: endpoint<void, ApiResponse<ServicePhotoResponse>>({
+		url: ({ id }) => `/api/event-types/${id}/photo`,
+		method: deleteData,
+		defaultErrorMessage: 'Failed to delete service photo',
+	}),
 }
 ```
 
@@ -309,9 +324,9 @@ const mediaApiConfig = {
 
 ```ts
 export const AVATAR_UPLOAD_CONFIG: UploadConfig = {
-  accept: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
-  maxSizeBytes: 2 * 1024 * 1024,
-  minDimensions: { width: 200, height: 200 },
+	accept: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
+	maxSizeBytes: 2 * 1024 * 1024,
+	minDimensions: { width: 200, height: 200 },
 }
 
 export const ORG_LOGO_UPLOAD_CONFIG: UploadConfig = AVATAR_UPLOAD_CONFIG
@@ -326,20 +341,20 @@ export const SERVICE_PHOTO_UPLOAD_CONFIG: UploadConfig = AVATAR_UPLOAD_CONFIG
 
 ```ts
 interface AvatarUploaderProps {
-  currentAvatar: string
-  fallbackText: string
-  config: UploadConfig
-  onUpload: (file: File) => Promise<{ avatar: string }>
-  onDelete: () => Promise<{ avatar: string }>
-  onSuccess: (avatarUrl: string) => void
-  labels?: {
-    triggerButton?: string
-    dialogTitle?: string
-    removeButton?: string
-    confirmRemove?: string
-    dropZone?: string
-    successToast?: string
-  }
+	currentAvatar: string
+	fallbackText: string
+	config: UploadConfig
+	onUpload: (file: File) => Promise<{ avatar: string }>
+	onDelete: () => Promise<{ avatar: string }>
+	onSuccess: (avatarUrl: string) => void
+	labels?: {
+		triggerButton?: string
+		dialogTitle?: string
+		removeButton?: string
+		confirmRemove?: string
+		dropZone?: string
+		successToast?: string
+	}
 }
 ```
 
@@ -387,30 +402,30 @@ const deleteLogo = () =>
 
 ```tsx
 const uploadServicePhoto = (eventTypeId: string) => (file: File) => {
-  const fd = new FormData()
-  fd.append('file', file)
-  return mediaApi
-    .uploadServicePhoto({ pathParams: { id: eventTypeId }, body: fd })
-    .then((r) => ({ avatar: r.data.image }))
+	const fd = new FormData()
+	fd.append('file', file)
+	return mediaApi
+		.uploadServicePhoto({ pathParams: { id: eventTypeId }, body: fd })
+		.then((r) => ({ avatar: r.data.image }))
 }
 
-<AvatarUploader
-  currentAvatar={service.image}
-  fallbackText={service.name}
-  config={SERVICE_PHOTO_UPLOAD_CONFIG}
-  labels={{
-    triggerButton: t('services.photo.uploadPhoto'),
-    dialogTitle:   t('services.photo.uploadPhoto'),
-    removeButton:  t('services.photo.removePhoto'),
-    successToast:  t('services.photo.photoUpdated'),
-  }}
-  onUpload={uploadServicePhoto(service.id)}
-  onDelete={() =>
-    mediaApi
-      .deleteServicePhoto({ pathParams: { id: service.id } })
-      .then((r) => ({ avatar: r.data.image }))
-  }
-  onSuccess={(image) => mutateServicesList(service.id, { image })}
+;<AvatarUploader
+	currentAvatar={service.image}
+	fallbackText={service.name}
+	config={SERVICE_PHOTO_UPLOAD_CONFIG}
+	labels={{
+		triggerButton: t('services.photo.uploadPhoto'),
+		dialogTitle: t('services.photo.uploadPhoto'),
+		removeButton: t('services.photo.removePhoto'),
+		successToast: t('services.photo.photoUpdated'),
+	}}
+	onUpload={uploadServicePhoto(service.id)}
+	onDelete={() =>
+		mediaApi
+			.deleteServicePhoto({ pathParams: { id: service.id } })
+			.then((r) => ({ avatar: r.data.image }))
+	}
+	onSuccess={(image) => mutateServicesList(service.id, { image })}
 />
 ```
 
@@ -430,8 +445,8 @@ Solo-услуги (`type='solo'`, `userId` set, `orgId=null`) управляют
 
 ```tsx
 <Avatar className="size-10 rounded-md">
-  {service.image ? <AvatarImage src={service.image} alt="" /> : null}
-  <AvatarFallback>{getInitial(service.name)}</AvatarFallback>
+	{service.image ? <AvatarImage src={service.image} alt="" /> : null}
+	<AvatarFallback>{getInitial(service.name)}</AvatarFallback>
 </Avatar>
 ```
 
@@ -441,23 +456,23 @@ Solo-услуги (`type='solo'`, `userId` set, `orgId=null`) управляют
 
 ```json
 {
-  "org": {
-    "logo": {
-      "title": "Logo",
-      "uploadLogo": "Upload logo",
-      "removeLogo": "Remove logo",
-      "logoUpdated": "Logo updated"
-    }
-  },
-  "services": {
-    "photo": {
-      "title": "Photo",
-      "uploadPhoto": "Upload photo",
-      "removePhoto": "Remove photo",
-      "photoUpdated": "Photo updated",
-      "saveBeforePhoto": "Save the service to add a photo"
-    }
-  }
+	"org": {
+		"logo": {
+			"title": "Logo",
+			"uploadLogo": "Upload logo",
+			"removeLogo": "Remove logo",
+			"logoUpdated": "Logo updated"
+		}
+	},
+	"services": {
+		"photo": {
+			"title": "Photo",
+			"uploadPhoto": "Upload photo",
+			"removePhoto": "Remove photo",
+			"photoUpdated": "Photo updated",
+			"saveBeforePhoto": "Save the service to add a photo"
+		}
+	}
 }
 ```
 

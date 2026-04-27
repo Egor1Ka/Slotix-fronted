@@ -13,7 +13,7 @@ async function AppFooter() {
 			data-slot="app-footer"
 			className="border-border/40 mt-auto border-t"
 		>
-			<div className="mx-auto flex max-w-7xl flex-col items-center justify-center gap-3 px-4 py-3 text-xs sm:h-10 sm:flex-row sm:gap-2 sm:py-0 sm:px-6 lg:px-8">
+			<div className="mx-auto flex max-w-7xl flex-col items-center justify-center gap-3 px-4 py-3 text-xs sm:h-10 sm:flex-row sm:gap-2 sm:px-6 sm:py-0 lg:px-8">
 				<Link
 					href="/"
 					aria-label="Slotix"

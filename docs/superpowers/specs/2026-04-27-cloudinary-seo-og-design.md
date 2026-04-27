@@ -21,11 +21,11 @@
 
 Покрываем три публичные страницы:
 
-| Страница | Что показывается |
-| --- | --- |
-| `/(public)/org/[orgId]` | лого + название + описание организации |
+| Страница                          | Что показывается                                                          |
+| --------------------------------- | ------------------------------------------------------------------------- |
+| `/(public)/org/[orgId]`           | лого + название + описание организации                                    |
 | `/(public)/org/[orgId]/[staffId]` | аватар сотрудника + `${имя} · ${орг}` + bio (или fallback к описанию орг) |
-| `/(public)/book/[staffSlug]` | аватар solo-юзера + имя + bio/description |
+| `/(public)/book/[staffSlug]`      | аватар solo-юзера + имя + bio/description                                 |
 
 Не входит в этот план: per-service OG (когда URL содержит выбранную услугу), sitemap.xml, JSON-LD, локализация заголовков. Вынесено в §7.
 
@@ -33,17 +33,17 @@
 
 ## 2. Зафиксированные решения
 
-| Решение | Выбор |
-| --- | --- |
-| Размер OG картинки | 1200×630, `c_fill,g_auto` (контент-aware) |
-| Где хранится OG-URL | Не хранится в БД. Генерируется на лету через `cloudinary.url(publicId, transformation)` при сборке DTO |
-| Как фронт получает OG-URL | Бэкенд кладёт поле `ogImage: string \| null` в существующие DTO (`OrgByIdResponse`, `StaffBySlugResponse`, `StaffMember`, `EventType`) |
-| Fallback при отсутствии ассета | Дефолтная брендовая картинка `/og-default.png` 1200×630 (создаётся вручную в `public/`) |
-| Локализация OG-текстов | Не локализуем content (название/описание берём из БД как есть). Но `og:locale` ставим из URL (`en_US` / `uk_UA`) |
-| Twitter Cards | Явные `twitter:card=summary_large_image` + `twitter:title/description/image` |
-| Шаблоны заголовков | Без шаблонов — `og:title = org.name` (без суффикса «\| Slotix»). Для staff в орге исключение — `${staff.name} · ${org.name}` |
-| Каскад для staff `ogImage` | per-org membership avatar → personal user avatar → `null` (фронт подставит дефолт) |
-| Деду fetch'ей в Next | `generateMetadata` использует `cache: 'force-cache'` для своих API-вызовов, чтобы не дублировать с самой страницей |
+| Решение                        | Выбор                                                                                                                                  |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Размер OG картинки             | 1200×630, `c_fill,g_auto` (контент-aware)                                                                                              |
+| Где хранится OG-URL            | Не хранится в БД. Генерируется на лету через `cloudinary.url(publicId, transformation)` при сборке DTO                                 |
+| Как фронт получает OG-URL      | Бэкенд кладёт поле `ogImage: string \| null` в существующие DTO (`OrgByIdResponse`, `StaffBySlugResponse`, `StaffMember`, `EventType`) |
+| Fallback при отсутствии ассета | Дефолтная брендовая картинка `/og-default.png` 1200×630 (создаётся вручную в `public/`)                                                |
+| Локализация OG-текстов         | Не локализуем content (название/описание берём из БД как есть). Но `og:locale` ставим из URL (`en_US` / `uk_UA`)                       |
+| Twitter Cards                  | Явные `twitter:card=summary_large_image` + `twitter:title/description/image`                                                           |
+| Шаблоны заголовков             | Без шаблонов — `og:title = org.name` (без суффикса «\| Slotix»). Для staff в орге исключение — `${staff.name} · ${org.name}`           |
+| Каскад для staff `ogImage`     | per-org membership avatar → personal user avatar → `null` (фронт подставит дефолт)                                                     |
+| Деду fetch'ей в Next           | `generateMetadata` использует `cache: 'force-cache'` для своих API-вызовов, чтобы не дублировать с самой страницей                     |
 
 ---
 
@@ -111,9 +111,7 @@ const toOrgDto = (doc) => {
 		name: doc.name,
 		timezone: doc.timezone || null,
 		logo: doc.settings ? doc.settings.logoUrl || null : null,
-		ogImage: hasLogo
-			? getOgImageUrl(ASSET_TYPES.ORG_LOGO, id)
-			: null,
+		ogImage: hasLogo ? getOgImageUrl(ASSET_TYPES.ORG_LOGO, id) : null,
 		description: doc.description || null,
 		address: doc.address || null,
 		phone: doc.phone || null,
@@ -162,17 +160,18 @@ const buildStaffOgImage = ({ membership, user, orgId }) => {
 ```
 
 И прокидывать в выдачу:
+
 - `GET /api/org/:id/staff` (массив) — каждый item имеет `ogImage`
 - `GET /api/staff/by-slug/:slug` или эквивалентный endpoint (имя уточняется при реализации) — добавить `ogImage`
 
 ### 3.6. Какие endpoint'ы трогаем
 
-| Endpoint | Изменение |
-| --- | --- |
-| `GET /api/org/:id` | DTO теперь включает `ogImage` |
-| `GET /api/org/:id/staff` | Каждый staff item включает `ogImage` |
-| `GET /api/staff/by-slug/:slug` (или эквивалент — уточнить при реализации) | Включает `ogImage` |
-| `GET /api/event-types/:id` и список | Включают `ogImage` |
+| Endpoint                                                                  | Изменение                            |
+| ------------------------------------------------------------------------- | ------------------------------------ |
+| `GET /api/org/:id`                                                        | DTO теперь включает `ogImage`        |
+| `GET /api/org/:id/staff`                                                  | Каждый staff item включает `ogImage` |
+| `GET /api/staff/by-slug/:slug` (или эквивалент — уточнить при реализации) | Включает `ogImage`                   |
+| `GET /api/event-types/:id` и список                                       | Включают `ogImage`                   |
 
 **Что не трогаем:** никаких новых endpoint'ов, никаких изменений в схеме БД, никаких новых routes.
 
@@ -181,7 +180,7 @@ const buildStaffOgImage = ({ membership, user, orgId }) => {
 **`src/modules/media/__tests__/cloudinaryProvider.test.js`** — добавить 4 теста для `getOgImageUrl`:
 
 ```js
-test("getOgImageUrl содержит трансформацию 1200x630 для user-avatar", () => {
+test('getOgImageUrl содержит трансформацию 1200x630 для user-avatar', () => {
 	const url = provider.getOgImageUrl('user-avatar', 'u1')
 	assert.match(url, /w_1200/)
 	assert.match(url, /h_630/)
@@ -299,6 +298,7 @@ export const buildOgMetadata = ({
 **Решение:** в `generateMetadata` зовём API через ту же функцию, что и сама страница. Чтобы это сработало с нашим `services/api/methods.ts`, надо убедиться, что `request()` использует Next's встроенный `fetch` (не модифицирует `cache`/`revalidate`). Если базовый `fetch` модифицируется (например, `cache: 'no-store'` глобально) — добавить опциональный override через параметр в `methods.ts`.
 
 При имплементации первого шага плана надо проверить:
+
 1. Что `services/api/request.ts` не выставляет `cache: 'no-store'` принудительно.
 2. Если выставляет — добавить опцию пере-определения, чтобы `generateMetadata` мог звать с дефолтным кешем.
 

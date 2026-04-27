@@ -20,15 +20,15 @@
 
 ## File Structure
 
-| Файл | Что делаем |
-| --- | --- |
-| `src/modules/media/providers/cloudinary.js` | Добавить `OG_TRANSFORMATION` + `getOgImageUrl(assetType, ownerId)` + экспорт в default object |
-| `src/modules/media/services/mediaServices.js` | Добавить wrapper `getOgImageUrl` через `getActiveProvider()` |
-| `src/modules/media/index.js` | Re-export `getOgImageUrl` |
-| `src/modules/media/__tests__/cloudinaryProvider.test.js` | 4 новых теста на `getOgImageUrl` (URL содержит `w_1200,h_630,c_fill,g_auto`) |
-| `src/dto/orgDto.js` | Добавить `ogImage` в `toOrgDto` (null если нет лого) |
-| `src/dto/eventTypeDto.js` | Добавить `ogImage` в `toEventTypeDto` (null если нет image) |
-| `src/dto/staffDto.js` | Добавить `ogImage` в `toStaffDto` и `toOrgStaffDto` с каскадом per-org → personal → null |
+| Файл                                                     | Что делаем                                                                                    |
+| -------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `src/modules/media/providers/cloudinary.js`              | Добавить `OG_TRANSFORMATION` + `getOgImageUrl(assetType, ownerId)` + экспорт в default object |
+| `src/modules/media/services/mediaServices.js`            | Добавить wrapper `getOgImageUrl` через `getActiveProvider()`                                  |
+| `src/modules/media/index.js`                             | Re-export `getOgImageUrl`                                                                     |
+| `src/modules/media/__tests__/cloudinaryProvider.test.js` | 4 новых теста на `getOgImageUrl` (URL содержит `w_1200,h_630,c_fill,g_auto`)                  |
+| `src/dto/orgDto.js`                                      | Добавить `ogImage` в `toOrgDto` (null если нет лого)                                          |
+| `src/dto/eventTypeDto.js`                                | Добавить `ogImage` в `toEventTypeDto` (null если нет image)                                   |
+| `src/dto/staffDto.js`                                    | Добавить `ogImage` в `toStaffDto` и `toOrgStaffDto` с каскадом per-org → personal → null      |
 
 ---
 
@@ -48,6 +48,7 @@ PATH="/Users/egorzozula/.nvm/versions/node/v22.22.2/bin:$PATH" npm run test:medi
 ## Task 1: Расширить Cloudinary провайдер `getOgImageUrl`
 
 **Files:**
+
 - Modify: `src/modules/media/providers/cloudinary.js`
 - Test: `src/modules/media/__tests__/cloudinaryProvider.test.js`
 
@@ -56,34 +57,34 @@ PATH="/Users/egorzozula/.nvm/versions/node/v22.22.2/bin:$PATH" npm run test:medi
 В конец `src/modules/media/__tests__/cloudinaryProvider.test.js` добавить:
 
 ```js
-test("getOgImageUrl содержит трансформацию 1200x630 для user-avatar", () => {
-  const url = provider.getOgImageUrl("user-avatar", "u1");
-  assert.match(url, /w_1200/);
-  assert.match(url, /h_630/);
-  assert.match(url, /c_fill/);
-  assert.match(url, /g_auto/);
-});
+test('getOgImageUrl содержит трансформацию 1200x630 для user-avatar', () => {
+	const url = provider.getOgImageUrl('user-avatar', 'u1')
+	assert.match(url, /w_1200/)
+	assert.match(url, /h_630/)
+	assert.match(url, /c_fill/)
+	assert.match(url, /g_auto/)
+})
 
-test("getOgImageUrl для staff-avatar", () => {
-  const url = provider.getOgImageUrl("staff-avatar", "org1/u2");
-  assert.match(url, /w_1200/);
-  assert.match(url, /h_630/);
-  assert.match(url, /slotix\/avatars\/staff\/org1\/u2/);
-});
+test('getOgImageUrl для staff-avatar', () => {
+	const url = provider.getOgImageUrl('staff-avatar', 'org1/u2')
+	assert.match(url, /w_1200/)
+	assert.match(url, /h_630/)
+	assert.match(url, /slotix\/avatars\/staff\/org1\/u2/)
+})
 
-test("getOgImageUrl для org-logo", () => {
-  const url = provider.getOgImageUrl("org-logo", "org1");
-  assert.match(url, /w_1200/);
-  assert.match(url, /h_630/);
-  assert.match(url, /slotix\/orgs\/org1\/logo/);
-});
+test('getOgImageUrl для org-logo', () => {
+	const url = provider.getOgImageUrl('org-logo', 'org1')
+	assert.match(url, /w_1200/)
+	assert.match(url, /h_630/)
+	assert.match(url, /slotix\/orgs\/org1\/logo/)
+})
 
-test("getOgImageUrl для service-photo", () => {
-  const url = provider.getOgImageUrl("service-photo", "evt1");
-  assert.match(url, /w_1200/);
-  assert.match(url, /h_630/);
-  assert.match(url, /slotix\/services\/evt1/);
-});
+test('getOgImageUrl для service-photo', () => {
+	const url = provider.getOgImageUrl('service-photo', 'evt1')
+	assert.match(url, /w_1200/)
+	assert.match(url, /h_630/)
+	assert.match(url, /slotix\/services\/evt1/)
+})
 ```
 
 **Замечание про мок:** существующий `mock.module("cloudinary", ...)` в этом файле имеет `url: (publicId) => \`https://test/${publicId}\``, который игнорирует трансформации. Чтобы тесты проходили, надо расширить мок — `url(publicId, options)` должен включать опции в строку.
@@ -118,23 +119,23 @@ PATH="/Users/egorzozula/.nvm/versions/node/v22.22.2/bin:$PATH" npm run test:medi
 
 ```js
 const OG_TRANSFORMATION = [
-  { width: 1200, height: 630, crop: "fill", gravity: "auto" },
-  { quality: "auto", fetch_format: "auto" },
-];
+	{ width: 1200, height: 630, crop: 'fill', gravity: 'auto' },
+	{ quality: 'auto', fetch_format: 'auto' },
+]
 
 const getOgImageUrl = (assetType, ownerId) => {
-  const publicId = buildPublicId(assetType, ownerId);
-  return cloudinary.url(publicId, {
-    secure: true,
-    transformation: OG_TRANSFORMATION,
-  });
-};
+	const publicId = buildPublicId(assetType, ownerId)
+	return cloudinary.url(publicId, {
+		secure: true,
+		transformation: OG_TRANSFORMATION,
+	})
+}
 ```
 
 Заменить `export default` строку:
 
 ```js
-export default { upload, delete: remove, buildProviderId, getOgImageUrl };
+export default { upload, delete: remove, buildProviderId, getOgImageUrl }
 ```
 
 - [ ] **Step 4: Запустить тесты — все 9 должны пройти**
@@ -152,6 +153,7 @@ PATH="/Users/egorzozula/.nvm/versions/node/v22.22.2/bin:$PATH" npm run test:medi
 ## Task 2: Добавить `getOgImageUrl` в mediaServices + index
 
 **Files:**
+
 - Modify: `src/modules/media/services/mediaServices.js`
 - Modify: `src/modules/media/index.js`
 
@@ -165,7 +167,7 @@ PATH="/Users/egorzozula/.nvm/versions/node/v22.22.2/bin:$PATH" npm run test:medi
  * Provider-agnostic — работает поверх Cloudinary, S3 (когда добавим), и т.д.
  */
 export const getOgImageUrl = (assetType, ownerId) =>
-  getActiveProvider().getOgImageUrl(assetType, ownerId);
+	getActiveProvider().getOgImageUrl(assetType, ownerId)
 ```
 
 - [ ] **Step 2: Открыть `src/modules/media/index.js`**
@@ -175,12 +177,12 @@ export const getOgImageUrl = (assetType, ownerId) =>
 ```js
 // src/modules/media/index.js
 export {
-  uploadAvatar,
-  deleteAvatar,
-  getOgImageUrl,
-} from "./services/mediaServices.js";
-export { uploadFor, handleUploadError } from "./middleware/upload.js";
-export { ASSET_TYPES } from "./constants/media.js";
+	uploadAvatar,
+	deleteAvatar,
+	getOgImageUrl,
+} from './services/mediaServices.js'
+export { uploadFor, handleUploadError } from './middleware/upload.js'
+export { ASSET_TYPES } from './constants/media.js'
 ```
 
 - [ ] **Step 3: Verify import**
@@ -208,40 +210,41 @@ PATH="/Users/egorzozula/.nvm/versions/node/v22.22.2/bin:$PATH" npm run test:medi
 ## Task 3: Расширить `orgDto.toOrgDto()` полем `ogImage`
 
 **Files:**
+
 - Modify: `src/dto/orgDto.js`
 
 - [ ] **Step 1: Заменить содержимое `src/dto/orgDto.js` на:**
 
 ```js
-import { getOgImageUrl, ASSET_TYPES } from "../modules/media/index.js";
+import { getOgImageUrl, ASSET_TYPES } from '../modules/media/index.js'
 
 const toOrgDto = (doc) => {
-  const id = doc._id.toString();
-  const hasLogo = Boolean(doc.settings && doc.settings.logoUrl);
-  return {
-    id,
-    name: doc.name,
-    timezone: doc.timezone || null,
-    logo: doc.settings ? doc.settings.logoUrl || null : null,
-    ogImage: hasLogo ? getOgImageUrl(ASSET_TYPES.ORG_LOGO, id) : null,
-    description: doc.description || null,
-    address: doc.address || null,
-    phone: doc.phone || null,
-    website: doc.website || null,
-    active: doc.active !== false,
-  };
-};
+	const id = doc._id.toString()
+	const hasLogo = Boolean(doc.settings && doc.settings.logoUrl)
+	return {
+		id,
+		name: doc.name,
+		timezone: doc.timezone || null,
+		logo: doc.settings ? doc.settings.logoUrl || null : null,
+		ogImage: hasLogo ? getOgImageUrl(ASSET_TYPES.ORG_LOGO, id) : null,
+		description: doc.description || null,
+		address: doc.address || null,
+		phone: doc.phone || null,
+		website: doc.website || null,
+		active: doc.active !== false,
+	}
+}
 
 const toOrgListItemDto = (org, membership) => ({
-  id: org._id.toString(),
-  name: org.name,
-  logo: org.settings ? org.settings.logoUrl || null : null,
-  role: membership.role,
-  status: membership.status,
-  active: org.active !== false,
-});
+	id: org._id.toString(),
+	name: org.name,
+	logo: org.settings ? org.settings.logoUrl || null : null,
+	role: membership.role,
+	status: membership.status,
+	active: org.active !== false,
+})
 
-export { toOrgDto, toOrgListItemDto };
+export { toOrgDto, toOrgListItemDto }
 ```
 
 (Только в `toOrgDto` добавлен `ogImage`. `toOrgListItemDto` не трогаем — это для списка организаций пользователя в дашборде, не для публичных страниц.)
@@ -262,6 +265,7 @@ PATH="/Users/egorzozula/.nvm/versions/node/v22.22.2/bin:$PATH" npm test
 ## Task 4: Расширить `eventTypeDto.toEventTypeDto()` полем `ogImage`
 
 **Files:**
+
 - Modify: `src/dto/eventTypeDto.js`
 
 - [ ] **Step 1: Открыть `src/dto/eventTypeDto.js` и расширить импорты + DTO**
@@ -269,45 +273,43 @@ PATH="/Users/egorzozula/.nvm/versions/node/v22.22.2/bin:$PATH" npm test
 Заменить содержимое на:
 
 ```js
-import { getOgImageUrl, ASSET_TYPES } from "../modules/media/index.js";
+import { getOgImageUrl, ASSET_TYPES } from '../modules/media/index.js'
 
 const toPriceDto = (price) => ({
-  amount: price.amount,
-  currency: price.currency,
-});
+	amount: price.amount,
+	currency: price.currency,
+})
 
 const toEventTypeDto = (doc) => {
-  const id = doc._id.toString();
-  return {
-    id,
-    userId: doc.userId ? doc.userId.toString() : null,
-    orgId: doc.orgId ? doc.orgId.toString() : null,
-    slug: doc.slug,
-    name: doc.name,
-    image: doc.image || "",
-    ogImage: doc.image
-      ? getOgImageUrl(ASSET_TYPES.SERVICE_PHOTO, id)
-      : null,
-    durationMin: doc.durationMin,
-    type: doc.type,
-    color: doc.color,
-    description: doc.description || null,
-    price: doc.price ? toPriceDto(doc.price) : null,
-    bufferAfter: doc.bufferAfter,
-    minNotice: doc.minNotice,
-    slotStepMin: doc.slotStepMin,
-    active: doc.active,
-    staffPolicy: doc.staffPolicy,
-    assignedPositions: doc.assignedPositions
-      ? doc.assignedPositions.map((id) => id.toString())
-      : [],
-    assignedStaff: doc.assignedStaff
-      ? doc.assignedStaff.map((id) => id.toString())
-      : [],
-  };
-};
+	const id = doc._id.toString()
+	return {
+		id,
+		userId: doc.userId ? doc.userId.toString() : null,
+		orgId: doc.orgId ? doc.orgId.toString() : null,
+		slug: doc.slug,
+		name: doc.name,
+		image: doc.image || '',
+		ogImage: doc.image ? getOgImageUrl(ASSET_TYPES.SERVICE_PHOTO, id) : null,
+		durationMin: doc.durationMin,
+		type: doc.type,
+		color: doc.color,
+		description: doc.description || null,
+		price: doc.price ? toPriceDto(doc.price) : null,
+		bufferAfter: doc.bufferAfter,
+		minNotice: doc.minNotice,
+		slotStepMin: doc.slotStepMin,
+		active: doc.active,
+		staffPolicy: doc.staffPolicy,
+		assignedPositions: doc.assignedPositions
+			? doc.assignedPositions.map((id) => id.toString())
+			: [],
+		assignedStaff: doc.assignedStaff
+			? doc.assignedStaff.map((id) => id.toString())
+			: [],
+	}
+}
 
-export { toEventTypeDto };
+export { toEventTypeDto }
 ```
 
 - [ ] **Step 2: Запустить тесты**
@@ -325,14 +327,15 @@ PATH="/Users/egorzozula/.nvm/versions/node/v22.22.2/bin:$PATH" npm test
 ## Task 5: Расширить `staffDto` каскадным `ogImage`
 
 **Files:**
+
 - Modify: `src/dto/staffDto.js`
 
 - [ ] **Step 1: Заменить содержимое `src/dto/staffDto.js` на:**
 
 ```js
-import { getOgImageUrl, ASSET_TYPES } from "../modules/media/index.js";
+import { getOgImageUrl, ASSET_TYPES } from '../modules/media/index.js'
 
-const toString = (id) => id.toString();
+const toString = (id) => id.toString()
 
 /**
  * Каскад OG-картинки для staff:
@@ -341,47 +344,47 @@ const toString = (id) => id.toString();
  * - ничего → null (фронт подставит дефолт)
  */
 const buildStaffOgImage = (user, membership) => {
-  if (membership && membership.avatar) {
-    return getOgImageUrl(
-      ASSET_TYPES.STAFF_AVATAR,
-      `${membership.orgId}/${user.id}`,
-    );
-  }
-  if (user.avatar) {
-    return getOgImageUrl(ASSET_TYPES.USER_AVATAR, user.id);
-  }
-  return null;
-};
+	if (membership && membership.avatar) {
+		return getOgImageUrl(
+			ASSET_TYPES.STAFF_AVATAR,
+			`${membership.orgId}/${user.id}`,
+		)
+	}
+	if (user.avatar) {
+		return getOgImageUrl(ASSET_TYPES.USER_AVATAR, user.id)
+	}
+	return null
+}
 
 const toStaffDto = (user, position, membership) => ({
-  id: user.id,
-  name: (membership && membership.displayName) || user.name,
-  displayName: membership ? membership.displayName || null : null,
-  avatar: user.avatar,
-  ogImage: buildStaffOgImage(user, membership),
-  position: position ? position.name : null,
-  bio: membership ? membership.bio || null : null,
-  orgId: membership ? membership.orgId.toString() : null,
-  locationIds: membership ? membership.locationIds.map(toString) : [],
-});
+	id: user.id,
+	name: (membership && membership.displayName) || user.name,
+	displayName: membership ? membership.displayName || null : null,
+	avatar: user.avatar,
+	ogImage: buildStaffOgImage(user, membership),
+	position: position ? position.name : null,
+	bio: membership ? membership.bio || null : null,
+	orgId: membership ? membership.orgId.toString() : null,
+	locationIds: membership ? membership.locationIds.map(toString) : [],
+})
 
 const toOrgStaffDto = (user, position, bookingCount, status, membership) => ({
-  id: user.id,
-  name: (membership && membership.displayName) || user.name,
-  displayName: membership ? membership.displayName || null : null,
-  avatar: membership ? membership.avatar || "" : "",
-  ogImage: buildStaffOgImage(user, membership),
-  position: position ? position.name : null,
-  positionId:
-    membership && membership.positionId
-      ? membership.positionId.toString()
-      : null,
-  bio: membership ? membership.bio || null : null,
-  bookingCount,
-  status: status || "active",
-});
+	id: user.id,
+	name: (membership && membership.displayName) || user.name,
+	displayName: membership ? membership.displayName || null : null,
+	avatar: membership ? membership.avatar || '' : '',
+	ogImage: buildStaffOgImage(user, membership),
+	position: position ? position.name : null,
+	positionId:
+		membership && membership.positionId
+			? membership.positionId.toString()
+			: null,
+	bio: membership ? membership.bio || null : null,
+	bookingCount,
+	status: status || 'active',
+})
 
-export { toStaffDto, toOrgStaffDto };
+export { toStaffDto, toOrgStaffDto }
 ```
 
 (Helper `buildStaffOgImage` инкапсулирует каскад. Оба DTO зовут его одинаково.)

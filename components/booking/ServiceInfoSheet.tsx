@@ -39,7 +39,7 @@ function StaffItem({ member }: { member: OrgStaffMember }) {
 				<AvatarFallback>{getInitial(member.name)}</AvatarFallback>
 			</Avatar>
 			<div className="flex flex-1 flex-col">
-				<span className="text-sm font-semibold leading-tight">
+				<span className="text-sm leading-tight font-semibold">
 					{member.name}
 				</span>
 				{member.position ? (
@@ -100,7 +100,7 @@ function ServiceInfoSheet({
 			variant="ghost"
 			size="icon-sm"
 			type="button"
-			className="absolute top-2 right-2 size-8 bg-black/35 text-white hover:bg-black/55 backdrop-blur"
+			className="absolute top-2 right-2 size-8 bg-black/35 text-white backdrop-blur hover:bg-black/55"
 			aria-label={t('aboutService')}
 		>
 			<InfoIcon className="size-4" />

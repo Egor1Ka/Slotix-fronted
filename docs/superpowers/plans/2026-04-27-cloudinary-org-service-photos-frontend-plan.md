@@ -18,19 +18,19 @@
 
 ## File Structure
 
-| Файл | Что делаем | Ответственность |
-| --- | --- | --- |
-| `services/configs/media.types.ts` | Modify | Добавить `'org-logo' \| 'service-photo'` в `AssetType`, экспортировать `OrgLogoResponse`, `ServicePhotoResponse` |
-| `services/configs/media.config.ts` | Modify | 4 новых эндпоинта: `uploadOrgLogo`, `deleteOrgLogo`, `uploadServicePhoto`, `deleteServicePhoto` |
-| `services/configs/booking.types.ts` | Modify | Добавить `image: string` в `EventType` |
-| `services/configs/org.types.ts` | Modify | Убрать `logoUrl` из `UpdateOrgBody` |
-| `components/media/AvatarUploader.tsx` | Modify | Опциональный `labels`-prop с fallback на текущие i18n-ключи |
-| `components/media/AvatarUploader.config.ts` | Modify | Алиасы `ORG_LOGO_UPLOAD_CONFIG`, `SERVICE_PHOTO_UPLOAD_CONFIG` |
-| `i18n/messages/en.json` | Modify | Ключи `org.logo.*`, `services.photo.*` |
-| `i18n/messages/uk.json` | Modify | Те же ключи на украинском |
-| `app/[locale]/(org)/manage/[orgId]/profile/page.tsx` | Modify | Секция «Логотип» с `<AvatarUploader>` |
-| `components/services/ServiceDialog.tsx` | Modify | Блок «Фото услуги» сверху диалога (только в edit-режиме) |
-| `components/booking/ServiceList.tsx` | Modify | Миниатюра `service.image` слева от названия услуги |
+| Файл                                                 | Что делаем | Ответственность                                                                                                  |
+| ---------------------------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------- |
+| `services/configs/media.types.ts`                    | Modify     | Добавить `'org-logo' \| 'service-photo'` в `AssetType`, экспортировать `OrgLogoResponse`, `ServicePhotoResponse` |
+| `services/configs/media.config.ts`                   | Modify     | 4 новых эндпоинта: `uploadOrgLogo`, `deleteOrgLogo`, `uploadServicePhoto`, `deleteServicePhoto`                  |
+| `services/configs/booking.types.ts`                  | Modify     | Добавить `image: string` в `EventType`                                                                           |
+| `services/configs/org.types.ts`                      | Modify     | Убрать `logoUrl` из `UpdateOrgBody`                                                                              |
+| `components/media/AvatarUploader.tsx`                | Modify     | Опциональный `labels`-prop с fallback на текущие i18n-ключи                                                      |
+| `components/media/AvatarUploader.config.ts`          | Modify     | Алиасы `ORG_LOGO_UPLOAD_CONFIG`, `SERVICE_PHOTO_UPLOAD_CONFIG`                                                   |
+| `i18n/messages/en.json`                              | Modify     | Ключи `org.logo.*`, `services.photo.*`                                                                           |
+| `i18n/messages/uk.json`                              | Modify     | Те же ключи на украинском                                                                                        |
+| `app/[locale]/(org)/manage/[orgId]/profile/page.tsx` | Modify     | Секция «Логотип» с `<AvatarUploader>`                                                                            |
+| `components/services/ServiceDialog.tsx`              | Modify     | Блок «Фото услуги» сверху диалога (только в edit-режиме)                                                         |
+| `components/booking/ServiceList.tsx`                 | Modify     | Миниатюра `service.image` слева от названия услуги                                                               |
 
 ---
 
@@ -50,6 +50,7 @@ npm run build
 ## Task 1: Расширить media-типы
 
 **Files:**
+
 - Modify: `services/configs/media.types.ts`
 
 - [ ] **Step 1: Открыть файл**
@@ -141,6 +142,7 @@ git commit -m "feat(media): добавить типы OrgLogoResponse и Service
 ## Task 2: Расширить mediaApi-конфиг
 
 **Files:**
+
 - Modify: `services/configs/media.config.ts`
 
 - [ ] **Step 1: Заменить содержимое на:**
@@ -230,6 +232,7 @@ git commit -m "feat(media-api): эндпоинты uploadOrgLogo / uploadService
 ## Task 3: Добавить поле `image` в `EventType`
 
 **Files:**
+
 - Modify: `services/configs/booking.types.ts`
 
 - [ ] **Step 1: Найти и расширить интерфейс**
@@ -299,6 +302,7 @@ git commit -m "feat(event-type): добавить поле image в фронто
 ## Task 4: Убрать `logoUrl` из `UpdateOrgBody`
 
 **Files:**
+
 - Modify: `services/configs/org.types.ts`
 
 - [ ] **Step 1: Удалить поле**
@@ -350,6 +354,7 @@ git commit -m "refactor(org): убрать logoUrl из CreateOrgBody / UpdateOr
 ## Task 5: Добавить `labels`-prop в `<AvatarUploader>`
 
 **Files:**
+
 - Modify: `components/media/AvatarUploader.tsx`
 
 - [ ] **Step 1: Расширить пропсы**
@@ -384,24 +389,24 @@ interface AvatarUploaderProps {
 ```tsx
 const resolvedLabels = {
 	triggerButton: labels?.triggerButton ?? t('profile.changePhoto'),
-	dialogTitle:   labels?.dialogTitle   ?? t('profile.changePhoto'),
-	removeButton:  labels?.removeButton  ?? t('profile.removePhoto'),
+	dialogTitle: labels?.dialogTitle ?? t('profile.changePhoto'),
+	removeButton: labels?.removeButton ?? t('profile.removePhoto'),
 	confirmRemove: labels?.confirmRemove ?? t('profile.confirmRemove'),
-	dropZone:      labels?.dropZone      ?? t('profile.dropOrClick'),
-	successToast:  labels?.successToast  ?? t('profile.photoUpdated'),
+	dropZone: labels?.dropZone ?? t('profile.dropOrClick'),
+	successToast: labels?.successToast ?? t('profile.photoUpdated'),
 }
 ```
 
 И в JSX заменить:
 
-| Было | Стало |
-| --- | --- |
-| `t('profile.changePhoto')` (в `<Button>` триггера) | `resolvedLabels.triggerButton` |
-| `t('profile.changePhoto')` (в `<DialogTitle>`) | `resolvedLabels.dialogTitle` |
-| `t('profile.removePhoto')` | `resolvedLabels.removeButton` |
-| `t('profile.confirmRemove')` | `resolvedLabels.confirmRemove` |
-| `t('profile.dropOrClick')` | `resolvedLabels.dropZone` |
-| `t('profile.photoUpdated')` (в обоих `toast.success`-ах) | `resolvedLabels.successToast` |
+| Было                                                     | Стало                          |
+| -------------------------------------------------------- | ------------------------------ |
+| `t('profile.changePhoto')` (в `<Button>` триггера)       | `resolvedLabels.triggerButton` |
+| `t('profile.changePhoto')` (в `<DialogTitle>`)           | `resolvedLabels.dialogTitle`   |
+| `t('profile.removePhoto')`                               | `resolvedLabels.removeButton`  |
+| `t('profile.confirmRemove')`                             | `resolvedLabels.confirmRemove` |
+| `t('profile.dropOrClick')`                               | `resolvedLabels.dropZone`      |
+| `t('profile.photoUpdated')` (в обоих `toast.success`-ах) | `resolvedLabels.successToast`  |
 
 (`t('profile.uploadingPhoto')` и `t('common.cancel')` / `t('common.save')` оставить как есть — они общие и не зависят от типа ассета.)
 
@@ -446,6 +451,7 @@ git commit -m "feat(avatar-uploader): опциональный labels-prop, ша
 ## Task 6: Алиасы конфигов загрузки
 
 **Files:**
+
 - Modify: `components/media/AvatarUploader.config.ts`
 
 - [ ] **Step 1: Добавить алиасы в конец файла**
@@ -479,6 +485,7 @@ git commit -m "feat(media): алиасы ORG_LOGO_UPLOAD_CONFIG и SERVICE_PHOTO
 ## Task 7: i18n-ключи
 
 **Files:**
+
 - Modify: `i18n/messages/en.json`
 - Modify: `i18n/messages/uk.json`
 
@@ -560,6 +567,7 @@ git commit -m "i18n: добавить ключи org.logo.* и services.photo.* 
 ## Task 8: Лого организации на `manage/[orgId]/profile`
 
 **Files:**
+
 - Modify: `app/[locale]/(org)/manage/[orgId]/profile/page.tsx`
 
 - [ ] **Step 1: Добавить импорты**
@@ -636,6 +644,7 @@ const getInitial = (text: string) =>
 > ```tsx
 > const tLogo = useTranslations('org.logo')
 > ```
+>
 > и обращайся как `tLogo('uploadLogo')`, `tLogo('title')`, и т.д.
 
 - [ ] **Step 4: Проверка типов**
@@ -668,6 +677,7 @@ git commit -m "feat(org-profile): загрузка лого организаци
 ## Task 9: Фото услуги в `ServiceDialog`
 
 **Files:**
+
 - Modify: `components/services/ServiceDialog.tsx`
 
 `<ServicesList>` используется на двух страницах: `manage/[orgId]/services/page.tsx` (org) и `(personal)/my-services/page.tsx` (solo). Обе показывают тот же `<ServiceDialog>`. Изменения здесь покрывают оба сценария.
@@ -699,35 +709,37 @@ const getInitial = (text: string) =>
 Внутри `<DialogContent>`, перед текстовыми полями (как первый блок после `<DialogHeader>`):
 
 ```tsx
-{service && service.id ? (
-	<section className="mb-4 flex flex-col items-start gap-3">
-		<h3 className="text-sm font-medium">{tPhoto('title')}</h3>
-		<Avatar className="size-20 rounded-md">
-			{currentImage ? <AvatarImage src={currentImage} alt="" /> : null}
-			<AvatarFallback className="text-xl">
-				{getInitial(service.name)}
-			</AvatarFallback>
-		</Avatar>
-		<AvatarUploader
-			currentAvatar={currentImage}
-			fallbackText={service.name}
-			config={SERVICE_PHOTO_UPLOAD_CONFIG}
-			labels={{
-				triggerButton: tPhoto('uploadPhoto'),
-				dialogTitle: tPhoto('uploadPhoto'),
-				removeButton: tPhoto('removePhoto'),
-				successToast: tPhoto('photoUpdated'),
-			}}
-			onUpload={uploadPhoto}
-			onDelete={deletePhoto}
-			onSuccess={handlePhotoSuccess}
-		/>
-	</section>
-) : (
-	<p className="text-muted-foreground mb-4 text-sm">
-		{tPhoto('saveBeforePhoto')}
-	</p>
-)}
+{
+	service && service.id ? (
+		<section className="mb-4 flex flex-col items-start gap-3">
+			<h3 className="text-sm font-medium">{tPhoto('title')}</h3>
+			<Avatar className="size-20 rounded-md">
+				{currentImage ? <AvatarImage src={currentImage} alt="" /> : null}
+				<AvatarFallback className="text-xl">
+					{getInitial(service.name)}
+				</AvatarFallback>
+			</Avatar>
+			<AvatarUploader
+				currentAvatar={currentImage}
+				fallbackText={service.name}
+				config={SERVICE_PHOTO_UPLOAD_CONFIG}
+				labels={{
+					triggerButton: tPhoto('uploadPhoto'),
+					dialogTitle: tPhoto('uploadPhoto'),
+					removeButton: tPhoto('removePhoto'),
+					successToast: tPhoto('photoUpdated'),
+				}}
+				onUpload={uploadPhoto}
+				onDelete={deletePhoto}
+				onSuccess={handlePhotoSuccess}
+			/>
+		</section>
+	) : (
+		<p className="text-muted-foreground mb-4 text-sm">
+			{tPhoto('saveBeforePhoto')}
+		</p>
+	)
+}
 ```
 
 - [ ] **Step 5: Добавить локальный state для image и три callback'а**
@@ -813,6 +825,7 @@ git commit -m "feat(services): загрузка фото услуги в Service
 ## Task 10: Миниатюры услуг в `<ServiceList>` (публичный букинг)
 
 **Files:**
+
 - Modify: `components/booking/ServiceList.tsx`
 
 - [ ] **Step 1: Добавить импорт `Avatar`**

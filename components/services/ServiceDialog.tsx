@@ -289,7 +289,15 @@ function ServiceDialog({
 			setIsAddingField(false)
 			clearPending()
 		}
-	}, [open, eventType, reset, loadReferenceData, loadCustomFields, isOrg, clearPending])
+	}, [
+		open,
+		eventType,
+		reset,
+		loadReferenceData,
+		loadCustomFields,
+		isOrg,
+		clearPending,
+	])
 
 	// ── Submit ──
 

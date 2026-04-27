@@ -138,9 +138,7 @@ function ServicesList({ ownerId, ownerType, currency }: ServicesListProps) {
 			/>
 			<div className="flex min-w-0 flex-1 items-center gap-3 py-3 pr-3 pl-5">
 				<Avatar className="size-10 shrink-0 rounded-md">
-					{service.image ? (
-						<AvatarImage src={service.image} alt="" />
-					) : null}
+					{service.image ? <AvatarImage src={service.image} alt="" /> : null}
 					<AvatarFallback
 						className="text-sm"
 						style={{ backgroundColor: service.color }}

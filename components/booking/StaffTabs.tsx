@@ -66,7 +66,7 @@ function StaffTabs({
 				type="button"
 				onClick={handleClick(member)}
 				className={cn(
-					'flex items-center gap-2 py-2 pl-3 pr-1',
+					'flex items-center gap-2 py-2 pr-1 pl-3',
 					behavior === 'select-one' && 'cursor-pointer',
 					behavior === 'show-all' && 'cursor-default',
 				)}

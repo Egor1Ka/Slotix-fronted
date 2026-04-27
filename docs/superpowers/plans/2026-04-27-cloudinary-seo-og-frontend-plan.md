@@ -24,13 +24,13 @@
 
 ## File Structure
 
-| Файл | Что делаем |
-| --- | --- |
-| `services/configs/booking.types.ts` | Добавить `ogImage: string \| null` в `OrgByIdResponse`, `StaffMember`, `StaffBySlugResponse`, `EventType` |
-| `lib/seo/og-metadata.ts` | NEW — helper `buildOgMetadata({ title, description, image, locale, url })` возвращает Next `Metadata` с `openGraph` + `twitter` |
-| `app/[locale]/(public)/org/[orgId]/page.tsx` | Добавить `generateMetadata` для org-страницы |
-| `app/[locale]/(public)/org/[orgId]/[staffId]/page.tsx` | Добавить `generateMetadata` для staff-в-орге страницы |
-| `app/[locale]/(public)/book/[staffSlug]/page.tsx` | Добавить `generateMetadata` для solo booking страницы |
+| Файл                                                   | Что делаем                                                                                                                      |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| `services/configs/booking.types.ts`                    | Добавить `ogImage: string \| null` в `OrgByIdResponse`, `StaffMember`, `StaffBySlugResponse`, `EventType`                       |
+| `lib/seo/og-metadata.ts`                               | NEW — helper `buildOgMetadata({ title, description, image, locale, url })` возвращает Next `Metadata` с `openGraph` + `twitter` |
+| `app/[locale]/(public)/org/[orgId]/page.tsx`           | Добавить `generateMetadata` для org-страницы                                                                                    |
+| `app/[locale]/(public)/org/[orgId]/[staffId]/page.tsx` | Добавить `generateMetadata` для staff-в-орге страницы                                                                           |
+| `app/[locale]/(public)/book/[staffSlug]/page.tsx`      | Добавить `generateMetadata` для solo booking страницы                                                                           |
 
 ---
 
@@ -49,6 +49,7 @@ npx tsc --noEmit 2>&1 | grep -v "StaffPositionAssignment\|ScheduleViewTab\|next.
 ## Task 1: Расширить frontend-типы полем `ogImage`
 
 **Files:**
+
 - Modify: `services/configs/booking.types.ts`
 
 - [ ] **Step 1: Добавить `ogImage` в 4 интерфейса**
@@ -132,6 +133,7 @@ npx tsc --noEmit 2>&1 | grep -E "booking\.types\.ts|ogImage" | head -10
 ## Task 2: Создать `buildOgMetadata` helper
 
 **Files:**
+
 - Create: `lib/seo/og-metadata.ts`
 
 - [ ] **Step 1: Создать новый файл с содержимым**
@@ -199,6 +201,7 @@ npx tsc --noEmit 2>&1 | grep "og-metadata\.ts" | head
 ## Task 3: `generateMetadata` для org-страницы
 
 **Files:**
+
 - Modify: `app/[locale]/(public)/org/[orgId]/page.tsx`
 
 - [ ] **Step 1: Добавить импорт `Metadata` и `buildOgMetadata`**
@@ -272,6 +275,7 @@ npx tsc --noEmit 2>&1 | grep -E "(public)/org/\[orgId\]/page\.tsx|og-metadata" |
 ## Task 4: `generateMetadata` для staff-в-орг страницы
 
 **Files:**
+
 - Modify: `app/[locale]/(public)/org/[orgId]/[staffId]/page.tsx`
 
 - [ ] **Step 1: Добавить импорт + fetcher**
@@ -349,6 +353,7 @@ npx tsc --noEmit 2>&1 | grep -E "\[staffId\]/page\.tsx|og-metadata" | head
 ## Task 5: `generateMetadata` для solo booking страницы
 
 **Files:**
+
 - Modify: `app/[locale]/(public)/book/[staffSlug]/page.tsx`
 
 - [ ] **Step 1: Добавить импорт + fetcher**
