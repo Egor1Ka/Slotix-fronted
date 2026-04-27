@@ -130,11 +130,137 @@
 			"bookNow": "Book Now"
 		},
 		"footer": {
-			"copyright": "© 2026 SLOTIX INC.",
+			"copyright": "© 2026 SLOTIX INC. All rights reserved.",
 			"docs": "Documentation",
 			"api": "API",
-			"privacy": "Privacy",
-			"terms": "Terms"
+			"privacy": "Privacy Policy",
+			"terms": "Terms of Service",
+			"contact": "Contact",
+			"support": "Support"
+		}
+	},
+	"legal": {
+		"privacy": {
+			"eyebrow": "LEGAL",
+			"title": "Privacy Policy",
+			"updated": "Last updated: April 27, 2026",
+			"intro": "This Privacy Policy explains how Slotix (\"we\", \"us\", \"our\") collects, uses, and protects information when you use our booking platform and related services (the \"Service\").",
+			"contact": "Questions about this policy? Reach us at",
+			"sections": [
+				{
+					"heading": "1. Information We Collect",
+					"body": "We collect information you provide directly when creating an account or making a booking, such as your name, email address, phone number, business details, and payment information processed by our payment provider (Creem). We also collect technical data automatically — IP address, browser type, device information, pages visited and timestamps — to operate and secure the Service."
+				},
+				{
+					"heading": "2. How We Use Your Information",
+					"body": "We use your information to:\n• Provide, maintain, and improve the Service\n• Process bookings and manage your calendar\n• Process payments and subscriptions through Creem\n• Send transactional emails (booking confirmations, password resets, billing notices)\n• Comply with legal obligations and prevent fraud\n• Respond to support requests"
+				},
+				{
+					"heading": "3. Sharing of Information",
+					"body": "We do not sell your personal data. We share information only with:\n• Service providers who help us operate the Service (hosting, analytics, email delivery, payment processing via Creem)\n• Authorities when required by law or to protect our rights\n• Other parties with your explicit consent\n\nClients booking via your public booking page share their contact details with you, the business operator."
+				},
+				{
+					"heading": "4. Payment Information",
+					"body": "Payments are handled by our payment processor Creem (creem.io). We do not store full card numbers on our servers. Creem's privacy policy applies to all data they collect during checkout."
+				},
+				{
+					"heading": "5. Cookies",
+					"body": "We use cookies and similar technologies for authentication (keeping you logged in), preferences (language, theme), and basic analytics. You can disable cookies in your browser, but the Service may not function correctly."
+				},
+				{
+					"heading": "6. Data Retention",
+					"body": "We retain your account data for as long as your account is active. After account deletion, we keep limited records (billing history, legal compliance) for up to 7 years as required by law. You can request deletion at any time via the contact email below."
+				},
+				{
+					"heading": "7. Your Rights",
+					"body": "You have the right to access, correct, export, or delete your personal data. You may also object to processing or withdraw consent at any time. To exercise these rights, contact us by email."
+				},
+				{
+					"heading": "8. Security",
+					"body": "We use industry-standard encryption (HTTPS/TLS), secure authentication, and access controls to protect your data. No method of transmission over the Internet is 100% secure, but we work to protect your information."
+				},
+				{
+					"heading": "9. International Transfers",
+					"body": "Your data may be processed in countries outside your country of residence, including the United States and the European Union. We ensure adequate protection in line with applicable laws."
+				},
+				{
+					"heading": "10. Children",
+					"body": "The Service is not directed to children under 16. We do not knowingly collect data from children. If you believe a child has provided us data, contact us and we will delete it."
+				},
+				{
+					"heading": "11. Changes to This Policy",
+					"body": "We may update this policy. Material changes will be communicated via email or an in-app notice. The \"Last updated\" date at the top reflects the current version."
+				},
+				{
+					"heading": "12. Contact",
+					"body": "For privacy questions, requests, or complaints, email egorzozulia@gmail.com."
+				}
+			]
+		},
+		"terms": {
+			"eyebrow": "LEGAL",
+			"title": "Terms of Service",
+			"updated": "Last updated: April 27, 2026",
+			"intro": "These Terms of Service (\"Terms\") govern your access to and use of Slotix (\"Service\"). By creating an account or using the Service you agree to these Terms.",
+			"contact": "Questions about these terms? Reach us at",
+			"sections": [
+				{
+					"heading": "1. Eligibility",
+					"body": "You must be at least 16 years old and able to form a binding contract to use the Service. By using the Service you represent that you meet these requirements."
+				},
+				{
+					"heading": "2. Account",
+					"body": "You are responsible for maintaining the confidentiality of your account credentials and for all activity under your account. Notify us immediately at egorzozulia@gmail.com of any unauthorized access."
+				},
+				{
+					"heading": "3. Subscription Plans and Pricing",
+					"body": "Slotix offers two plans:\n• Free — $0/month, includes a personal booking page, smart slot scheduling and unlimited bookings.\n• Business — $4.99/month, includes everything in Free plus the ability to create up to 3 organizations, manage staff, and use a public organization booking page.\n\nPaid subscriptions renew automatically each month unless cancelled. Prices are displayed in USD and exclude any applicable taxes."
+				},
+				{
+					"heading": "4. Payment and Billing",
+					"body": "Payments are processed by our payment provider Creem (creem.io). By subscribing you authorize us and Creem to charge your payment method on a recurring monthly basis. Failed payments may result in suspension of paid features."
+				},
+				{
+					"heading": "5. Cancellation and Refunds",
+					"body": "You can cancel your subscription at any time from the Billing page. Cancellation takes effect at the end of the current billing period — you keep access until that date. Payments already made are non-refundable except as required by law."
+				},
+				{
+					"heading": "6. Acceptable Use",
+					"body": "You agree not to:\n• Violate any law or third-party right\n• Upload malicious code or attempt to break the Service\n• Use the Service to send spam or unsolicited messages\n• Resell or sublicense the Service without our written consent\n• Reverse engineer or scrape the platform"
+				},
+				{
+					"heading": "7. Your Content",
+					"body": "You retain ownership of content you upload (organization details, services, schedules, client data). You grant us a limited, non-exclusive license to host and display this content as needed to operate the Service. You are responsible for the legality of the content you upload."
+				},
+				{
+					"heading": "8. Service Availability",
+					"body": "We strive for high availability but do not guarantee that the Service will be uninterrupted or error-free. We may perform maintenance, update features, or temporarily limit access without prior notice."
+				},
+				{
+					"heading": "9. Termination",
+					"body": "We may suspend or terminate your account if you breach these Terms or use the Service in a way that harms other users, our reputation, or our infrastructure. You may delete your account at any time."
+				},
+				{
+					"heading": "10. Disclaimers",
+					"body": "The Service is provided \"as is\" without warranties of any kind, express or implied, including merchantability, fitness for a particular purpose, and non-infringement. We do not warrant that bookings or schedules will be free of errors."
+				},
+				{
+					"heading": "11. Limitation of Liability",
+					"body": "To the maximum extent permitted by law, Slotix shall not be liable for any indirect, incidental, special, consequential or punitive damages, including loss of profits or data. Our total aggregate liability shall not exceed the amount you paid us in the 12 months preceding the claim."
+				},
+				{
+					"heading": "12. Changes to the Terms",
+					"body": "We may update these Terms from time to time. Material changes will be communicated by email or in-app notice. Continued use of the Service after such changes means you accept the updated Terms."
+				},
+				{
+					"heading": "13. Governing Law",
+					"body": "These Terms are governed by and construed in accordance with applicable consumer-protection and contract laws of the user's country of residence. Any disputes will be resolved in good faith first by direct contact at egorzozulia@gmail.com."
+				},
+				{
+					"heading": "14. Contact",
+					"body": "For any questions regarding these Terms, contact egorzozulia@gmail.com."
+				}
+			]
 		}
 	},
 	"login": {

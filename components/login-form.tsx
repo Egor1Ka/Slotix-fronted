@@ -62,8 +62,8 @@ export function LoginForm({
 				</CardContent>
 			</Card>
 			<FieldDescription className="px-6 text-center">
-				{t('terms')} <a href="#">{t('termsOfService')}</a> {t('and')}{' '}
-				<a href="#">{t('privacyPolicy')}</a>.
+				{t('terms')} <Link href="/terms">{t('termsOfService')}</Link>{' '}
+				{t('and')} <Link href="/privacy">{t('privacyPolicy')}</Link>.
 			</FieldDescription>
 		</div>
 	)
