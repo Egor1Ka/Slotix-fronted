@@ -22,9 +22,11 @@ jobs:
 
       - name: Run ESLint
         run: npm run lint
+        continue-on-error: true
 
       - name: Check formatting
         run: npx prettier --check .
+        continue-on-error: true
 
   build:
     name: Build

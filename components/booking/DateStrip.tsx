@@ -80,6 +80,16 @@ function DateStrip({
 	const today = startOfToday()
 	const [windowStart, setWindowStart] = useState<Date>(today)
 	const [pickerOpen, setPickerOpen] = useState(false)
+	const [prevSelectedDate, setPrevSelectedDate] = useState<string>(selectedDate)
+
+	if (selectedDate && selectedDate !== prevSelectedDate) {
+		setPrevSelectedDate(selectedDate)
+		const selected = parseYMD(selectedDate)
+		const lastVisible = addDays(windowStart, daysAhead - 1)
+		const outsideWindow =
+			isBefore(selected, windowStart) || isBefore(lastVisible, selected)
+		if (outsideWindow) setWindowStart(selected)
+	}
 
 	const days = useMemo(
 		() => buildDayList(windowStart, daysAhead),
@@ -87,15 +97,6 @@ function DateStrip({
 	)
 	const todayStr = formatYMD(today)
 	const weekday = formatWeekdayShort(locale)
-
-	useEffect(() => {
-		if (!selectedDate) return
-		const selected = parseYMD(selectedDate)
-		const lastVisible = addDays(windowStart, daysAhead - 1)
-		const outsideWindow =
-			isBefore(selected, windowStart) || isBefore(lastVisible, selected)
-		if (outsideWindow) setWindowStart(selected)
-	}, [selectedDate, daysAhead]) // eslint-disable-line react-hooks/exhaustive-deps
 
 	useEffect(() => {
 		const node = containerRef.current
