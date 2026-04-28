@@ -132,11 +132,11 @@ function ProfileInfoBlock({
 				>
 					<div className="overflow-hidden">
 						{isOrg && imageSource && (
-							<div className="mb-4 overflow-hidden rounded-xl">
+							<div className="bg-muted/50 mb-4 flex max-h-[420px] w-full justify-center overflow-hidden rounded-xl">
 								<img
 									src={imageSource}
 									alt={name}
-									className="aspect-3/1 w-full object-cover"
+									className="block h-auto max-h-[420px] w-auto max-w-full object-contain"
 								/>
 							</div>
 						)}

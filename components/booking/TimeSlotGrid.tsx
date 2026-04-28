@@ -30,7 +30,7 @@ function TimeSlotGrid({
 
 	if (loading) {
 		return (
-			<div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+			<div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
 				{SKELETON_ITEMS.map(renderSkeletonSlot)}
 			</div>
 		)
@@ -72,7 +72,7 @@ function TimeSlotGrid({
 	return (
 		<div
 			className={cn(
-				'grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4',
+				'grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6',
 				loading && 'pointer-events-none opacity-50',
 			)}
 		>

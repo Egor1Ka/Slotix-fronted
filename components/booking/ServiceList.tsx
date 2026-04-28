@@ -1,7 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { BanknoteIcon, ClockIcon } from 'lucide-react'
+import { BanknoteIcon, ClockIcon, InfoIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -99,18 +99,20 @@ function ServiceList({
 								</div>
 							)}
 						</div>
-						<div className="flex flex-col gap-1.5 p-4">
+						<div className="flex flex-col gap-1.5 px-4 py-2">
 							<span className="line-clamp-2 text-base leading-tight font-semibold">
 								{eventType.name}
 							</span>
-							<span className="text-primary mt-0.5 inline-flex items-center gap-1.5 text-base font-bold">
-								<BanknoteIcon className="size-4 shrink-0" />
-								{eventType.price} {eventType.currency}
-							</span>
-							<span className="text-muted-foreground inline-flex items-center gap-1.5 text-xs">
-								<ClockIcon className="size-3.5 shrink-0" />
-								{eventType.durationMin} {t('min')}
-							</span>
+							<div className="flex flex-col">
+								<span className="text-primary mt-0.5 inline-flex items-center gap-1.5 text-base font-bold">
+									<BanknoteIcon className="size-4 shrink-0" />
+									{eventType.price} {eventType.currency}
+								</span>
+								<span className="text-muted-foreground inline-flex items-center gap-1.5 text-xs">
+									<ClockIcon className="size-3.5 shrink-0" />
+									{eventType.durationMin} {t('min')}
+								</span>
+							</div>
 						</div>
 					</button>
 					<div className="absolute top-2 right-2">
@@ -124,38 +126,57 @@ function ServiceList({
 		}
 
 		return (
-			<button
+			<div
 				key={eventType.id}
-				type="button"
-				onClick={handleClick}
-				disabled={isDisabled}
 				className={cn(
-					'flex items-center gap-3 rounded-lg border p-3 text-left transition-all',
+					'relative rounded-lg border transition-all',
 					isActive
 						? 'border-primary bg-primary/10 ring-primary/30 shadow-sm ring-2'
 						: 'border-border hover:bg-muted',
 					isDisabled && 'cursor-not-allowed opacity-40 hover:bg-transparent',
 				)}
 			>
-				<Avatar className="size-10 shrink-0 rounded-md">
-					{eventType.image ? (
-						<AvatarImage src={eventType.image} alt="" />
-					) : null}
-					<AvatarFallback
-						className="text-sm"
-						style={{ backgroundColor: eventType.color }}
-					>
-						{getInitial(eventType.name)}
-					</AvatarFallback>
-				</Avatar>
-				<div className="flex-1">
-					<div className="text-sm font-medium">{eventType.name}</div>
-					<div className="text-muted-foreground text-xs">
-						{eventType.durationMin} {t('min')} · {eventType.price}{' '}
-						{eventType.currency}
+				<button
+					type="button"
+					onClick={handleClick}
+					disabled={isDisabled}
+					className="flex w-full items-center gap-3 p-2 pr-9 text-left disabled:cursor-not-allowed"
+				>
+					<Avatar className="size-10 shrink-0 rounded-md">
+						{eventType.image ? (
+							<AvatarImage src={eventType.image} alt="" />
+						) : null}
+						<AvatarFallback
+							className="text-sm"
+							style={{ backgroundColor: eventType.color }}
+						>
+							{getInitial(eventType.name)}
+						</AvatarFallback>
+					</Avatar>
+					<div className="min-w-0 flex-1">
+						<div className="line-clamp-2 text-base leading-tight font-medium">
+							{eventType.name}
+						</div>
+						<div className="text-muted-foreground mt-1 text-sm">
+							{eventType.durationMin} {t('min')} · {eventType.price}{' '}
+							{eventType.currency}
+						</div>
 					</div>
-				</div>
-			</button>
+				</button>
+				<ServiceInfoSheet
+					eventType={eventType}
+					onBook={isDisabled ? undefined : handleBookFromSheet}
+					trigger={
+						<button
+							type="button"
+							aria-label={t('aboutService')}
+							className="text-muted-foreground hover:bg-muted hover:text-foreground absolute top-2 right-2 flex size-7 items-center justify-center rounded-full transition-colors"
+						>
+							<InfoIcon className="size-3.5" />
+						</button>
+					}
+				/>
+			</div>
 		)
 	}
 
@@ -169,9 +190,7 @@ function ServiceList({
 			className={cn(
 				'gap-3 transition-opacity',
 				loading && 'pointer-events-none opacity-50',
-				isHorizontal
-					? 'flex overflow-x-auto px-1 pt-1.5 pb-3'
-					: 'flex flex-col',
+				isHorizontal ? 'flex overflow-x-auto px-1 pt-2 pb-2' : 'flex flex-col',
 			)}
 		>
 			{!isHorizontal && (
