@@ -223,6 +223,7 @@ const createStaffStrategy = (params: StaffStrategyParams): CalendarStrategy => {
 					eventTypes={eventTypes}
 					selectedId={selectedEventTypeId}
 					onSelect={onSelectEventType}
+					hideStaff
 				/>
 			)
 		},

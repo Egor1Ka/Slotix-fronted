@@ -13,6 +13,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Spinner } from '@/components/ui/spinner'
+import { cn } from '@/lib/utils'
 import { eventTypeApi } from '@/lib/booking-api-client'
 import { StaffInfoSheet } from './StaffInfoSheet'
 import type {
@@ -24,6 +25,7 @@ interface ServiceInfoSheetProps {
 	eventType: EventType
 	onBook?: () => void
 	trigger?: React.ReactElement
+	hideStaff?: boolean
 }
 
 const getInitial = (text: string): string =>
@@ -67,6 +69,7 @@ function ServiceInfoSheet({
 	eventType,
 	onBook,
 	trigger,
+	hideStaff = false,
 }: ServiceInfoSheetProps) {
 	const t = useTranslations('booking')
 	const [open, setOpen] = useState(false)
@@ -74,7 +77,7 @@ function ServiceInfoSheet({
 	const [staffLoaded, setStaffLoaded] = useState(false)
 
 	useEffect(() => {
-		if (!open || staffLoaded) return
+		if (hideStaff || !open || staffLoaded) return
 		const load = async () => {
 			try {
 				const data = await eventTypeApi.getStaffForEventType(eventType.id)
@@ -86,7 +89,7 @@ function ServiceInfoSheet({
 			}
 		}
 		load()
-	}, [open, eventType.id, staffLoaded])
+	}, [hideStaff, open, eventType.id, staffLoaded])
 
 	const handleBook = () => {
 		setOpen(false)
@@ -145,27 +148,34 @@ function ServiceInfoSheet({
 					)}
 				</div>
 
-				<section className="flex flex-col gap-3 px-6 pt-5 pb-4">
-					<h4 className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-						{t('whoLeads')}
-					</h4>
-					{!staffLoaded ? (
-						<div className="text-muted-foreground flex items-center gap-2 px-2 text-sm">
-							<Spinner className="size-4" />
-							{t('loading')}
-						</div>
-					) : !staff || staff.length === 0 ? (
-						<div className="text-muted-foreground px-2 text-sm">
-							{t('anyStaff')}
-						</div>
-					) : (
-						<div className="flex flex-col gap-1">
-							{staff.map(renderStaffItem)}
-						</div>
-					)}
-				</section>
+				{!hideStaff && (
+					<section className="flex flex-col gap-3 px-6 pt-5 pb-4">
+						<h4 className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+							{t('whoLeads')}
+						</h4>
+						{!staffLoaded ? (
+							<div className="text-muted-foreground flex items-center gap-2 px-2 text-sm">
+								<Spinner className="size-4" />
+								{t('loading')}
+							</div>
+						) : !staff || staff.length === 0 ? (
+							<div className="text-muted-foreground px-2 text-sm">
+								{t('anyStaff')}
+							</div>
+						) : (
+							<div className="flex flex-col gap-1">
+								{staff.map(renderStaffItem)}
+							</div>
+						)}
+					</section>
+				)}
 
-				<section className="flex flex-col gap-2 border-t px-6 py-5">
+				<section
+					className={cn(
+						'flex flex-col gap-2 px-6 py-5',
+						!hideStaff && 'border-t',
+					)}
+				>
 					<h2 className="text-2xl font-bold tracking-tight">
 						{eventType.name}
 					</h2>

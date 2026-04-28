@@ -206,6 +206,7 @@ const createClientStrategy = (
 					eventTypes={eventTypes}
 					selectedId={selectedEventTypeId}
 					onSelect={onSelectEventType}
+					hideStaff
 				/>
 			)
 		},

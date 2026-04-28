@@ -411,6 +411,7 @@ function SlotListView({
 					loading={loading}
 					variant="horizontal"
 					allowedIds={allowedIdsForPendingSlot}
+					hideStaff={variant === 'personal'}
 				/>
 			</section>
 

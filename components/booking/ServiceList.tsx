@@ -18,6 +18,7 @@ interface ServiceListProps {
 	loading?: boolean
 	variant?: 'vertical' | 'horizontal'
 	allowedIds?: Set<string>
+	hideStaff?: boolean
 }
 
 const SKELETON_ITEMS = [1, 2, 3, 4]
@@ -52,6 +53,7 @@ function ServiceList({
 	loading = false,
 	variant = 'vertical',
 	allowedIds,
+	hideStaff = false,
 }: ServiceListProps) {
 	const t = useTranslations('booking')
 
@@ -119,6 +121,7 @@ function ServiceList({
 						<ServiceInfoSheet
 							eventType={eventType}
 							onBook={isDisabled ? undefined : handleBookFromSheet}
+							hideStaff={hideStaff}
 						/>
 					</div>
 				</div>
@@ -166,6 +169,7 @@ function ServiceList({
 				<ServiceInfoSheet
 					eventType={eventType}
 					onBook={isDisabled ? undefined : handleBookFromSheet}
+					hideStaff={hideStaff}
 					trigger={
 						<button
 							type="button"
