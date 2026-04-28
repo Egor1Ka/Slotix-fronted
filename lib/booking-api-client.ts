@@ -1,3 +1,6 @@
+'use client'
+
+import { toast } from 'sonner'
 import type {
 	StaffBySlugResponse,
 	EventType,
@@ -32,6 +35,11 @@ interface ApiResponse<T> {
 	status: string
 }
 
+// Те же исключения, что в createToastInterceptor для основного API:
+// 401 — обрабатывается рефрешем, validationError — идёт в поля формы.
+const isToastSuppressedStatus = (httpStatus: number, backendStatus?: string): boolean =>
+	httpStatus === 401 || backendStatus === 'validationError'
+
 const fetchApi = async <T>(
 	path: string,
 	options: RequestInit = {},
@@ -48,15 +56,17 @@ const fetchApi = async <T>(
 
 	const contentType = res.headers.get('content-type') ?? ''
 	if (!contentType.includes('application/json')) {
-		throw new Error(
-			`API error: ${res.status} — expected JSON, got ${contentType || 'unknown'}`,
-		)
+		const message = `API error: ${res.status} — expected JSON, got ${contentType || 'unknown'}`
+		if (!isToastSuppressedStatus(res.status)) toast.error(message)
+		throw new Error(message)
 	}
 
 	const json: ApiResponse<T> = await res.json()
 
 	if (!res.ok) {
-		throw new Error(json.status || `API error: ${res.status}`)
+		const message = json.status || `API error: ${res.status}`
+		if (!isToastSuppressedStatus(res.status, json.status)) toast.error(message)
+		throw new Error(message)
 	}
 
 	return json.data
