@@ -19,6 +19,7 @@ import { ServiceList } from './ServiceList'
 import { TimeSlotGrid } from './TimeSlotGrid'
 import { StaffSlotCard } from './StaffSlotCard'
 import { BookingFlowDialog } from './BookingFlowDialog'
+import { DateStrip } from './DateStrip'
 import { useFindNearestSlots } from '@/lib/calendar/hooks/useFindNearestSlots'
 import { formatYMD } from '@/lib/calendar/utils'
 import type { ClientInfoData } from './ClientInfoForm'
@@ -391,12 +392,12 @@ function SlotListView({
 	}
 
 	return (
-		<div className="flex flex-col gap-6">
+		<div className="flex flex-col gap-3">
 			{/* Service selection */}
 			<section
 				ref={serviceListRef}
 				className={cn(
-					'flex flex-col gap-3 rounded-2xl transition-all',
+					'flex flex-col rounded-2xl transition-all',
 					highlightServices && 'ring-primary/40 ring-2 ring-offset-2',
 				)}
 			>
@@ -415,13 +416,21 @@ function SlotListView({
 
 			{/* Date picker + slots — side by side on desktop */}
 			<div className="flex flex-col gap-4 md:flex-row md:items-start md:gap-6">
+				<DateStrip
+					selectedDate={dateStr}
+					onDateChange={onDateChange}
+					locale={locale}
+					dateFnsLocale={dateFnsLocale}
+					className="md:hidden"
+				/>
+
 				<Calendar
 					mode="single"
 					selected={new Date(dateStr + 'T00:00:00')}
 					onSelect={handleCalendarSelect}
 					disabled={{ before: new Date() }}
 					locale={dateFnsLocale}
-					className="bg-card shrink-0 rounded-xl border p-3 shadow-sm"
+					className="bg-card hidden shrink-0 rounded-xl border p-3 shadow-sm md:block"
 				/>
 
 				<div className="flex flex-1 flex-col gap-3">

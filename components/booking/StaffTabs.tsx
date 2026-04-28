@@ -66,21 +66,23 @@ function StaffTabs({
 				type="button"
 				onClick={handleClick(member)}
 				className={cn(
-					'flex items-center gap-2 py-2 pr-1 pl-3',
+					'flex items-center gap-2 py-2.5 pl-3.5',
 					behavior === 'select-one' && 'cursor-pointer',
 					behavior === 'show-all' && 'cursor-default',
 				)}
 			>
-				<Avatar className="size-6">
+				<Avatar className="size-9">
 					<AvatarImage src={member.avatar} alt={member.name} />
-					<AvatarFallback className="text-[10px]">
+					<AvatarFallback className="text-xs">
 						{getInitials(member.name)}
 					</AvatarFallback>
 				</Avatar>
 				<div className="flex flex-col items-start">
-					<span className="text-sm font-medium">{member.name}</span>
+					<span className="text-base font-medium lg:text-lg">
+						{member.name}
+					</span>
 					{member.position && (
-						<span className="text-muted-foreground text-[10px] leading-tight">
+						<span className="text-muted-foreground text-xs leading-tight">
 							{member.position}
 						</span>
 					)}
@@ -99,7 +101,7 @@ function StaffTabs({
 	return (
 		<div
 			className={cn(
-				'flex gap-2 overflow-x-auto pb-2 transition-opacity',
+				'flex gap-2 overflow-x-auto transition-opacity',
 				loading && 'pointer-events-none opacity-50',
 			)}
 		>
@@ -108,13 +110,13 @@ function StaffTabs({
 					type="button"
 					onClick={handleAllClick}
 					className={cn(
-						'hover:bg-muted flex shrink-0 cursor-pointer items-center gap-2 rounded-lg border-2 px-3 py-2 transition-all',
+						'hover:bg-muted flex shrink-0 cursor-pointer items-center gap-2 rounded-lg border-2 px-4 py-2.5 transition-all',
 						allActive
 							? 'border-primary bg-primary/5'
 							: 'text-muted-foreground border-transparent',
 					)}
 				>
-					<span className="text-sm font-medium">{t('allStaff')}</span>
+					<span className="text-base font-medium">{t('allStaff')}</span>
 				</button>
 			)}
 			{staff.map(renderTab)}

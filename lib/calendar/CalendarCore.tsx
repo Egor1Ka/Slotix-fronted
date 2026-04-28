@@ -733,13 +733,13 @@ function CalendarCore({
 			{profileInfo && <ProfileInfoBlock {...profileInfo} />}
 			<div className="flex flex-1 flex-col lg:flex-row">
 				{!hideSidebar && view !== 'list' && (
-					<aside className="hidden w-[220px] shrink-0 flex-col border-r p-4 lg:flex">
+					<aside className="hidden w-[280px] shrink-0 flex-col border-r p-4 lg:flex">
 						{strategy.renderSidebar()}
 					</aside>
 				)}
 
 				<main className="min-w-0 flex-1 p-4">
-					<div className="flex flex-col gap-4">
+					<div className="flex flex-col gap-4 md:gap-2">
 						<div className="flex flex-wrap items-center justify-between gap-2">
 							{view !== 'list' && (
 								<div className="flex items-center gap-1">

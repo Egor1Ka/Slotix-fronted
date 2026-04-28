@@ -93,7 +93,7 @@ function ServiceInfoSheet({
 		if (onBook) onBook()
 	}
 
-	const heroSrc = eventType.ogImage ?? eventType.image ?? null
+	const heroSrc = eventType.ogImage || eventType.image || null
 
 	const defaultTrigger = (
 		<Button
@@ -111,13 +111,25 @@ function ServiceInfoSheet({
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger render={trigger ?? defaultTrigger} />
 			<SheetContent className="w-full overflow-y-auto p-0 sm:max-w-md">
-				<SheetHeader className="sr-only">
+				<SheetHeader
+					style={{
+						position: 'absolute',
+						width: 1,
+						height: 1,
+						padding: 0,
+						margin: -1,
+						overflow: 'hidden',
+						clipPath: 'inset(50%)',
+						whiteSpace: 'nowrap',
+						border: 0,
+					}}
+				>
 					<SheetTitle>{eventType.name}</SheetTitle>
 				</SheetHeader>
 
 				<div
-					className="relative aspect-2/1 w-full overflow-hidden"
-					style={{ backgroundColor: eventType.color }}
+					className="relative w-full shrink-0 overflow-hidden"
+					style={{ aspectRatio: '2 / 1', backgroundColor: eventType.color }}
 				>
 					{heroSrc ? (
 						// eslint-disable-next-line @next/next/no-img-element
