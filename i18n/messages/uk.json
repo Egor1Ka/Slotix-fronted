@@ -609,7 +609,51 @@
 		"groupOrgProfile": "Профіль",
 		"groupSchedule": "Розклад",
 		"groupStructure": "Структура",
+		"groupAnalytics": "Аналітика",
+		"myStats": "Моя статистика",
+		"orgStats": "Статистика організації",
+		"myStatsInOrg": "Моя статистика в цій організації",
 		"billing": "Підписка та платежі"
+	},
+	"stats": {
+		"title": "Статистика",
+		"kpi": {
+			"bookings": "Бронювання",
+			"revenue": "Виторг",
+			"avgTicket": "Середній чек"
+		},
+		"filters": {
+			"dateRange": "Період",
+			"status": "Статус",
+			"staff": "Спеціаліст"
+		},
+		"presets": {
+			"today": "Сьогодні",
+			"7d": "7 днів",
+			"30d": "30 днів",
+			"thisMonth": "Цей місяць",
+			"thisYear": "Цей рік",
+			"custom": "Довільний"
+		},
+		"charts": {
+			"timeseries": "Динаміка",
+			"timeseriesCount": "Бронювання у часі",
+			"timeseriesRevenue": "Виторг у часі",
+			"byStatus": "За статусом",
+			"topServices": "Топ послуг",
+			"topServicesByCount": "Топ послуг за бронюваннями",
+			"topServicesByRevenue": "Топ послуг за виторгом",
+			"topStaff": "Топ спеціалістів",
+			"bookingsCount": "Бронювання",
+			"revenue": "Виторг"
+		},
+		"empty": {
+			"title": "За обраний період бронювань немає",
+			"expandRange": "Розширити до 90 днів"
+		},
+		"errors": {
+			"generic": "Не вдалося завантажити статистику"
+		}
 	},
 	"organizations": {
 		"title": "Мої організації",
@@ -786,7 +830,9 @@
 		"minCharsHint": "Введіть мінімум 3 символи",
 		"alreadyInOrg": "Вже в організації",
 		"invited": "Не прийняв",
-		"timezoneFromOrg": "Часовий пояс визначається організацією"
+		"timezoneFromOrg": "Часовий пояс визначається організацією",
+		"currency": "Валюта",
+		"currencyHint": "Використовується для відображення сум у вашій статистиці."
 	},
 	"profile": {
 		"title": "Профіль",
@@ -830,10 +876,6 @@
 			"popupBlocked": "Не вдалося відкрити посилання. Скопіюйте та відкрийте вручну:",
 			"nowConnected": "Telegram успішно підключено!"
 		},
-		"timezone": "Мій часовий пояс",
-		"timezoneHint": "Визначає ваш особистий розклад. Змініть, якщо ви працюєте в іншій зоні.",
-		"timezoneSaved": "Часовий пояс оновлено",
-		"timezoneSave": "Зберегти",
 		"emailLabel": "Пошта",
 		"orgDisplayNameLabel": "Ваше ім'я в цій організації",
 		"orgDisplayNamePlaceholder": "Залиште пустим, щоб використати глобальне ім'я",

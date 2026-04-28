@@ -67,6 +67,7 @@ interface ScheduleTemplate {
 	slotStepMin: number
 	slotMode: SlotMode
 	timezone: string
+	currency: 'UAH' | 'USD'
 }
 
 type SlotMode = 'fixed' | 'optimal' | 'dynamic'
@@ -163,6 +164,7 @@ interface OrgByIdResponse {
 	website: string | null
 	active: boolean
 	timezone?: string
+	currency?: 'UAH' | 'USD'
 }
 
 interface OrgStaffMember extends StaffMember {

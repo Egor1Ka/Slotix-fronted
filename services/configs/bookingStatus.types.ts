@@ -24,6 +24,10 @@ interface UpdateBookingStatusBody {
 	order?: number
 }
 
+import type { ApiResponse } from './user.config'
+
+export type BookingStatusListResponse = ApiResponse<BookingStatusObject[]>
+
 export type {
 	BookingStatusObject,
 	CreateBookingStatusBody,

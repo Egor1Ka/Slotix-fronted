@@ -41,6 +41,8 @@ import eventTypeApiConfig from './configs/event-type.config'
 import bookingFieldApiConfig from './configs/booking-field.config'
 import userSearchApiConfig from './configs/user-search.config'
 import mediaApiConfig from './configs/media.config'
+import bookingStatusApiConfig from './configs/bookingStatus.config'
+import statsApiConfig from './configs/stats.config'
 
 const defaultInterceptors = {
 	interceptors: {
@@ -75,6 +77,11 @@ export const userSearchApi = createApiMethods(
 	defaultInterceptors,
 )
 export const mediaApi = createApiMethods(mediaApiConfig, defaultInterceptors)
+export const bookingStatusApi = createApiMethods(
+	bookingStatusApiConfig,
+	defaultInterceptors,
+)
+export const statsApi = createApiMethods(statsApiConfig, defaultInterceptors)
 export type { User, UpdateUserBody } from './configs/user.config'
 export type {
 	Plan,
@@ -128,6 +135,22 @@ export type {
 	CustomFieldValue,
 } from './configs/booking-field.types'
 export type { UserSearchResult } from './configs/user-search.types'
+export type {
+	BookingStatusObject,
+	BookingStatusListResponse,
+} from './configs/bookingStatus.types'
+export type {
+	Granularity,
+	StatsScope,
+	StatsResponse,
+	StatsFilters,
+	StatsPreset,
+	StatsKpi,
+	TimeseriesPoint,
+	StatusSlice,
+	TopServiceItem,
+	TopStaffItem,
+} from './configs/stats.types'
 export type {
 	UploadAvatarResponse,
 	StaffAvatarResponse,

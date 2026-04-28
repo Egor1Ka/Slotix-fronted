@@ -117,12 +117,16 @@ function ScheduleViewTab({ staffId, orgId, readOnly }: ScheduleViewTabProps) {
 	const [localTimezone, setLocalTimezone] = useState<string>(
 		schedule?.timezone ?? '',
 	)
+	const [localCurrency, setLocalCurrency] = useState<'UAH' | 'USD'>(
+		schedule?.currency ?? 'UAH',
+	)
 
 	useEffect(() => {
 		if (schedule) {
 			setLocalSlotMode(schedule.slotMode)
 			setLocalSlotStep(schedule.slotStepMin ?? 30)
 			setLocalTimezone(schedule.timezone)
+			setLocalCurrency(schedule.currency)
 		}
 	}, [schedule])
 
@@ -135,6 +139,7 @@ function ScheduleViewTab({ staffId, orgId, readOnly }: ScheduleViewTabProps) {
 				localSlotMode,
 				localSlotStep,
 				localTimezone,
+				localCurrency,
 			)
 			await fetchSchedule()
 			toast.success(t('scheduleSaved'))
@@ -158,6 +163,7 @@ function ScheduleViewTab({ staffId, orgId, readOnly }: ScheduleViewTabProps) {
 				mode,
 				localSlotStep,
 				localTimezone,
+				localCurrency,
 			)
 			await fetchSchedule()
 		} catch (err) {
@@ -170,8 +176,8 @@ function ScheduleViewTab({ staffId, orgId, readOnly }: ScheduleViewTabProps) {
 		}
 	}
 
-	const handleSlotStepChange = async (value: string) => {
-		if (!schedule) return
+	const handleSlotStepChange = async (value: string | null) => {
+		if (!schedule || !value) return
 		const step = Number(value)
 		setLocalSlotStep(step)
 		setSavingMode(true)
@@ -183,6 +189,7 @@ function ScheduleViewTab({ staffId, orgId, readOnly }: ScheduleViewTabProps) {
 				localSlotMode,
 				step,
 				localTimezone,
+				localCurrency,
 			)
 			await fetchSchedule()
 		} catch (err) {
@@ -207,10 +214,38 @@ function ScheduleViewTab({ staffId, orgId, readOnly }: ScheduleViewTabProps) {
 				localSlotMode,
 				localSlotStep,
 				tz,
+				localCurrency,
 			)
 			await fetchSchedule()
 		} catch (err) {
 			setLocalTimezone(schedule.timezone)
+			const message =
+				err instanceof Error ? err.message : t('scheduleSaveError')
+			toast.error(message)
+		} finally {
+			setSavingMode(false)
+		}
+	}
+
+	const handleCurrencyChange = async (value: string | null) => {
+		if (!schedule) return
+		if (value !== 'UAH' && value !== 'USD') return
+		const previous = localCurrency
+		setLocalCurrency(value)
+		setSavingMode(true)
+		try {
+			await scheduleApi.updateTemplate(
+				staffId,
+				orgId ?? null,
+				schedule.weeklyHours,
+				localSlotMode,
+				localSlotStep,
+				localTimezone,
+				value,
+			)
+			await fetchSchedule()
+		} catch (err) {
+			setLocalCurrency(previous)
 			const message =
 				err instanceof Error ? err.message : t('scheduleSaveError')
 			toast.error(message)
@@ -279,6 +314,24 @@ function ScheduleViewTab({ staffId, orgId, readOnly }: ScheduleViewTabProps) {
 						))}
 					</SelectContent>
 				</Select>
+			</div>
+			<div
+				className={cn(
+					'flex flex-col gap-2',
+					savingMode && 'pointer-events-none opacity-50',
+				)}
+			>
+				<Label>{t('currency')}</Label>
+				<Select value={localCurrency} onValueChange={handleCurrencyChange}>
+					<SelectTrigger className="w-44">
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="UAH">UAH (₴)</SelectItem>
+						<SelectItem value="USD">USD ($)</SelectItem>
+					</SelectContent>
+				</Select>
+				<p className="text-muted-foreground text-xs">{t('currencyHint')}</p>
 			</div>
 		</div>
 	)

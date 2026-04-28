@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation'
 import { useLocale, useTranslations } from 'next-intl'
 import Link from 'next/link'
 import {
+	BarChart3,
 	Building2,
 	Calendar,
 	CalendarCog,
@@ -45,6 +46,7 @@ function PersonalSidebar() {
 
 	const scheduleHref = buildHref('/schedule')
 	const myScheduleHref = buildHref('/my-schedule')
+	const statsHref = buildHref('/stats')
 	const myServicesHref = buildHref('/my-services')
 	const profileHref = buildHref('/profile')
 	const billingHref = buildHref('/billing')
@@ -92,6 +94,22 @@ function PersonalSidebar() {
 								>
 									<CalendarCog className="size-4" />
 									<span>{t('myScheduleSettings')}</span>
+								</SidebarMenuButton>
+							</SidebarMenuItem>
+						</SidebarMenu>
+					</SidebarGroupContent>
+				</SidebarGroup>
+				<SidebarGroup>
+					<SidebarGroupLabel>{t('groupAnalytics')}</SidebarGroupLabel>
+					<SidebarGroupContent>
+						<SidebarMenu>
+							<SidebarMenuItem>
+								<SidebarMenuButton
+									render={<Link href={statsHref} />}
+									isActive={isActive(statsHref)}
+								>
+									<BarChart3 className="size-4" />
+									<span>{t('myStats')}</span>
 								</SidebarMenuButton>
 							</SidebarMenuItem>
 						</SidebarMenu>

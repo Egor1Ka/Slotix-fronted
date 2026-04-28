@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react'
 import {
 	Calendar,
 	ArrowLeft,
+	BarChart3,
 	Briefcase,
 	Settings2,
 	ClipboardList,
@@ -74,6 +75,8 @@ function OrgSidebar() {
 	const servicesHref = buildHref(`/manage/${orgId}/services`)
 	const staffScheduleHref = buildHref(`/manage/${orgId}/staff-schedule`)
 	const bookingStatusesHref = buildHref(`/manage/${orgId}/booking-statuses`)
+	const orgStatsHref = buildHref(`/manage/${orgId}/stats`)
+	const myStatsInOrgHref = buildHref(`/org/${orgId}/my-stats`)
 	const myScheduleHref = buildHref(`/org/${orgId}/my-schedule`)
 	const myProfileHref = buildHref(`/org/${orgId}/my-profile`)
 	const orgsHref = buildHref('/organizations')
@@ -182,6 +185,22 @@ function OrgSidebar() {
 								</SidebarMenu>
 							</SidebarGroupContent>
 						</SidebarGroup>
+						<SidebarGroup>
+							<SidebarGroupLabel>{t('groupAnalytics')}</SidebarGroupLabel>
+							<SidebarGroupContent>
+								<SidebarMenu>
+									<SidebarMenuItem>
+										<SidebarMenuButton
+											render={<Link href={orgStatsHref} />}
+											isActive={isActive(orgStatsHref)}
+										>
+											<BarChart3 className="size-4" />
+											<span>{t('orgStats')}</span>
+										</SidebarMenuButton>
+									</SidebarMenuItem>
+								</SidebarMenu>
+							</SidebarGroupContent>
+						</SidebarGroup>
 					</>
 				)}
 				<SidebarGroup>
@@ -204,6 +223,15 @@ function OrgSidebar() {
 								>
 									<UserCircle className="size-4" />
 									<span>{t('myProfile')}</span>
+								</SidebarMenuButton>
+							</SidebarMenuItem>
+							<SidebarMenuItem>
+								<SidebarMenuButton
+									render={<Link href={myStatsInOrgHref} />}
+									isActive={isActive(myStatsInOrgHref)}
+								>
+									<BarChart3 className="size-4" />
+									<span>{t('myStatsInOrg')}</span>
 								</SidebarMenuButton>
 							</SidebarMenuItem>
 						</SidebarMenu>

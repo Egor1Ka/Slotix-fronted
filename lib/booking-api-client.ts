@@ -117,6 +117,7 @@ interface BackendScheduleTemplate {
 	validFrom: string
 	validTo: string | null
 	timezone: string
+	currency: 'UAH' | 'USD'
 	slotMode: SlotMode
 	slotStepMin: number
 	weeklyHours: BackendWeeklyHours[]
@@ -202,6 +203,7 @@ const toFrontendSchedule = (
 	slotStepMin: raw.slotStepMin,
 	slotMode: raw.slotMode,
 	timezone: raw.timezone,
+	currency: raw.currency ?? 'UAH',
 })
 
 const toFrontendBookingResponse = (
@@ -348,6 +350,7 @@ const updateScheduleTemplate = async (
 	slotMode?: SlotMode,
 	slotStepMin?: number,
 	timezone?: string,
+	currency?: 'UAH' | 'USD',
 ): Promise<ScheduleTemplate> => {
 	const body = {
 		staffId,
@@ -356,6 +359,7 @@ const updateScheduleTemplate = async (
 		...(slotMode !== undefined && { slotMode }),
 		...(slotStepMin !== undefined && { slotStepMin }),
 		...(timezone !== undefined && { timezone }),
+		...(currency !== undefined && { currency }),
 	}
 	const raw = await put<BackendScheduleTemplate>('/schedule/template', body)
 	return toFrontendSchedule(raw)

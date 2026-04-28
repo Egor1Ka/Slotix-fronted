@@ -113,6 +113,16 @@ const getTodayStrInTz = (timezone: string): string => {
 	return `${wc.year}-${String(wc.month).padStart(2, '0')}-${String(wc.day).padStart(2, '0')}`
 }
 
+const startOfMonthInTz = (timezone: string): string => {
+	const wc = wallClockInTz(new Date().toISOString(), timezone)
+	return `${wc.year}-${String(wc.month).padStart(2, '0')}-01`
+}
+
+const startOfYearInTz = (timezone: string): string => {
+	const wc = wallClockInTz(new Date().toISOString(), timezone)
+	return `${wc.year}-01-01`
+}
+
 // Возвращает «не раньше чем» в минутах для конкретной даты в заданном timezone.
 // Прошлые дни — Infinity (все слоты отфильтровываются движком),
 // сегодня — текущая минута, будущие дни — 0.
@@ -393,6 +403,8 @@ export {
 	formatHour,
 	formatDateISO,
 	getTodayStrInTz,
+	startOfMonthInTz,
+	startOfYearInTz,
 	getNowMinForDate,
 	formatDateLocale,
 	formatWeekRange,

@@ -609,7 +609,51 @@
 		"groupOrgProfile": "Profile",
 		"groupSchedule": "Schedule",
 		"groupStructure": "Structure",
+		"groupAnalytics": "Analytics",
+		"myStats": "My stats",
+		"orgStats": "Organization stats",
+		"myStatsInOrg": "My stats in this org",
 		"billing": "Billing"
+	},
+	"stats": {
+		"title": "Statistics",
+		"kpi": {
+			"bookings": "Bookings",
+			"revenue": "Revenue",
+			"avgTicket": "Avg ticket"
+		},
+		"filters": {
+			"dateRange": "Date range",
+			"status": "Status",
+			"staff": "Staff"
+		},
+		"presets": {
+			"today": "Today",
+			"7d": "7 days",
+			"30d": "30 days",
+			"thisMonth": "This month",
+			"thisYear": "This year",
+			"custom": "Custom"
+		},
+		"charts": {
+			"timeseries": "Trend",
+			"timeseriesCount": "Bookings over time",
+			"timeseriesRevenue": "Revenue over time",
+			"byStatus": "By status",
+			"topServices": "Top services",
+			"topServicesByCount": "Top services by bookings",
+			"topServicesByRevenue": "Top services by revenue",
+			"topStaff": "Top staff",
+			"bookingsCount": "Bookings",
+			"revenue": "Revenue"
+		},
+		"empty": {
+			"title": "No bookings in the selected range",
+			"expandRange": "Expand to 90 days"
+		},
+		"errors": {
+			"generic": "Failed to load statistics"
+		}
 	},
 	"organizations": {
 		"title": "My organizations",
@@ -786,7 +830,9 @@
 		"minCharsHint": "Enter at least 3 characters",
 		"alreadyInOrg": "Already in organization",
 		"invited": "Invited",
-		"timezoneFromOrg": "Timezone is set by the organization"
+		"timezoneFromOrg": "Timezone is set by the organization",
+		"currency": "Currency",
+		"currencyHint": "Used for amounts on your stats page."
 	},
 	"profile": {
 		"title": "Profile",
@@ -830,10 +876,6 @@
 			"popupBlocked": "Could not open the link. Copy and open it manually:",
 			"nowConnected": "Telegram connected successfully!"
 		},
-		"timezone": "My Timezone",
-		"timezoneHint": "Defines your personal schedule. Change if you work in a different timezone.",
-		"timezoneSaved": "Timezone updated",
-		"timezoneSave": "Save",
 		"emailLabel": "Email",
 		"orgDisplayNameLabel": "Your name in this organization",
 		"orgDisplayNamePlaceholder": "Leave empty to use your global name",
