@@ -15,6 +15,13 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select'
+import {
 	AlertDialog,
 	AlertDialogAction,
 	AlertDialogCancel,
@@ -34,6 +41,8 @@ function OrgProfilePage() {
 	const [timezone, setTimezone] = useState('')
 	const [pendingTimezone, setPendingTimezone] = useState<string | null>(null)
 	const [savingTz, setSavingTz] = useState(false)
+	const [currency, setCurrency] = useState<'UAH' | 'USD'>('UAH')
+	const [savingCurrency, setSavingCurrency] = useState(false)
 
 	const orgId = params.orgId
 
@@ -44,6 +53,7 @@ function OrgProfilePage() {
 			})
 			setOrg(response.data)
 			setTimezone(response.data.timezone ?? '')
+			if (response.data.currency) setCurrency(response.data.currency)
 		} catch {
 			// toast interceptor handles errors
 		} finally {
@@ -124,6 +134,26 @@ function OrgProfilePage() {
 		setPendingTimezone(null)
 	}
 
+	const handleCurrencyChange = (value: string | null) => {
+		if (value === 'UAH' || value === 'USD') setCurrency(value)
+	}
+
+	const handleCurrencySave = async () => {
+		setSavingCurrency(true)
+		try {
+			await orgApi.update({
+				pathParams: { id: orgId },
+				body: { currency },
+			})
+			setOrg((prev) => (prev ? { ...prev, currency } : prev))
+			toast.success(tOrg('currencySaved'))
+		} catch {
+			setCurrency(org?.currency ?? 'UAH')
+		} finally {
+			setSavingCurrency(false)
+		}
+	}
+
 	const uploadLogo = (file: File) => {
 		const fd = new FormData()
 		fd.append('file', file)
@@ -187,6 +217,29 @@ function OrgProfilePage() {
 				/>
 				<Button onClick={handleTimezoneSaveClick} disabled={savingTz}>
 					{tOrg('timezoneSave')}
+				</Button>
+			</div>
+
+			<Separator />
+
+			<div className="space-y-4">
+				<h2 className="text-lg font-semibold">{tOrg('currencySection')}</h2>
+				<Select
+					value={currency}
+					onValueChange={handleCurrencyChange}
+					disabled={savingCurrency}
+				>
+					<SelectTrigger className="w-44">
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="UAH">UAH (₴)</SelectItem>
+						<SelectItem value="USD">USD ($)</SelectItem>
+					</SelectContent>
+				</Select>
+				<p className="text-muted-foreground text-sm">{tOrg('currencyHint')}</p>
+				<Button onClick={handleCurrencySave} disabled={savingCurrency}>
+					{tOrg('currencySave')}
 				</Button>
 			</div>
 

@@ -29,6 +29,7 @@ interface UpdateOrgBody {
 	website?: string | null
 	brandColor?: string | null
 	timezone?: string
+	currency?: 'UAH' | 'USD'
 }
 
 interface AddStaffBody {

@@ -315,24 +315,31 @@ function ScheduleViewTab({ staffId, orgId, readOnly }: ScheduleViewTabProps) {
 					</SelectContent>
 				</Select>
 			</div>
-			<div
-				className={cn(
-					'flex flex-col gap-2',
-					savingMode && 'pointer-events-none opacity-50',
-				)}
-			>
-				<Label>{t('currency')}</Label>
-				<Select value={localCurrency} onValueChange={handleCurrencyChange}>
-					<SelectTrigger className="w-44">
-						<SelectValue />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectItem value="UAH">UAH (₴)</SelectItem>
-						<SelectItem value="USD">USD ($)</SelectItem>
-					</SelectContent>
-				</Select>
-				<p className="text-muted-foreground text-xs">{t('currencyHint')}</p>
-			</div>
+			{orgId ? (
+				<div className="text-muted-foreground text-sm">
+					{t('currencyFromOrg')}:{' '}
+					<span className="font-medium">{localCurrency}</span>
+				</div>
+			) : (
+				<div
+					className={cn(
+						'flex flex-col gap-2',
+						savingMode && 'pointer-events-none opacity-50',
+					)}
+				>
+					<Label>{t('currency')}</Label>
+					<Select value={localCurrency} onValueChange={handleCurrencyChange}>
+						<SelectTrigger className="w-44">
+							<SelectValue />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="UAH">UAH (₴)</SelectItem>
+							<SelectItem value="USD">USD ($)</SelectItem>
+						</SelectContent>
+					</Select>
+					<p className="text-muted-foreground text-xs">{t('currencyHint')}</p>
+				</div>
+			)}
 		</div>
 	)
 }

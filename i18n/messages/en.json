@@ -699,6 +699,10 @@
 		"timezoneWarningDesc": "New schedules will be created in the new timezone. Existing schedules will not change. Continue?",
 		"timezoneWarningConfirm": "Continue",
 		"timezoneWarningCancel": "Cancel",
+		"currencySection": "Organization Currency",
+		"currencyHint": "Used for all organization services and bookings.",
+		"currencySaved": "Organization currency updated",
+		"currencySave": "Save",
 		"logo": {
 			"title": "Logo",
 			"uploadLogo": "Upload logo",
@@ -832,7 +836,8 @@
 		"invited": "Invited",
 		"timezoneFromOrg": "Timezone is set by the organization",
 		"currency": "Currency",
-		"currencyHint": "Used for amounts on your stats page."
+		"currencyHint": "Used for amounts on your stats page.",
+		"currencyFromOrg": "Currency is set by the organization"
 	},
 	"profile": {
 		"title": "Profile",
