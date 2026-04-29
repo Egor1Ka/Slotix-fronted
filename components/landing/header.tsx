@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 import { getUser } from '@/lib/auth/get-user'
+import { buildLoginHref } from '@/lib/auth/build-login-href'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { Logo } from '@/components/logo'
@@ -8,7 +9,7 @@ import { Logo } from '@/components/logo'
 async function Header() {
 	const t = await getTranslations('landing')
 	const user = await getUser()
-	const authHref = user ? '/organizations' : '/login'
+	const authHref = user ? '/organizations' : buildLoginHref('/my-services')
 
 	return (
 		<header

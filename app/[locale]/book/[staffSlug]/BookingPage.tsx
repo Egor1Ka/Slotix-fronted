@@ -231,6 +231,9 @@ function BookingPage({
 				phone: staff.phone ?? null,
 				website: staff.website ?? null,
 				isOrg: false,
+				staffId: staff.id,
+				staffBio: staff.bio ?? staff.description ?? null,
+				staffPosition: staff.position ?? null,
 			}
 
 	// ── Derived data ──

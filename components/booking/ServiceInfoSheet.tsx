@@ -15,11 +15,15 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Spinner } from '@/components/ui/spinner'
 import { cn } from '@/lib/utils'
 import { eventTypeApi } from '@/lib/booking-api-client'
+import { ReviewSection } from '@/components/reviews/ReviewSection'
+import { RatingSummary } from '@/components/reviews/RatingSummary'
+import { useOptionalUser } from '@/lib/auth/user-provider'
 import { StaffInfoSheet } from './StaffInfoSheet'
 import type {
 	EventType,
 	OrgStaffMember,
 } from '@/services/configs/booking.types'
+import type { RatingSummary as RatingSummaryData } from '@/services'
 
 interface ServiceInfoSheetProps {
 	eventType: EventType
@@ -72,9 +76,17 @@ function ServiceInfoSheet({
 	hideStaff = false,
 }: ServiceInfoSheetProps) {
 	const t = useTranslations('booking')
+	const tReviews = useTranslations('reviews')
+	const currentUser = useOptionalUser()
+	const currentUserId = currentUser?.id ?? null
 	const [open, setOpen] = useState(false)
 	const [staff, setStaff] = useState<OrgStaffMember[] | null>(null)
 	const [staffLoaded, setStaffLoaded] = useState(false)
+	const [summary, setSummary] = useState<RatingSummaryData | null>(null)
+	const [descExpanded, setDescExpanded] = useState(false)
+	const handleToggleDesc = () => setDescExpanded((prev) => !prev)
+	const description = eventType.description ?? null
+	const isLongDescription = description ? description.length > 180 : false
 
 	useEffect(() => {
 		if (hideStaff || !open || staffLoaded) return
@@ -176,9 +188,20 @@ function ServiceInfoSheet({
 						!hideStaff && 'border-t',
 					)}
 				>
-					<h2 className="text-2xl font-bold tracking-tight">
-						{eventType.name}
-					</h2>
+					<div className="flex items-start justify-between gap-3">
+						<h2 className="text-2xl font-bold tracking-tight">
+							{eventType.name}
+						</h2>
+						{summary && summary.count > 0 ? (
+							<RatingSummary
+								avg={summary.avg}
+								count={summary.count}
+								size="md"
+								variant="badge"
+								className="mt-1 shrink-0"
+							/>
+						) : null}
+					</div>
 					<div className="flex items-baseline gap-2">
 						<span className="text-primary text-xl font-semibold">
 							{eventType.price} {eventType.currency}
@@ -187,12 +210,37 @@ function ServiceInfoSheet({
 							· {eventType.durationMin} {t('min')}
 						</span>
 					</div>
-					{eventType.description ? (
-						<p className="text-foreground/80 mt-2 text-sm leading-relaxed whitespace-pre-wrap">
-							{eventType.description}
-						</p>
+					{description ? (
+						<div className="mt-2 flex flex-col gap-1.5">
+							<p
+								className={cn(
+									'text-foreground/80 text-sm leading-relaxed whitespace-pre-wrap',
+									!descExpanded && isLongDescription && 'line-clamp-4',
+								)}
+							>
+								{description}
+							</p>
+							{isLongDescription ? (
+								<button
+									type="button"
+									onClick={handleToggleDesc}
+									className="text-primary self-start text-xs font-semibold hover:underline"
+								>
+									{descExpanded
+										? tReviews('showLess')
+										: tReviews('showMore')}
+								</button>
+							) : null}
+						</div>
 					) : null}
 				</section>
+
+				<ReviewSection
+					targetType="EventType"
+					targetId={eventType.id}
+					currentUserId={currentUserId}
+					onSummaryChange={setSummary}
+				/>
 
 				{onBook ? (
 					<div className="bg-background sticky bottom-0 border-t p-4">

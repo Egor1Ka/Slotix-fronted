@@ -901,5 +901,22 @@
 	"common": {
 		"cancel": "Cancel",
 		"save": "Save"
+	},
+	"reviews": {
+		"title": "Reviews",
+		"empty": "No reviews yet — be the first",
+		"yourRating": "Your rating",
+		"removeRating": "Remove rating",
+		"loginCta": "Sign in to leave a rating or comment",
+		"loginAction": "Sign in",
+		"commentPlaceholder": "Share your experience…",
+		"submit": "Post",
+		"update": "Save",
+		"edit": "Edit",
+		"delete": "Delete",
+		"cancel": "Cancel",
+		"showMore": "Show more",
+		"showLess": "Show less",
+		"confirmDelete": "Delete this comment?"
 	}
 }

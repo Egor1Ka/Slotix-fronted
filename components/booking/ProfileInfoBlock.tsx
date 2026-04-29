@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { MapPin, Phone, Globe, ChevronDown, ChevronUp } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { StaffInfoSheet } from '@/components/booking/StaffInfoSheet'
 import { cn } from '@/lib/utils'
 
 interface ProfileInfoBlockProps {
@@ -18,6 +19,9 @@ interface ProfileInfoBlockProps {
 	website: string | null
 	isOrg: boolean
 	showThemeToggle?: boolean
+	staffId?: string | null
+	staffBio?: string | null
+	staffPosition?: string | null
 }
 
 const getInitial = (name: string): string => name.charAt(0).toUpperCase()
@@ -33,6 +37,9 @@ function ProfileInfoBlock({
 	website,
 	isOrg,
 	showThemeToggle = false,
+	staffId,
+	staffBio,
+	staffPosition,
 }: ProfileInfoBlockProps) {
 	const t = useTranslations('profile')
 	const [open, setOpen] = useState(false)
@@ -40,11 +47,22 @@ function ProfileInfoBlock({
 	const hasContactInfo = address || phone || website
 	const hasDescription = description && description.length > 0
 	const hasDetails = hasDescription || hasContactInfo
+	const showStaffInfoTrigger = !isOrg && !!staffId
 
 	const toggleOpen = () => setOpen((prev) => !prev)
 	const imageSource = isOrg ? logo : avatar
 	const toggleLabel = open ? t('hide') : isOrg ? t('aboutUs') : t('about')
 	const showHeaderAvatar = !open
+
+	const staffInfoSheet = showStaffInfoTrigger ? (
+		<StaffInfoSheet
+			staffId={staffId as string}
+			name={name}
+			avatar={avatar ?? ''}
+			position={staffPosition ?? null}
+			bio={staffBio ?? null}
+		/>
+	) : null
 
 	if (!hasDetails) {
 		return (
@@ -72,6 +90,7 @@ function ProfileInfoBlock({
 							</span>
 						)}
 					</span>
+					{staffInfoSheet}
 					{showThemeToggle && <ThemeToggle />}
 				</div>
 			</div>
@@ -121,6 +140,7 @@ function ProfileInfoBlock({
 							)}
 						</span>
 					</button>
+					{staffInfoSheet}
 					{showThemeToggle && <ThemeToggle />}
 				</div>
 

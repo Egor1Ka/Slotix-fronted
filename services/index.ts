@@ -43,6 +43,8 @@ import userSearchApiConfig from './configs/user-search.config'
 import mediaApiConfig from './configs/media.config'
 import bookingStatusApiConfig from './configs/bookingStatus.config'
 import statsApiConfig from './configs/stats.config'
+import ratingApiConfig from './configs/rating.config'
+import commentApiConfig from './configs/comment.config'
 
 const defaultInterceptors = {
 	interceptors: {
@@ -82,6 +84,8 @@ export const bookingStatusApi = createApiMethods(
 	defaultInterceptors,
 )
 export const statsApi = createApiMethods(statsApiConfig, defaultInterceptors)
+export const ratingApi = createApiMethods(ratingApiConfig, defaultInterceptors)
+export const commentApi = createApiMethods(commentApiConfig, defaultInterceptors)
 export type { User, UpdateUserBody } from './configs/user.config'
 export type {
 	Plan,
@@ -156,3 +160,14 @@ export type {
 	StaffAvatarResponse,
 } from './configs/media.config'
 export type { AssetType, UploadConfig } from './configs/media.types'
+export type {
+	RatingTargetType,
+	RatingSummary,
+	SetRatingBody,
+} from './configs/rating.types'
+export type {
+	ReviewComment,
+	CommentAuthor,
+	CommentListResponse,
+	CommentBody,
+} from './configs/comment.types'

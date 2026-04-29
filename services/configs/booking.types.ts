@@ -45,6 +45,8 @@ interface EventType {
 	staffPolicy: 'any' | 'by_position' | 'specific'
 	assignedPositions: string[]
 	assignedStaff: string[]
+	avgRating?: number | null
+	ratingCount?: number
 }
 
 // ── Schedule ──

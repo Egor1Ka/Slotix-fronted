@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { cookies } from 'next/headers'
 import { getLocale, getTranslations } from 'next-intl/server'
 import { getUser } from '@/lib/auth/get-user'
+import { buildLoginHref } from '@/lib/auth/build-login-href'
 import {
 	ArrowRight,
 	Check,
@@ -106,13 +107,14 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function LandingPage() {
 	const t = await getTranslations('landing')
 	const user = await getUser()
-	const authHref = user ? '/organizations' : '/login'
+	const loginHref = buildLoginHref('/my-services')
+	const authHref = user ? '/organizations' : loginHref
 	const hasSub = user ? await hasActiveSubscription() : false
 	const businessHref = user
 		? hasSub
 			? '/organizations'
 			: checkoutHref
-		: '/login'
+		: loginHref
 
 	const preview: PreviewTranslations = {
 		day: t('preview.day'),
