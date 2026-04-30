@@ -23,26 +23,11 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select'
+import { ColorPicker } from '@/components/ui/color-picker'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { TimezoneSelector } from '@/components/shared/TimezoneSelector'
 import { orgApi, setServerErrors } from '@/services'
 import type { Plan } from '@/services'
-
-// Предустановленные цвета бренда
-const PRESET_COLORS = [
-	'#1a1a2e',
-	'#16213e',
-	'#0f3460',
-	'#533483',
-	'#e94560',
-	'#ff6b6b',
-	'#feca57',
-	'#48dbfb',
-	'#0abde3',
-	'#10ac84',
-	'#01a3a4',
-	'#2d3436',
-]
 
 const createOrgSchema = z.object({
 	name: z
@@ -88,7 +73,6 @@ function CreateOrgDialog({ onCreated, plan, orgCount }: CreateOrgDialogProps) {
 		formState: { errors, isSubmitting },
 		reset,
 		setError,
-		setValue,
 	} = useForm<CreateOrgFormData>({
 		resolver: zodResolver(createOrgSchema),
 		defaultValues: {
@@ -118,20 +102,6 @@ function CreateOrgDialog({ onCreated, plan, orgCount }: CreateOrgDialogProps) {
 			}
 		}
 	}
-
-	const selectPresetColor = (color: string) => () => {
-		setValue('brandColor', color)
-	}
-
-	const renderColorOption = (color: string) => (
-		<button
-			key={color}
-			type="button"
-			className="size-6 rounded-full border-2 border-transparent hover:border-gray-400"
-			style={{ backgroundColor: color }}
-			onClick={selectPresetColor(color)}
-		/>
-	)
 
 	return (
 		<>
@@ -182,16 +152,17 @@ function CreateOrgDialog({ onCreated, plan, orgCount }: CreateOrgDialogProps) {
 						</Field>
 
 						<Field data-invalid={!!errors.brandColor || undefined}>
-							<FieldLabel htmlFor="brandColor">
-								{t('form.brandColor')}
-							</FieldLabel>
-							<div className="mb-2 flex flex-wrap gap-2">
-								{PRESET_COLORS.map(renderColorOption)}
-							</div>
-							<Input
-								id="brandColor"
-								placeholder="#1a1a2e"
-								{...register('brandColor')}
+							<FieldLabel htmlFor="brandColor">{t('form.brandColor')}</FieldLabel>
+							<Controller
+								control={control}
+								name="brandColor"
+								render={({ field }) => (
+									<ColorPicker
+										id="brandColor"
+										value={field.value ?? ''}
+										onChange={field.onChange}
+									/>
+								)}
 							/>
 							<FieldError errors={[errors.brandColor]} />
 						</Field>

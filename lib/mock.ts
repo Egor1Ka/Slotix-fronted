@@ -14,7 +14,7 @@ import { wallClockInTz } from '@/lib/calendar/tz'
 const MOCK_STATUS_CONFIRMED: BookingStatusObject = {
 	id: 'mock-status-confirmed',
 	label: 'status_confirmed',
-	color: 'blue',
+	color: '#3B82F6',
 	actions: [],
 	isDefault: true,
 	isArchived: false,
@@ -26,7 +26,7 @@ const MOCK_STATUS_CONFIRMED: BookingStatusObject = {
 const MOCK_STATUS_COMPLETED: BookingStatusObject = {
 	id: 'mock-status-completed',
 	label: 'status_completed',
-	color: 'green',
+	color: '#10B981',
 	actions: [],
 	isDefault: false,
 	isArchived: false,

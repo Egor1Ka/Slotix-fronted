@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import { useTranslations } from 'next-intl'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { toast } from 'sonner'
@@ -16,19 +16,9 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
+import { ColorPicker, DEFAULT_COLOR_PALETTE } from '@/components/ui/color-picker'
 import { positionApi, setServerErrors } from '@/services'
 import type { Position } from '@/services'
-
-const PALETTE = [
-	'#8B5CF6',
-	'#06B6D4',
-	'#F59E0B',
-	'#EF4444',
-	'#10B981',
-	'#3B82F6',
-	'#EC4899',
-	'#F97316',
-]
 
 const positionSchema = z.object({
 	name: z.string().min(2),
@@ -62,25 +52,22 @@ function PositionDialog({
 		formState: { errors, isSubmitting },
 		reset,
 		setError,
-		setValue,
-		watch,
+		control,
 	} = useForm<PositionFormData>({
 		resolver: zodResolver(positionSchema),
 		defaultValues: {
 			name: '',
 			level: 0,
-			color: PALETTE[0],
+			color: DEFAULT_COLOR_PALETTE[0],
 		},
 	})
-
-	const selectedColor = watch('color')
 
 	useEffect(() => {
 		if (open) {
 			reset({
 				name: position?.name ?? '',
 				level: position?.level ?? 0,
-				color: position?.color ?? PALETTE[0],
+				color: position?.color ?? DEFAULT_COLOR_PALETTE[0],
 			})
 		}
 	}, [open, position, reset])
@@ -108,26 +95,6 @@ function PositionDialog({
 			}
 		}
 	}
-
-	const selectColor = (color: string) => () => {
-		setValue('color', color, { shouldValidate: true })
-	}
-
-	const isSelected = (color: string) => color === selectedColor
-
-	const renderColorOption = (color: string) => (
-		<button
-			key={color}
-			type="button"
-			className={`size-7 rounded-full border-2 transition-transform ${
-				isSelected(color)
-					? 'border-foreground scale-110'
-					: 'border-transparent hover:border-gray-400'
-			}`}
-			style={{ backgroundColor: color }}
-			onClick={selectColor(color)}
-		/>
-	)
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
@@ -159,9 +126,13 @@ function PositionDialog({
 
 					<Field data-invalid={!!errors.color || undefined}>
 						<FieldLabel>{t('color')}</FieldLabel>
-						<div className="flex flex-wrap gap-2">
-							{PALETTE.map(renderColorOption)}
-						</div>
+						<Controller
+							control={control}
+							name="color"
+							render={({ field }) => (
+								<ColorPicker value={field.value} onChange={field.onChange} />
+							)}
+						/>
 						<FieldError errors={[errors.color]} />
 					</Field>
 

@@ -131,7 +131,7 @@ const createBooking = async (
 	const mockConfirmedStatus: BookingStatusObject = {
 		id: 'mock-status-confirmed',
 		label: 'status_confirmed',
-		color: 'blue',
+		color: '#3B82F6',
 		actions: [],
 		isDefault: true,
 		isArchived: false,
@@ -224,7 +224,7 @@ const cancelById = async (
 	const mockCancelledStatus: BookingStatusObject = {
 		id: 'mock-status-cancelled',
 		label: 'status_cancelled',
-		color: 'red',
+		color: '#EF4444',
 		actions: [],
 		isDefault: false,
 		isArchived: false,

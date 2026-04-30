@@ -40,21 +40,11 @@ import { AvatarUploader } from '@/components/media/AvatarUploader'
 import { SERVICE_PHOTO_UPLOAD_CONFIG } from '@/components/media/AvatarUploader.config'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { validateFile } from '@/hooks/use-file-validation'
+import { ColorPicker, DEFAULT_COLOR_PALETTE } from '@/components/ui/color-picker'
 import type {
 	BookingField,
 	BookingFieldType,
 } from '@/services/configs/booking-field.types'
-
-const PALETTE = [
-	'#8B5CF6',
-	'#06B6D4',
-	'#F59E0B',
-	'#EF4444',
-	'#10B981',
-	'#3B82F6',
-	'#EC4899',
-	'#F97316',
-]
 
 const baseServiceSchema = z.object({
 	name: z.string().min(2),
@@ -214,7 +204,7 @@ function ServiceDialog({
 			name: '',
 			durationMin: 30,
 			price: 0,
-			color: PALETTE[0],
+			color: DEFAULT_COLOR_PALETTE[0],
 			description: '',
 			staffPolicy: 'any',
 			assignedPositions: [],
@@ -222,7 +212,6 @@ function ServiceDialog({
 		},
 	})
 
-	const selectedColor = watch('color')
 	const staffPolicy = watch('staffPolicy')
 	const assignedPositions = watch('assignedPositions')
 	const assignedStaff = watch('assignedStaff')
@@ -271,7 +260,7 @@ function ServiceDialog({
 				name: eventType?.name ?? '',
 				durationMin: eventType?.durationMin ?? 30,
 				price: eventType?.price ?? 0,
-				color: eventType?.color ?? PALETTE[0],
+				color: eventType?.color ?? DEFAULT_COLOR_PALETTE[0],
 				description: eventType?.description ?? '',
 			}
 
@@ -414,28 +403,6 @@ function ServiceDialog({
 			}
 		}
 	}
-
-	// ── Color helpers ──
-
-	const selectColor = (color: string) => () => {
-		setValue('color', color, { shouldValidate: true })
-	}
-
-	const isColorSelected = (color: string) => color === selectedColor
-
-	const renderColorOption = (color: string) => (
-		<button
-			key={color}
-			type="button"
-			className={`size-7 rounded-full border-2 transition-transform ${
-				isColorSelected(color)
-					? 'border-foreground scale-110'
-					: 'border-transparent hover:border-gray-400'
-			}`}
-			style={{ backgroundColor: color }}
-			onClick={selectColor(color)}
-		/>
-	)
 
 	// ── Staff assignment helpers ──
 
@@ -715,9 +682,13 @@ function ServiceDialog({
 
 						<Field data-invalid={!!errors.color || undefined}>
 							<FieldLabel>{t('color')}</FieldLabel>
-							<div className="flex flex-wrap gap-2">
-								{PALETTE.map(renderColorOption)}
-							</div>
+							<Controller
+								control={control}
+								name="color"
+								render={({ field }) => (
+									<ColorPicker value={field.value} onChange={field.onChange} />
+								)}
+							/>
 							<FieldError errors={[errors.color]} />
 						</Field>
 

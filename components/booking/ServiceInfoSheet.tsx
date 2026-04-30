@@ -189,7 +189,7 @@ function ServiceInfoSheet({
 					)}
 				>
 					<div className="flex items-start justify-between gap-3">
-						<h2 className="text-2xl font-bold tracking-tight">
+						<h2 className="min-w-0 flex-1 text-2xl font-bold tracking-tight wrap-break-word">
 							{eventType.name}
 						</h2>
 						{summary && summary.count > 0 ? (
@@ -214,7 +214,7 @@ function ServiceInfoSheet({
 						<div className="mt-2 flex flex-col gap-1.5">
 							<p
 								className={cn(
-									'text-foreground/80 text-sm leading-relaxed whitespace-pre-wrap',
+									'text-foreground/80 text-sm leading-relaxed whitespace-pre-wrap wrap-break-word',
 									!descExpanded && isLongDescription && 'line-clamp-4',
 								)}
 							>

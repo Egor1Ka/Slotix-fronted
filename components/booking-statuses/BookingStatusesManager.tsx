@@ -26,28 +26,7 @@ import {
 import { cn } from '@/lib/utils'
 import { bookingStatusApi } from '@/lib/booking-api-client'
 import type { BookingStatusObject } from '@/services/configs/bookingStatus.types'
-
-const STATUS_COLORS = [
-	'blue',
-	'green',
-	'red',
-	'yellow',
-	'purple',
-	'orange',
-	'gray',
-	'teal',
-]
-
-const COLOR_CLASS: Record<string, string> = {
-	blue: 'bg-blue-500',
-	green: 'bg-green-500',
-	red: 'bg-red-500',
-	yellow: 'bg-yellow-400',
-	purple: 'bg-purple-500',
-	orange: 'bg-orange-500',
-	gray: 'bg-gray-400',
-	teal: 'bg-teal-500',
-}
+import { ColorPicker, DEFAULT_COLOR_PALETTE } from '@/components/ui/color-picker'
 
 const AVAILABLE_ACTIONS = [
 	{ value: 'hideFromSchedule', labelKey: 'hideFromSchedule' as const },
@@ -65,7 +44,7 @@ interface StatusFormState {
 
 const DEFAULT_FORM: StatusFormState = {
 	label: '',
-	color: 'blue',
+	color: DEFAULT_COLOR_PALETTE[5],
 	actions: [],
 }
 
@@ -80,9 +59,9 @@ function ColorDot({
 		<span
 			className={cn(
 				'shrink-0 rounded-full',
-				COLOR_CLASS[color] ?? 'bg-gray-400',
 				size === 'sm' ? 'size-2.5' : 'size-3.5',
 			)}
+			style={{ backgroundColor: color }}
 		/>
 	)
 }
@@ -138,9 +117,8 @@ function BookingStatusesManager({ orgId }: BookingStatusesManagerProps) {
 		setForm((prev) => ({ ...prev, label: e.target.value }))
 	}
 
-	const handleColorSelect = (color: string) => () => {
+	const handleStatusColorChange = (color: string) =>
 		setForm((prev) => ({ ...prev, color }))
-	}
 
 	const handleActionToggle = (value: string) => (checked: boolean) => {
 		setForm((prev) => ({
@@ -336,21 +314,10 @@ function BookingStatusesManager({ orgId }: BookingStatusesManagerProps) {
 
 						<div className="space-y-1.5">
 							<label className="text-sm font-medium">{t('statusColor')}</label>
-							<div className="flex flex-wrap gap-2">
-								{STATUS_COLORS.map((color) => (
-									<button
-										key={color}
-										type="button"
-										onClick={handleColorSelect(color)}
-										className={cn(
-											'size-7 rounded-full transition-transform hover:scale-110',
-											COLOR_CLASS[color] ?? 'bg-gray-400',
-											form.color === color &&
-												'ring-foreground ring-2 ring-offset-2',
-										)}
-									/>
-								))}
-							</div>
+							<ColorPicker
+								value={form.color}
+								onChange={handleStatusColorChange}
+							/>
 						</div>
 
 						{AVAILABLE_ACTIONS.length > 0 && (
